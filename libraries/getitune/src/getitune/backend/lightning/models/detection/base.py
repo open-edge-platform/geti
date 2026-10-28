@@ -39,7 +39,7 @@ from getitune.types.label import LabelInfoTypes
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
-    from datumaro.experimental.fields import TileInfo
+    from getidata.fields import TileInfo
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.backend.lightning.models.detection.detectors import SingleStageDetector

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import Mock
 
-from datumaro.experimental.fields import Subset
+from getidata.fields import Subset
 
 from getitune.data.dataset.tile import (
     TileDatasetFactory,

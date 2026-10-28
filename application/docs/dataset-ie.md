@@ -31,7 +31,7 @@ benefits in terms of maintainability and reliability.
 - Datasets can be arbitrarily large, and most of the operations scale linearly with dataset size.
   - Example of operations: uploading, downloading, archiving, extracting, parsing, transforming.
 - Metadata about the dataset (e.g., type of annotations, labels, number of items) can be obtained without fully loading
-  the dataset into memory, provided that the dataset is stored in Datumaro format.
+  the dataset into memory, provided that the dataset is stored in getidata format.
 - Datasets may be imported to projects of different task types and labels. If so, annotations need to be adapted
   accordingly (see [Task compatibility](#task-compatibility) for more details) and the labels must explicitly re-mapped.
 
@@ -48,13 +48,13 @@ use cases by composing the necessary intermediate steps in a set of endpoints an
 Two important design choices follow from these observations:
 
 1. All datasets that are uploaded or downloaded by the user (directly or via API), must be zip archives in a standard
-   dataset format (Datumaro, COCO, ...).
+   dataset format (Geti, COCO, YOLO or VOC). Legacy Datumaro v1 archives are not supported.
 2. Internally, all processing steps must operate on a common representation of the dataset. In practice, this means
-   `dm.Dataset` objects from Datumaro.
+   `getidata.Dataset` objects from getidata.
 
 The first condition provides users with a stable and familiar interface for working with datasets.
 The second one avoids coupling the import/export logic to the specifics of any dataset format, making it easier to
-add support for new formats in the future; moreover, it allows to take advantage of Datumaro powerful features for
+add support for new formats in the future; moreover, it allows to take advantage of getidata powerful features for
 dataset manipulation and filtering.
 
 After defining _how_ datasets should be represented, the next step is to define _where_ the datasets should be stored
@@ -78,8 +78,8 @@ In the above example, the staging area contains two datasets being processed, ea
 
 - The first one is a zip archive in COCO format. A dataset in this form (compressed) is normally the result of an upload
   operation (for later import) or an export operation (dataset ready for download).
-- The second one is a Datumaro dataset in uncompressed form. This form is ideal for internal processing, as
-  Datumaro datasets can be efficiently filtered and transformed thanks to its internal polars-based representation.
+- The second one is a getidata dataset in uncompressed form. This form is ideal for internal processing, as
+  getidata datasets can be efficiently filtered and transformed thanks to its internal polars-based representation.
 
 Notably, the staging area exists purely in the file system; there is no corresponding representation in the database.
 This is essential to allow users to access the staging area directly, without going through the application API.
@@ -128,7 +128,7 @@ the staging area (import scenarios) or before persisting it to the staging area 
 1. The user uploads a zip archive containing the dataset to be imported, or they put it directly in the staging area
    folder.
 2. The user requests the dataset to be prepared for import, triggering a background job that extracts the archive,
-   converts it to Datumaro format and analyzes it to determine its characteristics (task type, labels, number of media
+   converts it to getidata format and analyzes it to determine its characteristics (task type, labels, number of media
    and annotations).
 3. The user is presented with the dataset information, which helps them configure the actual import in the next step.
 4. The user triggers the import operation, optionally specifying transformations to be applied to the dataset
@@ -144,7 +144,7 @@ the staging area (import scenarios) or before persisting it to the staging area 
 
 1. The user selects the dataset (or dataset revision) to use as source for the copy / fork operation.
    A background job loads the dataset and applies any requested filtering.
-2. The filtered dataset is saved to the staging area in Datumaro format.
+2. The filtered dataset is saved to the staging area in getidata format.
 3. The user triggers the import operation, optionally specifying transformations to be applied to the dataset
    (e.g., label remapping, filtering). The import operation also executes in a background job.
 4. The import job finally inserts the dataset items to the chosen destination, which can be an existing (4.1) or new
@@ -201,21 +201,21 @@ Locked staged datasets (i.e., those currently being processed by a job) must not
 The design relies heavily on background jobs to perform long-running operations. This section describes the main jobs
 involved in dataset import and export.
 
-- **prepare_dataset_for_import**: extracts a compressed dataset archive, saving it to Datumaro format while determining
+- **prepare_dataset_for_import**: extracts a compressed dataset archive, saving it to getidata format while determining
   its characteristics (task type, labels, number of media and annotations).
-- **import_dataset_to_existing_project**: loads a Datumaro dataset and inserts its items into the dataset of a project,
+- **import_dataset_to_existing_project**: loads a getidata dataset and inserts its items into the dataset of a project,
   applying optional filtering, annotation conversion and label remapping.
   If the target is a new project, this job also creates the project.
-- **import_dataset_as_new_project**: creates a new project, then loads a Datumaro dataset and inserts its items into
+- **import_dataset_as_new_project**: creates a new project, then loads a getidata dataset and inserts its items into
   the dataset of the newly created project, applying optional filtering and annotation conversion.
-- **stage_dataset**: loads a project's dataset (or dataset revision) as a Datumaro dataset, applying optional filtering,
-  then saves it to the staging area in Datumaro native format.
-- **export_dataset**: loads a project's dataset (or dataset revision) as a Datumaro dataset, applying optional
+- **stage_dataset**: loads a project's dataset (or dataset revision) as a getidata dataset, applying optional filtering,
+  then saves it to the staging area in getidata native format.
+- **export_dataset**: loads a project's dataset (or dataset revision) as a getidata dataset, applying optional
   filtering, then saves it to the staging area in the requested format (e.g., COCO) as a compressed zip archive.
 
 > [!NOTE]
 > The diagram in the [Data flow](#data-flow) section also shows an operation **prepare-for-export**, to create
-> a zip archive out of a persisted Datumaro dataset. It is shown for completeness, however it is not necessary to
+> a zip archive out of a persisted getidata dataset. It is shown for completeness, however it is not necessary to
 > implement it in practice since the _export_ operation already combines **stage** and **prepare-for-export**.\_
 
 [](ignored)
@@ -284,7 +284,7 @@ _Response:_ success -> JSON list of staged datasets
   },
   {
     "id": "63f983fe-f2c7-4054-a0b1-6aab8a355a12",
-    "format": "datumaro",
+    "format": "geti",
     "compressed": false,
     "ready_for_export": false,
     "ready_for_import": true,
@@ -299,7 +299,7 @@ _Response:_ success -> JSON list of staged datasets
 ]
 ```
 
-The `metadata` field is only returned for staged datasets in uncompressed Datumaro format (ready for import).
+The `metadata` field is only returned for staged datasets in uncompressed getidata format (ready for import).
 
 ---
 
@@ -336,7 +336,7 @@ _Body_:
 ```
 
 - Dataset revision is optional; if not provided, the project's dataset is used.
-- `export_format` can be any of the supported formats (e.g., `coco`, `yolo`, `datumaro`, ...)
+- `export_format` can be any of the supported formats (e.g., `coco`, `yolo`, `geti`, ...)
 - `filters` are optional; if not provided, the entire dataset is exported.
 
 _Response:_ HTTP 201 Created
@@ -350,7 +350,7 @@ _Response:_ HTTP 201 Created
 
 ---
 
-#### Stage dataset (as Datumaro dataset, ready for import)
+#### Stage dataset (as getidata dataset, ready for import)
 
 _Endpoint:_ `POST /api/jobs`
 

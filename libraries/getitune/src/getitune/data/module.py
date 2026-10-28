@@ -10,8 +10,9 @@ import multiprocessing
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
+from getidata.schema import register_type_module_alias
 from lightning import LightningDataModule
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader, RandomSampler
@@ -27,7 +28,7 @@ from getitune.types.label import LabelInfo
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
     from lightning.pytorch.utilities.parsing import AttributeDict
 
     from getitune.data.dataset.base import VisionDataset
@@ -36,6 +37,8 @@ logger = logging.getLogger(__name__)
 
 
 _MP_CONTEXT = multiprocessing.get_context("spawn")
+
+register_type_module_alias("datumaro.experimental", "getidata")
 
 
 # Mapping from getitune subset config names to Datumaro experimental Subset enums
@@ -140,7 +143,7 @@ class DataModule(LightningDataModule):
         """Setup VisionDataset instances from a Datumaro experimental Dataset.
 
         Args:
-            dataset: A ``datumaro.experimental.Dataset`` loaded via ``import_dataset``.
+            dataset: A ``getidata.Dataset`` loaded via ``import_dataset``.
         """
         storage_dtype: str | None = None
         num_channels: int | None = None

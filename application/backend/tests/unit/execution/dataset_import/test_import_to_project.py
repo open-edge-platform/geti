@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import pytest
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from app.execution import ImportDatasetToProject
 from app.models import Task, TaskType

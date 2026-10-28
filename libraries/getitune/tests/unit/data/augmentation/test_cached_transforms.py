@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 import torch
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
+from getidata.fields import ImageInfo as DmImageInfo
 from torchvision import tv_tensors
 
 from getitune.data.augmentation.cache import _clone_for_cache

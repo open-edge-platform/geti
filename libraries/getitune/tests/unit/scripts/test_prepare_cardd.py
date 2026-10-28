@@ -23,8 +23,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 from PIL import Image
 from scripts.benchmark_datasets.prepare_cardd import _build_dataset, _find_coco_root, _polygon_to_array
 

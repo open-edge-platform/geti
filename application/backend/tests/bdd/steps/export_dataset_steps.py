@@ -10,8 +10,8 @@ from typing import cast
 from behave import given, then, when
 from behave.model import Table
 from behave.runner import Context
-from datumaro.experimental import LazyImage, LazyVideoFrame
-from datumaro.experimental.export_import import import_dataset
+from getidata import LazyImage, LazyVideoFrame
+from getidata.export_import import import_dataset
 from requests import Session
 
 from app.api.schemas import ProjectView

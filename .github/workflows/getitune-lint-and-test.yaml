@@ -48,6 +48,7 @@ jobs:
           files_yaml: |
             test:
               - libraries/getitune/**
+              - libraries/getidata/**
               - .github/workflows/getitune-lint-and-test.yaml
               - .github/actions/install-common-deps/**
               - '!**/*.md'

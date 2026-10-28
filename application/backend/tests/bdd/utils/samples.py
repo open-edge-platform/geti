@@ -5,8 +5,8 @@ import secrets
 from uuid import uuid4
 
 import numpy as np
-from datumaro.experimental import LazyImage, LazyVideoFrame, MediaInfo
-from datumaro.experimental.fields import Subset
+from getidata import LazyImage, LazyVideoFrame, MediaInfo
+from getidata.fields import Subset
 
 from app.datumaro_converter import (
     DetectionImportExportSample,

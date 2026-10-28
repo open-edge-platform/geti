@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 from uuid import UUID, uuid4
 
 import pytest
-from datumaro.experimental.categories import HierarchicalLabelCategories
+from getidata.categories import HierarchicalLabelCategories
 from loguru import logger
 
 from app.execution import PrepareDataset

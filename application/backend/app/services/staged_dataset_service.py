@@ -8,7 +8,7 @@ from typing import Any, BinaryIO
 from uuid import UUID, uuid4
 
 from anyio import to_thread
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from app.datumaro_converter.domain.samples.import_export import BaseImportExportSample
 from app.models import AnnotationType, DatasetFormat, StagedDataset
@@ -64,7 +64,7 @@ class _Counts:
 
 
 def _get_dataset_metadata(dataset: Dataset) -> DatasetMetadata:
-    from datumaro.experimental import LazyImage, LazyVideoFrame
+    from getidata import LazyImage, LazyVideoFrame
 
     labels = []
     label_attr_name = "label" if "label" in dataset.schema.attributes else "labels"

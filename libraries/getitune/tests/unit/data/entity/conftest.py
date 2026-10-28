@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import pytest
 import torch
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset
 from torchvision import tv_tensors
 
 from getitune.data.entity.sample import ClassificationSample

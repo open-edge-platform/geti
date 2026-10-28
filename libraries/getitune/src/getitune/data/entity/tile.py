@@ -18,7 +18,7 @@ from getitune.types.task import TaskType
 from .base import ImageInfo
 
 if TYPE_CHECKING:
-    from datumaro.experimental.fields import TileInfo
+    from getidata.fields import TileInfo
     from torch import LongTensor
 
 
