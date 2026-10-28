@@ -9,6 +9,7 @@ import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti-
 import { OverlayTriggerState } from 'react-stately';
 
 import { useImportDatasetAsNewProject } from '../../../../hooks/storage/use-import-dataset-as-new-project.hook';
+import { LARGE_DIALOG_SIZE } from '../../../../shared/dialog-sizes';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-buttons.component';
@@ -19,7 +20,6 @@ import { ImportProcess } from './import-process/import-process.component';
 import { ImportTaskSelection } from './import-task-selection/import-task-selection.component';
 import { ProgressStepper } from './progress-stepper/progress-stepper.component';
 
-import largeDialogClasses from '../../../../shared/styles/large-dialog.module.scss';
 import classes from './import-dataset-as-new-project.module.scss';
 
 type ImportDatasetAsNewProjectProps = {
@@ -44,7 +44,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
     return (
         <DialogContainer onDismiss={dialogState.close}>
             {dialogState.isOpen && (
-                <Dialog aria-label={'import-dataset-dialog'} UNSAFE_className={largeDialogClasses.largeDialog}>
+                <Dialog aria-label={'import-dataset-dialog'} {...LARGE_DIALOG_SIZE}>
                     <Heading>{t('project.import.title')}</Heading>
                     <Divider />
                     <Content UNSAFE_className={classes.container}>

@@ -914,11 +914,11 @@
                 "card": {
                     "numberOfParameters": "Liczba parametrów: {{count}} mln",
                     "gigaflops": "Gigaflopy: {{value}}",
-                    "recommended": "Zalecany"
+                    "recommended": "Rekomendowany"
                 },
                 "sort": {
                     "label": "Sortuj modele według:",
-                    "recommended": "Najpierw zalecane",
+                    "recommended": "Najpierw rekomendowane",
                     "nameAsc": "Nazwa (A do Z)",
                     "nameDesc": "Nazwa (Z do A)",
                     "speedAsc": "Szybkość (najszybsze pierwsze)",
