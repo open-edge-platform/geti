@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 
 import type { DatasetItemAnnotationStatus, DatasetSubset } from '@/api/types';
 
@@ -37,14 +37,10 @@ export const useGetDatasetItemsById = ({
         datasetViewId,
     });
 
-    const accumulatedReviewStatusRef = useRef(new Map<string, boolean>());
-
     const reviewStatus = useMemo(() => {
-        datasetItemsQuery.items.forEach(({ id, user_reviewed }) => {
-            accumulatedReviewStatusRef.current.set(id, user_reviewed);
-        });
+        const entries = datasetItemsQuery.items.map(({ id, user_reviewed }) => [id, user_reviewed] as const);
 
-        return new Map(accumulatedReviewStatusRef.current);
+        return new Map(entries);
     }, [datasetItemsQuery.items]);
 
     return { reviewStatus, ...datasetItemsQuery };

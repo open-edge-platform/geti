@@ -1,9 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { TrainingConfiguration } from '@/api/types';
+import { isEqual } from 'lodash-es';
 
 import {
     useGetModelArchitectureTrainingConfiguration,
@@ -23,25 +24,21 @@ export const useTrainingConfiguration = ({ modelArchitectureId, modelRevisionId 
 
     const modelTrainingConfigurationQuery = useGetModelTrainingConfiguration(modelRevisionId);
 
-    useEffect(() => {
-        if (modelTrainingConfigurationQuery.isSuccess) {
-            setTrainingConfiguration(modelTrainingConfigurationQuery.data);
-        }
-    }, [modelTrainingConfigurationQuery.data, modelTrainingConfigurationQuery.isSuccess]);
-
-    useEffect(() => {
-        if (modelArchitectureTrainingConfigurationQuery.isSuccess) {
-            setTrainingConfiguration(modelArchitectureTrainingConfigurationQuery.data);
-        }
-    }, [modelArchitectureTrainingConfigurationQuery.data, modelArchitectureTrainingConfigurationQuery.isSuccess]);
-
     const [trainingConfiguration, setTrainingConfiguration] = useState<TrainingConfiguration | undefined>(undefined);
 
-    return [
-        trainingConfiguration,
-        setTrainingConfiguration,
+    const defaultTrainingConfiguration =
         modelRevisionId === null
             ? modelArchitectureTrainingConfigurationQuery.data
-            : modelTrainingConfigurationQuery.data,
-    ] as const;
+            : modelTrainingConfigurationQuery.data;
+
+    const [previousTrainingConfiguration, setPreviousTrainingConfiguration] = useState<
+        TrainingConfiguration | undefined
+    >(undefined);
+
+    if (!isEqual(previousTrainingConfiguration, defaultTrainingConfiguration)) {
+        setPreviousTrainingConfiguration(defaultTrainingConfiguration);
+        setTrainingConfiguration(defaultTrainingConfiguration);
+    }
+
+    return [trainingConfiguration, setTrainingConfiguration, defaultTrainingConfiguration] as const;
 };

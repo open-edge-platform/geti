@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { FloatConfigurableRangeParameter } from '@/api/types';
 import { Flex, NumberField, RangeSlider, type RangeValue } from '@geti-ui/ui';
@@ -33,10 +33,10 @@ export const RangeParameterField = ({
     maxValue,
 }: RangeParameterFieldProps) => {
     const [parameterValues, setParameterValues] = useState<RangeValue<number>>({ start: value[0], end: value[1] });
-    const prevValues = useRef<RangeParameterValue>(value);
+    const [prevValues, setPrevValues] = useState<RangeParameterValue>(value);
 
-    if (!isEqual(prevValues.current, value)) {
-        prevValues.current = value;
+    if (!isEqual(prevValues, value)) {
+        setPrevValues(value);
         setParameterValues({ start: value[0], end: value[1] });
     }
 
