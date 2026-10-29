@@ -36,7 +36,7 @@ const useSubset = (subset: DatasetSubset, mediaItem: Media) => {
     const [prev, setPrev] = useState({ mediaItemKey, subset });
 
     if (prev.mediaItemKey !== mediaItemKey || prev.subset !== subset) {
-        setPrev({ mediaItemId, subset });
+        setPrev({ mediaItemKey, subset });
         setPendingSubset(subset);
     }
 
