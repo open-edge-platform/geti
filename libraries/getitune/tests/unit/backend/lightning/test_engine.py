@@ -7,9 +7,11 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
+from getitune.backend.lightning.callbacks.aug_scheduler import AugmentationSchedulerCallback, DataAugSwitch
 from getitune.backend.lightning.engine import LightningEngine
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.backend.lightning.models.classification.multiclass_models import EfficientNetMulticlassCls
+from getitune.data.dataset.mixins import DataAugSwitchMixin
 from getitune.types.export import ExportFormat
 from getitune.types.precision import Precision
 
@@ -334,6 +336,20 @@ class TestEngine:
         mock_model.label_info = fxt_engine.datamodule.label_info
         result = fxt_engine.benchmark(checkpoint=checkpoint)
         assert "latency" in result
+
+    def test_setup_data_aug_switch_syncs_datamodule_input_size(self, mocker: MockerFixture) -> None:
+        data_aug_switch = mocker.create_autospec(DataAugSwitch, instance=True)
+        train_dataset = mocker.create_autospec(DataAugSwitchMixin, instance=True)
+
+        engine = object.__new__(LightningEngine)
+        engine._trainer = MagicMock(callbacks=[AugmentationSchedulerCallback(data_aug_switch)])
+        engine._datamodule = MagicMock(input_size=(1024, 1024), subsets={"train": train_dataset})
+        engine._datamodule.train_subset.subset_name = "train"
+
+        engine._setup_data_aug_switch_for_datasets()
+
+        data_aug_switch.set_input_size.assert_called_once_with((1024, 1024))
+        train_dataset.set_data_aug_switch.assert_called_once_with(data_aug_switch)
 
     def test_num_devices(self, fxt_engine, tmp_path) -> None:
         assert fxt_engine.num_devices == 1

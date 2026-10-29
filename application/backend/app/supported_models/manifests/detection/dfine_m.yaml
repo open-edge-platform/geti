@@ -25,6 +25,10 @@ hyperparameters:
         epochs: 30
     allowed_values_input_size:
       - 640
+      - 800
+      - 960
+      - 1024
+      - 1280
     input_size_width: 640
     input_size_height: 640
   dataset_preparation:

@@ -7,15 +7,18 @@ from __future__ import annotations
 
 import secrets
 from multiprocessing import Value
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
+import yaml
 from lightning.pytorch import LightningModule, Trainer
 from lightning.pytorch.callbacks.callback import Callback
 
 from getitune.backend.lightning.callbacks.aug_scheduler import AugmentationSchedulerCallback, DataAugSwitch
 from getitune.data.augmentation import CPUAugmentationPipeline, GPUAugmentationPipeline
+from getitune.data.augmentation.transforms import CachedMixUp, CachedMosaic, Resize
 
 # ---------------------------------------------------------------------------
 # Helpers / fixtures shared across test classes
@@ -230,6 +233,63 @@ class TestDataAugSwitch:
         switch = DataAugSwitch(POLICY_EPOCHS, policies, input_size=[640, 640])
         gpu = switch.build_gpu_pipeline("no_aug")
         assert isinstance(gpu, GPUAugmentationPipeline)
+
+    # -- set_input_size -------------------------------------------------
+
+    @staticmethod
+    def _resize_sizes(switch: DataAugSwitch) -> dict[str, tuple[int, ...]]:
+        return {
+            name: next(aug.size for aug in policy["cpu_pipeline"].augmentations if isinstance(aug, Resize))
+            for name, policy in switch.policies.items()
+        }
+
+    @pytest.fixture
+    def placeholder_policies(self):
+        policies = _make_minimal_policies()
+        for policy in policies.values():
+            policy["augmentations_cpu"] = [
+                {
+                    "class_path": "getitune.data.augmentation.transforms.Resize",
+                    "init_args": {"size": "$(input_size)", "keep_aspect_ratio": False},
+                },
+            ]
+        return policies
+
+    def test_init_resolves_input_size_placeholder(self, placeholder_policies):
+        switch = DataAugSwitch(POLICY_EPOCHS, placeholder_policies, input_size=[640, 640])
+        assert set(self._resize_sizes(switch).values()) == {(640, 640)}
+
+    def test_init_does_not_mutate_policies(self, placeholder_policies):
+        DataAugSwitch(POLICY_EPOCHS, placeholder_policies, input_size=[640, 640])
+        for policy in placeholder_policies.values():
+            assert policy["augmentations_cpu"][0]["init_args"]["size"] == "$(input_size)"
+
+    def test_set_input_size_rebuilds_pipelines(self, placeholder_policies):
+        switch = DataAugSwitch(POLICY_EPOCHS, placeholder_policies, input_size=[640, 640])
+        switch.build_gpu_pipeline("no_aug")
+
+        switch.set_input_size((1024, 1024))
+
+        assert switch.input_size == (1024, 1024)
+        assert set(self._resize_sizes(switch).values()) == {(1024, 1024)}
+        assert switch._gpu_pipeline_cache == {}
+
+    def test_set_input_size_same_value_is_noop(self, placeholder_policies):
+        switch = DataAugSwitch(POLICY_EPOCHS, placeholder_policies, input_size=[640, 640])
+        pipeline_before = switch.get_cpu_pipeline("no_aug")
+
+        switch.set_input_size([640, 640])
+
+        assert switch.get_cpu_pipeline("no_aug") is pipeline_before
+
+    def test_set_input_size_keeps_shared_epoch(self, placeholder_policies):
+        switch = DataAugSwitch(POLICY_EPOCHS, placeholder_policies, input_size=[640, 640])
+        switch.set_shared_epoch(Value("i", 0))
+        switch.epoch = 10
+
+        switch.set_input_size((800, 800))
+
+        assert switch.epoch == 10
 
 
 # ===================================================================
@@ -505,3 +565,31 @@ class TestDataAugSwitchIntegration:
         # Simulate worker reading
         assert switch.epoch == 15
         assert switch.current_policy_name in ("strong_aug_1", "strong_aug_2")
+
+
+# ===================================================================
+# DEIM D-FINE recipes follow the configured input size
+# ===================================================================
+_DETECTION_RECIPE_DIR = Path(__file__).resolve().parents[5] / "src" / "getitune" / "recipe" / "detection"
+
+
+@pytest.mark.parametrize("recipe_name", ["deim_dfine_m.yaml", "deim_dfine_l.yaml", "deim_dfine_x.yaml"])
+def test_deim_dfine_recipe_policies_follow_input_size(recipe_name: str) -> None:
+    """Scheduled DEIM policies must not pin 640, otherwise larger input sizes train at 640."""
+    recipe = yaml.safe_load((_DETECTION_RECIPE_DIR / recipe_name).read_text())
+    scheduler_cfg = next(
+        cb for cb in recipe["callbacks"] if cb["class_path"].endswith("aug_scheduler.AugmentationSchedulerCallback")
+    )
+    switch_args = scheduler_cfg["init_args"]["data_aug_switch"]["init_args"]
+    switch = DataAugSwitch(**switch_args)
+
+    switch.set_input_size((1024, 1024))
+
+    for name, policy in switch.policies.items():
+        sizes = [
+            aug.size if isinstance(aug, Resize) else aug.img_scale
+            for aug in policy["cpu_pipeline"].augmentations
+            if isinstance(aug, (Resize, CachedMosaic, CachedMixUp))
+        ]
+        assert sizes, f"{recipe_name}: policy '{name}' has no size-dependent transform"
+        assert all(tuple(size) == (1024, 1024) for size in sizes), f"{recipe_name}: policy '{name}' sizes {sizes}"
