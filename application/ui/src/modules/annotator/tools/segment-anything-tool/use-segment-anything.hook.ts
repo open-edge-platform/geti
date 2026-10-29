@@ -11,7 +11,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getQueryKey } from '../../../../query-client/query-client';
-import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaItemQueryParams, isVideo } from '../../../../shared/media-item-utils';
 import { isDetectionTask } from '../../../../shared/task-type-guards';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import type {
@@ -90,9 +90,6 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
         enabled,
     });
 
-const getEncodingQueryParams = (mediaItem: Media) =>
-    isVideoFrame(mediaItem) ? { frame_index: mediaItem.frame_number } : undefined;
-
 // Prefix matching every media's encoding query, so callers can cancel them all at once.
 export const SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX: QueryKey = [
     'get',
@@ -106,7 +103,7 @@ const getSegmentAnythingEncodingQueryKey = (projectId: string, mediaItem: Media)
         {
             params: {
                 path: { project_id: projectId, media_id: mediaItem.id },
-                query: getEncodingQueryParams(mediaItem),
+                query: getMediaItemQueryParams(mediaItem),
             },
         },
     ]);
@@ -138,7 +135,7 @@ const segmentAnythingEncodingQueryOptions = (projectId: string, mediaItem: Media
                 {
                     params: {
                         path: { project_id: projectId, media_id: mediaItem.id },
-                        query: getEncodingQueryParams(mediaItem),
+                        query: getMediaItemQueryParams(mediaItem),
                     },
                     parseAs: 'arrayBuffer',
                     signal,

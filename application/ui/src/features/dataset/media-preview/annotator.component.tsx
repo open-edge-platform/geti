@@ -32,12 +32,12 @@ const isDatasetSubset = (key: Key | null): key is DatasetSubset => DATASET_SUBSE
 
 const useSubset = (subset: DatasetSubset, mediaItem: Media) => {
     const [pendingSubset, setPendingSubset] = useState<DatasetSubset>(subset);
-    const prevMediaItemIdRef = useRef<string>(getMediaItemKey(mediaItem));
-    const currentMediaItemId = getMediaItemKey(mediaItem);
+    const mediaItemKey = getMediaItemKey(mediaItem);
+    const prevMediaItemKeyRef = useRef(mediaItemKey);
     const prevSubsetRef = useRef(subset);
 
-    if (prevMediaItemIdRef.current !== currentMediaItemId) {
-        prevMediaItemIdRef.current = currentMediaItemId;
+    if (prevMediaItemKeyRef.current !== mediaItemKey) {
+        prevMediaItemKeyRef.current = mediaItemKey;
         setPendingSubset(subset);
     }
 
