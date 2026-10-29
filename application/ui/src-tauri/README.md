@@ -14,8 +14,8 @@ every platform depends on it.
 | ------------------------------------------- | ------------------------------------------------------------------ |
 | [The backend sidecar](#the-backend-sidecar) | What `tauri dev` / `tauri build` require before they will compile. |
 | [Windows](#windows)                         | Setup, dev shell, MSIX build, troubleshooting. **Primary target.** |
-| [macOS](#macos)                             | Setup, TLS, dev shell, `.app` / `.dmg` build. Development only.    |
-| [Linux](#linux)                             | Setup, TLS, dev shell, AppImage / `.deb` build. Development only.  |
+| [macOS](#macos)                             | Setup, TLS, dev shell, `.app` build. Development only.             |
+| [Linux](#linux)                             | Setup, TLS, dev shell, release binary build. Development only.     |
 | [Reference](#reference)                     | How the web/desktop source split works, data locations, cleanup.   |
 
 ---
@@ -350,7 +350,7 @@ npm run start:desktop
 For UI-only work, `npm run start` serves the same app in a browser with no
 Rust toolchain and no sidecar required.
 
-### 6. Build a distributable `.app` / `.dmg`
+### 6. Build a distributable `.app`
 
 ```sh
 just tauri-build   # from application/
@@ -425,13 +425,15 @@ npm run build:api
 npm run start:desktop
 ```
 
-### 5. Build a distributable AppImage / `.deb`
+### 5. Build the release binary
 
 ```sh
 just tauri-build   # from application/
 ```
 
-Artifacts land in `application/ui/src-tauri/target/release/bundle/`.
+`bundle.targets` is `["app"]` (macOS-only), so no AppImage or `.deb` is
+produced: `geti_ui`, `geti-backend`, and `_internal/` land in
+`application/ui/src-tauri/target/release/`.
 
 ---
 
