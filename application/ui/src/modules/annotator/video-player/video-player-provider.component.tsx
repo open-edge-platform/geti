@@ -19,7 +19,6 @@ import {
 import type { MediaVideoFrame } from '@/api/types';
 import { VisuallyHidden } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isEqual } from 'lodash-es';
 
 import { getMediaBinaryUrl } from '../../../shared/media-url.utils';
 import { useVideoControls, VideoControls } from './use-video-controls';
@@ -57,7 +56,8 @@ const useSynchronizeVideoTimeWithVideoFrame = ({
     onUpdateCurrentFrameIndex: (index: number) => void;
     onUpdateVideoError: (error: VideoPlayerErrorReason | null) => void;
 }) => {
-    const previousVideoFrame = usePreviousVideoFrame(videoFrame);
+    const previousVideoFrameRef = useRef<MediaVideoFrame | undefined>(videoFrame);
+
     /*
      * This part is responsible for updating video time on the initial load when the frame number is not 0.
      * In that case we need to move the video to the correct frame number.
@@ -101,28 +101,19 @@ const useSynchronizeVideoTimeWithVideoFrame = ({
             return;
         }
 
-        if (previousVideoFrame?.frame_number !== videoFrame.frame_number) {
+        if (previousVideoFrameRef?.current?.frame_number !== videoFrame.frame_number) {
+            previousVideoFrameRef.current = videoFrame;
             onUpdateCurrentFrameIndex(videoFrame.frame_number);
 
             videoRef.current.currentTime = (videoFrame.frame_number + 1) / videoFrame.fps;
         }
-    }, [videoFrame, previousVideoFrame, videoRef, onUpdateCurrentFrameIndex]);
+    }, [videoFrame, videoRef, onUpdateCurrentFrameIndex]);
 
     useEffect(() => {
-        if (videoFrame?.id !== previousVideoFrame?.id) {
+        if (videoFrame?.id !== previousVideoFrameRef?.current?.id) {
             onUpdateVideoError(null);
         }
-    }, [videoFrame, previousVideoFrame, onUpdateVideoError]);
-};
-
-const usePreviousVideoFrame = (videoFrame: MediaVideoFrame | undefined) => {
-    const [previousVideoFrame, setPreviousVideoFrame] = useState<MediaVideoFrame | undefined>(videoFrame);
-
-    if (!isEqual(previousVideoFrame, videoFrame)) {
-        setPreviousVideoFrame(videoFrame);
-    }
-
-    return previousVideoFrame;
+    }, [videoFrame, onUpdateVideoError]);
 };
 
 const VideoPlayerContext = createContext<VideoPlayerContextProps | null>(null);
