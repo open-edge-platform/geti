@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useIntelligentScissorsWorker } from '../../../shared/smart-tools/use-intelligent-scissors-worker.hook';
-import { useSegmentAnythingWorker } from '../../../shared/smart-tools/use-segment-anything-worker.hook';
-import { useSSIMWorker } from '../../../shared/smart-tools/use-ssim-worker.hook';
+import { useIntelligentScissorsWorker } from '../smart-tools/use-intelligent-scissors-worker.hook';
+import { useSegmentAnythingWorker } from '../smart-tools/use-segment-anything-worker.hook';
+import { useSSIMWorker } from '../smart-tools/use-ssim-worker.hook';
 import { useAvailableTools } from './annotator-tools/use-available-tools';
 
 /**

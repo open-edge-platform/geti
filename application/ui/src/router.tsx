@@ -12,13 +12,13 @@ import { ProjectList } from './features/project/list/project-list.component';
 import { ImportDatasetDialogProvider } from './features/project/providers/import-dataset-dialog-provider.component';
 import { useProjects } from './hooks/api/project.hook';
 import { Layout } from './layout';
+import { useTerminateSmartToolWorkersOnUnmount } from './modules/annotator/smart-tools/terminate-smart-tool-workers-on-unmount.hook';
 import { Dataset } from './routes/dataset/dataset.component';
 import { ErrorPage } from './routes/error-page/error-page';
 import { Inference } from './routes/inference/inference';
 import { Models } from './routes/models/models';
 import { CreateProject } from './routes/project/create-project';
 import { RootLayout } from './routes/root/root';
-import { useTerminateSmartToolWorkersOnUnmount } from './shared/smart-tools/terminate-smart-tool-workers-on-unmount.hook';
 
 const Redirect = () => {
     let path = paths.project.index({});

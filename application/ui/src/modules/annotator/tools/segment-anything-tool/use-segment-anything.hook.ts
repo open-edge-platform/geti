@@ -11,14 +11,14 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getQueryKey } from '../../../../query-client/query-client';
 import { getMediaItemQueryParams, isVideo } from '../../../../shared/media-item-utils';
-import { executeWithTimeout } from '../../../../shared/smart-tools/execute-with-timeout';
-import { SAM_DECODER_TIMEOUT_MS, SAM_ENCODING_GC_TIME_MS } from '../../../../shared/smart-tools/sam-timeouts';
+import { isDetectionTask } from '../../../../shared/task-type-guards';
+import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
+import { executeWithTimeout } from '../../smart-tools/execute-with-timeout';
+import { SAM_DECODER_TIMEOUT_MS, SAM_ENCODING_GC_TIME_MS } from '../../smart-tools/sam-timeouts';
 import {
     useSegmentAnythingWorker,
     type SegmentAnythingRemoteInstance,
-} from '../../../../shared/smart-tools/use-segment-anything-worker.hook';
-import { isDetectionTask } from '../../../../shared/task-type-guards';
-import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
+} from '../../smart-tools/use-segment-anything-worker.hook';
 import { convertToolShapeToGetiShape } from '../utils';
 import type { InteractiveAnnotationPoint, SegmentAnythingDecodingResult } from './segment-anything.interface';
 

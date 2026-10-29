@@ -9,10 +9,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Remote } from 'comlink';
 import { clamp } from 'lodash-es';
 
-import { executeWithTimeout } from '../../../../shared/smart-tools/execute-with-timeout';
-import { SSIM_WORKER_QUERY_KEY, useSSIMWorker } from '../../../../shared/smart-tools/use-ssim-worker.hook';
-import type { SSIMWorkerInstance } from '../../../../shared/smart-tools/webworkers/ssim-worker.interface';
 import type { Shape } from '../../../../shared/types';
+import { executeWithTimeout } from '../../smart-tools/execute-with-timeout';
+import { SSIM_WORKER_QUERY_KEY, useSSIMWorker } from '../../smart-tools/use-ssim-worker.hook';
+import type { SSIMWorkerInstance } from '../../smart-tools/webworkers/ssim-worker.interface';
 import {
     convertRectToShape,
     convertToolMatchesToGetiMatches,
