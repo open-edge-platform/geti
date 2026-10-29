@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { $api } from '@/api';
+import { $api, ApiError, fetchClient } from '@/api';
+import { PipelineMetrics } from '@/api/types';
 import { QueryClient, usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
@@ -38,23 +39,69 @@ const POLLING_INTERVAL = 5000;
 // Aggregate over the polling interval so that consecutive samples do not overlap
 const METRICS_TIME_WINDOW_SECONDS = POLLING_INTERVAL / 1000;
 
+// How much metrics history is kept (and displayed) on the client
+export const METRICS_HISTORY_WINDOW_MS = 5 * 60 * 1000;
+
+export type MetricsDataPoint = {
+    timestamp: number;
+    value: number;
+};
+
+const getMetricsTimestamp = ({ time_window }: PipelineMetrics): number => new Date(time_window.end).getTime();
+
+const toMetricsData = (metrics: PipelineMetrics[]) => {
+    const latencyData: MetricsDataPoint[] = [];
+    const throughputData: MetricsDataPoint[] = [];
+
+    metrics.forEach((sample) => {
+        const timestamp = getMetricsTimestamp(sample);
+
+        latencyData.push({ timestamp, value: sample.inference.latency.avg_ms ?? 0 });
+        throughputData.push({ timestamp, value: sample.inference.throughput.avg_requests_per_second ?? 0 });
+    });
+
+    return { latencyData, throughputData };
+};
+
+const pipelineMetricsQueryOptions = (projectId: string) => {
+    return $api.queryOptions('get', '/api/projects/{project_id}/pipeline/metrics', {
+        params: {
+            path: { project_id: projectId },
+            query: { time_window: METRICS_TIME_WINDOW_SECONDS },
+        },
+    });
+};
+
 export const usePipelineMetrics = () => {
     const projectId = useProjectIdentifier();
+    const { queryKey } = pipelineMetricsQueryOptions(projectId);
 
-    return $api.useQuery(
-        'get',
-        '/api/projects/{project_id}/pipeline/metrics',
-        {
-            params: {
-                path: { project_id: projectId },
-                query: { time_window: METRICS_TIME_WINDOW_SECONDS },
-            },
+    return useQuery({
+        queryKey,
+        queryFn: async ({ client, signal }) => {
+            const { data, error } = await fetchClient.GET('/api/projects/{project_id}/pipeline/metrics', {
+                ...queryKey[2],
+                signal,
+            });
+
+            if (error) {
+                throw new ApiError(error);
+            }
+
+            const previousMetrics = client.getQueryData<PipelineMetrics[]>(queryKey) ?? [];
+
+            if (data === undefined) {
+                return previousMetrics;
+            }
+
+            const cutoff = getMetricsTimestamp(data) - METRICS_HISTORY_WINDOW_MS;
+
+            return [...previousMetrics, data].filter((sample) => getMetricsTimestamp(sample) > cutoff);
         },
-        {
-            refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
-            retry: false,
-        }
-    );
+        select: toMetricsData,
+        refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
+        retry: false,
+    });
 };
 
 export const usePipelineHealth = () => {

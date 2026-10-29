@@ -160,3 +160,4 @@ export type PipelineComponentsHealth = components['schemas']['PipelineComponents
 export type PipelineStatus = components['schemas']['Status'];
 
 export type DatasetView = components['schemas']['DatasetViewView'];
+export type PipelineMetrics = components['schemas']['PipelineMetricsView'];
