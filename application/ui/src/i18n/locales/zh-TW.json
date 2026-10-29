@@ -25,8 +25,6 @@
             "refresh": "重新整理",
             "remove": "移除",
             "selectAll": "全選",
-            "showLess": "收合",
-            "showMore": "顯示更多",
             "skip": "略過",
             "start": "開始",
             "submit": "提交",
@@ -913,6 +911,7 @@
                 },
                 "sort": {
                     "label": "模型排序：",
+                    "recommended": "推薦優先",
                     "nameAsc": "名稱（A 到 Z）",
                     "nameDesc": "名稱（Z 到 A）",
                     "speedAsc": "速度（最快優先）",

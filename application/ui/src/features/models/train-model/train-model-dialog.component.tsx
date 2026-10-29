@@ -10,6 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { Link, useMatch } from 'react-router';
 
 import { paths } from '../../../constants/paths';
+import { LARGE_DIALOG_SIZE } from '../../../shared/dialog-sizes';
 import { AdvancedSettings } from './advanced-settings/advanced-settings.component';
 import { BasicTrainModelContent } from './basic-train-model-content.component';
 import { useTrainModel } from './hooks/use-train-model';
@@ -81,7 +82,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
     };
 
     return (
-        <Dialog width={'clamp(800px, 50vw, 1150px)'} height={isAdvancedSettingsMode ? '80vh' : undefined}>
+        <Dialog {...LARGE_DIALOG_SIZE}>
             <Heading>{t('models.training.setup.dialog.title')}</Heading>
 
             <Divider size={'S'} />

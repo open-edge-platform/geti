@@ -110,7 +110,8 @@ test.describe('Model training flow E2E', () => {
         await test.step('Train model', async () => {
             await page.getByRole('tab', { name: 'Models' }).click();
             await modelsPage.openTrainModelDialog();
-            const speedCard = modelsPage.getRecommendedModelArchitectures().getByLabel(/- speed/);
+            await modelsPage.sortModelArchitectures('Speed (fastest first)');
+            const speedCard = modelsPage.getModelArchitectureCards().first();
 
             const selectedArchitectureName = await speedCard.getAttribute('data-architecture-name');
 

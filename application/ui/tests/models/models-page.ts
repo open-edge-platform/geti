@@ -179,10 +179,6 @@ export class ModelsPage {
         await this.page.getByRole('button', { name: 'Advanced settings' }).click();
     }
 
-    async openMoreModelArchitectures() {
-        await this.page.getByRole('button', { name: 'Show more' }).click();
-    }
-
     async goBack() {
         await this.page.getByRole('button', { name: 'Back' }).click();
     }
@@ -237,8 +233,13 @@ export class ModelsPage {
         return this.page.getByLabel('toast').filter({ hasText: message });
     }
 
-    getRecommendedModelArchitectures() {
-        return this.page.getByLabel('Recommended model architectures');
+    getModelArchitectureCards() {
+        return this.page.getByLabel('Model architectures', { exact: true }).locator('[data-architecture-name]');
+    }
+
+    async sortModelArchitectures(optionName: string) {
+        await this.page.getByRole('button', { name: /Sort Models by:/ }).click();
+        await this.page.getByRole('option', { name: optionName, exact: true }).click();
     }
 
     getRunningJob(modelName: string) {

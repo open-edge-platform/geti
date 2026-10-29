@@ -9,6 +9,7 @@ import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti-
 import { OverlayTriggerState } from 'react-stately';
 
 import { useImportDatasetAsNewProject } from '../../../../hooks/storage/use-import-dataset-as-new-project.hook';
+import { LARGE_DIALOG_SIZE } from '../../../../shared/dialog-sizes';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-buttons.component';
@@ -43,7 +44,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
     return (
         <DialogContainer onDismiss={dialogState.close}>
             {dialogState.isOpen && (
-                <Dialog aria-label={'import-dataset-dialog'} width={860}>
+                <Dialog aria-label={'import-dataset-dialog'} {...LARGE_DIALOG_SIZE}>
                     <Heading>{t('project.import.title')}</Heading>
                     <Divider />
                     <Content UNSAFE_className={classes.container}>
@@ -51,7 +52,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
 
                         <ImportErrorBoundary>
                             <Suspense fallback={<ImportLoadingCard />}>
-                                <View flex={'1'} width={'100%'} minHeight={'size-6000'} backgroundColor={'gray-50'}>
+                                <View flex={'1'} width={'100%'} backgroundColor={'gray-50'}>
                                     {currentStep === 'uploading' && (
                                         <ImportUploadFile
                                             formatOptions='Geti, Datumaro, COCO, YOLO, VOC'

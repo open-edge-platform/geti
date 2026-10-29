@@ -25,8 +25,6 @@
             "refresh": "Odśwież",
             "remove": "Usuń",
             "selectAll": "Zaznacz wszystko",
-            "showLess": "Pokaż mniej",
-            "showMore": "Pokaż więcej",
             "skip": "Pomiń",
             "start": "Rozpocznij",
             "submit": "Wyślij",
@@ -919,6 +917,7 @@
                 },
                 "sort": {
                     "label": "Sortuj modele według:",
+                    "recommended": "Najpierw rekomendowane",
                     "nameAsc": "Nazwa (A do Z)",
                     "nameDesc": "Nazwa (Z do A)",
                     "speedAsc": "Szybkość (najszybsze pierwsze)",

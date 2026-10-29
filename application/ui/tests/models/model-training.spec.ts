@@ -352,7 +352,7 @@ test.describe('Model training flow', () => {
         );
     });
 
-    test('Keeps model architectures list expanded when navigating back from advanced settings if not recommended model is selected', async ({
+    test('Keeps the selected model architecture when navigating back from advanced settings', async ({
         network,
         modelsPage,
         page,
@@ -370,10 +370,6 @@ test.describe('Model training flow', () => {
         await modelsPage.goto();
         await modelsPage.openTrainModelDialog();
 
-        await test.step('Expand architectures list', async () => {
-            await modelsPage.openMoreModelArchitectures();
-        });
-
         await test.step('Select a not recommended model architecture', async () => {
             await modelsPage.selectModelArchitecture(notRecommendedModelArchitecture.name);
         });
@@ -387,9 +383,8 @@ test.describe('Model training flow', () => {
             await modelsPage.goBack();
         });
 
-        await test.step('Verify that the list is still expanded and selected architecture is visible', async () => {
-            await expect(page.getByRole('button', { name: 'Show less' })).toBeVisible();
-            await expect(modelsPage.getModelArchitecture(notRecommendedModelArchitecture.name)).toBeVisible();
+        await test.step('Verify that the selected architecture is still selected', async () => {
+            await expect(modelsPage.getModelArchitecture(notRecommendedModelArchitecture.name)).toBeChecked();
         });
     });
 });

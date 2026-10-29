@@ -73,9 +73,6 @@ export type TrainModelContextProps = TimmModelSelection & {
     trainingConfiguration: TrainingConfiguration | undefined;
     defaultTrainingConfiguration: TrainingConfiguration | undefined;
     onTrainingConfigurationChange: Dispatch<SetStateAction<TrainingConfiguration | undefined>>;
-
-    showMoreModelArchitectures: boolean;
-    onToggleShowMoreModelArchitectures: (showMore: boolean) => void;
 };
 
 const TrainModelContext = createContext<TrainModelContextProps | null>(null);
@@ -217,8 +214,6 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
         modelRevisionId: selectedModelRevision?.value ?? null,
     });
 
-    const [showMoreModelArchitectures, setShowMoreModelArchitectures] = useState<boolean>(false);
-
     const onSelectModelArchitectureId = useCallback(
         (modelArchitectureId: string | null) => {
             setSelectedModelArchitectureId(modelArchitectureId);
@@ -252,9 +247,6 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
             isAdvancedSettingsMode,
             onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
 
-            showMoreModelArchitectures,
-            onToggleShowMoreModelArchitectures: setShowMoreModelArchitectures,
-
             trainingConfiguration,
             defaultTrainingConfiguration,
             onTrainingConfigurationChange: setTrainingConfiguration,
@@ -272,7 +264,6 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
             modelRevisions,
             selectedModelRevisionId,
             isAdvancedSettingsMode,
-            showMoreModelArchitectures,
             trainingConfiguration,
             defaultTrainingConfiguration,
             setTrainingConfiguration,

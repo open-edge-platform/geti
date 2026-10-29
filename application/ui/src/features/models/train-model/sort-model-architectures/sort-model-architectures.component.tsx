@@ -49,7 +49,7 @@ export const SortModelArchitectures = ({ sortBy, onSort, items, ariaLabel }: Sor
         >
             {(item) => {
                 return (
-                    <Section key={`${item[0].key}-${item[1].key}`}>
+                    <Section key={`section-${item.map((option) => option.key).join('-')}`}>
                         {item.map((option) => (
                             <Item key={option.key} textValue={option.name}>
                                 <SortModelArchitectureItem item={option} />
