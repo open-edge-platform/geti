@@ -10,13 +10,13 @@ import pytest
 from PIL import Image as PILImage
 
 from app.utils.images import (
+    convert_image_to_display_png_bytes,
     convert_to_jpeg_compatible,
     crop_to_thumbnail,
     is_high_bit_depth_image,
-    needs_display_normalization,
+    needs_display_conversion,
     normalize_high_bit_depth_array,
     normalize_high_bit_depth_image,
-    normalize_image_to_png_bytes,
     to_uint8_rgb,
 )
 
@@ -73,7 +73,7 @@ def test_is_high_bit_depth_image_standard_modes(mode: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# needs_display_normalization
+# needs_display_conversion
 # ---------------------------------------------------------------------------
 
 
@@ -94,6 +94,18 @@ def test_is_high_bit_depth_image_standard_modes(mode: str) -> None:
         ),
         pytest.param(
             PILImage.new("RGB", (8, 8), color=(128, 64, 32)),
+            "img.tif",
+            True,
+            id="8bit_rgb_tiff",
+        ),
+        pytest.param(
+            PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000),
+            "img16.png",
+            True,
+            id="16bit_png",
+        ),
+        pytest.param(
+            PILImage.new("RGB", (8, 8), color=(128, 64, 32)),
             "img.png",
             False,
             id="8bit_rgb_png",
@@ -106,9 +118,9 @@ def test_is_high_bit_depth_image_standard_modes(mode: str) -> None:
         ),
     ],
 )
-def test_needs_display_normalization(image: PILImage.Image, filename: str, expected: bool, tmp_path: Path) -> None:
+def test_needs_display_conversion(image: PILImage.Image, filename: str, expected: bool, tmp_path: Path) -> None:
     path = _save_tmp(image, tmp_path, filename)
-    assert needs_display_normalization(path) is expected
+    assert needs_display_conversion(path) is expected
 
 
 # ---------------------------------------------------------------------------
@@ -255,26 +267,50 @@ def test_to_uint8_rgb_rejects_unsupported_dimensions() -> None:
 
 
 # ---------------------------------------------------------------------------
-# normalize_image_to_png_bytes
+# convert_image_to_display_png_bytes
 # ---------------------------------------------------------------------------
 
 
-def test_normalize_image_to_png_bytes(tmp_path: Path) -> None:
+def test_convert_image_to_display_png_bytes_high_bit_depth(tmp_path: Path) -> None:
     path = _save_tmp(PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000), tmp_path, "t.tif")
-    result = normalize_image_to_png_bytes(path)
+    result = convert_image_to_display_png_bytes(path)
     assert isinstance(result, bytes) and len(result) > 0
     reloaded = PILImage.open(BytesIO(result))
     assert reloaded.format == "PNG"
     assert reloaded.mode == "RGB"
 
 
-def test_normalize_image_to_png_bytes_narrow_range(tmp_path: Path) -> None:
+def test_convert_image_to_display_png_bytes_narrow_range(tmp_path: Path) -> None:
     """Values in a narrow range (e.g. [500, 1000]) must span the full [0, 255] output."""
     arr = np.array([[500, 1000]], dtype=np.int32)
     path = _save_tmp(PILImage.fromarray(arr, mode="I"), tmp_path, "t.tif")
-    pixels = np.array(PILImage.open(BytesIO(normalize_image_to_png_bytes(path))).convert("L"))
+    pixels = np.array(PILImage.open(BytesIO(convert_image_to_display_png_bytes(path))).convert("L"))
     assert pixels.min() == 0
     assert pixels.max() == 255
+
+
+@pytest.mark.parametrize("mode", ["RGB", "RGBA", "L"])
+def test_convert_image_to_display_png_bytes_keeps_8bit_pixels(mode: str, tmp_path: Path) -> None:
+    """8-bit TIFFs are re-encoded as PNG without altering their pixels."""
+    rng = np.random.default_rng(0)
+    image = PILImage.fromarray((rng.random((8, 6, len(mode))) * 255).astype(np.uint8).squeeze(), mode=mode)
+    path = _save_tmp(image, tmp_path, "t.tif")
+
+    reloaded = PILImage.open(BytesIO(convert_image_to_display_png_bytes(path)))
+
+    assert reloaded.format == "PNG"
+    assert reloaded.mode == mode
+    np.testing.assert_array_equal(np.array(reloaded), np.array(image))
+
+
+def test_convert_image_to_display_png_bytes_cmyk_becomes_rgb(tmp_path: Path) -> None:
+    """PNG cannot store CMYK, so it is converted to RGB."""
+    path = _save_tmp(PILImage.new("CMYK", (4, 4), color=(0, 255, 255, 0)), tmp_path, "t.tif")
+
+    reloaded = PILImage.open(BytesIO(convert_image_to_display_png_bytes(path)))
+
+    assert reloaded.mode == "RGB"
+    assert reloaded.getpixel((0, 0)) == (255, 0, 0)
 
 
 # ---------------------------------------------------------------------------
