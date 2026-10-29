@@ -160,9 +160,9 @@ describe('TrainModel', () => {
                 'alpha',
                 'bravo',
             ]);
-            expect(screen.getByText('Recommended for balance')).toBeVisible();
-            expect(screen.getByText('Recommended for accuracy')).toBeVisible();
-            expect(screen.getByText('Recommended for speed')).toBeVisible();
+            expect(screen.getByText('Balance')).toBeVisible();
+            expect(screen.getByText('Accuracy')).toBeVisible();
+            expect(screen.getByText('Speed')).toBeVisible();
         });
     });
 
