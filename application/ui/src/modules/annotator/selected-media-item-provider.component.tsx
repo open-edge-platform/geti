@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
@@ -67,10 +67,10 @@ const useMediaItem = (initialMediaItem: Media) => {
     const frameNumber = Math.max(0, Math.min(frameNumberFromPathParam, maxFrameNumber));
 
     const [mediaItem, setMediaItem] = useState<Media>(() => convertMediaItem(initialMediaItem, frameNumber));
-    const prevInitialMediaItem = useRef(initialMediaItem);
+    const [prevInitialMediaItem, setPrevInitialMediaItem] = useState<Media>(initialMediaItem);
 
-    if (initialMediaItem.id !== prevInitialMediaItem.current.id) {
-        prevInitialMediaItem.current = initialMediaItem;
+    if (initialMediaItem.id !== prevInitialMediaItem.id) {
+        setPrevInitialMediaItem(initialMediaItem);
         setMediaItem(convertMediaItem(initialMediaItem, frameNumber));
     }
 

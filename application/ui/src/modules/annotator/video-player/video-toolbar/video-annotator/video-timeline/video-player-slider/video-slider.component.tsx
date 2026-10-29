@@ -1,9 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ComponentRef, RefObject, useRef } from 'react';
+import { ComponentRef, RefObject, useRef, useState } from 'react';
 
 import { useNumberFormatter, VisuallyHidden, type SpectrumSliderProps } from '@geti-ui/ui';
+import { useResizeObserver } from '@react-aria/utils';
 import { AriaSliderProps, mergeProps, useFocusRing, useSlider, useSliderThumb } from 'react-aria';
 import { SliderState, useSliderState } from 'react-stately';
 
@@ -45,21 +46,12 @@ type VideoSliderProps = SpectrumSliderProps & {
 
 const THUMB_INDEX = 0;
 
-const getTrackWidthWhileIsLastFrame = (trackRef: RefObject<HTMLDivElement | null>, leftOffset: number) => {
-    if (trackRef.current === null) {
-        return `0px`;
-    }
-
-    const THUMB_OFFSET = 8;
-
-    const width = trackRef.current.getBoundingClientRect().width - THUMB_OFFSET - leftOffset;
-
-    return `${width}px`;
-};
+const THUMB_OFFSET = 8;
 
 export const VideoSlider = ({ leftOffset = 0, sizePerSquare, isLastFrame, ...props }: VideoSliderProps) => {
     const trackRef = useRef<ComponentRef<'div'>>(null);
     const sliderProps = props as unknown as AriaSliderProps<number | number[]>;
+    const [trackWidth, setTrackWidth] = useState<number>(0);
 
     const numberFormatter = useNumberFormatter(props.formatOptions);
     const state = useSliderState({ ...props, numberFormatter });
@@ -67,8 +59,15 @@ export const VideoSlider = ({ leftOffset = 0, sizePerSquare, isLastFrame, ...pro
 
     const { groupProps, trackProps } = useSlider(sliderProps, state, trackRef);
 
-    const trackWidth = isLastFrame
-        ? getTrackWidthWhileIsLastFrame(trackRef, leftOffset)
+    useResizeObserver({
+        ref: trackRef,
+        onResize: () => {
+            setTrackWidth(trackRef.current?.getBoundingClientRect().width ?? 0);
+        },
+    });
+
+    const finalTrackWidth = isLastFrame
+        ? `${Math.max(0, trackWidth - THUMB_OFFSET - leftOffset)}px`
         : sizePerSquare
           ? `${sizePerSquare * (value / state.step)}px`
           : `${state.getThumbPercent(THUMB_INDEX) * 100}%`;
@@ -82,9 +81,9 @@ export const VideoSlider = ({ leftOffset = 0, sizePerSquare, isLastFrame, ...pro
             }}
         >
             <div {...trackProps} ref={trackRef} className={classes.track} style={{ left: `${leftOffset}px` }}>
-                <div className={classes.lowerTrack} style={{ width: trackWidth }}></div>
+                <div className={classes.lowerTrack} style={{ width: finalTrackWidth }}></div>
 
-                <Thumb index={THUMB_INDEX} state={state} trackRef={trackRef} trackWidth={trackWidth} />
+                <Thumb index={THUMB_INDEX} state={state} trackRef={trackRef} trackWidth={finalTrackWidth} />
             </div>
         </div>
     );

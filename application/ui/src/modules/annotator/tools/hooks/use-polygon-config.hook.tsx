@@ -92,7 +92,7 @@ export const usePolygonConfig = ({
         setPointerLine,
         lassoSegment,
         setLassoSegment,
-        isMounted: isMounted.current,
+        isMountedRef: isMounted,
         segments,
         setSegments,
         optimizePolygonOrSegments,
