@@ -907,12 +907,7 @@
                 },
                 "card": {
                     "numberOfParameters": "Número de parámetros: {{count}} millones",
-                    "gigaflops": "Gigaflops: {{value}}",
-                    "recommendedFor": {
-                        "speed": "Recomendado para velocidad",
-                        "balance": "Recomendado para equilibrio",
-                        "accuracy": "Recomendado para precisión"
-                    }
+                    "gigaflops": "Gigaflops: {{value}}"
                 },
                 "sort": {
                     "label": "Ordenar modelos por:",
