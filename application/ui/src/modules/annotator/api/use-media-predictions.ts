@@ -7,7 +7,7 @@ import { queryOptions, useIsFetching, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { EMPTY_LABEL_ID } from '../../../shared/labels';
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemPredictionRange } from '../../../shared/media-item-utils';
 import { getModelIdentifierPayload, SelectableModel } from '../../../shared/selectable-model';
 import { usePredictionSetup } from '../predictions-setup-provider.component';
 import { useSelectedMediaItem } from '../selected-media-item-provider.component';
@@ -164,16 +164,12 @@ const useIsFetchingCurrentFramePredictions = (mediaId: string) => {
     const { selectedModel, selectedDevice, confidenceThreshold } = usePredictionSetup();
     const { mediaItem } = useSelectedMediaItem();
 
-    const singleFrameRange = isVideoFrame(mediaItem)
-        ? { start_frame: mediaItem.frame_number, end_frame: mediaItem.frame_number, stride: mediaItem.frame_stride }
-        : null;
-
     return useIsFetchingMediaPredictions({
         mediaId,
         selectedModel,
         device: selectedDevice,
         confidenceThreshold,
-        range: singleFrameRange,
+        range: getMediaItemPredictionRange(mediaItem),
     });
 };
 

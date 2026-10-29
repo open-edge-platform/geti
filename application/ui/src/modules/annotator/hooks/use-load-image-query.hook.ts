@@ -5,20 +5,15 @@ import type { Media } from '@/api/types';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { isVideoFrame } from '../../../shared/media-item-utils';
-import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
+import { getMediaItemBinaryUrl, getMediaItemKey } from '../../../shared/media-item-utils';
 import { getImageDataFromTiffUrl, isTiffFormat } from '../../../shared/media-utils';
 import { getImageData, loadImage } from '../tools/utils';
 
 export const loadImageQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
-        queryKey: isVideoFrame(media)
-            ? ['mediaItem', projectId, media.id, media.frame_number]
-            : ['mediaItem', projectId, media.id],
+        queryKey: ['mediaItem', projectId, getMediaItemKey(media)],
         queryFn: async () => {
-            const url = isVideoFrame(media)
-                ? getVideoFrameBinaryUrl(projectId, media.id, media.frame_number)
-                : getMediaBinaryUrl(projectId, media.id);
+            const url = getMediaItemBinaryUrl(projectId, media);
 
             if (isTiffFormat(media)) {
                 return getImageDataFromTiffUrl(url);
