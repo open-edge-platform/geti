@@ -1,54 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { useTranslation } from '@/i18n';
 import { Content, Heading, IllustratedMessage, View } from '@geti-ui/ui';
-import { usePipelineMetrics } from 'hooks/api/pipeline.hook';
+import { METRICS_HISTORY_WINDOW_MS, MetricsDataPoint, usePipelineMetrics } from 'hooks/api/pipeline.hook';
 import { TIME_WITH_SECONDS_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 import { CartesianGrid, Label, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
-
-type DataPoint = {
-    timestamp: number;
-    value: number;
-};
-
-const DISPLAYED_WINDOW_MS = 5 * 60 * 1000;
-
-const useMetricsData = () => {
-    const { data: metrics = [] } = usePipelineMetrics();
-
-    const { latencyData, throughputData } = useMemo(() => {
-        const metricsData = metrics.reduce(
-            (acc, { time_window, inference }) => {
-                const timestamp = new Date(time_window.end).getTime();
-                acc.latencyData.push({ timestamp, value: inference.latency.avg_ms ?? 0 });
-                acc.throughputData.push({ timestamp, value: inference.throughput.avg_requests_per_second ?? 0 });
-
-                return acc;
-            },
-            {
-                latencyData: [] as DataPoint[],
-                throughputData: [] as DataPoint[],
-            }
-        );
-
-        const lastLatencyPoint = metricsData.latencyData.at(-1);
-        const lastThroughputPoint = metricsData.throughputData.at(-1);
-
-        return {
-            latencyData: metricsData.latencyData.filter(
-                ({ timestamp }) => timestamp > (lastLatencyPoint?.timestamp ?? 0) - DISPLAYED_WINDOW_MS
-            ),
-            throughputData: metricsData.throughputData.filter(
-                ({ timestamp }) => timestamp > (lastThroughputPoint?.timestamp ?? 0) - DISPLAYED_WINDOW_MS
-            ),
-        };
-    }, [metrics]);
-
-    return { latencyData, throughputData };
-};
 
 const AXIS_LABEL_STYLE = {
     textAnchor: 'middle',
@@ -58,7 +15,7 @@ const AXIS_LABEL_STYLE = {
 
 type GraphProps = {
     label: string;
-    data: DataPoint[];
+    data: MetricsDataPoint[];
     fractionDigits: number;
 };
 
@@ -82,7 +39,7 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
                 dataKey='timestamp'
                 type='number'
                 scale='time'
-                domain={end === undefined ? ['auto', 'auto'] : [end - DISPLAYED_WINDOW_MS, end]}
+                domain={end === undefined ? ['auto', 'auto'] : [end - METRICS_HISTORY_WINDOW_MS, end]}
                 tickFormatter={formatTime}
                 tickLine={false}
                 tickMargin={8}
@@ -128,11 +85,11 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
 
 export const Graphs = () => {
     const { t } = useTranslation();
-    const { latencyData, throughputData } = useMetricsData();
+    const { data } = usePipelineMetrics();
 
     return (
         <View height={'100%'} UNSAFE_style={{ overflow: 'hidden auto' }}>
-            {latencyData.length === 0 ? (
+            {data === undefined || data.latencyData.length === 0 ? (
                 <IllustratedMessage>
                     <Heading>{t('inference.metrics.empty.title')}</Heading>
                     <Content>{t('inference.metrics.empty.description')}</Content>
@@ -145,7 +102,7 @@ export const Graphs = () => {
                         </Heading>
                         <Graph
                             label={t('inference.metrics.throughput.axisLabel')}
-                            data={throughputData}
+                            data={data.throughputData}
                             fractionDigits={2}
                         />
                     </View>
@@ -153,7 +110,11 @@ export const Graphs = () => {
                         <Heading level={4} marginBottom={'size-300'}>
                             {t('inference.metrics.latency.title')}
                         </Heading>
-                        <Graph label={t('inference.metrics.latency.axisLabel')} data={latencyData} fractionDigits={1} />
+                        <Graph
+                            label={t('inference.metrics.latency.axisLabel')}
+                            data={data.latencyData}
+                            fractionDigits={1}
+                        />
                     </View>
                 </>
             )}

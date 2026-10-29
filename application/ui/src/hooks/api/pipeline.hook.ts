@@ -39,28 +39,48 @@ const POLLING_INTERVAL = 5000;
 // Aggregate over the polling interval so that consecutive samples do not overlap
 const METRICS_TIME_WINDOW_SECONDS = POLLING_INTERVAL / 1000;
 
-const pipelineMetricsQueryOptions = (projectId: string, timeWindow: number = METRICS_TIME_WINDOW_SECONDS) => {
+// How much metrics history is kept (and displayed) on the client
+export const METRICS_HISTORY_WINDOW_MS = 5 * 60 * 1000;
+
+export type MetricsDataPoint = {
+    timestamp: number;
+    value: number;
+};
+
+const getMetricsTimestamp = ({ time_window }: PipelineMetrics): number => new Date(time_window.end).getTime();
+
+const toMetricsData = (metrics: PipelineMetrics[]) => {
+    const latencyData: MetricsDataPoint[] = [];
+    const throughputData: MetricsDataPoint[] = [];
+
+    metrics.forEach((sample) => {
+        const timestamp = getMetricsTimestamp(sample);
+
+        latencyData.push({ timestamp, value: sample.inference.latency.avg_ms ?? 0 });
+        throughputData.push({ timestamp, value: sample.inference.throughput.avg_requests_per_second ?? 0 });
+    });
+
+    return { latencyData, throughputData };
+};
+
+const pipelineMetricsQueryOptions = (projectId: string) => {
     return $api.queryOptions('get', '/api/projects/{project_id}/pipeline/metrics', {
         params: {
             path: { project_id: projectId },
-            query: { time_window: timeWindow },
+            query: { time_window: METRICS_TIME_WINDOW_SECONDS },
         },
     });
 };
 
 export const usePipelineMetrics = () => {
     const projectId = useProjectIdentifier();
+    const { queryKey } = pipelineMetricsQueryOptions(projectId);
 
-    const options = pipelineMetricsQueryOptions(projectId, METRICS_TIME_WINDOW_SECONDS);
-
-    return useQuery<PipelineMetrics[]>({
-        queryKey: options.queryKey,
-        queryFn: async ({ client, signal, queryKey }) => {
+    return useQuery({
+        queryKey,
+        queryFn: async ({ client, signal }) => {
             const { data, error } = await fetchClient.GET('/api/projects/{project_id}/pipeline/metrics', {
-                params: {
-                    path: { project_id: projectId },
-                    query: { time_window: METRICS_TIME_WINDOW_SECONDS },
-                },
+                ...queryKey[2],
                 signal,
             });
 
@@ -68,12 +88,17 @@ export const usePipelineMetrics = () => {
                 throw new ApiError(error);
             }
 
-            const previousMetrics: PipelineMetrics[] = client.getQueryData<PipelineMetrics[]>(queryKey) ?? [];
+            const previousMetrics = client.getQueryData<PipelineMetrics[]>(queryKey) ?? [];
 
-            const allMetrics: PipelineMetrics[] = data === undefined ? previousMetrics : [...previousMetrics, data];
+            if (data === undefined) {
+                return previousMetrics;
+            }
 
-            return allMetrics;
+            const cutoff = getMetricsTimestamp(data) - METRICS_HISTORY_WINDOW_MS;
+
+            return [...previousMetrics, data].filter((sample) => getMetricsTimestamp(sample) > cutoff);
         },
+        select: toMetricsData,
         refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
         retry: false,
     });
