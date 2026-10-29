@@ -545,8 +545,10 @@ specifiers, so the package name does not survive into the output, but every
 On the desktop, `downloadFile()`
 ([`download-file.tauri.ts`](../src/platform/download-file.tauri.ts)) calls the
 shell's `download_file` command ([`src/download.rs`](./src/download.rs)). The
-shell shows the save dialog and streams the backend response straight into the
-chosen file, so the webview never holds the file in memory and needs no
+shell shows the save dialog and streams the backend response into
+`<file>.part` next to the chosen file, renaming it over the target only once
+complete, so a failed download never replaces an existing file. The webview
+never holds the file in memory and needs no
 filesystem permissions. The command only accepts `https://localhost:7860` URLs
 and only trusts the backend's own certificate (`<data dir>/certs/localhost.pem`).
 
