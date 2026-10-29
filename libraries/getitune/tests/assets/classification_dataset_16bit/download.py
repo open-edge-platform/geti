@@ -7,7 +7,7 @@ The script:
 1. Creates synthetic 32x32 RGB images stored as ``uint16`` tensors
    (values in 0-65535 range) with two classes: "circle" and "square".
 2. Wraps every image in a ``ClassificationSample``.
-3. Stores all samples in a ``datumaro.experimental.Dataset``.
+3. Stores all samples in a ``getidata.Dataset``.
 4. Exports the dataset to disk with ``export_dataset``.
 
 This dataset exercises the 16-bit image path (``storage_dtype="uint16"``)
@@ -28,12 +28,12 @@ from pathlib import Path
 
 import polars as pl
 import torch
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset
-from datumaro.experimental.fields.images import ImageField
+from getidata import Dataset
+from getidata.categories import LabelCategories
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset
+from getidata.fields.images import ImageField
 from torchvision import tv_tensors
 
 from getitune.data.entity.sample import ClassificationSample
@@ -76,7 +76,7 @@ def _generate_image(label_idx: int, seed: int) -> torch.Tensor:
 
 
 def _build_dataset() -> Dataset:
-    """Build a datumaro.experimental.Dataset of ClassificationSample objects with uint16 images."""
+    """Build a getidata.Dataset of ClassificationSample objects with uint16 images."""
     categories = {"label": LabelCategories(labels=CLASS_NAMES)}
 
     # Override image field to use UInt16 dtype

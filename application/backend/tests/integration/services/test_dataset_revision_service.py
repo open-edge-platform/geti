@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 import cv2
-import datumaro.experimental as dm
+import getidata as dm
 import numpy as np
 import polars as pl
 import pytest

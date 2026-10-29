@@ -22,7 +22,7 @@ from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import Prediction, PredictionBatch
 
 if TYPE_CHECKING:
-    from datumaro.experimental.fields import TileInfo
+    from getidata.fields import TileInfo
 
 # Maximum number of elements 2**31 -1
 MAX_ELEMENTS: int = np.iinfo(np.int32).max

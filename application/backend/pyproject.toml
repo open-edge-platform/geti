@@ -12,8 +12,9 @@ authors = [
 requires-python = ">=3.14,<3.15"
 
 dependencies = [
+    "getidata",
     "fastapi[standard]~=0.138.1",
-    "pillow~=12.0",
+    "pillow~=13.0",
     "python-multipart~=0.0.20",
     "uvicorn~=0.38.0",
     "psutil~=7.1.3",
@@ -24,7 +25,6 @@ dependencies = [
     "aiofiles==25.1.0",
     "pydantic-settings~=2.14.2",
     "aiortc~=1.15.0",
-    "datumaro[experimental]~=1.13.12",
     "defusedxml~=0.7.1",
     "scikit-learn~=1.7.2",
     "faster-coco-eval~=1.7.0",
@@ -41,6 +41,7 @@ dependencies = [
     "hypercorn~=0.18.0",
     "huggingface-hub~=1.29.0",
     "safetensors~=0.8.0",
+    "tzdata>=2026.6"
 ]
 
 [project.optional-dependencies]
@@ -118,6 +119,7 @@ allow-direct-references = true
 packages = ["app"]
 
 [tool.uv.sources]
+getidata = { path = "../../libraries/getidata", editable = true }
 getitune = { path = "../../libraries/getitune", editable = true }
 
 [tool.ruff]

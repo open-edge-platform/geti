@@ -37,7 +37,7 @@ def _make_image_in_mode(mode: str) -> PILImage.Image:
         return PILImage.fromarray(np.zeros((4, 4), dtype=np.float32), mode="F")
     # "I;16" and variants: round-trip through an in-memory TIFF
     buf = io.BytesIO()
-    PILImage.fromarray(np.zeros((4, 4), dtype=np.uint16), mode="I;16").save(buf, format="TIFF")
+    PILImage.fromarray(np.zeros((4, 4), dtype=np.uint16)).save(buf, format="TIFF")
     buf.seek(0)
     img = PILImage.open(buf)
     img.load()
@@ -62,7 +62,7 @@ def test_is_high_bit_depth_image(mode: str) -> None:
 
 def test_is_high_bit_depth_image_16bit_tiff(tmp_path: Path) -> None:
     """I;16 mode is only exposed after loading a real TIFF file."""
-    path = _save_tmp(PILImage.fromarray(np.zeros((4, 4), dtype=np.uint16), mode="I;16"), tmp_path, "t.tif")
+    path = _save_tmp(PILImage.fromarray(np.zeros((4, 4), dtype=np.uint16)), tmp_path, "t.tif")
     with PILImage.open(path) as img:
         assert is_high_bit_depth_image(img) is True
 
@@ -81,7 +81,7 @@ def test_is_high_bit_depth_image_standard_modes(mode: str) -> None:
     "image, filename, expected",
     [
         pytest.param(
-            PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000, mode="I;16"),
+            PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000),
             "img.tif",
             True,
             id="16bit_tiff",
@@ -119,7 +119,7 @@ def test_needs_display_normalization(image: PILImage.Image, filename: str, expec
 @pytest.mark.parametrize(
     "image",
     [
-        pytest.param(PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000, mode="I;16"), id="16bit_int"),
+        pytest.param(PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000), id="16bit_int"),
         pytest.param(
             PILImage.fromarray(np.linspace(0.0, 1.0, 64, dtype=np.float32).reshape(8, 8), mode="F"), id="32bit_float"
         ),
@@ -133,7 +133,7 @@ def test_normalize_high_bit_depth_image(image: PILImage.Image) -> None:
 
 def test_normalize_high_bit_depth_image_uniform_becomes_black() -> None:
     """A uniform image (lo == hi) must produce all-zero output, not divide-by-zero."""
-    img = PILImage.fromarray(np.full((4, 4), fill_value=500, dtype=np.uint16), mode="I;16")
+    img = PILImage.fromarray(np.full((4, 4), fill_value=500, dtype=np.uint16))
     assert np.array(normalize_high_bit_depth_image(img)).max() == 0
 
 
@@ -260,7 +260,7 @@ def test_to_uint8_rgb_rejects_unsupported_dimensions() -> None:
 
 
 def test_normalize_image_to_png_bytes(tmp_path: Path) -> None:
-    path = _save_tmp(PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000, mode="I;16"), tmp_path, "t.tif")
+    path = _save_tmp(PILImage.fromarray(np.ones((8, 8), dtype=np.uint16) * 1000), tmp_path, "t.tif")
     result = normalize_image_to_png_bytes(path)
     assert isinstance(result, bytes) and len(result) > 0
     reloaded = PILImage.open(BytesIO(result))
@@ -301,7 +301,7 @@ def test_convert_to_jpeg_compatible_non_jpeg_modes(mode: str, expected_mode: str
 
 def test_convert_to_jpeg_compatible_high_bit_depth() -> None:
     """High bit depth images are normalized to RGB, not just cast."""
-    img = PILImage.fromarray(np.full((4, 4), fill_value=1000, dtype=np.uint16), mode="I;16")
+    img = PILImage.fromarray(np.full((4, 4), fill_value=1000, dtype=np.uint16))
     result = convert_to_jpeg_compatible(img)
     assert result.mode == "RGB"
     # Uniform value → all zeros after min-max normalization

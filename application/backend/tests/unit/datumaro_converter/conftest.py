@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 
 import pytest
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from app.datumaro_converter import SampleMode, convert_dataset
 from app.models import (

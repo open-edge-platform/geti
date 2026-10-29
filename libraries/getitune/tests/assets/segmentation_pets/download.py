@@ -20,11 +20,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import Colormap, MaskCategories, RgbColor
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.categories import Colormap, MaskCategories, RgbColor
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset
 from PIL import Image as PILImage
 from torchvision import tv_tensors
 from torchvision.datasets import OxfordIIITPet
@@ -84,7 +84,7 @@ def _build_dataset(
     test_items: list[tuple[np.ndarray, np.ndarray, int]],
     images_dir: Path,
 ) -> Dataset:
-    """Build a ``datumaro.experimental.Dataset`` of ``SegmentationSample``."""
+    """Build a ``getidata.Dataset`` of ``SegmentationSample``."""
     colormap = Colormap(
         {
             0: RgbColor(0, 0, 0),  # background

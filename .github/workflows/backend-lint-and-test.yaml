@@ -47,6 +47,7 @@ jobs:
             test:
               - application/backend/**
               - libraries/getitune/**
+              - libraries/getidata/**
               - .github/workflows/backend-lint-and-test.yaml
               - .github/actions/install-common-deps/**
               - '!**/*.md'

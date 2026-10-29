@@ -10,8 +10,8 @@ from uuid import uuid4
 import numpy as np
 import polars as pl
 import pytest
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import LabelCategories
+from getidata import Dataset
+from getidata.categories import LabelCategories
 
 from app.execution import ImportDatasetAsNewProject
 from app.models import Label, Project, Task, TaskType

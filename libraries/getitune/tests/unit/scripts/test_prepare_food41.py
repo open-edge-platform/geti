@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from datumaro.experimental.fields import Subset
+from getidata.fields import Subset
 from PIL import Image
 from scripts.benchmark_datasets.prepare_food41 import _build_dataset, _find_food_root, _resolve_split_file
 

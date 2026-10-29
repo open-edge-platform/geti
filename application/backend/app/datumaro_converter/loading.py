@@ -1,14 +1,15 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Load stored Datumaro datasets and upgrade schemas written by older application versions."""
+"""Load stored getidata datasets and upgrade schemas written by older application versions."""
 
 import copy
 from pathlib import Path
 from typing import Any
 
-from datumaro.experimental import Dataset, Sample
-from datumaro.experimental.export_import import import_dataset as dm_import_dataset
+from getidata import Dataset, Sample
+from getidata.export_import import import_dataset as dm_import_dataset
+from getidata.schema import register_type_module_alias
 from loguru import logger
 
 from .domain import (
@@ -36,6 +37,8 @@ _WIDENED_LABEL_SAMPLES: tuple[type[Sample], ...] = (
     InstanceSegmentationImportExportSample,
 )
 _LEGACY_LABEL_DTYPE = "UInt8"
+
+register_type_module_alias("datumaro.experimental", "getidata")
 
 
 def _legacy_schema_attributes(sample_type: type[Sample]) -> dict[str, Any]:

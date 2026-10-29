@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import polars as pl
-from datumaro.experimental import LazyImage, Sample, register_sample
-from datumaro.experimental.fields import (
+from getidata import LazyImage, Sample, register_sample
+from getidata.fields import (
     ImageInfo,
     Subset,
     bbox_field,

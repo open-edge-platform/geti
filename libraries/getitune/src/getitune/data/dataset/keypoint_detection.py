@@ -16,7 +16,7 @@ from getitune.types import TaskType
 from getitune.types.label import LabelInfo
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
 
 
 class KeypointDetectionDataset(VisionDataset):

@@ -17,7 +17,7 @@ import torch
 from getitune.utils.device import is_xpu_available
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
     from torch.utils.data import Dataset as TorchDataset
     from torch.utils.data import Sampler
 
