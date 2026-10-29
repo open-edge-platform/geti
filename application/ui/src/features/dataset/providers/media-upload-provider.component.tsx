@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode, useEffect, useReducer, useRef } from 'react';
+import { ReactNode, useEffect, useReducer, useRef, useState } from 'react';
 
 import { removeToast, toast } from '@/components/toast/toast.component';
 import { useTranslation, type TranslateFn } from '@/i18n';
@@ -86,7 +86,7 @@ export const MediaUploadProvider = ({ children }: { children: ReactNode }) => {
     const { t } = useTranslation();
     const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
     const lastToastUpdateRef = useRef(0);
-    const abortControllersRef = useRef(new Map<string, AbortController>());
+    const [abortControllers] = useState(() => new Map<string, AbortController>());
 
     useEffect(() => {
         return () => removeToast(UPLOAD_TOAST_ID);
@@ -119,7 +119,7 @@ export const MediaUploadProvider = ({ children }: { children: ReactNode }) => {
     }, [state.items, state.isUploading, t]);
 
     return (
-        <MediaUploadAbortControllersContext.Provider value={abortControllersRef.current}>
+        <MediaUploadAbortControllersContext.Provider value={abortControllers}>
             <MediaUploadDispatchContext.Provider value={dispatch}>
                 <IsUploadingContext.Provider value={state.isUploading}>
                     <MediaUploadStateContext.Provider value={state}>

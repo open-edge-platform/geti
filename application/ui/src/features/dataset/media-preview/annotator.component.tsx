@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { DatasetSubset, Media } from '@/api/types';
 import { Key, View } from '@geti-ui/ui';
@@ -31,18 +31,12 @@ const DATASET_SUBSETS: DatasetSubset[] = ['unassigned', 'training', 'validation'
 const isDatasetSubset = (key: Key | null): key is DatasetSubset => DATASET_SUBSETS.includes(key as DatasetSubset);
 
 const useSubset = (subset: DatasetSubset, mediaItem: Media) => {
-    const [pendingSubset, setPendingSubset] = useState<DatasetSubset>(subset);
     const mediaItemKey = getMediaItemKey(mediaItem);
-    const prevMediaItemKeyRef = useRef(mediaItemKey);
-    const prevSubsetRef = useRef(subset);
+    const [pendingSubset, setPendingSubset] = useState<DatasetSubset>(subset);
+    const [prev, setPrev] = useState({ mediaItemKey, subset });
 
-    if (prevMediaItemKeyRef.current !== mediaItemKey) {
-        prevMediaItemKeyRef.current = mediaItemKey;
-        setPendingSubset(subset);
-    }
-
-    if (prevSubsetRef.current !== subset) {
-        prevSubsetRef.current = subset;
+    if (prev.mediaItemKey !== mediaItemKey || prev.subset !== subset) {
+        setPrev({ mediaItemId, subset });
         setPendingSubset(subset);
     }
 
