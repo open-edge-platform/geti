@@ -239,6 +239,15 @@ experiments:
       - oxford_pets
       - vehicles
       - cardd
+    scenarios:
+      - name: input_1024
+        description: "D-FINE at 1024x1024 input size (larger input for high-resolution images)"
+        tag: input_size
+        models: [deim_dfine_m, deim_dfine_x]
+        datasets: [wgisd, bccd]
+        overrides:
+          data.input_size: [1024, 1024]
+          data.train_subset.batch_size: 4
     criteria:
       accuracy_metric: map
       thresholds:
