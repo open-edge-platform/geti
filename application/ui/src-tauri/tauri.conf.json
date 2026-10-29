@@ -22,7 +22,7 @@
                 "fullscreen": false,
                 "useHttpsScheme": true,
                 "dragDropEnabled": false,
-                "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:7860"
+                "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --ignore-certificate-errors"
             }
         ],
         "security": {

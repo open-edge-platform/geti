@@ -364,7 +364,8 @@ tauri-build:
     fi
     echo "✅ Bundle ready at $APP"
 
-# `tauri build` on non-macOS platforms (Windows .msi/.exe, Linux AppImage/.deb).
+# `tauri build` on non-macOS platforms. `bundle.targets` is macOS-only (`app`), so
+# this only produces the binaries; CI packs the Windows MSIX from them.
 # The flat install layout doesn't trigger PyInstaller's bundle detection, so
 # no post-build patching is needed.
 [linux]
