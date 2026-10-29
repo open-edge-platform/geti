@@ -240,14 +240,34 @@ experiments:
       - vehicles
       - cardd
     scenarios:
-      - name: input_1024
-        description: "D-FINE at 1024x1024 input size (larger input for high-resolution images)"
+      - name: input_800
+        description: "D-FINE at 800x800 input size"
         tag: input_size
-        models: [deim_dfine_m, deim_dfine_x]
-        datasets: [wgisd, bccd]
+        models: [deim_dfine_m, deim_dfine_l, deim_dfine_x]
+        overrides:
+          data.input_size: [800, 800]
+          data.train_subset.batch_size: 4
+      - name: input_960
+        description: "D-FINE at 960x960 input size"
+        tag: input_size
+        models: [deim_dfine_m, deim_dfine_l, deim_dfine_x]
+        overrides:
+          data.input_size: [960, 960]
+          data.train_subset.batch_size: 4
+      - name: input_1024
+        description: "D-FINE at 1024x1024 input size"
+        tag: input_size
+        models: [deim_dfine_m, deim_dfine_l, deim_dfine_x]
         overrides:
           data.input_size: [1024, 1024]
           data.train_subset.batch_size: 4
+      - name: input_1280
+        description: "D-FINE at 1280x1280 input size"
+        tag: input_size
+        models: [deim_dfine_m, deim_dfine_l, deim_dfine_x]
+        overrides:
+          data.input_size: [1280, 1280]
+          data.train_subset.batch_size: 2
     criteria:
       accuracy_metric: map
       thresholds:
