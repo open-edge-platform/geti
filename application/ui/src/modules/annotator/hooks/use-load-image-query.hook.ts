@@ -6,20 +6,13 @@ import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getMediaItemBinaryUrl, getMediaItemKey } from '../../../shared/media-item-utils';
-import { getImageDataFromTiffUrl, isTiffFormat } from '../../../shared/media-utils';
 import { getImageData, loadImage } from '../tools/utils';
 
 export const loadImageQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
         queryKey: ['mediaItem', projectId, getMediaItemKey(media)],
         queryFn: async () => {
-            const url = getMediaItemBinaryUrl(projectId, media);
-
-            if (isTiffFormat(media)) {
-                return getImageDataFromTiffUrl(url);
-            }
-
-            const image = await loadImage(url);
+            const image = await loadImage(getMediaItemBinaryUrl(projectId, media));
 
             return getImageData(image);
         },
