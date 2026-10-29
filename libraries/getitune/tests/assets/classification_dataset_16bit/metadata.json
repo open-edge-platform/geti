@@ -24,7 +24,7 @@
       },
       "subset": {
         "type": "Subset",
-        "type_module": "datumaro.experimental.fields.datasets",
+        "type_module": "getidata.fields.datasets",
         "field": {
           "type": "SubsetField",
           "semantic": "default",
@@ -45,7 +45,7 @@
       },
       "dm_image_info": {
         "type": "ImageInfo",
-        "type_module": "datumaro.experimental.fields.images",
+        "type_module": "getidata.fields.images",
         "field": {
           "type": "ImageInfoField",
           "semantic": "default",

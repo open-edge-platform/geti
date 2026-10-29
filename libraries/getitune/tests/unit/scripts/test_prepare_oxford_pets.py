@@ -15,8 +15,8 @@ import sys
 from pathlib import Path
 
 import pytest
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 
 _SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_oxford_pets.py"
 

@@ -4,6 +4,7 @@
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
 import type { MediaVideoFrame } from '@/api/types';
+import { useResizeObserver } from '@react-aria/utils';
 import { defer } from 'lodash-es';
 import { useHover } from 'react-aria';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -72,18 +73,6 @@ const getFrameNumber = (x: number, width: number, minValue: number, maxValue: nu
     return frameNumber;
 };
 
-const getContainerScroll = (ref?: RefObject<HTMLDivElement | null>) => {
-    if (ref === undefined) {
-        return 0;
-    }
-
-    if (ref.current) {
-        return ref.current.scrollLeft;
-    }
-
-    return 0;
-};
-
 const blurActiveInput = (isFocused: boolean): void => {
     const element = document.activeElement;
 
@@ -120,7 +109,14 @@ export const VideoPlayerSlider = ({
     const isDisplayingAllFrames = FRAME_STEP_TO_DISPLAY_ALL_FRAMES === step;
     const lastFrame = isDisplayingAllFrames ? maxValue : framesCount - step;
     const isLastFrame = sliderValue >= lastFrame;
-    const containerScrollLeft = getContainerScroll(ref);
+    const [containerScrollLeft, setContainerScrollLeft] = useState(0);
+
+    useResizeObserver({
+        ref,
+        onResize: () => {
+            setContainerScrollLeft(ref?.current?.scrollLeft ?? 0);
+        },
+    });
 
     const handlePointerMove = (event: PointerEvent<HTMLDivElement>): void => {
         const rect = event.currentTarget.getBoundingClientRect();

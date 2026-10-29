@@ -4,8 +4,8 @@
 from collections.abc import Sequence
 
 import numpy as np
-from datumaro.experimental import LazyImage
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import LazyImage
+from getidata.fields import ImageInfo, Subset
 from loguru import logger
 from numpy import ndarray
 

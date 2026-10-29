@@ -72,25 +72,26 @@ export const PolygonTool = () => {
         }
     };
 
-    const onPointerDown = leftMouseButtonHandler((event) => {
-        event.currentTarget.setPointerCapture(event.pointerId);
+    const onPointerDown = (pointerEvent: PointerEvent<SVGSVGElement>) =>
+        leftMouseButtonHandler((event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
 
-        setPointFromEvent((point: Point) => {
-            setMode(PolygonMode.Polygon);
+            setPointFromEvent((point: Point) => {
+                setMode(PolygonMode.Polygon);
 
-            isPointerDown.current = true;
+                isPointerDown.current = true;
 
-            if (canPathBeClosed(point)) {
-                isPointerDown.current = false;
+                if (canPathBeClosed(point)) {
+                    isPointerDown.current = false;
 
-                return;
-            }
+                    return;
+                }
 
-            setSegments(removeEmptySegments(lassoSegment, [point]), true);
-            setLassoSegment([]);
-            pendingHistoryCommit.current = true;
-        })(event);
-    });
+                setSegments(removeEmptySegments(lassoSegment, [point]), true);
+                setLassoSegment([]);
+                pendingHistoryCommit.current = true;
+            })(event);
+        })(pointerEvent);
 
     const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
         event.currentTarget.releasePointerCapture(event.pointerId);
@@ -127,18 +128,19 @@ export const PolygonTool = () => {
         })(event);
     };
 
-    const onPointerMove = setPointFromEvent((newPoint: Point) => {
-        if (isEmpty(segments)) return;
+    const onPointerMove = (event: PointerEvent<SVGElement>) =>
+        setPointFromEvent((newPoint: Point) => {
+            if (isEmpty(segments)) return;
 
-        if (mode === PolygonMode.Polygon && isPointerDown.current) setMode(PolygonMode.Lasso);
+            if (mode === PolygonMode.Polygon && isPointerDown.current) setMode(PolygonMode.Lasso);
 
-        if (mode === PolygonMode.Lasso) {
-            setLassoSegment((newLassoSegment: Point[]) => [...newLassoSegment, newPoint]);
-        }
+            if (mode === PolygonMode.Lasso) {
+                setLassoSegment((newLassoSegment: Point[]) => [...newLassoSegment, newPoint]);
+            }
 
-        handleIsStartingPointHovered(newPoint);
-        setPointerLine(() => [...segments.flat(), ...lassoSegment, newPoint]);
-    });
+            handleIsStartingPointHovered(newPoint);
+            setPointerLine(() => [...segments.flat(), ...lassoSegment, newPoint]);
+        })(event);
 
     return (
         <SvgToolCanvas

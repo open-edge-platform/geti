@@ -6,7 +6,7 @@ from contextlib import AbstractContextManager
 from pathlib import Path
 from uuid import UUID
 
-from datumaro.experimental import Dataset
+from getidata import Dataset
 from sqlalchemy.orm import Session
 
 from app.execution.base import step

@@ -7,8 +7,8 @@ from uuid import UUID
 
 from behave import given, then, when
 from behave.runner import Context
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import Categories, LabelCategories
+from getidata import Dataset
+from getidata.categories import Categories, LabelCategories
 from requests import Session
 
 from app.api.schemas import ProjectView

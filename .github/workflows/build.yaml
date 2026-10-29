@@ -54,6 +54,8 @@ jobs:
             test:
               - application/**
               - libraries/getitune/src/**
+              - libraries/getidata/src/**
+              - libraries/getidata/pyproject.toml
               - libraries/getitune/pyproject.toml
               - libraries/getitune/uv.lock
               - libraries/getitune/MANIFEST.in

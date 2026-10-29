@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from .evaluators import (
     DetectionEvaluator,

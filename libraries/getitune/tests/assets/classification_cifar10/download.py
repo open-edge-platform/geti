@@ -9,7 +9,7 @@ The script:
    quick classification testing / benchmarking.
 3. Wraps every image in a ``ClassificationSample`` (the library entity defined
    in ``getitune.data.entity.sample``).
-4. Stores all samples in a ``datumaro.experimental.Dataset``.
+4. Stores all samples in a ``getidata.Dataset``.
 5. Exports the dataset to disk with ``export_dataset``.
 
 Usage
@@ -29,11 +29,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.categories import LabelCategories
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset
 from torchvision import tv_tensors
 from torchvision.datasets import CIFAR10
 
@@ -99,7 +99,7 @@ def _build_dataset(
     test_items: list[tuple[np.ndarray, int, int]],
     images_dir: Path,
 ) -> Dataset:
-    """Build a ``datumaro.experimental.Dataset`` of ``ClassificationSample`` objects."""
+    """Build a ``getidata.Dataset`` of ``ClassificationSample`` objects."""
     from PIL import Image as PILImage
 
     selected_class_names = tuple(CIFAR10_CLASSES[i] for i in SELECTED_CLASS_INDICES)

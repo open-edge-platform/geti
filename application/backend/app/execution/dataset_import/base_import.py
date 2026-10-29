@@ -9,8 +9,8 @@ from typing import cast
 from uuid import UUID
 
 import numpy as np
-from datumaro.experimental import Dataset, LazyImage, LazyVideoFrame, Sample
-from datumaro.experimental.categories import LabelCategories
+from getidata import Dataset, LazyImage, LazyVideoFrame, Sample
+from getidata.categories import LabelCategories
 from loguru import logger
 from sqlalchemy.orm import Session
 

@@ -5,9 +5,9 @@ from uuid import uuid4
 
 import numpy as np
 import pytest
-from datumaro.experimental import Dataset, LazyImage
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import Dataset, LazyImage
+from getidata.categories import LabelCategories
+from getidata.fields import ImageInfo, Subset
 
 from app.datumaro_converter import (
     DetectionTrainingSample,

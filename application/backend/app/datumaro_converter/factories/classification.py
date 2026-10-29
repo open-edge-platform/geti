@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-from datumaro.experimental import LazyImage
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import LazyImage
+from getidata.fields import ImageInfo, Subset
 from loguru import logger
 
 from app.datumaro_converter.domain import (

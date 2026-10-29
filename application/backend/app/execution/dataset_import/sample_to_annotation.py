@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from datumaro.experimental.categories import LabelCategories
+from getidata.categories import LabelCategories
 
 from app.datumaro_converter import (
     DetectionImportExportSample,

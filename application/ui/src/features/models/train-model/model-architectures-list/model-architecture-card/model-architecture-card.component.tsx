@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
 
 import type { ModelArchitecture as ModelArchitectureType, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -141,8 +141,10 @@ export const ModelArchitectureCard = ({
     onSelect,
     modelArchitecture,
 }: ModelArchitectureProps) => {
+    const value = useMemo(() => ({ isSelected, modelArchitecture }), [isSelected, modelArchitecture]);
+
     return (
-        <ModelArchitectureContext value={{ isSelected, modelArchitecture }}>
+        <ModelArchitectureContext value={value}>
             <div
                 className={clsx(classes.modelArchitectureContainer, {
                     [classes.modelArchitectureSelected]: isSelected,

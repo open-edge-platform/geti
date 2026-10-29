@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from datumaro.experimental.export_import import import_dataset
+from getidata.export_import import import_dataset
 from PIL import Image
 from scripts.benchmark_datasets.prepare_brain_tumor import (
     _find_yolo_root,

@@ -6,7 +6,7 @@ from uuid import uuid4
 import numpy as np
 import polars as pl
 import pytest
-from datumaro.experimental import LazyImage
+from getidata import LazyImage
 
 from app.datumaro_converter import (
     DetectionImportExportSample,

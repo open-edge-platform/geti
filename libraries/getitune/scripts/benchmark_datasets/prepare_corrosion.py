@@ -27,7 +27,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from datumaro.experimental.fields import Subset
+from getidata.fields import Subset
 from hf_mask_helper import prepare_hf_mask_dataset
 
 from getitune.benchmark.dataset_helpers import parse_args

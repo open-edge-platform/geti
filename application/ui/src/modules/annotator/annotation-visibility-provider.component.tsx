@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 interface AnnotationVisibilityState {
     isVisible: boolean;
@@ -16,18 +16,17 @@ export const AnnotationVisibilityProvider = ({ children }: { children: ReactNode
     const [isVisible, setIsVisible] = useState(true);
     const [isFocussed, setIsFocussed] = useState(false);
 
-    return (
-        <VisibilityContext.Provider
-            value={{
-                isVisible,
-                toggleVisibility: () => setIsVisible((prev) => !prev),
-                isFocussed,
-                toggleFocus: () => setIsFocussed((prev) => !prev),
-            }}
-        >
-            {children}
-        </VisibilityContext.Provider>
+    const value = useMemo(
+        () => ({
+            isVisible,
+            toggleVisibility: () => setIsVisible((prev) => !prev),
+            isFocussed,
+            toggleFocus: () => setIsFocussed((prev) => !prev),
+        }),
+        [isVisible, isFocussed]
     );
+
+    return <VisibilityContext.Provider value={value}>{children}</VisibilityContext.Provider>;
 };
 
 export const useAnnotationVisibility = () => {

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import Mock
 
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from getitune.data.dataset.segmentation import SegmentationDataset
 from getitune.data.entity.sample import SegmentationSample
