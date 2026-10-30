@@ -8,7 +8,7 @@ from typing import Annotated, Any, BinaryIO
 from uuid import UUID
 
 from anyio import to_thread
-from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile, status
 from fastapi.openapi.models import Example
 from starlette.responses import Response
 
@@ -25,7 +25,13 @@ from app.api.dependencies import (
     get_system_service,
     get_upload_service,
 )
-from app.api.io_utils import write_bytes_to_response, write_file_to_response, write_image_to_response
+from app.api.io_utils import (
+    file_etag,
+    is_not_modified,
+    write_bytes_to_response,
+    write_file_to_response,
+    write_image_to_response,
+)
 from app.api.schemas.media import (
     AnnotatedVideoFrame,
     BulkDeleteMedia,
@@ -67,7 +73,7 @@ from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
 from app.services.sam import MediaSegmentService
-from app.utils.images import convert_image_to_display_png_bytes, needs_display_conversion
+from app.utils.images import DISPLAY_CONVERSION_VERSION, convert_image_to_display_png_bytes, needs_display_conversion
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset/media", tags=["Media"])
 
@@ -500,11 +506,13 @@ def list_video_frames(
     response_model=None,
     responses={
         status.HTTP_200_OK: {"description": "Media binary found"},
+        status.HTTP_304_NOT_MODIFIED: {"description": "Converted display image unchanged since the cached copy"},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid media ID or project ID"},
         status.HTTP_404_NOT_FOUND: {"description": "Media, media binary or project not found"},
     },
 )
 def get_media_binary(
+    request: Request,
     project: Annotated[Project, Depends(get_project)],
     media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
@@ -530,8 +538,16 @@ def get_media_binary(
         and isinstance(media.format, ImageFormat)
         and needs_display_conversion(binary_path)
     ):
+        # Browsers revalidate on every request; an unchanged file skips the conversion and the transfer
+        etag = file_etag(binary_path, variant=f"display-png-v{DISPLAY_CONVERSION_VERSION}")
+        cache_headers = {"ETag": etag, "Cache-Control": "no-cache"}
+        if is_not_modified(request.headers.get("if-none-match"), etag):
+            return Response(status_code=status.HTTP_304_NOT_MODIFIED, headers=cache_headers)
+
         png_bytes = convert_image_to_display_png_bytes(binary_path)
-        return write_bytes_to_response(content=png_bytes, filename=f"{media.name}.png", media_type="image/png")
+        response = write_bytes_to_response(content=png_bytes, filename=f"{media.name}.png", media_type="image/png")
+        response.headers.update(cache_headers)
+        return response
 
     filename = f"{media.name}.{media.format.value.lower()}"
 

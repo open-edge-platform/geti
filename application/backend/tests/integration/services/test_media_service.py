@@ -1006,6 +1006,60 @@ class TestMediaServiceIntegration:
                 )
             )
 
+    @pytest.mark.parametrize("from_path", [False, True])
+    def test_create_image_over_pixel_limit(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        fxt_media_service: MediaService,
+        fxt_project_with_pipeline: tuple[Project, Pipeline],
+        from_path: bool,
+    ) -> None:
+        """Images over Pillow's decompression bomb limit are rejected as invalid instead of failing unhandled."""
+        source_path = tmp_path / "upload.part"
+        PILImage.new("RGB", (100, 100)).save(source_path, format="PNG")
+        # Scale the limit down: Pillow raises above 2 * MAX_IMAGE_PIXELS (10_000 px > 2_000)
+        monkeypatch.setattr(PILImage, "MAX_IMAGE_PIXELS", 1000)
+        project, _ = fxt_project_with_pipeline
+        data = source_path if from_path else BytesIO(source_path.read_bytes())
+
+        with pytest.raises(InvalidImageError):
+            fxt_media_service.create_image(
+                ImageMetadata(project_id=project.id, name="test", image_format=ImageFormat.PNG, data=data)
+            )
+
+        assert source_path.exists()
+
+    def test_create_image_multipage_tiff_uses_first_page(
+        self,
+        tmp_path: Path,
+        fxt_media_service: MediaService,
+        fxt_project_with_pipeline: tuple[Project, Pipeline],
+    ) -> None:
+        """Only the first page of a multi-page TIFF sets the media size and thumbnail; the file is stored whole."""
+        first_page = PILImage.new("RGB", (96, 64), color=(255, 0, 0))
+        second_page = PILImage.new("RGB", (32, 16), color=(0, 0, 255))
+        buffer = BytesIO()
+        first_page.save(buffer, format="TIFF", save_all=True, append_images=[second_page])
+        original_bytes = buffer.getvalue()
+        project, _ = fxt_project_with_pipeline
+
+        created_media = fxt_media_service.create_image(
+            ImageMetadata(
+                project_id=project.id, name="test", image_format=ImageFormat.TIFF, data=BytesIO(original_bytes)
+            )
+        )
+
+        assert (created_media.width, created_media.height) == (96, 64)
+        dataset_dir = tmp_path / f"projects/{project.id}/dataset"
+        binary_path = dataset_dir / f"{created_media.id}.tiff"
+        assert binary_path.read_bytes() == original_bytes
+        with PILImage.open(binary_path) as stored:
+            assert stored.n_frames == 2
+        with PILImage.open(dataset_dir / f"{created_media.id}-thumb.jpg") as thumbnail:
+            red, _, blue = thumbnail.convert("RGB").getpixel((0, 0))
+            assert red > 200 and blue < 50
+
     @pytest.mark.parametrize(
         "start_date, start_date_out_of_range",
         [
