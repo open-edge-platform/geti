@@ -16,7 +16,6 @@ type LocalFolderProps = {
     defaultState: LocalFolderSinkConfig;
 };
 
-// TODO: Remove this component in a separate PR
 export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
     const { t } = useTranslation();
     const [folderPath, setFolderPath] = useState(defaultState.folder_path);

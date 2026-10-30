@@ -65,7 +65,7 @@ const Header = () => {
                     </Item>
                 </TabList>
 
-                <Flex gap={'size-200'} alignItems={'center'}>
+                <Flex gap={'size-75'} alignItems={'center'}>
                     <Suspense fallback={<Loading />}>
                         <ProjectsListPanel />
                     </Suspense>

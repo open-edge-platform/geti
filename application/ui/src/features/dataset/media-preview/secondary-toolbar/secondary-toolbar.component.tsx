@@ -23,7 +23,6 @@ import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotations } from '../../../../modules/annotator/annotation-document-provider.component';
 import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import { Labels } from '../../../../modules/annotator/labels/labels.component';
@@ -108,7 +107,7 @@ const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
                     <Flex gap={'size-300'} direction={'column'}>
                         <PredictionModelSelector isDisabled={isDisabled} />
                         <PredictionInferenceDevices isDisabled={isDisabled} />
-                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PredictionConfidenceThreshold />}
+                        <PredictionConfidenceThreshold />
                     </Flex>
                 </Content>
             </Dialog>
