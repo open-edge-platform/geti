@@ -20,6 +20,9 @@ import { formatToFileArray, isSupportedDatasetZip } from './util';
 
 import classes from './import-upload-file.module.scss';
 
+const SUPPORTED_FORMATS_LINK =
+    'https://docs.geti.intel.com/docs/user-guide/geti-fundamentals/datasets/dataset-export-import#supported-formats';
+
 export type FileUploadedResponse = { size: number; fileName: string; prepareJobId: string; stagedDatasetId: string };
 
 type ImportUploadFileProps = {
@@ -153,7 +156,12 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
 
                             <Text UNSAFE_className={classes.formatOptions}>({formatOptions}).zip</Text>
 
-                            <Link href='/' target='_blank' rel='noopener noreferrer' UNSAFE_className={classes.link}>
+                            <Link
+                                href={SUPPORTED_FORMATS_LINK}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                UNSAFE_className={classes.link}
+                            >
                                 {t('dataset.import.learnMoreFormats')}
                                 <LinkOut size='XS' />
                             </Link>

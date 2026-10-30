@@ -583,7 +583,6 @@ jobs:
 
       - name: Build Tauri app
         env:
-          PUBLIC_API_URL: http://localhost:9100
           DEBUG_BUILD: ${{ inputs.debug_build }}
         working-directory: application/ui
         run: |
