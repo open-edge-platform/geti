@@ -87,10 +87,9 @@ export type SourceConfigPayload = Exclude<SourceConfig, DisconnectedSourceConfig
 export type LocalFolderSinkConfig = components['schemas']['FolderSinkConfigView'];
 export type MqttSinkConfig = components['schemas']['MqttSinkConfigView'];
 export type WebhookSinkConfig = components['schemas']['WebhookSinkConfigView'];
-export type RosSinkConfig = components['schemas']['RosSinkConfigView'];
 export type SinkOutputFormats = LocalFolderSinkConfig['output_formats'];
 
-export type SinkConfig = LocalFolderSinkConfig | MqttSinkConfig | WebhookSinkConfig | RosSinkConfig;
+export type SinkConfig = LocalFolderSinkConfig | MqttSinkConfig | WebhookSinkConfig;
 
 export type AnnotationDTO = components['schemas']['DatasetItemAnnotation'];
 export type PredictionDTO = components['schemas']['DatasetItemAnnotation'];
@@ -110,7 +109,7 @@ export type AnnotationType = components['schemas']['AnnotationType'];
 export type Point = components['schemas']['Point'];
 export type Rect = components['schemas']['Rectangle'];
 export type Polygon = components['schemas']['Polygon'];
-export type FullImage = components['schemas']['FullImage'];
+type FullImage = components['schemas']['FullImage'];
 
 export type Shape = Rect | Polygon | FullImage;
 
