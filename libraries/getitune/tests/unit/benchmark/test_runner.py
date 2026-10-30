@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import textwrap
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -194,6 +195,22 @@ class TestRunnerDryRun:
         successes, failures = runner.run(manifest, catalog)
         assert successes == []
         assert failures == []
+
+    def test_dry_run_logs_cli_eval_upto_override(
+        self,
+        manifest: BenchmarkManifest,
+        catalog: DatasetCatalog,
+        run_config: RunConfig,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        caplog.set_level(logging.INFO, logger="getitune.benchmark.runner")
+        run_config.filters = ManifestFilters(dry_run=True)
+        run_config.eval_upto = "train"
+        runner = BenchmarkRunner(run_config)
+
+        runner.run(manifest, catalog)
+
+        assert "eval_upto=train" in caplog.text
 
 
 # ---------------------------------------------------------------------------

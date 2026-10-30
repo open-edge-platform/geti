@@ -357,7 +357,7 @@ class BenchmarkRunner:
                     exp.dataset_name,
                     exp.scenario.name,
                     exp.model.priority,
-                    exp.eval_upto,
+                    eval_upto,
                     seeds,
                 )
             return [], []
