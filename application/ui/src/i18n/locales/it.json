@@ -363,6 +363,7 @@
             "label": "Dispositivo di inferenza"
         },
         "sources": {
+            "title": "Sorgente",
             "uploadError": "Impossibile caricare il file video.",
             "deleteVideoError": "Impossibile eliminare il file video caricato.",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "Destinazione",
             "types": {
                 "folder": "cartella",
                 "mqtt": "mqtt",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "Pipeline disabilitata con successo"
             },
             "configuration": {
-                "sidebarLabel": "Configurazione pipeline",
-                "sourcesTab": "Input",
-                "sinksTab": "Output"
+                "sidebarLabel": "Configurazione pipeline"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "Integro",
                 "finished": "Completato",
                 "unavailable": "Non disponibile"
-            },
-            "componentLabels": {
-                "source": "Sorgente",
-                "sink": "Destinazione"
             }
         },
         "stream": {

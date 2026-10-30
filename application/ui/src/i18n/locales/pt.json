@@ -363,6 +363,7 @@
             "label": "Dispositivo de inferência"
         },
         "sources": {
+            "title": "Fonte",
             "uploadError": "Falha ao carregar o ficheiro de vídeo.",
             "deleteVideoError": "Falha ao eliminar o ficheiro de vídeo carregado.",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "Destino",
             "types": {
                 "folder": "pasta",
                 "mqtt": "mqtt",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "Pipeline desativado com sucesso"
             },
             "configuration": {
-                "sidebarLabel": "Configuração do pipeline",
-                "sourcesTab": "Entrada",
-                "sinksTab": "Saída"
+                "sidebarLabel": "Configuração do pipeline"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "Operacional",
                 "finished": "Terminado",
                 "unavailable": "Indisponível"
-            },
-            "componentLabels": {
-                "source": "Fonte",
-                "sink": "Destino (sink)"
             }
         },
         "stream": {

@@ -363,6 +363,7 @@
             "label": "Inferentieapparaat"
         },
         "sources": {
+            "title": "Bron",
             "uploadError": "Uploaden van videobestand mislukt.",
             "deleteVideoError": "Verwijderen van geüpload videobestand mislukt.",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "Put",
             "types": {
                 "folder": "map",
                 "mqtt": "mqtt",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "Pipeline succesvol uitgeschakeld"
             },
             "configuration": {
-                "sidebarLabel": "Pipelineconfiguratie",
-                "sourcesTab": "Invoer",
-                "sinksTab": "Uitvoer"
+                "sidebarLabel": "Pipelineconfiguratie"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "In orde",
                 "finished": "Afgerond",
                 "unavailable": "Niet beschikbaar"
-            },
-            "componentLabels": {
-                "source": "Bron",
-                "sink": "Uitvoer"
             }
         },
         "stream": {

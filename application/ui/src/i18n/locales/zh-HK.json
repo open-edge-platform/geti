@@ -363,6 +363,7 @@
             "label": "推理裝置"
         },
         "sources": {
+            "title": "輸入源",
             "uploadError": "影片檔案上載失敗。",
             "deleteVideoError": "無法刪除已上載的影片檔案。",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "輸出端",
             "types": {
                 "folder": "資料夾",
                 "mqtt": "MQTT",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "管線停用成功"
             },
             "configuration": {
-                "sidebarLabel": "管線設定",
-                "sourcesTab": "輸入",
-                "sinksTab": "輸出"
+                "sidebarLabel": "管線設定"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "健康",
                 "finished": "已完成",
                 "unavailable": "無法使用"
-            },
-            "componentLabels": {
-                "source": "輸入源",
-                "sink": "輸出端"
             }
         },
         "stream": {
