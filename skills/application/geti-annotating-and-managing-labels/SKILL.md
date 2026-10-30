@@ -74,6 +74,8 @@ flowchart LR
   `subsets[]`, `sort_by`, `sort_direction`.
 - **Fetch** a media file or thumbnail:
   `GET /api/projects/<id>/dataset/media/<media_id>/binary` and `/thumbnail`.
+  TIFF and high bit depth images are returned as 8-bit PNG; add `?raw=true` to
+  `/binary` to get the original file.
 - **Delete** media: `DELETE .../media/<media_id>` or bulk delete with
   `DELETE .../media` and `media_ids[]`.
 

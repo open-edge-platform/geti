@@ -16,7 +16,10 @@ elements, edit annotations and other attributes.
 ### Media vs Dataset item
 
 In Geti, a _media_ refers to the actual image or video file that contains visual content. Media files are the raw
-data that the system processes, analyzes, and displays. They can be in various formats such as JPEG, PNG, MP4, etc.
+data that the system processes, analyzes, and displays. Supported image formats are JPEG (`jpg`, `jpeg`, `jfif`),
+PNG, TIFF (`tif`, `tiff`), BMP and WebP; supported video formats are MP4, AVI, MKV, MOV, WebM and M4V.
+The original file is always kept as uploaded; images that browsers cannot display (TIFF and high bit depth images,
+e.g. 16-bit) are converted to 8-bit PNG when they are served for display (see the [API](api.md#media)).
 Images and video frames can be annotated. When a frame is annotated, Geti extracts it
 from the video, assigns it an ID, and saves it as an image; the extracted frame can also be
 considered a media, supporting all the operations that are normally possible for images.
