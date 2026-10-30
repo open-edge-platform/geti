@@ -49,7 +49,7 @@ def write_bytes_to_response(
         FastAPI Response if content is bytes, StreamingResponse otherwise.
     """
     # Header values must be latin-1, so non-ASCII names (e.g. media names) are sent percent-encoded (RFC 6266)
-    quoted_filename = quote(filename)
+    quoted_filename = quote(filename, safe="")
     disposition = (
         f'inline; filename="{filename}"'
         if quoted_filename == filename
