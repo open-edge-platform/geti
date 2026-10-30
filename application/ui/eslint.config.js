@@ -346,19 +346,14 @@ export default [
         files: ['tests/**/*.ts'],
 
         rules: {
-            'playwright/no-wait-for-selector': ['off'],
             'playwright/no-conditional-expect': ['off'],
-            'playwright/no-standalone-expect': ['off'],
-            'playwright/missing-playwright-await': ['warn'],
-            'playwright/valid-expect': ['warn'],
-            'playwright/no-useless-not': ['warn'],
-            'playwright/no-page-pause': ['warn'],
-            'playwright/prefer-to-have-length': ['warn'],
             'playwright/no-conditional-in-test': ['off'],
-            'playwright/expect-expect': ['off'],
-            'playwright/no-skipped-test': ['off'],
-            'playwright/no-wait-for-timeout': ['off'],
-            'playwright/no-nested-step': ['off'],
+            'playwright/expect-expect': [
+                'error',
+                {
+                    assertFunctionPatterns: ['^expect.*'],
+                },
+            ],
         },
     },
 ];
