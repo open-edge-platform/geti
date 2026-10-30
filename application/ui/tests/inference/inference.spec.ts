@@ -330,7 +330,7 @@ test.describe('Inference', () => {
             await expect.poll(() => patchedBodies).toContainEqual({ inference: { confidence_threshold: 0.8 } });
         });
 
-        await test.step('updates input and output source', async () => {
+        await test.step('updates sink and source', async () => {
             network.use(
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
                     return response(200).json(getMockedPipeline({ source: null, sink: null }));
@@ -419,11 +419,11 @@ test.describe('Inference', () => {
                 rateLimitSamples: 5,
             });
 
-            await inferencePage.getInputTab().click();
+            await inferencePage.getSourceTab().click();
             await expect(inferencePage.getSourceCard(usbCamera)).toBeVisible();
             await expect(page.getByText('Device: FaceTime HD Camera')).toBeVisible();
 
-            await inferencePage.getOutputTab().click();
+            await inferencePage.getSinkTab().click();
             await expect(inferencePage.getSinkCard('My Sink')).toBeVisible();
             await expect(page.getByText('Folder path: e2e-output')).toBeVisible();
             await expect(page.getByText('Rate limit: 5 samples every 1 second')).toBeVisible();
