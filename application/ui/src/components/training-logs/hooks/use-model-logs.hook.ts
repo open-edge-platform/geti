@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchClient } from '@/api';
-import { useTranslation } from '@/i18n';
 import { useQuery } from '@tanstack/react-query';
 
 import { getQueryKey } from '../../../query-client/query-client';

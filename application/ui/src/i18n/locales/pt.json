@@ -891,7 +891,6 @@
                 "dialogTitle": "Registos de Treino",
                 "loadError": "Falha ao carregar registos: {{message}}",
                 "noJobOrModel": "Nenhuma tarefa ou modelo especificado",
-                "fetchError": "Falha ao obter registos do modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Transferência dos registos de treino iniciada"
             },
             "parameters": {

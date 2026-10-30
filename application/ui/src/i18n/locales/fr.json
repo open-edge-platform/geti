@@ -910,7 +910,6 @@
                 "dialogTitle": "Journaux d’entraînement",
                 "loadError": "Échec du chargement des journaux : {{message}}",
                 "noJobOrModel": "Aucune tâche ni aucun modèle spécifié",
-                "fetchError": "Échec de la récupération des journaux du modèle : {{status}} {{statusText}}",
                 "downloadStarted": "Le téléchargement des journaux d’entraînement a commencé"
             },
             "parameters": {

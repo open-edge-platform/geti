@@ -891,7 +891,6 @@
                 "dialogTitle": "训练日志",
                 "loadError": "日志加载失败：{{message}}",
                 "noJobOrModel": "未指定任务或模型",
-                "fetchError": "模型日志获取失败：{{status}} {{statusText}}",
                 "downloadStarted": "训练日志下载已开始"
             },
             "parameters": {
