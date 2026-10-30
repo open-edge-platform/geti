@@ -11,7 +11,6 @@ import { useDatasetViewsQuery } from 'hooks/api/dataset-views.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hook';
 
-import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
 import { ImportExport } from '../../import-export/import-export.component';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
@@ -142,11 +141,9 @@ export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarPro
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <Heading margin={0}>{t('common.labels.dataset')}</Heading>
 
-                    {FEATURE_FLAGS.DATASET_VIEWS && (
-                        <Suspense fallback={null}>
-                            <DatasetViews resetSelectedMediaIds={resetSelectedMediaIds} />
-                        </Suspense>
-                    )}
+                    <Suspense fallback={null}>
+                        <DatasetViews resetSelectedMediaIds={resetSelectedMediaIds} />
+                    </Suspense>
                 </Flex>
 
                 <ButtonGroup UNSAFE_style={{ gap: dimensionValue('size-125') }}>
@@ -193,20 +190,16 @@ export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarPro
                                 onDeleted={toggleSelectedKeys}
                                 isHotkeyEnabled={selectedMediaItem === null}
                             />
-                            {FEATURE_FLAGS.DATASET_VIEWS && (
-                                <>
-                                    <Suspense fallback={null}>
-                                        <DatasetViewActions
-                                            selectedMediaIds={selectedMediaItemsIds}
-                                            resetSelectedMediaIds={resetSelectedMediaIds}
-                                        />
-                                    </Suspense>
-                                    <UnassignMediaFromView
-                                        selectedMediaIds={selectedMediaItemsIds}
-                                        resetSelectedMediaIds={resetSelectedMediaIds}
-                                    />
-                                </>
-                            )}
+                            <Suspense fallback={null}>
+                                <DatasetViewActions
+                                    selectedMediaIds={selectedMediaItemsIds}
+                                    resetSelectedMediaIds={resetSelectedMediaIds}
+                                />
+                            </Suspense>
+                            <UnassignMediaFromView
+                                selectedMediaIds={selectedMediaItemsIds}
+                                resetSelectedMediaIds={resetSelectedMediaIds}
+                            />
                         </>
                     )}
                 </Flex>

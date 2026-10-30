@@ -6,7 +6,6 @@ import { ReactNode, Suspense } from 'react';
 import { useTranslation } from '@/i18n';
 import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
-import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { SinkActions } from '../sinks/sink-actions.component';
 import { SourceActions } from '../sources/source-actions.component';
 import { PipelineConfidenceThreshold } from './pipeline-confidence-threshold.component';
@@ -29,7 +28,7 @@ export const PipelineConfiguration = () => {
                 <StreamInferenceDevices />
             </Suspense>
 
-            {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PipelineConfidenceThreshold />}
+            <PipelineConfidenceThreshold />
 
             <Tabs
                 aria-label={'Pipeline configuration tabs'}
