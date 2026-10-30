@@ -3,36 +3,24 @@
 
 import { toast } from '@/components/toast/toast.component';
 import { i18n } from '@/i18n';
-import { save } from '@tauri-apps/plugin-dialog';
-import { writeFile } from '@tauri-apps/plugin-fs';
+import { Channel, invoke } from '@tauri-apps/api/core';
 
 export const downloadFile = (url: string, name?: string, startedMessage?: string): void => {
     void saveDownload(url, name, startedMessage);
 };
 
+// The shell shows the save dialog and streams the file to disk (`src-tauri/src/download.rs`).
 const saveDownload = async (url: string, name?: string, startedMessage?: string): Promise<void> => {
     try {
-        const filename = name ?? getFallbackFilename(url);
-        const selectedPath = await save({
-            defaultPath: filename,
-            filters: [getFilterForFilename(filename)],
-        });
+        const fileName = name ?? getFallbackFilename(url);
+        const onStarted = new Channel<null>();
+        onStarted.onmessage = () => {
+            if (startedMessage !== undefined) {
+                toast({ type: 'info', message: startedMessage });
+            }
+        };
 
-        if (selectedPath === null) {
-            return;
-        }
-
-        if (startedMessage !== undefined) {
-            toast({ type: 'info', message: startedMessage });
-        }
-
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`download failed: ${response.status} ${response.statusText}`);
-        }
-
-        const fileData = new Uint8Array(await response.arrayBuffer());
-        await writeFile(selectedPath, fileData);
+        await invoke('download_file', { url, fileName, filter: getFilterForFilename(fileName), onStarted });
     } catch (error: unknown) {
         console.error('[tauri downloadFile] failed', error);
         toast({ type: 'error', message: i18n.t('downloads.failure.genericError') });
