@@ -123,6 +123,21 @@ def test_needs_display_conversion(image: PILImage.Image, filename: str, expected
     assert needs_display_conversion(path) is expected
 
 
+@pytest.mark.parametrize(
+    "file_format, filename, expected",
+    [
+        pytest.param("TIFF", "img.png", True, id="tiff_bytes_with_png_extension"),
+        pytest.param("PNG", "img.tif", False, id="png_bytes_with_tif_extension"),
+    ],
+)
+def test_needs_display_conversion_uses_file_contents_not_extension(
+    file_format: str, filename: str, expected: bool, tmp_path: Path
+) -> None:
+    path = tmp_path / filename
+    PILImage.new("RGB", (8, 8), color=(128, 64, 32)).save(path, format=file_format)
+    assert needs_display_conversion(path) is expected
+
+
 # ---------------------------------------------------------------------------
 # normalize_high_bit_depth_image
 # ---------------------------------------------------------------------------

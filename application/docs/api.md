@@ -81,6 +81,10 @@
 > only the media assigned to that [dataset view](#views) are returned. This is the only endpoint to list the
 > content of a dataset view.
 
+> `GET /api/projects/<id>/dataset/media/<id>/binary` returns images that browsers cannot display (TIFF and high
+> bit depth images, e.g. 16-bit) as an 8-bit PNG. Pass `?raw=true` to get the original file instead. The media
+> `format` field always reports the format of the stored file, not of the returned content.
+
 ### Predictions
 
 | Method | Path                                       | Payload              | Return                 | Description                                 |
