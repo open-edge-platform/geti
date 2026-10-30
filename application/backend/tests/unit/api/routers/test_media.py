@@ -1037,9 +1037,9 @@ class TestMediaEndpoints:
             with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
                 temp_file_path = Path(tmp_file.name)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
-                # needs_display_normalization is tested separately; mock it out so that
+                # needs_display_conversion is tested separately; mock it out so that
                 # arbitrary (possibly non-image) temp files don't cause PIL errors here.
-                with patch("app.api.routers.media.needs_display_normalization", return_value=False):
+                with patch("app.api.routers.media.needs_display_conversion", return_value=False):
                     response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
 
         finally:
@@ -1084,6 +1084,35 @@ class TestMediaEndpoints:
         assert response.status_code == status.HTTP_200_OK
         assert "image/png" in response.headers.get("content-type", "")
 
+    def test_get_media_binary_converts_8bit_tiff_to_png(self, fxt_get_project, fxt_media_service, fxt_client):
+        """Browsers cannot display TIFF, so even 8-bit TIFFs are served as PNG with the same pixels."""
+        import numpy as np
+
+        media = MagicMock(spec=Image, id=uuid4(), format=ImageFormat.TIFF, type=MediaType.IMAGE)
+        type(media).name = PropertyMock(return_value="test_8bit")
+        fxt_media_service.get_media_by_id.return_value = media
+        pixels = np.arange(10 * 12 * 3, dtype=np.uint8).reshape(10, 12, 3)
+
+        temp_file_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as tmp_file:
+                temp_file_path = Path(tmp_file.name)
+                PILImage.fromarray(pixels).save(temp_file_path)
+                fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
+                response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
+                raw_response = fxt_client.get(
+                    f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary?raw=true"
+                )
+        finally:
+            if temp_file_path and os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "image/png" in response.headers.get("content-type", "")
+        np.testing.assert_array_equal(np.array(PILImage.open(BytesIO(response.content))), pixels)
+        assert raw_response.status_code == status.HTTP_200_OK
+        assert "image/tiff" in raw_response.headers.get("content-type", "")
+
     @pytest.mark.parametrize(
         "image_format, suffix",
         [
@@ -1105,7 +1134,7 @@ class TestMediaEndpoints:
         try:
             with (
                 tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file,
-                patch("app.api.routers.media.normalize_image_to_png_bytes") as mock_normalize_image,
+                patch("app.api.routers.media.convert_image_to_display_png_bytes") as mock_convert_image,
             ):
                 temp_file_path = Path(tmp_file.name)
                 img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000)
@@ -1117,7 +1146,7 @@ class TestMediaEndpoints:
                 os.unlink(temp_file_path)
 
         assert response.status_code == status.HTTP_200_OK
-        mock_normalize_image.assert_not_called()
+        mock_convert_image.assert_not_called()
 
     def test_get_video_frame_binary_on_the_fly_annotated(self, fxt_get_project, fxt_media_service, fxt_client):
         video_id = uuid4()
@@ -1134,7 +1163,7 @@ class TestMediaEndpoints:
         try:
             with (
                 tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp_file,
-                patch("app.api.routers.media.needs_display_normalization", return_value=False),
+                patch("app.api.routers.media.needs_display_conversion", return_value=False),
             ):
                 temp_file_path = Path(tmp_file.name)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path

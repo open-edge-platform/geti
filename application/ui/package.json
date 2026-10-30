@@ -68,7 +68,6 @@
         "spin-delay": "^2.0.1",
         "tus-js-client": "~4.3.1",
         "usehooks-ts": "^3.1.1",
-        "utif": "^3.1.0",
         "zipson": "^0.2.12"
     },
     "devDependencies": {
@@ -92,7 +91,6 @@
         "@types/node": "~26.6.4",
         "@types/react": "~19.3.0",
         "@types/react-dom": "~19.3.0",
-        "@types/utif": "^3.0.6",
         "@wessberg/pointer-events": "^1.0.9",
         "eslint": "~9.39.5",
         "eslint-import-resolver-typescript": "~4.4.5",
