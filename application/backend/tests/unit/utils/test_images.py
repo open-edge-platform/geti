@@ -328,6 +328,18 @@ def test_convert_image_to_display_png_bytes_cmyk_becomes_rgb(tmp_path: Path) -> 
     assert reloaded.getpixel((0, 0)) == (255, 0, 0)
 
 
+def test_convert_image_to_display_png_bytes_multipage_tiff_uses_first_page(tmp_path: Path) -> None:
+    """Only the first page of a multi-page TIFF is served for display."""
+    path = tmp_path / "t.tif"
+    second_page = PILImage.new("RGB", (4, 4), color=(0, 0, 255))
+    PILImage.new("RGB", (8, 6), color=(255, 0, 0)).save(path, save_all=True, append_images=[second_page])
+
+    reloaded = PILImage.open(BytesIO(convert_image_to_display_png_bytes(path)))
+
+    assert reloaded.size == (8, 6)
+    assert reloaded.getpixel((0, 0)) == (255, 0, 0)
+
+
 # ---------------------------------------------------------------------------
 # convert_to_jpeg_compatible
 # ---------------------------------------------------------------------------
