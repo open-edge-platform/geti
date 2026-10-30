@@ -31,7 +31,11 @@ export const LoadingImportDataset = ({
     const { t } = useTranslation();
     const deleteStagedFileMutation = useDeleteStagedDataset({ stagedDatasetId });
 
-    const { data: job, ...response } = useImportJobStatus({
+    const {
+        data: job,
+        isError,
+        error,
+    } = useImportJobStatus({
         jobId,
         onSuccess: async () => {
             deleteEntry();
@@ -43,8 +47,8 @@ export const LoadingImportDataset = ({
                 type: 'success',
             });
         },
-        onError: (error) => {
-            if (isInvalidJob(error)) {
+        onError: (err) => {
+            if (isInvalidJob(err)) {
                 deleteEntry();
                 deleteStagedFileMutation.mutate();
             }
@@ -66,11 +70,11 @@ export const LoadingImportDataset = ({
                 />
             )}
 
-            {response.isError && (
+            {isError && (
                 <ImportFailedJob
                     size={size}
                     fileName={fileName}
-                    error={`${response.error?.detail ?? t('common.errors.unknownDetail')}`}
+                    error={`${error?.detail ?? t('common.errors.unknownDetail')}`}
                     message={t('dataset.import.genericError')}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}

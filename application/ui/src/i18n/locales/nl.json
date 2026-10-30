@@ -891,7 +891,6 @@
                 "dialogTitle": "Trainingslogboeken",
                 "loadError": "Laden van logboeken mislukt: {{message}}",
                 "noJobOrModel": "Geen taak of model opgegeven",
-                "fetchError": "Ophalen van modellogboeken mislukt: {{status}} {{statusText}}",
                 "downloadStarted": "Download van trainingslogboeken gestart"
             },
             "parameters": {

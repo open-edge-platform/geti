@@ -897,7 +897,6 @@
                 "dialogTitle": "Dzienniki trenowania",
                 "loadError": "Nie udało się wczytać dzienników: {{message}}",
                 "noJobOrModel": "Nie podano zadania ani modelu",
-                "fetchError": "Nie udało się pobrać dzienników modelu: {{status}} {{statusText}}",
                 "downloadStarted": "Rozpoczęto pobieranie dzienników trenowania"
             },
             "parameters": {

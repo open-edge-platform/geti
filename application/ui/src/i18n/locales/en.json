@@ -891,7 +891,6 @@
                 "dialogTitle": "Training Logs",
                 "loadError": "Failed to load logs: {{message}}",
                 "noJobOrModel": "No job or model specified",
-                "fetchError": "Failed to fetch model logs: {{status}} {{statusText}}",
                 "downloadStarted": "Training logs download started"
             },
             "parameters": {

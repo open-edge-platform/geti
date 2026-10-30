@@ -891,7 +891,6 @@
                 "dialogTitle": "Log di addestramento",
                 "loadError": "Impossibile caricare i log: {{message}}",
                 "noJobOrModel": "Nessun processo o modello specificato",
-                "fetchError": "Impossibile recuperare i log del modello: {{status}} {{statusText}}",
                 "downloadStarted": "Download log di addestramento iniziato"
             },
             "parameters": {

@@ -891,7 +891,6 @@
                 "dialogTitle": "Registros de entrenamiento",
                 "loadError": "No se pudieron cargar los registros: {{message}}",
                 "noJobOrModel": "No se ha especificado ninguna tarea o modelo",
-                "fetchError": "No se pudieron obtener los registros del modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Descarga de los registros de entrenamiento iniciada"
             },
             "parameters": {

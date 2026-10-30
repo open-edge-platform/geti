@@ -891,7 +891,6 @@
                 "dialogTitle": "訓練記錄",
                 "loadError": "記錄載入失敗：{{message}}",
                 "noJobOrModel": "未指定工作或模型",
-                "fetchError": "模型記錄取得失敗：{{status}} {{statusText}}",
                 "downloadStarted": "訓練記錄下載已開始"
             },
             "parameters": {

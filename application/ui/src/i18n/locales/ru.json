@@ -937,7 +937,6 @@
                 "dialogTitle": "Журналы обучения",
                 "loadError": "Не удалось загрузить журналы: {{message}}",
                 "noJobOrModel": "Задание или модель не указаны",
-                "fetchError": "Не удалось получить журналы модели: {{status}} {{statusText}}",
                 "downloadStarted": "Скачивание журналов обучения началось"
             },
             "parameters": {
