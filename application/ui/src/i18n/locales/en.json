@@ -363,6 +363,7 @@
             "label": "Inference device"
         },
         "sources": {
+            "title": "Source",
             "uploadError": "Failed to upload video file.",
             "deleteVideoError": "Failed to delete uploaded video file.",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "Sink",
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "Pipeline disabled successfully"
             },
             "configuration": {
-                "sidebarLabel": "Pipeline configuration",
-                "sourcesTab": "Source",
-                "sinksTab": "Sink"
+                "sidebarLabel": "Pipeline configuration"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "Healthy",
                 "finished": "Finished",
                 "unavailable": "Unavailable"
-            },
-            "componentLabels": {
-                "source": "Source",
-                "sink": "Sink"
             }
         },
         "stream": {

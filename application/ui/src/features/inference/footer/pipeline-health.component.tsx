@@ -31,8 +31,8 @@ const PipelineComponentsDetailsInfo = ({ components }: PipelineComponentsDetails
     const { t } = useTranslation();
 
     const componentLabels: Record<(typeof COMPONENT_ORDER)[number], string> = {
-        source: t('inference.health.componentLabels.source'),
-        sink: t('inference.health.componentLabels.sink'),
+        source: t('inference.sources.title'),
+        sink: t('inference.sinks.title'),
         model: t('common.labels.model'),
     };
 

@@ -363,6 +363,7 @@
             "label": "推理设备"
         },
         "sources": {
+            "title": "输入源",
             "uploadError": "视频文件上传失败。",
             "deleteVideoError": "已上传的视频文件删除失败。",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "输出端",
             "types": {
                 "folder": "文件夹",
                 "mqtt": "MQTT",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "流水线停用成功"
             },
             "configuration": {
-                "sidebarLabel": "流水线配置",
-                "sourcesTab": "输入源",
-                "sinksTab": "输出端"
+                "sidebarLabel": "流水线配置"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "健康",
                 "finished": "已完成",
                 "unavailable": "不可用"
-            },
-            "componentLabels": {
-                "source": "输入源",
-                "sink": "输出端"
             }
         },
         "stream": {

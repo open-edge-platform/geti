@@ -40,11 +40,11 @@ export const PipelineConfiguration = () => {
                 }}
             >
                 <TabList marginBottom={'size-200'}>
-                    <Item key='sources' textValue={t('inference.pipeline.configuration.sourcesTab')}>
-                        <Text>{t('inference.pipeline.configuration.sourcesTab')}</Text>
+                    <Item key='sources' textValue={t('inference.sources.title')}>
+                        <Text>{t('inference.sources.title')}</Text>
                     </Item>
-                    <Item key='sinks' textValue={t('inference.pipeline.configuration.sinksTab')}>
-                        <Text>{t('inference.pipeline.configuration.sinksTab')}</Text>
+                    <Item key='sinks' textValue={t('inference.sinks.title')}>
+                        <Text>{t('inference.sinks.title')}</Text>
                     </Item>
                 </TabList>
                 <TabPanels flex={1} minHeight={0} UNSAFE_style={{ overflowY: 'auto' }}>

@@ -377,6 +377,7 @@
             "label": "Périphérique d’inférence"
         },
         "sources": {
+            "title": "Source",
             "uploadError": "Échec du téléversement du fichier vidéo.",
             "deleteVideoError": "Échec de la suppression du fichier vidéo téléversé.",
             "list": {
@@ -439,6 +440,7 @@
             }
         },
         "sinks": {
+            "title": "Destination",
             "types": {
                 "folder": "dossier",
                 "mqtt": "mqtt",
@@ -527,9 +529,7 @@
                 "disabledSuccess": "Pipeline désactivé avec succès"
             },
             "configuration": {
-                "sidebarLabel": "Configuration du pipeline",
-                "sourcesTab": "Source",
-                "sinksTab": "Destination"
+                "sidebarLabel": "Configuration du pipeline"
             }
         },
         "collection": {
@@ -573,10 +573,6 @@
                 "healthy": "Opérationnel",
                 "finished": "Terminé",
                 "unavailable": "Indisponible"
-            },
-            "componentLabels": {
-                "source": "Source",
-                "sink": "Destination"
             }
         },
         "stream": {

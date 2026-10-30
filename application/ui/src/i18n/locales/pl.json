@@ -363,6 +363,7 @@
             "label": "Urządzenie wnioskujące"
         },
         "sources": {
+            "title": "Źródło",
             "uploadError": "Nie udało się przesłać pliku wideo.",
             "deleteVideoError": "Nie udało się usunąć przesłanego pliku wideo.",
             "list": {
@@ -425,6 +426,7 @@
             }
         },
         "sinks": {
+            "title": "Odbiornik",
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
@@ -511,9 +513,7 @@
                 "disabledSuccess": "Pipeline został pomyślnie wyłączony"
             },
             "configuration": {
-                "sidebarLabel": "Konfiguracja pipelinu",
-                "sourcesTab": "Źródło",
-                "sinksTab": "Odbiornik"
+                "sidebarLabel": "Konfiguracja pipelinu"
             }
         },
         "collection": {
@@ -557,10 +557,6 @@
                 "healthy": "Sprawny",
                 "finished": "Zakończony",
                 "unavailable": "Niedostępny"
-            },
-            "componentLabels": {
-                "source": "Źródło",
-                "sink": "Odbiornik"
             }
         },
         "stream": {
