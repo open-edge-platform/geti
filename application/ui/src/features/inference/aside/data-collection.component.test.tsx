@@ -44,7 +44,7 @@ describe('DataCollection capture rate fields', () => {
                 return HttpResponse.json({
                     project_id: '',
                     status: 'idle',
-                    device: 'images_folder',
+                    device: 'cpu',
                 });
             })
         );

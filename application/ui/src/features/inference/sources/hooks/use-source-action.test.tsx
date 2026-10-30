@@ -41,7 +41,7 @@ const renderApp = async ({
             HttpResponse.json({
                 project_id: '',
                 status: 'idle',
-                device: 'images_folder',
+                device: 'cpu',
             })
         )
     );
@@ -144,7 +144,7 @@ describe('useSourceAction', () => {
             server.use(
                 http.post('/api/sources', () => HttpResponse.json({ ...mockedConfig, id: 'new-id-test' })),
                 http.patch('/api/projects/{project_id}/pipeline', () =>
-                    HttpResponse.json({ project_id: '', status: 'idle', device: 'images_folder' })
+                    HttpResponse.json({ project_id: '', status: 'idle', device: 'cpu' })
                 )
             );
 
