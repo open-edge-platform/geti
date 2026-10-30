@@ -7,9 +7,9 @@ import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { Point, Polygon } from '../../../../shared/types';
+import { useIntelligentScissorsWorker } from '../../smart-tools/use-intelligent-scissors-worker.hook';
 import { usePolygonState } from '../polygon-tool/polygon-state-provider.component';
 import { convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
-import { useIntelligentScissorsWorker } from './use-intelligent-scissors-worker.hook';
 
 export const usePolygonConfig = ({
     zoom,
