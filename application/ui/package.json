@@ -83,6 +83,7 @@
         "@rstest/adapter-rsbuild": "~0.12.3",
         "@rstest/core": "~0.12.3",
         "@rstest/coverage-v8": "~0.12.3",
+        "@tanstack/eslint-plugin-query": "^5.104.5",
         "@tauri-apps/cli": "~2.12.1",
         "@testing-library/jest-dom": "~6.6.4",
         "@testing-library/react": "~16.3.3",

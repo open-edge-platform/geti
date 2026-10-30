@@ -74,11 +74,10 @@ const pipelineMetricsQueryOptions = (projectId: string) => {
 
 export const usePipelineMetrics = () => {
     const projectId = useProjectIdentifier();
-    const { queryKey } = pipelineMetricsQueryOptions(projectId);
 
     return useQuery({
-        queryKey,
-        queryFn: async ({ client, signal }) => {
+        queryKey: pipelineMetricsQueryOptions(projectId).queryKey,
+        queryFn: async ({ client, signal, queryKey }) => {
             const { data, error } = await fetchClient.GET('/api/projects/{project_id}/pipeline/metrics', {
                 ...queryKey[2],
                 signal,

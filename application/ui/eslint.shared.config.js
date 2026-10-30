@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import js from '@eslint/js';
+import tanstackPluginQuery from '@tanstack/eslint-plugin-query';
 import header from 'eslint-plugin-header';
 import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
@@ -35,6 +36,7 @@ export default [
     ...tsConfigs.recommended,
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
+    ...tanstackPluginQuery.configs['flat/recommended'],
     {
         files: ['src/**/*.tsx', 'src/**/*.ts'],
         ...reactPlugin.configs.flat.recommended,

@@ -47,7 +47,7 @@ const isValidAnnotation = (annotation: AnnotationDTO): boolean => {
 const annotationsQueryFn = async (
     projectId: string,
     media: Media
-): Promise<{ annotations: AnnotationDTO[]; user_reviewed: boolean; subset: DatasetSubset } | undefined> => {
+): Promise<{ annotations: AnnotationDTO[]; user_reviewed: boolean; subset: DatasetSubset }> => {
     const queryParams = getMediaItemQueryParams(media);
 
     const { data, error, response } = await fetchClient.GET(
@@ -71,7 +71,11 @@ const annotationsQueryFn = async (
         throw new ApiError(error);
     }
 
-    if (data?.annotations.length === 0) {
+    if (data == undefined) {
+        throw new ApiError({ detail: `No data returned from API for media ${media.id}` });
+    }
+
+    if (data.annotations.length === 0) {
         const annotationDTO = {
             shape: {
                 type: 'full_image',
@@ -84,10 +88,6 @@ const annotationsQueryFn = async (
             user_reviewed: true,
             subset: data.subset,
         };
-    }
-
-    if (data === undefined) {
-        return data;
     }
 
     return {
