@@ -528,8 +528,8 @@
             },
             "configuration": {
                 "sidebarLabel": "Configuration du pipeline",
-                "sourcesTab": "Entrée",
-                "sinksTab": "Sortie"
+                "sourcesTab": "Source",
+                "sinksTab": "Destination"
             }
         },
         "collection": {

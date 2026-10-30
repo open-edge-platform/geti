@@ -512,8 +512,8 @@
             },
             "configuration": {
                 "sidebarLabel": "管線設定",
-                "sourcesTab": "輸入",
-                "sinksTab": "輸出"
+                "sourcesTab": "輸入源",
+                "sinksTab": "輸出端"
             }
         },
         "collection": {

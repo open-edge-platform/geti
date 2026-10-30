@@ -512,8 +512,8 @@
             },
             "configuration": {
                 "sidebarLabel": "流水线配置",
-                "sourcesTab": "输入",
-                "sinksTab": "输出"
+                "sourcesTab": "输入源",
+                "sinksTab": "输出端"
             }
         },
         "collection": {

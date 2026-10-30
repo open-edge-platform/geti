@@ -512,8 +512,8 @@
             },
             "configuration": {
                 "sidebarLabel": "Konfiguracja pipelinu",
-                "sourcesTab": "Wejście",
-                "sinksTab": "Wyjście"
+                "sourcesTab": "Źródło",
+                "sinksTab": "Odbiornik"
             }
         },
         "collection": {

@@ -552,8 +552,8 @@
             },
             "configuration": {
                 "sidebarLabel": "Настройки обработки потока",
-                "sourcesTab": "Источники",
-                "sinksTab": "Получатели результатов"
+                "sourcesTab": "Источник",
+                "sinksTab": "Получатель результатов"
             }
         },
         "collection": {
