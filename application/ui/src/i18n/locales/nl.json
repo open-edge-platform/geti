@@ -513,7 +513,7 @@
             "configuration": {
                 "sidebarLabel": "Pipelineconfiguratie",
                 "sourcesTab": "Bron",
-                "sinksTab": "Bestemming"
+                "sinksTab": "Put"
             }
         },
         "collection": {
@@ -560,7 +560,7 @@
             },
             "componentLabels": {
                 "source": "Bron",
-                "sink": "Bestemming"
+                "sink": "Put"
             }
         },
         "stream": {
