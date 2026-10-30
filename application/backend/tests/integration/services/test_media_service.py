@@ -1055,9 +1055,12 @@ class TestMediaServiceIntegration:
         binary_path = dataset_dir / f"{created_media.id}.tiff"
         assert binary_path.read_bytes() == original_bytes
         with PILImage.open(binary_path) as stored:
-            assert stored.n_frames == 2
+            stored.seek(1)
+            assert stored.size == (32, 16)
         with PILImage.open(dataset_dir / f"{created_media.id}-thumb.jpg") as thumbnail:
-            red, _, blue = thumbnail.convert("RGB").getpixel((0, 0))
+            pixel = thumbnail.convert("RGB").getpixel((0, 0))
+            assert isinstance(pixel, tuple)
+            red, _, blue = pixel
             assert red > 200 and blue < 50
 
     @pytest.mark.parametrize(

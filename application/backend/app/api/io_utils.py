@@ -34,17 +34,19 @@ def file_iterator(filepath: Path, chunk_size: int = 1024 * 1024) -> Generator[by
 
 def file_etag(path: Path, variant: str) -> str:
     """
-    Build a strong ETag for content derived from a file, which changes whenever the file is modified.
+    Build a weak ETag for content derived from a file, which changes whenever the file is modified.
+
+    The tag is derived from the file's modification time and size rather than its bytes, hence weak.
 
     Args:
         path: Path to the source file.
         variant: Identifies how the content is derived from the file, so different derivations never share an ETag.
 
     Returns:
-        Quoted ETag value.
+        Weak ETag value.
     """
     stat = path.stat()
-    return f'"{variant}-{stat.st_mtime_ns:x}-{stat.st_size:x}"'
+    return f'W/"{variant}-{stat.st_mtime_ns:x}-{stat.st_size:x}"'
 
 
 def is_not_modified(if_none_match: str | None, etag: str) -> bool:
@@ -60,7 +62,9 @@ def is_not_modified(if_none_match: str | None, etag: str) -> bool:
     """
     if if_none_match is None:
         return False
-    return any(tag.strip().removeprefix("W/") in (etag, "*") for tag in if_none_match.split(","))
+    # If-None-Match uses weak comparison: the W/ prefix is ignored on both sides
+    current = etag.removeprefix("W/")
+    return any(tag.strip().removeprefix("W/") in (current, "*") for tag in if_none_match.split(","))
 
 
 def write_bytes_to_response(

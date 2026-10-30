@@ -7,7 +7,8 @@ import pytest
 
 from app.api.io_utils import file_etag, is_not_modified, write_bytes_to_response
 
-ETAG = '"display-png-v1-abc-10"'
+OPAQUE_TAG = '"display-png-v1-abc-10"'
+ETAG = f"W/{OPAQUE_TAG}"
 
 
 @pytest.mark.parametrize(
@@ -31,7 +32,7 @@ def test_file_etag_changes_with_file_and_variant(tmp_path: Path) -> None:
     path.write_bytes(b"original")
     etag = file_etag(path, variant="a")
 
-    assert etag.startswith('"a-') and etag.endswith('"')
+    assert etag.startswith('W/"a-') and etag.endswith('"')
     assert file_etag(path, variant="a") == etag
     assert file_etag(path, variant="b") != etag
 
@@ -44,7 +45,7 @@ def test_file_etag_changes_with_file_and_variant(tmp_path: Path) -> None:
     [
         pytest.param(None, False, id="no_header"),
         pytest.param(ETAG, True, id="exact"),
-        pytest.param(f"W/{ETAG}", True, id="weak"),
+        pytest.param(OPAQUE_TAG, True, id="without_weak_prefix"),
         pytest.param(f'"other", {ETAG}', True, id="list"),
         pytest.param("*", True, id="wildcard"),
         pytest.param('"other"', False, id="mismatch"),

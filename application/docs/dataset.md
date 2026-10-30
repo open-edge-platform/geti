@@ -20,7 +20,7 @@ data that the system processes, analyzes, and displays. Supported image formats 
 PNG, TIFF (`tif`, `tiff`), BMP and WebP; supported video formats are MP4, AVI, MKV, MOV, WebM and M4V.
 The original file is always kept as uploaded; images that browsers cannot display (TIFF and high bit depth images,
 e.g. 16-bit) are converted to 8-bit PNG when they are served for display (see the [API](api.md#media)).
-For multi-page TIFF files, only the first page is used. Uploads of images larger than about 179 megapixels are rejected.
+For multi-page TIFF files, the first page is used for metadata, thumbnails, and display conversion; the original file is preserved. Uploads of images larger than about 179 megapixels are rejected.
 Images and video frames can be annotated. When a frame is annotated, Geti extracts it
 from the video, assigns it an ID, and saves it as an image; the extracted frame can also be
 considered a media, supporting all the operations that are normally possible for images.
