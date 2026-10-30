@@ -548,20 +548,20 @@ cache to OS-conventional per-user directories (resolved via Tauri's
 **outside** the install prefix, so reinstalls and upgrades preserve them
 — same convention as Chrome and VSCode.
 
-| Platform | Data                                           | Logs                            | Cache (matplotlib)                           |
-| -------- | ---------------------------------------------- | ------------------------------- | -------------------------------------------- |
-| macOS    | `~/Library/Application Support/com.intel.geti` | `~/Library/Logs/com.intel.geti` | `~/Library/Caches/com.intel.geti/matplotlib` |
-| Windows  | `%LOCALAPPDATA%\Intel\Geti`                    | `%LOCALAPPDATA%\Intel\Geti`     | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
-| Linux    | `~/.local/share/com.intel.geti`                | `~/.local/state/com.intel.geti` | `~/.cache/com.intel.geti/matplotlib`         |
+| Platform | Data                                           | Logs                             | Cache (matplotlib)                           |
+| -------- | ---------------------------------------------- | -------------------------------- | -------------------------------------------- |
+| macOS    | `~/Library/Application Support/com.intel.geti` | `~/Library/Logs/com.intel.geti`  | `~/Library/Caches/com.intel.geti/matplotlib` |
+| Windows  | `%LOCALAPPDATA%\Intel\Geti`                    | `%LOCALAPPDATA%\Intel\Geti\logs` | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
+| Linux    | `~/.local/share/com.intel.geti`                | `~/.local/state/com.intel.geti`  | `~/.cache/com.intel.geti/matplotlib`         |
 
 The logs folder holds both the backend's `app.log` and the desktop shell's
 `shell.log`.
 
 On macOS and Linux, set `DATA_DIR`, `LOG_DIR`, or `MPLCONFIGDIR` in the
 environment to override any of them (the Rust shell only fills in what's
-missing). On Windows the backend's `uwp.py` runtime hook pins data and logs to
-`%LOCALAPPDATA%\Intel\Geti` regardless of the environment; only `MPLCONFIGDIR`
-can be overridden. The WebView2 profile lives in
+missing). On Windows the backend's `uwp.py` runtime hook pins data to
+`%LOCALAPPDATA%\Intel\Geti` and logs to its `logs` subfolder regardless of the
+environment; only `MPLCONFIGDIR` can be overridden. The WebView2 profile lives in
 `%LOCALAPPDATA%\com.intel.geti\EBWebView`.
 
 ### Cleanup / uninstall
