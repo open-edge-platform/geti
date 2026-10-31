@@ -357,10 +357,6 @@ class AutoConfigurator:
         # Capture the tiling intent before overwriting the subset augmentations below.
         tiling_enabled = datamodule.tile_config.enable_tiler
 
-        # The OV recipe owns the loading configuration, including `num_workers`. Ensure that it is copied over.
-        if "num_workers" in ov_subset:
-            subset_config.num_workers = ov_subset["num_workers"]
-
         if keep_aspect_ratio:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
@@ -391,32 +387,7 @@ class AutoConfigurator:
             # pipeline prepends its intensity transform independently of Resize).
             self._strip_resize_transforms(subset_config.augmentations_cpu)
 
-            # IMPORTANT: the OV recipe's batch_size (e.g. 64) is tuned for *non-tiled*
-            # evaluation, where one dataset item == one model input. With tiling
-            # enabled, a single original image expands into *every* grid tile inside
-            # the dataset (see DataModule._eval_loader_kwargs), so a loader batch_size
-            # of N images can balloon into N * num_tiles tiles collated into a single
-            # in-memory batch. With tile_size=400/overlap=0.2 on large images this can
-            # produce a batch so large that building/collating it appears to hang
-            # (severe memory pressure / thrashing) rather than raising an error.
-            # The model still groups tiles into TileConfig.tile_inference_batch_size
-            # chunks for the actual forward passes, so the loader batch_size can (and
-            # must) stay small here regardless of what the OV recipe specifies.
-            if subset_config.batch_size != 1:
-                logger.info(
-                    "update_ov_subset_pipeline: tiling is enabled, overriding OV recipe "
-                    "%s_subset.batch_size (%d) -> 1 to avoid collating %d images' worth of "
-                    "tiles (tile_size=%s, overlap=%s) into a single dataloader batch, which "
-                    "can hang/OOM. Tile-level batching for the model forward pass is still "
-                    "controlled independently via tile_config.tile_inference_batch_size=%d.",
-                    subset,
-                    subset_config.batch_size,
-                    subset_config.batch_size,
-                    datamodule.tile_config.tile_size,
-                    datamodule.tile_config.overlap,
-                    datamodule.tile_config.tile_inference_batch_size,
-                )
-                subset_config.batch_size = 1
+            # Tiled loaders are batch-clamped to 1 in DataModule._eval_loader_kwargs.
         else:
             datamodule.tile_config.enable_tiler = False
 

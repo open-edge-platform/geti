@@ -162,6 +162,17 @@ class TestAutoConfigurator:
         # Without tiling, the OV recipe's batch_size is used as-is (no override).
         assert updated_datamodule.test_subset.batch_size == ov_recipe_batch_size
 
+    def test_update_ov_subset_pipeline_keeps_subset_num_workers(self) -> None:
+        data_root = "tests/assets/detection_coco"
+        auto_configurator = AutoConfigurator(data_root=data_root, task="DETECTION")
+
+        datamodule = auto_configurator.get_datamodule()
+        datamodule.test_subset.num_workers = 3
+
+        updated_datamodule = auto_configurator.update_ov_subset_pipeline(datamodule, subset="test")
+
+        assert updated_datamodule.test_subset.num_workers == 3
+
     def test_update_ov_subset_pipeline_tiling_keeps_tiler_and_strips_resize(self) -> None:
         """With tiling enabled, the OV pipeline keeps the tiler on and removes the tile Resize.
 
@@ -189,12 +200,10 @@ class TestAutoConfigurator:
 
         updated_datamodule = auto_configurator.update_ov_subset_pipeline(datamodule, subset="test")
 
-        # Tiling forces the loader batch_size down to 1 regardless of the OV recipe's
-        # configured batch_size: with tiling enabled, a single dataset item expands into
-        # every grid tile of the native-resolution image, so a larger loader batch_size
-        # would collate many images' worth of tiles into one in-memory batch, which can
-        # hang or OOM (see DataModule._eval_loader_kwargs and update_ov_subset_pipeline).
-        assert updated_datamodule.test_subset.batch_size == 1
+        # Tiling keeps the OV recipe's loader batch_size in the config; the DataModule clamps
+        # the tiled test loader to 1 at build time (a single item expands into every grid tile,
+        # so a larger loader batch would collate many images' worth of tiles in memory).
+        assert updated_datamodule.test_dataloader().batch_size == 1
 
         # Tiling stays enabled: ModelAPI performs tiled inference via forward_tiles.
         assert updated_datamodule.tile_config.enable_tiler
