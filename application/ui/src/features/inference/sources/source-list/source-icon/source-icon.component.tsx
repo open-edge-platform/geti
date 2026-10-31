@@ -1,12 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-    ImagesFolder as ImagesFolderIcon,
-    IpCamera as IpCameraIcon,
-    VideoFile as VideoFileIcon,
-    Webcam as WebcamIcon,
-} from '@/assets/icons';
+import { IpCamera as IpCameraIcon, VideoFile as VideoFileIcon, Webcam as WebcamIcon } from '@/assets/icons';
 
 type SourceIconProps = {
     type: string;
@@ -25,5 +20,5 @@ export const SourceIcon = ({ type }: SourceIconProps) => {
         return <VideoFileIcon />;
     }
 
-    return <ImagesFolderIcon />;
+    return null;
 };

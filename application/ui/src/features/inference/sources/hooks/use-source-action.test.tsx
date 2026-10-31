@@ -3,7 +3,7 @@
 
 import { startTransition } from 'react';
 
-import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '@/api/types';
+import type { IPCameraSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
@@ -11,6 +11,7 @@ import { renderHook } from 'test-utils/render';
 import * as actualTus from '../../../../api/tus-upload' with { rstest: 'importActual' };
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
+import { ipCameraBodyFormatter as bodyFormatter } from '../ip-camera/utils';
 import { prepareVideoFileFormData, videoFileBodyFormatter } from '../video-file/utils';
 import { useSourceAction } from './use-source-action.hook';
 
@@ -19,21 +20,13 @@ rs.mock('../../../../api/tus-upload', () => ({
     transferFile: rs.fn(async () => '00000000-0000-4000-8000-000000000001'),
 }));
 
-const mockedConfig: ImagesFolderSourceConfig = {
-    id: 'images_folder-id',
-    name: 'Test Folder',
-    source_type: 'images_folder',
-    images_folder_path: '/path/to/images',
-    ignore_existing_images: false,
+const mockedConfig: IPCameraSourceConfig = {
+    id: 'ip_camera-id',
+    name: 'Test Camera',
+    source_type: 'ip_camera',
+    stream_url: 'rtsp://camera/stream',
+    auth_required: false,
 };
-
-const bodyFormatter = (formData: FormData) => ({
-    id: String(formData.get('id')),
-    name: String(formData.get('name')),
-    source_type: 'images_folder' as const,
-    images_folder_path: String(formData.get('images_folder_path')),
-    ignore_existing_images: formData.get('ignore_existing_images') === 'on' ? true : false,
-});
 
 const renderApp = async ({
     isNewSource = false,
@@ -48,7 +41,7 @@ const renderApp = async ({
             HttpResponse.json({
                 project_id: '',
                 status: 'idle',
-                device: 'images_folder',
+                device: 'cpu',
             })
         )
     );
@@ -59,8 +52,7 @@ const renderApp = async ({
     const formData = new FormData();
     formData.append('name', config.name);
     formData.append('source_type', config.source_type);
-    formData.append('images_folder_path', config.images_folder_path);
-    formData.append('ignore_existing_images', String(config.ignore_existing_images));
+    formData.append('stream_url', config.stream_url);
     config.id && formData.append('id', config.id);
 
     await act(async () => {
@@ -84,7 +76,7 @@ describe('useSourceAction', () => {
     });
 
     describe('new configuration', () => {
-        it('submits folder config and display error message on failure', async () => {
+        it('submits ip camera config and display error message on failure', async () => {
             const mockedError = 'test-error';
             await renderApp({
                 isNewSource: true,
@@ -96,7 +88,7 @@ describe('useSourceAction', () => {
             });
         });
 
-        it('submit new image folder config and show success message', async () => {
+        it('submit new ip camera config and show success message', async () => {
             const mockedNewItemId = 'new-id-test';
             const [state] = await renderApp({
                 isNewSource: true,
@@ -111,7 +103,7 @@ describe('useSourceAction', () => {
     });
 
     describe('edit configuration', () => {
-        it('submits folder config and display error message on failure', async () => {
+        it('submits ip camera config and display error message on failure', async () => {
             const mockedError = 'test-error';
 
             await renderApp({
@@ -124,7 +116,7 @@ describe('useSourceAction', () => {
             });
         });
 
-        it('submits folder config and show success message', async () => {
+        it('submits ip camera config and show success message', async () => {
             const newConfig = { ...mockedConfig, id: 'mockedResponseId', name: 'Updated Name' };
 
             const [state] = await renderApp({
@@ -144,7 +136,7 @@ describe('useSourceAction', () => {
         it('awaits prepareFormData and lets bodyFormatter read its mutations to the FormData', async () => {
             const prepareFormData = async (formData: FormData) => {
                 await Promise.resolve();
-                formData.set('images_folder_path', '/mutated/by/prepare');
+                formData.set('stream_url', 'rtsp://mutated/by/prepare');
 
                 return undefined;
             };
@@ -152,7 +144,7 @@ describe('useSourceAction', () => {
             server.use(
                 http.post('/api/sources', () => HttpResponse.json({ ...mockedConfig, id: 'new-id-test' })),
                 http.patch('/api/projects/{project_id}/pipeline', () =>
-                    HttpResponse.json({ project_id: '', status: 'idle', device: 'images_folder' })
+                    HttpResponse.json({ project_id: '', status: 'idle', device: 'cpu' })
                 )
             );
 
@@ -164,8 +156,7 @@ describe('useSourceAction', () => {
             const formData = new FormData();
             formData.append('name', mockedConfig.name);
             formData.append('source_type', mockedConfig.source_type);
-            formData.append('images_folder_path', mockedConfig.images_folder_path);
-            formData.append('ignore_existing_images', String(mockedConfig.ignore_existing_images));
+            formData.append('stream_url', mockedConfig.stream_url);
 
             await act(async () => {
                 startTransition(async () => submitAction(formData));
@@ -174,7 +165,7 @@ describe('useSourceAction', () => {
             await waitFor(() => {
                 expect(screen.getByText('Source configuration created successfully.')).toBeVisible();
                 expect(result.current[0].id).toBe('new-id-test');
-                expect(result.current[0].images_folder_path).toBe('/mutated/by/prepare');
+                expect(result.current[0].stream_url).toBe('rtsp://mutated/by/prepare');
             });
         });
 

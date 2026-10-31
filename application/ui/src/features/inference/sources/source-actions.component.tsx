@@ -20,7 +20,9 @@ export const SourceActions = () => {
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');
     const [currentSource, setCurrentSource] = useState<SourceConfig | null>(null);
     const { data: sources = [], isPending } = useSourcesQuery();
-    const filteredSources = sources.filter((source) => source.source_type !== 'disconnected');
+    const filteredSources = sources.filter(
+        (source) => source.source_type !== 'disconnected' && source.source_type !== 'images_folder'
+    );
     const existingNames = filteredSources.map((source) => source.name);
 
     const pipeline = usePipeline();

@@ -387,7 +387,6 @@
                 "usbCamera": "caméra usb",
                 "ipCamera": "caméra ip",
                 "videoFile": "fichier vidéo",
-                "imagesFolder": "dossier d’images",
                 "disconnected": "déconnecté"
             },
             "options": {
@@ -419,13 +418,10 @@
                 "loading": "Chargement...",
                 "device": "Périphérique : {{name}}",
                 "unknownDevice": "Périphérique inconnu (id : {{deviceId}})",
-                "ignoreExistingImages": "Ignorer les images existantes : {{value}}",
                 "streamUrl": "URL du flux : {{url}}",
                 "videoPath": "Chemin de la vidéo : {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Chemin du dossier d’images",
-                "ignoreExistingImages": "Ignorer les images existantes",
                 "streamUrl": "URL du flux :",
                 "requireAuthentication": "Exiger une authentification",
                 "camera": "Caméra",

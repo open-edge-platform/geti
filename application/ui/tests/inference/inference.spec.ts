@@ -126,7 +126,7 @@ test.describe('Inference', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
