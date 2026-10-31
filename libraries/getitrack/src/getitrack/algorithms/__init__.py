@@ -13,4 +13,4 @@ from getitrack.algorithms.iou import IOUTracker
 from getitrack.algorithms.ocsort import OCSortTracker
 from getitrack.algorithms.sort import SortTracker
 
-__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker", "IOUTracker"]  # noqa: RUF022
+__all__ = ["BotSortTracker", "ByteTrackTracker", "IOUTracker", "OCSortTracker", "SortTracker"]
