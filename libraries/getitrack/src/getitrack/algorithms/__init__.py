@@ -9,7 +9,8 @@ Importing this package registers every algorithm into
 
 from getitrack.algorithms.botsort import BotSortTracker
 from getitrack.algorithms.bytetrack import ByteTrackTracker
+from getitrack.algorithms.iou import IOUTracker
 from getitrack.algorithms.ocsort import OCSortTracker
 from getitrack.algorithms.sort import SortTracker
 
-__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker"]
+__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker", "IOUTracker"]  # noqa: RUF022

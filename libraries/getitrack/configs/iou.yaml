@@ -1,0 +1,8 @@
+# High-Speed IOU Tracker: thresholds should be tuned to the detector and dataset.
+algorithm: iou
+score_threshold: 0.1 # sigma_l (inclusive)
+high_score_threshold: 0.5 # sigma_h (inclusive peak score)
+iou_threshold: 0.5 # sigma_iou (inclusive)
+match_class_only: true
+lifecycle:
+  min_hits: 2 # t_min; no first-frame bypass
