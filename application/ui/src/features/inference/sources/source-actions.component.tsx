@@ -12,10 +12,12 @@ import { orderBy } from 'lodash-es';
 
 import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { useSourcesQuery } from './api/use-sources';
-import { EditSourceForm } from './deprecated/edit-source-form.component';
+import { EditSourceForm as DeprecatedEditSourceForm } from './deprecated/edit-source-form.component';
 import { SourcesList as DeprecatedSourcesList } from './deprecated/source-list/source-list.component';
-import { SourceOptions } from './deprecated/source-options';
+import { SourceOptions as DeprecatedSourceOptions } from './deprecated/source-options';
+import { EditSourceForm } from './edit-source-form.component';
 import { SourcesList } from './source-list/source-list.component';
+import { SourceOptions } from './source-options';
 
 export const SourceActions = () => {
     const { t } = useTranslation();
@@ -48,8 +50,19 @@ export const SourceActions = () => {
     }
 
     if (view === 'edit' && currentSource !== null) {
+        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR && currentSource.source_type !== 'disconnected') {
+            return (
+                <EditSourceForm
+                    config={currentSource}
+                    onSaved={handleShowList}
+                    onBackToList={handleShowList}
+                    isConnected={connectedSourceId === currentSource.id}
+                />
+            );
+        }
+
         return (
-            <EditSourceForm
+            <DeprecatedEditSourceForm
                 config={currentSource}
                 onSaved={handleShowList}
                 onBackToList={handleShowList}
@@ -72,8 +85,14 @@ export const SourceActions = () => {
         );
     }
 
+    const SourceOptionsComponent = FEATURE_FLAGS.SOURCES_SINKS_REFACTOR ? SourceOptions : DeprecatedSourceOptions;
+
     return (
-        <SourceOptions onSaved={handleShowList} hasHeader={filteredSources.length > 0} existingNames={existingNames}>
+        <SourceOptionsComponent
+            onSaved={handleShowList}
+            hasHeader={filteredSources.length > 0}
+            existingNames={existingNames}
+        >
             <Flex gap={'size-100'} marginBottom={'size-100'} alignItems={'center'}>
                 <ActionButton isQuiet onPress={handleShowList}>
                     <Back />
@@ -81,6 +100,6 @@ export const SourceActions = () => {
 
                 <Text>{t('inference.sources.add.title')}</Text>
             </Flex>
-        </SourceOptions>
+        </SourceOptionsComponent>
     );
 };
