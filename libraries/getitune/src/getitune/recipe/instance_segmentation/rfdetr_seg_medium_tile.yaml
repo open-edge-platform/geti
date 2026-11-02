@@ -100,6 +100,7 @@ overrides:
             resize_targets: false
 
     test_subset:
+      num_workers: 2
       batch_size: 4
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
