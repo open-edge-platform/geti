@@ -409,7 +409,6 @@
                 "usbCamera": "USB-камера",
                 "ipCamera": "IP-камера",
                 "videoFile": "видеофайл",
-                "imagesFolder": "папка с изображениями",
                 "disconnected": "отключено"
             },
             "options": {
@@ -441,13 +440,10 @@
                 "loading": "Загрузка...",
                 "device": "Устройство: {{name}}",
                 "unknownDevice": "Неизвестное устройство (ID: {{deviceId}})",
-                "ignoreExistingImages": "Обрабатывать только новые изображения: {{value}}",
                 "streamUrl": "Адрес видеопотока: {{url}}",
                 "videoPath": "Путь к видео: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Путь к папке с изображениями",
-                "ignoreExistingImages": "Обрабатывать только новые изображения",
                 "streamUrl": "Адрес видеопотока",
                 "requireAuthentication": "Нужны логин и пароль",
                 "camera": "Камера",

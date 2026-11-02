@@ -373,7 +373,6 @@
                 "usbCamera": "USB 摄像头",
                 "ipCamera": "IP 摄像头",
                 "videoFile": "视频文件",
-                "imagesFolder": "图片文件夹",
                 "disconnected": "未连接"
             },
             "options": {
@@ -405,13 +404,10 @@
                 "loading": "加载中……",
                 "device": "设备：{{name}}",
                 "unknownDevice": "未知设备（id：{{deviceId}}）",
-                "ignoreExistingImages": "忽略已有图片：{{value}}",
                 "streamUrl": "视频流地址：{{url}}",
                 "videoPath": "视频路径：{{path}}"
             },
             "fields": {
-                "imagesFolderPath": "图片文件夹路径",
-                "ignoreExistingImages": "忽略已有图片",
                 "streamUrl": "视频流地址：",
                 "requireAuthentication": "需要身份验证",
                 "camera": "摄像头",

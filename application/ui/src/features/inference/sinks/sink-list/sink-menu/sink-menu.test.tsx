@@ -54,7 +54,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status: 200 }
                     );
@@ -95,7 +95,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     )
@@ -152,7 +152,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status: 200 }
                     );

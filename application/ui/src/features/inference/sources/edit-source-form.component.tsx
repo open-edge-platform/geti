@@ -1,11 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ImagesFolderSourceConfig, SourceConfig, VideoFileSourceConfig } from '@/api/types';
+import type { SourceConfig, VideoFileSourceConfig } from '@/api/types';
 
 import { EditSource } from './edit-source/edit-source.component';
-import { ImageFolder } from './image-folder/image-folder.component';
-import { imagesFolderBodyFormatter } from './image-folder/utils';
 import { IpCamera } from './ip-camera/ip-camera.component';
 import { ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
@@ -70,14 +68,5 @@ export const EditSourceForm = ({ config, connectedSourceId, onSaved, onBackToLis
         );
     }
 
-    return (
-        <EditSource
-            onSaved={onSaved}
-            onBackToList={onBackToList}
-            config={config as ImagesFolderSourceConfig}
-            componentFields={(state: ImagesFolderSourceConfig) => <ImageFolder defaultState={state} />}
-            bodyFormatter={imagesFolderBodyFormatter}
-            isConnected={connectedSourceId === config.id}
-        />
-    );
+    return null;
 };

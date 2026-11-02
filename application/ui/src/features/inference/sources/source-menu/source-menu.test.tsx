@@ -78,7 +78,7 @@ describe('SourceMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     );
@@ -120,7 +120,7 @@ describe('SourceMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     )
@@ -176,7 +176,7 @@ describe('SourceMenu', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.post('/api/projects/{project_id}/pipeline:disable', async () => {
@@ -210,7 +210,7 @@ describe('SourceMenu', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.post('/api/projects/{project_id}/pipeline:disable', async () => {

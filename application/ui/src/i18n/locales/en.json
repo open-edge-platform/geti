@@ -373,7 +373,6 @@
                 "usbCamera": "usb camera",
                 "ipCamera": "ip camera",
                 "videoFile": "video file",
-                "imagesFolder": "images folder",
                 "disconnected": "disconnected"
             },
             "options": {
@@ -405,13 +404,10 @@
                 "loading": "Loading...",
                 "device": "Device: {{name}}",
                 "unknownDevice": "Unknown device (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignore existing images: {{value}}",
                 "streamUrl": "Stream url: {{url}}",
                 "videoPath": "Video path: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Images folder path",
-                "ignoreExistingImages": "Ignore existing images",
                 "streamUrl": "Stream Url:",
                 "requireAuthentication": "Require Authentication",
                 "camera": "Camera",

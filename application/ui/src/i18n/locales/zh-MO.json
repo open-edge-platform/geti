@@ -373,7 +373,6 @@
                 "usbCamera": "USB 攝影機",
                 "ipCamera": "IP 攝影機",
                 "videoFile": "影片檔案",
-                "imagesFolder": "圖片資料夾",
                 "disconnected": "未連線"
             },
             "options": {
@@ -405,13 +404,10 @@
                 "loading": "載入中……",
                 "device": "裝置：{{name}}",
                 "unknownDevice": "未知裝置（id：{{deviceId}}）",
-                "ignoreExistingImages": "忽略已有圖片：{{value}}",
                 "streamUrl": "影片串流位址：{{url}}",
                 "videoPath": "影片路徑：{{path}}"
             },
             "fields": {
-                "imagesFolderPath": "圖片資料夾路徑",
-                "ignoreExistingImages": "忽略已有圖片",
                 "streamUrl": "影片串流位址：",
                 "requireAuthentication": "需要身份驗證",
                 "camera": "攝影機",

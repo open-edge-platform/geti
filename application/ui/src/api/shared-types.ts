@@ -69,18 +69,13 @@ export type ProjectCreate = components['schemas']['ProjectCreate'];
 export type TaskType = components['schemas']['TaskType'];
 export type Task = components['schemas']['TaskView'];
 
-export type ImagesFolderSourceConfig = components['schemas']['ImagesFolderSourceConfigView'];
 export type IPCameraSourceConfig = components['schemas']['IPCameraSourceConfigView'];
 export type USBCameraSourceConfig = components['schemas']['USBCameraSourceConfigView'];
 export type VideoFileSourceConfig = components['schemas']['VideoFileSourceConfigView'];
 type DisconnectedSourceConfig = components['schemas']['DisconnectedSourceConfigView'];
 
 export type SourceConfig =
-    | DisconnectedSourceConfig
-    | USBCameraSourceConfig
-    | IPCameraSourceConfig
-    | VideoFileSourceConfig
-    | ImagesFolderSourceConfig;
+    DisconnectedSourceConfig | USBCameraSourceConfig | IPCameraSourceConfig | VideoFileSourceConfig;
 
 export type SourceConfigPayload = Exclude<SourceConfig, DisconnectedSourceConfig>;
 
