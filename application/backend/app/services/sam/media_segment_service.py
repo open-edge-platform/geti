@@ -9,7 +9,7 @@ from safetensors.numpy import save as safetensors_save
 from sqlalchemy.orm import Session
 
 from app.models import Image, Project, VideoFrame
-from app.models.media import Media, NotAnnotatedVideoFrame, Video
+from app.models.media import Media, NotAnnotatedVideoFrame, OmeImage, OmePlane, Video
 from app.models.system import DeviceInfo
 from app.services.base import BaseSessionManagedService
 from app.services.media_numpy_loader import MediaNumpyLoader
@@ -140,7 +140,7 @@ class MediaSegmentService(BaseSessionManagedService):
         media: Media | NotAnnotatedVideoFrame,
         device: DeviceInfo,
     ) -> bytes:
-        if isinstance(media, Image | VideoFrame):
+        if isinstance(media, Image | VideoFrame | OmePlane):
             media_binary = self._media_numpy_loader.load_media_binary(project_id=project.id, media=media)
         elif isinstance(media, NotAnnotatedVideoFrame):
             extracted = self._media_service.get_frame_binaries(
@@ -149,6 +149,8 @@ class MediaSegmentService(BaseSessionManagedService):
             media_binary = extracted[media.frame_index]
         elif isinstance(media, Video):
             raise ValueError("Video media type is not supported for segmentation")
+        elif isinstance(media, OmeImage):
+            raise ValueError("OME image media type is not supported for segmentation, use its planes instead")
 
         # Derive the resize metadata from the decoded binary (H, W, ...) before any channel
         # conversion; this is correct for every media type (Image, VideoFrame, extracted frame).

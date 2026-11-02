@@ -105,7 +105,71 @@ class VideoView(BaseRequiredIDNameModel):
     }
 
 
-MediaView = Annotated[ImageView | VideoView | VideoFrameView, Field(discriminator="type")]
+class OmeImageView(BaseRequiredIDNameModel):
+    """
+    OmeImage
+    """
+
+    type: Literal[MediaType.OME_IMAGE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    plane_count: int
+    source_id: UUID | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "id": "3fae2b1e-1c4f-4f60-9d0a-6b3f7b9b2a10",
+                "name": "plate_A01",
+                "type": "ome_image",
+                "format": "ome.tiff",
+                "width": 2048,
+                "height": 2048,
+                "size": 503316480,
+                "plane_count": 60,
+                "source_id": None,
+            }
+        }
+    }
+
+
+class OmePlaneView(BaseRequiredIDNameModel):
+    """
+    OmePlane
+    """
+
+    type: Literal[MediaType.OME_PLANE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+    source_id: UUID | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "id": "9b1caa02-5d3e-4a0f-8c55-2f1d0e6a7b31",
+                "name": "plate_A01_z12_t0",
+                "type": "ome_plane",
+                "format": "png",
+                "width": 2048,
+                "height": 2048,
+                "size": 4194304,
+                "ome_image_id": "3fae2b1e-1c4f-4f60-9d0a-6b3f7b9b2a10",
+                "z_index": 12,
+                "t_index": 0,
+                "source_id": None,
+            }
+        }
+    }
+
+
+MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView | OmePlaneView, Field(discriminator="type")]
 
 MediaViewAdapter: TypeAdapter[MediaView] = TypeAdapter(MediaView)
 

@@ -13,7 +13,7 @@ from uuid import UUID
 
 from loguru import logger
 
-from app.models.media import Image, MediaType, Video
+from app.models.media import LEAF_MEDIA_TYPES, Image, MediaType, Video
 from app.models.model_revision import ModelFormat
 
 if TYPE_CHECKING:
@@ -272,7 +272,7 @@ class DemoFilesService:
             image_media = self._media_service.list_media(
                 project_id=project_id,
                 filters=MediaFilters(limit=1, offset=0),
-                exclude_types=[MediaType.VIDEO, MediaType.VIDEO_FRAME],
+                exclude_types=[MediaType.VIDEO, *LEAF_MEDIA_TYPES, MediaType.OME_IMAGE],
             )
         except Exception:
             logger.exception("Failed to list media to pick a sample image for project {}", project_id)
@@ -293,7 +293,7 @@ class DemoFilesService:
             video_media = self._media_service.list_media(
                 project_id=project_id,
                 filters=MediaFilters(limit=1, offset=0),
-                exclude_types=[MediaType.IMAGE, MediaType.VIDEO_FRAME],
+                exclude_types=[MediaType.IMAGE, *LEAF_MEDIA_TYPES, MediaType.OME_IMAGE],
             )
         except Exception:
             logger.exception("Failed to list videos to extract a sample frame for project {}", project_id)

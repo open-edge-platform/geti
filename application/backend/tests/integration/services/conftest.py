@@ -12,6 +12,7 @@ from app.services import (
     LabelService,
     MediaService,
     ModelService,
+    OmeService,
     PipelineService,
     ProjectService,
     SystemService,
@@ -87,6 +88,12 @@ def fxt_dataset_service(
 ) -> DatasetService:
     """Fixture to create a DatasetService instance."""
     return DatasetService(label_service=fxt_label_service, media_service=fxt_media_service, db_session=db_session)
+
+
+@pytest.fixture
+def fxt_ome_service(fxt_projects_dir: Path, fxt_media_service: MediaService, db_session: Session) -> OmeService:
+    """Fixture to create an OmeService instance."""
+    return OmeService(data_dir=fxt_projects_dir.parent, media_service=fxt_media_service, db_session=db_session)
 
 
 @pytest.fixture

@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
 from app.models import DatasetItemSubset
 from app.models.dataset_item import DatasetItemSortBy
-from app.models.media import SortDirection
+from app.models.media import MediaType, SortDirection
 
 from .filters import _apply_annotation_status_filter, _apply_date_range_filter, _apply_subset_filter
 
@@ -213,7 +213,7 @@ class DatasetItemRepository:
         """List label rows of unassigned dataset items, each paired with the parent
         video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB, MediaDB.video_id)
+            select(DatasetItemLabelDB, MediaDB.parent_id)
             .join(DatasetItemDB, DatasetItemLabelDB.dataset_item_id == DatasetItemDB.id)
             .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
@@ -229,14 +229,14 @@ class DatasetItemRepository:
         Used to keep newly annotated frames of a video in the same subset as the
         video's previously assigned frames."""
         stmt = (
-            select(MediaDB.video_id, DatasetItemDB.subset, func.count(DatasetItemDB.id))
+            select(MediaDB.parent_id, DatasetItemDB.subset, func.count(DatasetItemDB.id))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,
                 DatasetItemDB.subset != DatasetItemSubset.UNASSIGNED,
-                MediaDB.video_id.is_not(None),
+                MediaDB.parent_id.is_not(None),
             )
-            .group_by(MediaDB.video_id, DatasetItemDB.subset)
+            .group_by(MediaDB.parent_id, DatasetItemDB.subset)
         )
         return [(row[0], row[1], row[2]) for row in self.db.execute(stmt).all()]
 
@@ -270,7 +270,7 @@ class DatasetItemRepository:
         result = self.db.execute(media_counts_stmt)
         rows = list(result)
         statistics: dict[str, Any] = {f"{row.type}s": cast(int, row.count) for row in rows}
-        statistics["video_frames"] = int(sum(row.frame_count or 0 for row in rows))
+        statistics["video_frames"] = int(sum(row.frame_count or 0 for row in rows if row.type == MediaType.VIDEO))
 
         # Annotation Counts (annotated images and video frames):
         annotated_images_frames_stmt = (
@@ -288,7 +288,7 @@ class DatasetItemRepository:
 
         # Annotation Counts (annotated videos)
         annotated_video_stmt = (
-            select(func.count(func.distinct(MediaDB.video_id)).label("count"))
+            select(func.count(func.distinct(MediaDB.parent_id)).label("count"))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,

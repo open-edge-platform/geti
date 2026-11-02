@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewDB, DatasetViewItemDB, MediaDB
 from app.models import DatasetItemSubset
 from app.models.dataset_item import DatasetItemSortBy
-from app.models.media import MediaSortBy, MediaType, SortDirection
+from app.models.media import LEAF_MEDIA_TYPES, MediaSortBy, MediaType, SortDirection
 
 from .base import BaseRepository
 from .filters import (
@@ -88,7 +88,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             select(DatasetViewItemDB.dataset_view_id)
             .join(
                 MediaDB,
-                (MediaDB.id == DatasetViewItemDB.media_id) | (MediaDB.video_id == DatasetViewItemDB.media_id),
+                (MediaDB.id == DatasetViewItemDB.media_id) | (MediaDB.parent_id == DatasetViewItemDB.media_id),
             )
             .where(MediaDB.id == media_id)
         )
@@ -122,7 +122,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         return exists(
             select(DatasetViewItemDB.media_id).where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
-                (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.video_id),
+                (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.parent_id),
             )
         ).correlate(MediaDB)
 
@@ -134,7 +134,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
 
@@ -146,7 +146,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
 
@@ -168,7 +168,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
         stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
@@ -322,7 +322,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         """List label rows of unassigned dataset items of a view, each paired with the parent
         video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB, MediaDB.video_id)
+            select(DatasetItemLabelDB, MediaDB.parent_id)
             .join(DatasetItemDB, DatasetItemDB.id == DatasetItemLabelDB.dataset_item_id)
             .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
@@ -365,7 +365,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         )
         rows = list(self.db.execute(media_counts_stmt))
         statistics: dict[str, Any] = {f"{row.type}s": cast(int, row.count) for row in rows}
-        statistics["video_frames"] = int(sum(row.frame_count or 0 for row in rows))
+        statistics["video_frames"] = int(sum(row.frame_count or 0 for row in rows if row.type == MediaType.VIDEO))
 
         # Annotation Counts (annotated images and video frames belonging to media assigned to the view):
         annotated_images_frames_stmt = (
@@ -385,7 +385,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
 
         # Annotation Counts (annotated videos assigned to the view)
         annotated_video_stmt = (
-            select(func.count(func.distinct(MediaDB.video_id)))
+            select(func.count(func.distinct(MediaDB.parent_id)))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,

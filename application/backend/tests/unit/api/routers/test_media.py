@@ -40,6 +40,7 @@ from app.models import (
     VideoFrame,
 )
 from app.models.media import (
+    LEAF_MEDIA_TYPES,
     ImageFormat,
     MediaListPredictionRequest,
     MediaPredictionRequest,
@@ -466,14 +467,14 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=MediaFilters(
                 limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_with_dataset_view_id(
@@ -527,7 +528,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -540,7 +541,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_naive_dates_are_normalized_to_utc(
@@ -561,7 +562,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -574,7 +575,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     @pytest.mark.parametrize("limit", [1000, 0, -20])
@@ -633,7 +634,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         # No pagination means there is nothing to count.
         fxt_media_service.count_media.assert_not_called()
@@ -661,7 +662,7 @@ class TestMediaEndpoints:
                 label_ids=[label_id],
                 subsets=[DatasetItemSubset.TRAINING.value],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_ids_with_dataset_view_id(
@@ -723,7 +724,7 @@ class TestMediaEndpoints:
             annotation_status=annotation_status,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -736,7 +737,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     @pytest.mark.parametrize("subset", ["unassigned", "training", "validation", "testing"])
@@ -756,7 +757,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=[subset],
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -769,7 +770,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=[subset],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_with_multiple_subsets(
@@ -788,7 +789,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=["training", "validation"],
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -801,7 +802,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=["training", "validation"],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_default_sort_direction(
@@ -826,7 +827,7 @@ class TestMediaEndpoints:
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=SortDirection.DESC,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     @pytest.mark.parametrize("sort_direction", [SortDirection.ASC, SortDirection.DESC])
@@ -852,7 +853,7 @@ class TestMediaEndpoints:
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=sort_direction,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     @pytest.mark.parametrize("sort_by", list(MediaSortBy))
@@ -878,7 +879,7 @@ class TestMediaEndpoints:
                 sort_by=sort_by,
                 sort_direction=SortDirection.DESC,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
 
     def test_list_media_wrong_sort_by(self, fxt_get_project, fxt_media_service, fxt_client):

@@ -24,6 +24,7 @@ from .media_service import MediaService
 from .metrics_service import MetricsService
 from .model_manifest_service import ModelManifestService
 from .model_service import ModelRevisionMetadata, ModelService
+from .ome_service import OmeService
 from .pipeline_metrics_service import PipelineMetricsService
 from .pipeline_service import PipelineService
 from .project_service import ProjectService
@@ -56,6 +57,7 @@ __all__ = [
     "ModelManifestService",
     "ModelRevisionMetadata",
     "ModelService",
+    "OmeService",
     "PipelineMetricsService",
     "PipelineService",
     "ProjectService",

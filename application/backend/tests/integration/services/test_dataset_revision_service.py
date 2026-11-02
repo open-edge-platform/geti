@@ -249,7 +249,7 @@ def fxt_project_with_video_frame_items_on_disk(
             size=1024,
             width=1920,
             height=1080,
-            video_id=str(db_video.id),
+            parent_id=str(db_video.id),
             frame_index=frame_index,
             project_id=str(project.id),
             created_at=datetime.fromisoformat("2025-02-01T00:00:00Z"),

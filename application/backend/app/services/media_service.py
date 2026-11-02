@@ -200,7 +200,7 @@ class MediaService(BaseSessionManagedService):
                 height=image.height,
                 size=os.path.getsize(binary_path),
                 source_id=str(metadata.source_id) if metadata.source_id is not None else None,
-                video_id=str(metadata.video_id) if metadata.video_id is not None else None,
+                parent_id=str(metadata.video_id) if metadata.video_id is not None else None,
                 frame_index=metadata.frame_idx,
             )
 
@@ -410,6 +410,8 @@ class MediaService(BaseSessionManagedService):
             os.remove(thumbnail_path)
         except FileNotFoundError:
             logger.warning("Media {} thumbnail was not found during deletion", media_id)
+        if media.type == MediaType.OME_IMAGE:
+            shutil.rmtree(self.projects_dir / f"{project.id}/dataset/ome_cache/{media.id}", ignore_errors=True)
 
         view_repo = DatasetViewRepository(project_id=str(project.id), db=self.db_session)
         view_repo.touch_views_containing_media(str(media.id))
@@ -467,7 +469,7 @@ class MediaService(BaseSessionManagedService):
                 format=str(format),
                 width=frame_image.width,
                 height=frame_image.height,
-                video_id=str(video.id),
+                parent_id=str(video.id),
                 frame_index=frame_index,
                 size=os.path.getsize(video_frame_path),
                 source_id=None,

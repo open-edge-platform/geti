@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, computed_field, model_validator
@@ -33,7 +33,52 @@ class VideoFormat(StrEnum):
     M4V = "m4v"
 
 
-MediaFormat = ImageFormat | VideoFormat
+class OmeFormat(StrEnum):
+    """Format of an OME (multi-dimensional microscopy) image."""
+
+    OME_TIFF = "ome.tiff"
+    OME_TIF = "ome.tif"
+
+
+MediaFormat = ImageFormat | VideoFormat | OmeFormat
+
+
+def parse_media_format(file_name_or_extension: str) -> MediaFormat | None:
+    """
+    Resolve a media format from a file name or extension, honouring compound extensions.
+
+    The longest matching suffix wins, so that `a.ome.tiff` resolves to OME-TIFF while `b.tiff` resolves to TIFF.
+
+    Args:
+        file_name_or_extension: A file name (`a.ome.tiff`) or an extension with or without the leading dot.
+
+    Returns:
+        The matching media format, or None if the extension is not supported.
+    """
+    value = file_name_or_extension.lower()
+    formats: list[MediaFormat] = [*OmeFormat, *ImageFormat, *VideoFormat]
+    for media_format in sorted(formats, key=lambda f: len(f.value), reverse=True):
+        if value == media_format.value or value.endswith(f".{media_format.value}"):
+            return media_format
+    return None
+
+
+def split_media_file_name(file_name: str) -> tuple[str, str]:
+    """
+    Split a file name into its base name and extension, keeping compound extensions such as `.ome.tiff` whole.
+
+    Args:
+        file_name: The file name to split.
+
+    Returns:
+        A tuple of (base name, extension without the leading dot). The extension is empty if there is none.
+    """
+    for ome_format in OmeFormat:
+        suffix = f".{ome_format.value}"
+        if file_name.lower().endswith(suffix) and len(file_name) > len(suffix):
+            return file_name[: -len(suffix)], file_name[-len(suffix) + 1 :]
+    name, dot, extension = file_name.rpartition(".")
+    return (name, extension) if dot else (file_name, "")
 
 
 class MediaType(StrEnum):
@@ -42,6 +87,28 @@ class MediaType(StrEnum):
     IMAGE = "image"
     VIDEO = "video"
     VIDEO_FRAME = "video_frame"
+    OME_IMAGE = "ome_image"
+    OME_PLANE = "ome_plane"
+
+
+# Media types acting as containers of lazily-created leaf media, and the leaf media types themselves.
+# Leaves are annotated individually but are never listed or assigned to dataset views on their own.
+CONTAINER_MEDIA_TYPES: tuple[MediaType, ...] = (MediaType.VIDEO, MediaType.OME_IMAGE)
+LEAF_MEDIA_TYPES: tuple[MediaType, ...] = (MediaType.VIDEO_FRAME, MediaType.OME_PLANE)
+
+
+def _expose_parent_id(model: type[BaseModel], data: Any, field_name: str) -> Any:
+    """
+    Map the ORM `parent_id` attribute onto the public field name of a leaf media (e.g. `video_id`).
+
+    ORM rows store the parent container under `parent_id`, while the public models keep a descriptive name.
+    Plain dicts and objects without `parent_id` (e.g. domain models) are passed through unchanged.
+    """
+    if isinstance(data, dict) or not hasattr(data, "parent_id"):
+        return data
+    values = {name: getattr(data, name) for name in model.model_fields if hasattr(data, name)}
+    values[field_name] = data.parent_id
+    return values
 
 
 class MediaSortBy(StrEnum):
@@ -99,6 +166,11 @@ class VideoFrame(BaseMedia):
     video_id: UUID
     frame_index: int
 
+    @model_validator(mode="before")
+    @classmethod
+    def _map_parent_id(cls, data: Any) -> Any:
+        return _expose_parent_id(cls, data, "video_id")
+
 
 class Video(BaseMedia):
     """
@@ -134,7 +206,64 @@ class NotAnnotatedVideoFrame(BaseModel):
         return self.video.id
 
 
-Media = Annotated[Image | Video | VideoFrame, Field(discriminator="type")]
+class OmeImage(BaseMedia):
+    """
+    Multi-dimensional (XYCZT) OME image. Its annotatable (Z, T) planes are `OmePlane` media created lazily.
+
+    Attributes:
+        plane_count: Total number of (Z, T) planes in the image
+    """
+
+    type: Literal[MediaType.OME_IMAGE]
+    plane_count: int
+
+    @model_validator(mode="before")
+    @classmethod
+    def _map_frame_count(cls, data: Any) -> Any:
+        # ORM rows store the number of leaves of any container under `frame_count`
+        if isinstance(data, dict) or not hasattr(data, "frame_count"):
+            return data
+        values = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
+        values["plane_count"] = data.frame_count
+        return values
+
+
+class OmePlane(BaseMedia):
+    """
+    Annotated (Z, T) plane of an OME image, holding all the channels.
+
+    Attributes:
+        ome_image_id: Identifier of the parent OME image
+        z_index: Z index of the plane
+        t_index: T index of the plane
+    """
+
+    type: Literal[MediaType.OME_PLANE]
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+
+    @model_validator(mode="before")
+    @classmethod
+    def _map_parent_id(cls, data: Any) -> Any:
+        return _expose_parent_id(cls, data, "ome_image_id")
+
+
+class NotAnnotatedOmePlane(BaseModel):
+    """OME plane that is not annotated yet. It contains the OME image information and the plane coordinates."""
+
+    model_config = ConfigDict(frozen=True)
+    ome_image: OmeImage
+    z_index: int
+    t_index: int
+
+    @computed_field
+    @property
+    def ome_image_id(self) -> UUID:
+        return self.ome_image.id
+
+
+Media = Annotated[Image | Video | VideoFrame | OmeImage | OmePlane, Field(discriminator="type")]
 
 MediaAdapter: TypeAdapter[Media] = TypeAdapter(Media)
 

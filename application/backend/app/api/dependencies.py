@@ -14,6 +14,7 @@ from app.db import get_db_session
 from app.models import Project, Sink, Source
 from app.models.dataset_revision import DatasetRevision
 from app.models.dataset_view import DatasetView
+from app.models.media import split_media_file_name
 from app.scheduler import Scheduler
 from app.services import (
     BaseWeightsService,
@@ -27,6 +28,7 @@ from app.services import (
     MediaService,
     MetricsService,
     ModelService,
+    OmeService,
     PipelineMetricsService,
     PipelineService,
     ProjectService,
@@ -59,8 +61,11 @@ def get_file_name_and_extension(file: UploadFile) -> tuple[str, str]:
     if not full_name:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File name cannot be empty.")
     file_name, file_ext = os.path.splitext(full_name)
-    file_name = file_name.strip()  # remove whitespace characters between the basename and the extension
     file_ext = file_ext[1:]  # remove leading dot in the extension
+    if file_name.lower().endswith(".ome"):
+        # Keep compound extensions whole, e.g. `.ome.tiff`
+        file_name, file_ext = split_media_file_name(full_name)
+    file_name = file_name.strip()  # remove whitespace characters between the basename and the extension
     if not file_ext:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File extension cannot be empty.")
     return file_name, file_ext
@@ -283,6 +288,15 @@ def get_media_service(
 ) -> MediaService:
     """Provides a MediaService instance."""
     return MediaService(data_dir=data_dir, video_service=video_service, db_session=db)
+
+
+def get_ome_service(
+    data_dir: Annotated[Path, Depends(get_data_dir)],
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+    db: Annotated[Session, Depends(get_db)],
+) -> OmeService:
+    """Provides an OmeService instance."""
+    return OmeService(data_dir=data_dir, media_service=media_service, db_session=db)
 
 
 def get_media_numpy_loader(

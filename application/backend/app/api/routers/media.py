@@ -3,6 +3,7 @@
 
 import os
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO
 from uuid import UUID
@@ -20,6 +21,7 @@ from app.api.dependencies import (
     get_media_prediction_service,
     get_media_segment_service,
     get_media_service,
+    get_ome_service,
     get_project,
     get_project_service,
     get_system_service,
@@ -43,19 +45,25 @@ from app.api.validators import MediaID, ProjectID, normalize_datetime_to_utc
 from app.core.models import Pagination
 from app.models import BatchInferenceResult, DatasetItemAnnotationStatus, DatasetItemSubset, Media, Project, Video
 from app.models.media import (
+    LEAF_MEDIA_TYPES,
     ImageFormat,
+    MediaFormat,
     MediaListPredictionRequest,
     MediaSortBy,
     MediaType,
+    NotAnnotatedOmePlane,
     NotAnnotatedVideoFrame,
+    OmeFormat,
+    OmeImage,
     SortDirection,
-    VideoFormat,
+    parse_media_format,
 )
 from app.services import (
     DatasetService,
     DatasetViewService,
     MediaPredictionService,
     MediaService,
+    OmeService,
     ProjectService,
     SystemService,
     UploadService,
@@ -65,9 +73,10 @@ from app.services.dataset_service import AnnotationValidationError, SubsetAlread
 from app.services.inference import InferenceBusyError
 from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
-from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
+from app.services.media_service import DEFAULT_THUMBNAIL_SIZE, ImageMetadata, InvalidImageError, MediaFilters
+from app.services.ome_service import OmePlaneOutOfRangeError
 from app.services.sam import MediaSegmentService
-from app.utils.images import convert_image_to_display_png_bytes, needs_display_conversion
+from app.utils.images import convert_image_to_display_png_bytes, crop_to_thumbnail, needs_display_conversion
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset/media", tags=["Media"])
 
@@ -76,6 +85,8 @@ MAX_MEDIA_NUMBER_RETURNED = 100
 
 DEFAULT_FRAME_INDEX_FROM = 0
 DEFAULT_FRAME_INDEX_TO = 50
+
+OME_PLANE_NOT_PROVIDED = "OME plane coordinates are not provided, set the `z` and/or `t` query parameters."
 
 SET_MEDIA_ANNOTATIONS_BODY_EXAMPLES = {
     "single_label": Example(
@@ -146,26 +157,37 @@ BULK_MEDIA_DELETE_EXAMPLE = {
 }
 
 
-def _parse_media_format(extension: str) -> ImageFormat | VideoFormat:
-    try:
-        return ImageFormat[extension.upper()]
-    except KeyError:
-        try:
-            return VideoFormat[extension.upper()]
-        except KeyError:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f"Unsupported media extension: {extension}",
-            )
+def _parse_media_format(extension: str) -> MediaFormat:
+    media_format = parse_media_format(extension)
+    if media_format is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=f"Unsupported media extension: {extension}",
+        )
+    return media_format
+
+
+RequestMedia = Media | NotAnnotatedVideoFrame | NotAnnotatedOmePlane
 
 
 def _get_request_media(
     project: Annotated[Project, Depends(get_project)],
     media_id: MediaID,
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
-) -> Media | NotAnnotatedVideoFrame:
+    z: Annotated[int | None, Query(description="OME image Z index (defaults to 0 if `t` is set)", ge=0)] = None,
+    t: Annotated[int | None, Query(description="OME image T index (defaults to 0 if `z` is set)", ge=0)] = None,
+) -> RequestMedia:
     media = media_service.get_media_by_id(project_id=project.id, media_id=media_id)
+    if isinstance(media, OmeImage) and (z is not None or t is not None):
+        # OME planes can be identified by OME image ID and (z, t) coordinates
+        z, t = z or 0, t or 0
+        try:
+            ome_plane = ome_service.get_plane(project=project, ome_image=media, z=z, t=t)
+        except OmePlaneOutOfRangeError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        return ome_plane if ome_plane is not None else NotAnnotatedOmePlane(ome_image=media, z_index=z, t_index=t)
     if media.type != MediaType.VIDEO or frame_index is None:
         return media
 
@@ -194,15 +216,17 @@ def _get_request_media(
 def add_media(
     project: Annotated[Project, Depends(get_project)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     file_name_and_extension: Annotated[tuple[str, str], Depends(get_file_name_and_extension)],
     file: Annotated[UploadFile, File()],
 ) -> MediaView:
-    """Add a new media to the dataset by uploading an image or a video"""
+    """Add a new media to the dataset by uploading an image, a video or an OME-TIFF image"""
     name, extension = file_name_and_extension
     return _create_media(
         project=project,
         media_service=media_service,
+        ome_service=ome_service,
         dataset_service=dataset_service,
         name=name,
         extension=extension,
@@ -223,6 +247,7 @@ def add_media(
 async def add_media_from_upload(
     project: Annotated[Project, Depends(get_project)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     upload_service: Annotated[UploadService, Depends(get_upload_service)],
     body: MediaFromUploadRequest,
@@ -243,6 +268,7 @@ async def add_media_from_upload(
                 media_view = _create_media(
                     project=project,
                     media_service=media_service,
+                    ome_service=ome_service,
                     dataset_service=dataset_service,
                     name=body.name if body.name is not None else name,
                     extension=extension,
@@ -260,15 +286,19 @@ async def add_media_from_upload(
 def _create_media(
     project: Project,
     media_service: MediaService,
+    ome_service: OmeService,
     dataset_service: DatasetService,
     name: str,
     extension: str,
     data: BinaryIO | Path,
 ) -> MediaView:
-    """Create an image or video media (depending on the extension), from a stream or from a file to be moved."""
+    """Create an image, video or OME image media (depending on the extension), from a stream or a file to move."""
     media_format = _parse_media_format(extension)
     try:
-        if isinstance(media_format, ImageFormat):
+        if isinstance(media_format, OmeFormat):
+            # Dataset items for OME images are created separately for each (Z, T) plane being annotated
+            media = ome_service.create_ome_image(project_id=project.id, name=name, ome_format=media_format, data=data)
+        elif isinstance(media_format, ImageFormat):
             media = media_service.create_image(
                 ImageMetadata(
                     project_id=project.id,
@@ -292,9 +322,10 @@ def _create_media(
                 video_format=media_format,
             )
         return MediaViewAdapter.validate_python(media, from_attributes=True)
-    except InvalidImageError:
+    except InvalidImageError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid image has been uploaded."
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(e) if isinstance(media_format, OmeFormat) else "Invalid image has been uploaded.",
         )
 
 
@@ -370,12 +401,12 @@ def list_media(  # noqa: PLR0913
             annotation_status=annotation_status,
             label_ids=labels,
             subsets=subset_values,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
         media_list = media_service.list_media(
             project_id=project.id,
             filters=filters,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
     return MediaWithPagination(
         items=[MediaViewAdapter.validate_python(media, from_attributes=True) for media in media_list],
@@ -431,7 +462,7 @@ def list_media_ids(  # noqa: PLR0913
         media_id_list = media_service.list_media_ids(
             project_id=project.id,
             filters=filters,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=list(LEAF_MEDIA_TYPES),
         )
     return MediaIdentifiers(
         items=[MediaIdentifier(id=media_id, type=media_type) for media_id, media_type in media_id_list]
@@ -506,13 +537,25 @@ def list_video_frames(
 )
 def get_media_binary(
     project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media: Annotated[RequestMedia, Depends(_get_request_media)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     raw: Annotated[
         bool, Query(description="Return the original file instead of a browser-displayable PNG for TIFF/high bit depth")
     ] = False,
 ) -> Response:
     """Get media binary content"""
+    if isinstance(media, NotAnnotatedOmePlane):
+        plane_image = ome_service.render_training_plane(
+            project_id=project.id, ome_image=media.ome_image, z=media.z_index, t=media.t_index
+        )
+        buffer = BytesIO()
+        plane_image.save(buffer, format="PNG")
+        return write_bytes_to_response(
+            content=buffer.getvalue(),
+            filename=f"{media.ome_image.name}_z{media.z_index}_t{media.t_index}.png",
+            media_type="image/png",
+        )
     if isinstance(media, NotAnnotatedVideoFrame):
         frame_binary = media_service.get_frame_binary(
             project_id=project.id, video=media.video, frame_index=media.frame_index
@@ -547,12 +590,15 @@ def get_media_binary(
         status.HTTP_404_NOT_FOUND: {"description": "Media, media thumbnail or project not found"},
     },
 )
-def get_media_thumbnail(
+def get_media_thumbnail(  # noqa: PLR0913
     project_id: ProjectID,
     media_id: MediaID,
     project_service: Annotated[ProjectService, Depends(get_project_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
+    z: Annotated[int | None, Query(description="OME image Z index (defaults to 0 if `t` is set)", ge=0)] = None,
+    t: Annotated[int | None, Query(description="OME image T index (defaults to 0 if `z` is set)", ge=0)] = None,
 ) -> Response:
     """Get media thumbnail binary content"""
 
@@ -564,12 +610,17 @@ def get_media_thumbnail(
     def _not_found() -> HTTPException:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Media thumbnail file is not found.")
 
+    is_plane_request = z is not None or t is not None
     thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=media_id)
-    if frame_index is None and os.path.exists(thumbnail_path):
+    if frame_index is None and not is_plane_request and os.path.exists(thumbnail_path):
         return _response(thumbnail_path=thumbnail_path, media_id=media_id)
 
     project = project_service.get_project_by_id(project_id=project_id)
     media = media_service.get_media_by_id(project_id=project_id, media_id=media_id)
+    if isinstance(media, OmeImage) and is_plane_request:
+        return _get_ome_plane_thumbnail(
+            project=project, ome_image=media, media_service=media_service, ome_service=ome_service, z=z or 0, t=t or 0
+        )
     if media.type != MediaType.VIDEO or frame_index is None:
         raise _not_found()
 
@@ -592,6 +643,27 @@ def get_media_thumbnail(
     # If the media is a video frame, generate the thumbnail on the fly
     frame_thumbnail = media_service.get_frame_thumbnail(project=project, video=media, frame_index=frame_index)
     return write_image_to_response(image=frame_thumbnail, filename=f"{media.name}_frame_{frame_index}.jpeg")
+
+
+def _get_ome_plane_thumbnail(
+    project: Project, ome_image: OmeImage, media_service: MediaService, ome_service: OmeService, z: int, t: int
+) -> Response:
+    """Thumbnail of an OME plane: the stored one if the plane is annotated, otherwise rendered on the fly."""
+    try:
+        ome_plane = ome_service.get_plane(project=project, ome_image=ome_image, z=z, t=t)
+    except OmePlaneOutOfRangeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    if ome_plane is not None:
+        thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project.id, media_id=ome_plane.id)
+        if os.path.exists(thumbnail_path):
+            return write_file_to_response(
+                path=thumbnail_path, filename=f"{ome_plane.id}-thumb.jpeg", cache_control="public, max-age=31536000"
+            )
+    plane_image = ome_service.render_training_plane(project_id=project.id, ome_image=ome_image, z=z, t=t)
+    plane_thumbnail = crop_to_thumbnail(
+        image=plane_image, target_width=DEFAULT_THUMBNAIL_SIZE, target_height=DEFAULT_THUMBNAIL_SIZE
+    )
+    return write_image_to_response(image=plane_thumbnail, filename=f"{ome_image.name}_z{z}_t{t}.jpeg")
 
 
 @router.delete(
@@ -648,15 +720,29 @@ def bulk_delete_media(
 )
 def set_media_annotations(
     project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media: Annotated[RequestMedia, Depends(_get_request_media)],
     media_annotations: Annotated[SetMediaAnnotations, Body(openapi_examples=SET_MEDIA_ANNOTATIONS_BODY_EXAMPLES)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
 ) -> MediaAnnotations:
     """Set media annotations"""
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    if isinstance(media, OmeImage):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=OME_PLANE_NOT_PROVIDED)
+    if isinstance(media, NotAnnotatedOmePlane):
+        ome_plane = ome_service.create_plane(
+            project=project, ome_image=media.ome_image, z=media.z_index, t=media.t_index
+        )
+        dataset_service.create_dataset_item(
+            project_id=project.id,
+            task=project.task,
+            media=ome_plane,
+            user_reviewed=True,
+        )
+        media = ome_plane
     if isinstance(media, NotAnnotatedVideoFrame):
         frame_binary = media_service.get_frame_binary(
             project_id=project.id, video=media.video, frame_index=media.frame_index
@@ -715,13 +801,17 @@ def set_media_annotations(
 )
 def get_media_annotations(
     project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media: Annotated[RequestMedia, Depends(_get_request_media)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
 ) -> MediaAnnotations:
     """Get the media annotations"""
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    if isinstance(media, OmeImage):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=OME_PLANE_NOT_PROVIDED)
+    if isinstance(media, NotAnnotatedOmePlane):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="OME plane has not been annotated yet.")
     if isinstance(media, NotAnnotatedVideoFrame):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video frame not found for the given index.")
     # Dataset item has the same ID as media
@@ -748,13 +838,17 @@ def get_media_annotations(
 )
 def delete_media_annotation(
     project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media: Annotated[RequestMedia, Depends(_get_request_media)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
 ) -> None:
     """Delete media annotations"""
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    if isinstance(media, OmeImage):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=OME_PLANE_NOT_PROVIDED)
+    if isinstance(media, NotAnnotatedOmePlane):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="OME plane has not been annotated yet.")
     if isinstance(media, NotAnnotatedVideoFrame):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video frame not found for the given index.")
     # Dataset item has the same ID as media
@@ -845,7 +939,7 @@ def media_predict(
 )
 def get_media_embeddings(
     project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media: Annotated[RequestMedia, Depends(_get_request_media)],
     media_segment_service: Annotated[MediaSegmentService, Depends(get_media_segment_service)],
     system_service: Annotated[SystemService, Depends(get_system_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
@@ -856,6 +950,10 @@ def get_media_embeddings(
     """
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    if isinstance(media, OmeImage | NotAnnotatedOmePlane):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Embeddings are only available for annotated OME planes."
+        )
     device = device if device is not None else "cpu"
     if not system_service.is_valid_inference_device(device):
         raise HTTPException(

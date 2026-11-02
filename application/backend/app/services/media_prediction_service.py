@@ -17,7 +17,7 @@ from app.models import (
     Project,
     VideoFrame,
 )
-from app.models.media import Media, MediaListPredictionRequest, MediaType, Video, VideoRange
+from app.models.media import Media, MediaListPredictionRequest, MediaType, OmePlane, Video, VideoRange
 from app.models.system import DeviceInfo
 
 from .base import BaseSessionManagedService, ResourceError, ResourceNotFoundError, ResourceType
@@ -41,7 +41,7 @@ class VideoRangeError(ResourceError):
 
 @dataclass(frozen=True)
 class LoadedMedia:
-    single_media: list[Image | VideoFrame]
+    single_media: list[Image | VideoFrame | OmePlane]
     video_frames: dict[Video, list[Frame]]
 
 
@@ -98,7 +98,7 @@ class MediaPredictionService(BaseSessionManagedService):
         return video_frames
 
     def _load_media(self, project: Project, request: MediaListPredictionRequest) -> LoadedMedia:
-        single_media: list[Image | VideoFrame] = []
+        single_media: list[Image | VideoFrame | OmePlane] = []
         video_frames: dict[Video, list[Frame]] = {}
 
         media_ids: list[UUID] = [media_request.media_id for media_request in request.media]
@@ -113,6 +113,10 @@ class MediaPredictionService(BaseSessionManagedService):
                 if media.type == MediaType.VIDEO:
                     raise VideoRangeError(
                         str(media_request.media_id), "Video cannot be used for predictions, please specify frame range."
+                    )
+                if media.type == MediaType.OME_IMAGE:
+                    raise VideoRangeError(
+                        str(media_request.media_id), "OME image cannot be used for predictions, use its planes instead."
                     )
                 single_media.append(media)
             else:

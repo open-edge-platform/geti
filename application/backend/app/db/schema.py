@@ -162,8 +162,10 @@ class DatasetViewItemDB(Base):
 class MediaDB(BaseID):
     __tablename__ = "media"
     __table_args__ = (
-        Index("idx_media_video_id", "video_id"),
-        UniqueConstraint("video_id", "frame_index", name="uq_video_id_frame_index"),
+        Index("idx_media_parent_id", "parent_id"),
+        # Constraint name kept from when the column was `video_id`: renaming it on SQLite requires recreating the
+        # table, which would cascade-delete dependent rows since migrations run with foreign keys enabled.
+        UniqueConstraint("parent_id", "frame_index", name="uq_video_id_frame_index"),
     )
 
     project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
@@ -174,12 +176,59 @@ class MediaDB(BaseID):
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     fps: Mapped[float | None] = mapped_column(Float, nullable=True, default=None)
     frame_count: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
-    video_id: Mapped[str | None] = mapped_column(
+    # Parent container media: a video for video frames, an OME image for OME planes.
+    parent_id: Mapped[str | None] = mapped_column(
         Text, ForeignKey("media.id", ondelete="CASCADE"), nullable=True, default=None
     )
+    # Linear index within the parent: video frame number, or (z + t * size_z) for OME planes.
     frame_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    # Populated only for OME planes.
+    z_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    t_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    # SQLite INTEGER is always 64-bit, so sizes above 2^31 (BigTIFF) already fit without widening the column.
     size: Mapped[int] = mapped_column(Integer, nullable=False)
     source_id: Mapped[str | None] = mapped_column(Text, ForeignKey("sources.id", ondelete="SET NULL"), nullable=True)
+
+
+class OmeImageDB(Base):
+    """OME-metadata-derived structure of an uploaded OME image, 1:1 with an `ome_image` media row."""
+
+    __tablename__ = "ome_images"
+
+    media_id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True)
+    container_format: Mapped[str] = mapped_column(String(20), nullable=False)
+    size_x: Mapped[int] = mapped_column(Integer, nullable=False)
+    size_y: Mapped[int] = mapped_column(Integer, nullable=False)
+    size_z: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    size_c: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    size_t: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    # Free-form axis string: NGFF declares the axis order per image, so it is not constrained to OME-TIFF orders
+    dimension_order: Mapped[str] = mapped_column(String(16), nullable=False)
+    pixel_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    significant_bits: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    series_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_big_tiff: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # [{"index": 0, "name": "DAPI", "color": "#0000ff", "emission_wavelength": 461}, ...]
+    channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # Fixed channel->RGB projection used to materialize training data; computed once at ingest, never mutated
+    channel_mapping: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # [{"level": 0, "width": 40000, "height": 30000, "scale": [1, 1]}, ...]; empty if not pyramidal
+    pyramid_levels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # Multi-file layouts: entrypoint and constituent files, relative to the media root
+    entrypoint: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    files: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # Verbatim OME-XML / NGFF attributes, to re-parse without touching the binary
+    raw_metadata: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class OmeChannelViewDB(Base):
+    """User display settings (channel->RGB mapping and intensity windows) of an OME image in the annotator."""
+
+    __tablename__ = "ome_channel_views"
+
+    media_id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True)
+    # [{"channel": 2, "target": "red", "enabled": true, "window_min": 120, "window_max": 4000}, ...]
+    settings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
 
 class LabelDB(BaseID):

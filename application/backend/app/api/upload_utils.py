@@ -9,6 +9,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
+from app.models.media import split_media_file_name
 from app.services.upload_service import (
     ClaimedUpload,
     UploadChecksumMismatchError,
@@ -77,9 +78,9 @@ def split_upload_filename(filename: str) -> tuple[str, str]:
     Raises:
         HTTPException: 422 if the filename has no name or no extension.
     """
-    name, dot, extension = filename.rpartition(".")
+    name, extension = split_media_file_name(filename)
     name = name.strip()
-    if not dot or not name or not extension:
+    if not name or not extension:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"The uploaded filename '{filename}' must have a name and an extension.",

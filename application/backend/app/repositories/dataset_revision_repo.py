@@ -88,7 +88,7 @@ class DatasetRevisionRepository(BaseRepository[DatasetRevisionDB]):
             exists(
                 select(DatasetViewItemDB.media_id).where(
                     DatasetViewItemDB.dataset_view_id == dataset_view_id,
-                    (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.video_id),
+                    (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.parent_id),
                 )
             ).correlate(MediaDB)
         )

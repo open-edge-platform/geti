@@ -155,6 +155,10 @@ hiddenimports += collect_submodules('scipy._external.array_api_compat')
 tmp_ret = collect_all('polars')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
+# OME-TIFF reading
+tmp_ret = collect_all('tifffile')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+
 tmp_ret = collect_all('transformers')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 

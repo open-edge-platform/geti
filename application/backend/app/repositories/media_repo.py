@@ -156,11 +156,31 @@ class MediaRepository:
         return result.rowcount > 0
 
     def get_video_frame_by_video_id_and_index(self, video_id: str, frame_index: int) -> MediaDB | None:
-        stmt = self._base_select().where(MediaDB.video_id == video_id, MediaDB.frame_index == frame_index)
+        return self.get_child_by_index(parent_id=video_id, frame_index=frame_index)
+
+    def get_child_by_index(self, parent_id: str, frame_index: int) -> MediaDB | None:
+        """Get the leaf media (video frame, OME plane) at the given index of a container media."""
+        stmt = self._base_select().where(MediaDB.parent_id == parent_id, MediaDB.frame_index == frame_index)
         return self.db.scalar(stmt)
 
+    def list_annotated_children(self, parent_id: str, offset: int, limit: int) -> list[tuple[DatasetItemDB, MediaDB]]:
+        """List annotated leaf media of a container media, ordered by index."""
+        stmt = (
+            select(DatasetItemDB, MediaDB)
+            .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
+            .where(
+                MediaDB.project_id == self.project_id,
+                MediaDB.parent_id == parent_id,
+                DatasetItemDB.annotation_data.is_not(None),
+            )
+            .order_by(MediaDB.frame_index.asc())
+            .offset(offset)
+            .limit(limit)
+        )
+        return [(dataset_item, media) for (dataset_item, media) in self.db.execute(stmt).all()]
+
     def search_video_frames_by_video_id_and_indexes(self, video_id: str, frame_indexes: list[int]) -> list[MediaDB]:
-        stmt = self._base_select().where(MediaDB.video_id == video_id, MediaDB.frame_index.in_(frame_indexes))
+        stmt = self._base_select().where(MediaDB.parent_id == video_id, MediaDB.frame_index.in_(frame_indexes))
         return list(self.db.scalars(stmt).all())
 
     def list_annotated_video_frames_by_video_id(
@@ -177,7 +197,7 @@ class MediaRepository:
             .where(
                 MediaDB.id == DatasetItemDB.id,
                 MediaDB.project_id == DatasetItemDB.project_id,
-                MediaDB.video_id == video_id,
+                MediaDB.parent_id == video_id,
                 MediaDB.frame_index >= frame_index_from,
                 MediaDB.frame_index <= frame_index_to,
             )
@@ -191,7 +211,7 @@ class MediaRepository:
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 MediaDB.project_id == self.project_id,
-                MediaDB.video_id == video_id,
+                MediaDB.parent_id == video_id,
                 DatasetItemDB.annotation_data.is_not(None),
             )
         )

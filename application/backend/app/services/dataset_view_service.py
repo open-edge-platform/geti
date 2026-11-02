@@ -9,7 +9,7 @@ from app.db.schema import DatasetViewDB
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItem
 from app.models.dataset_view import DatasetView
-from app.models.media import Media, MediaAdapter, MediaType, Video
+from app.models.media import LEAF_MEDIA_TYPES, Media, MediaAdapter, MediaType, Video
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.repositories.base import UniqueConstraintIntegrityError
 from app.services.dataset_service import DatasetItemFilters
@@ -69,7 +69,7 @@ class DatasetViewService(BaseSessionManagedService):
         }
         for media_id in media_ids:
             media_type = found_media.get(str(media_id))
-            if media_type is None or media_type == MediaType.VIDEO_FRAME:
+            if media_type is None or media_type in LEAF_MEDIA_TYPES:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
 
     def create_dataset_view(self, project_id: UUID, name: str, media_ids: list[UUID] | None = None) -> DatasetView:

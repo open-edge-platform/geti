@@ -7,7 +7,8 @@ from sqlalchemy import Select, exists, func, select
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
-from app.models import DatasetItemAnnotationStatus, MediaType
+from app.models import DatasetItemAnnotationStatus
+from app.models.media import CONTAINER_MEDIA_TYPES
 
 
 def _apply_date_range_filter(
@@ -68,16 +69,17 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
             select(frame_alias.id)
             .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
-                frame_alias.video_id == MediaDB.id,
+                frame_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
         )
         stmt = stmt.where(
-            (MediaDB.type != MediaType.VIDEO)
+            (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES))
             & (DatasetItemDB.annotation_data.isnot(None))  # image or frame with annotation
             | (
-                (MediaDB.type == MediaType.VIDEO) & annotated_frame_exists  # video with at least one annotated frame
+                (MediaDB.type.in_(CONTAINER_MEDIA_TYPES))
+                & annotated_frame_exists  # video with at least one annotated frame
             )
         )
     elif annotation_status == DatasetItemAnnotationStatus.MISSING_ANNOTATIONS:
@@ -86,17 +88,17 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
             select(func.count(frame_alias.id))
             .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
-                frame_alias.video_id == MediaDB.id,
+                frame_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
             .scalar_subquery()
         )
         stmt = stmt.where(
-            (MediaDB.type != MediaType.VIDEO)
+            (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES))
             & (DatasetItemDB.annotation_data.is_(None))  # image or frame missing annotation
             | (
-                (MediaDB.type == MediaType.VIDEO)
+                (MediaDB.type.in_(CONTAINER_MEDIA_TYPES))
                 & (annotated_frame_count < MediaDB.frame_count)  # not all frames annotated
             )
         )
@@ -140,15 +142,15 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
         select(frame_alias.id)
         .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == frame_alias.id)
         .where(
-            frame_alias.video_id == MediaDB.id,
+            frame_alias.parent_id == MediaDB.id,
             DatasetItemLabelDB.label_id.in_(label_ids),
         )
         .correlate(MediaDB)
     )
 
     return stmt.where(
-        ((MediaDB.type != MediaType.VIDEO) & own_label_exists)
-        | ((MediaDB.type == MediaType.VIDEO) & frame_label_exists)
+        ((MediaDB.type.not_in(CONTAINER_MEDIA_TYPES)) & own_label_exists)
+        | ((MediaDB.type.in_(CONTAINER_MEDIA_TYPES)) & frame_label_exists)
     )
 
 
@@ -196,13 +198,13 @@ def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | N
         select(frame_alias.id)
         .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
         .where(
-            frame_alias.video_id == MediaDB.id,
+            frame_alias.parent_id == MediaDB.id,
             DatasetItemDB.subset.in_(subsets),
         )
         .correlate(MediaDB)
     )
 
     return stmt.where(
-        ((MediaDB.type != MediaType.VIDEO) & own_subset_exists)
-        | ((MediaDB.type == MediaType.VIDEO) & frame_subset_exists)
+        ((MediaDB.type.not_in(CONTAINER_MEDIA_TYPES)) & own_subset_exists)
+        | ((MediaDB.type.in_(CONTAINER_MEDIA_TYPES)) & frame_subset_exists)
     )
