@@ -10,13 +10,13 @@ import { clsx } from 'clsx';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEqual } from 'lodash-es';
 
-import { getErrorMessage } from '../../../../query-client/query-client';
-import { useTestSource } from '../api/use-test-source';
-import { SourceMenu } from '../source-menu/source-menu.component';
+import { getErrorMessage } from '../../../../../query-client/query-client';
+import { useTestSource } from '../../api/use-test-source';
+import { SourceMenu } from '../../source-menu/source-menu.component';
 import { SettingsList } from './settings-list/settings-list.component';
 import { SourceIcon } from './source-icon/source-icon.component';
 
-import classes from './source-list.module.scss';
+import classes from '../../source-list/source-list.module.scss';
 
 const SOURCE_TYPE_LABEL_KEYS = {
     usb_camera: 'inference.sources.types.usbCamera',

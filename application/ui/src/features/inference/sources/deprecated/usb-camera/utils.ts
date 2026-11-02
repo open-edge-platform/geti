@@ -4,7 +4,7 @@
 import type { USBCameraSourceConfig } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
-import { getUniqueName } from '../utils';
+import { getUniqueName } from '../../utils';
 
 export const getUsbCameraInitialConfig = (t: TranslateFn, existingNames: string[] = []): USBCameraSourceConfig => ({
     id: '',

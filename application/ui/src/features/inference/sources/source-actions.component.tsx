@@ -11,9 +11,9 @@ import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
 import { useSourcesQuery } from './api/use-sources';
-import { EditSourceForm } from './edit-source-form.component';
-import { SourcesList } from './source-list/source-list.component';
-import { SourceOptions } from './source-options';
+import { EditSourceForm } from './deprecated/edit-source-form.component';
+import { SourcesList } from './deprecated/source-list/source-list.component';
+import { SourceOptions } from './deprecated/source-options';
 
 export const SourceActions = () => {
     const { t } = useTranslation();

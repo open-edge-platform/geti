@@ -8,16 +8,16 @@ import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { http } from '../../../../api/utils';
-import { useConnectSourceToPipeline } from '../../../../hooks/api/pipeline.hook';
-import { server } from '../../../../msw-node-setup';
+import { http } from '../../../../../api/utils';
+import { useConnectSourceToPipeline } from '../../../../../hooks/api/pipeline.hook';
+import { server } from '../../../../../msw-node-setup';
 import { useSourceMutation } from '../hooks/use-source-mutation.hook';
 import { IpCamera } from '../ip-camera/ip-camera.component';
 import { getIpCameraInitialConfig, ipCameraBodyFormatter } from '../ip-camera/utils';
 import { EditSource } from './edit-source.component';
 
 rs.mock('../hooks/use-source-mutation.hook');
-rs.mock('../../../../hooks/api/pipeline.hook');
+rs.mock('../../../../../hooks/api/pipeline.hook');
 
 const mockConnectMutation = (mutateAsync: ReturnType<typeof rs.fn>) =>
     rs

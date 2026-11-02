@@ -5,7 +5,7 @@ import { deleteSourceVideo, uploadSourceVideo } from '@/api';
 import type { VideoFileSourceConfig } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
-import { getUniqueName } from '../utils';
+import { getUniqueName } from '../../utils';
 
 export const getVideoFileInitialConfig = (t: TranslateFn, existingNames: string[] = []): VideoFileSourceConfig => ({
     id: '',

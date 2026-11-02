@@ -8,14 +8,14 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
-import * as actualTus from '../../../../api/tus-upload' with { rstest: 'importActual' };
-import { http } from '../../../../api/utils';
-import { server } from '../../../../msw-node-setup';
+import * as actualTus from '../../../../../api/tus-upload' with { rstest: 'importActual' };
+import { http } from '../../../../../api/utils';
+import { server } from '../../../../../msw-node-setup';
 import { ipCameraBodyFormatter as bodyFormatter } from '../ip-camera/utils';
 import { prepareVideoFileFormData, videoFileBodyFormatter } from '../video-file/utils';
 import { useSourceAction } from './use-source-action.hook';
 
-rs.mock('../../../../api/tus-upload', () => ({
+rs.mock('../../../../../api/tus-upload', () => ({
     ...actualTus,
     transferFile: rs.fn(async () => '00000000-0000-4000-8000-000000000001'),
 }));

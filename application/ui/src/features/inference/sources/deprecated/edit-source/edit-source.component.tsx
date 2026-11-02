@@ -10,10 +10,10 @@ import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useConnectSourceToPipeline } from 'hooks/api/pipeline.hook';
 
-import { testSourceQueryOptions } from '../api/use-test-source';
+import { testSourceQueryOptions } from '../../api/use-test-source';
 import { useSourceAction, type PrepareFormData } from '../hooks/use-source-action.hook';
 
-import classes from './edit-source.module.scss';
+import classes from '../../edit-source/edit-source.module.scss';
 
 interface EditSourceProps<T> {
     config: Awaited<T>;

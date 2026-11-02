@@ -5,7 +5,7 @@ import { $api } from '@/api';
 import type { SourceConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 
-import classes from './settings-list.module.scss';
+import classes from '../../../source-list/settings-list/settings-list.module.scss';
 
 interface SettingsListProps {
     source: SourceConfig;

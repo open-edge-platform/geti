@@ -8,10 +8,10 @@ import { UploadProgress } from '@/components/upload-progress/upload-progress.com
 import { useTranslation } from '@/i18n';
 import { Button, Flex, Switch, Text, TextField } from '@geti-ui/ui';
 
-import { acceptedVideoExtensions } from '../../../../shared/media-file-utils';
+import { acceptedVideoExtensions } from '../../../../../shared/media-file-utils';
 import type { VideoFileUploadProgress } from './use-video-file-upload.hook';
 
-import classes from './video-file.module.scss';
+import classes from '../../video-file/video-file.module.scss';
 
 type VideoFileProps = {
     defaultState?: VideoFileSourceConfig;

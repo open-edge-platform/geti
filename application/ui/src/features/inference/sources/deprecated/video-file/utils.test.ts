@@ -5,12 +5,12 @@ import { API_BASE_URL } from '@/api';
 import { createI18nInstance } from '@/i18n';
 import { HttpResponse, http as mswHttp } from 'msw';
 
-import * as actualTusUpload from '../../../../api/tus-upload' with { rstest: 'importActual' };
-import { http } from '../../../../api/utils';
-import { server } from '../../../../msw-node-setup';
+import * as actualTusUpload from '../../../../../api/tus-upload' with { rstest: 'importActual' };
+import { http } from '../../../../../api/utils';
+import { server } from '../../../../../msw-node-setup';
 import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './utils';
 
-rs.mock('../../../../api/tus-upload', () => ({
+rs.mock('../../../../../api/tus-upload', () => ({
     ...actualTusUpload,
     transferFile: rs.fn(async () => '00000000-0000-4000-8000-000000000001'),
 }));

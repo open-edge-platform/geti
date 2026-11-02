@@ -8,7 +8,7 @@ import type { SourceConfigPayload } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 
-import { getErrorMessage } from '../../../../query-client/query-client';
+import { getErrorMessage } from '../../../../../query-client/query-client';
 import { useSourceMutation } from './use-source-mutation.hook';
 
 // Optionally returns a rollback that undoes its side effects (e.g. an upload) if the source is not saved.
