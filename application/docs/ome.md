@@ -124,7 +124,7 @@ this protocol and are written once.
 
 Rendering is **server-side**. A plane is rendered by:
 
-1. Choosing a pyramid level from the requested output size.
+1. Resolving the requested pyramid `level` (an explicit query parameter, §5.4) against `ome_images.pyramid_levels`.
 2. Reading the enabled channels at that level.
 3. Applying per-channel window/level: `v <= min -> 0`, `v >= max -> 255`, linear between.
 4. Compositing enabled channels into their assigned RGB targets.
@@ -408,18 +408,58 @@ PUT /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 ### 5.4 Rendering
 
 ```http
-GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2
+GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&c=0|120:2400$3B6CFF,1|300:9800$27C46A,2|40:1500$E8503A
 200 -> image/png, Cache-Control: private, max-age=…, ETag: {settings_hash}
+304 -> If-None-Match matched
+400 -> malformed `c` (bad index, min >= max, invalid hex color)
+422 -> level out of range for this image's pyramid_levels
 ```
 
-Window/level is deliberately **not** in the query string: the render reflects the stored channel view, so responses are
-cacheable and identical to what training will see. `PUT /channel-view` invalidates via the `ETag`.
+**Query parameters**
+
+| Param    | Required                              | Description                                    |
+| -------- | ------------------------------------- | ---------------------------------------------- |
+| `z`, `t` | no (default: stored defaults, else 0) | Plane and time point.                          |
+| `level`  | no (default 0)                        | Pyramid level; 0 = full resolution.            |
+| `c`      | no                                    | Per-request channel view override (see below). |
+
+**Channel view resolution**
+
+- **`c` omitted:** the render uses the stored channel view (`PUT .../channel-view`). The result is identical to what
+  training will see.
+- **`c` present:** the render uses the supplied view for this request only. Nothing is persisted. The UI uses this for
+  live slider preview, and the same string can be placed in the app's URL to share a view.
+- **Syntax:** `c=<index>|<min>:<max>$<RRGGBB>` entries, comma-separated.
+  - A channel that is not listed is hidden.
+  - Channels are composited additively and each is clamped to 0–255.
+  - Intensity mapping: `value <= min → 0`, `value >= max → 255`, linear in between.
+- **Optional fields:** `gamma`, `inverted` and the `rgb` slot mode are not in v1 of `c`. They can be added as extra
+  `|`-separated fields without breaking existing clients.
+
+**Caching**
+
+- `ETag` is a hash of the _effective_ settings: `media_id`, `z`, `t`, `level`, and the channel view actually used
+  (stored or override), plus the source version.
+- Identical `c` values therefore hit the same cache entry. Clients should avoid sending sub-integer min/max values so
+  the cache is reused.
+- A `PUT .../channel-view` changes the effective settings only for requests that omit `c`. Their `ETag` changes
+  automatically, so no explicit invalidation is needed.
+- Server-side, cache raw decoded tiles keyed by `(media_id, level, z, t, channel, tile)`. A new `c` then only reapplies
+  the intensity mapping and color, with no storage read.
+
+**Live preview (client guidance, non-normative)**
+
+- While the user drags a slider, send `GET .../render?c=…` with no `PUT`. Throttle to one request per animation frame or
+  about 50–100 ms.
+- Optionally request one pyramid level lower during the drag and re-render at full quality on release.
+- On commit (pointer release, about 500 ms idle, or an explicit save), send `PUT .../channel-view` in the background
+  with optimistic UI. Rendering never waits on it.
 
 Optional, added only if profiling demands it (and the natural fit for Zarr chunks):
 
 ```http
-GET /api/projects/{project_id}/dataset/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0
-200 -> image/png
+GET /api/projects/{project_id}/dataset/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0&channel=1
+200 -> application/octet-stream (raw uint16 tile) or image/png (single-channel, unmapped)
 ```
 
 ### 5.5 Plane listing and thumbnails
