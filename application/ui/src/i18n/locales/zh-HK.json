@@ -830,6 +830,24 @@
                 "unableToPlay": "無法播放影片，請重試。",
                 "unsupportedFormat": "無法播放影片，請換用其他影片格式（mp4/webm）。"
             }
+        },
+        "ome": {
+            "zSlice": "Z 切片",
+            "timePoint": "時間點",
+            "annotatedPlanes": "已標註平面：{{count}}",
+            "channels": "通道",
+            "channelName": "通道 {{index}}",
+            "displayRange": "顯示範圍",
+            "red": "紅色",
+            "green": "綠色",
+            "blue": "藍色",
+            "displayOnlyHint": "顯示設定不會影響訓練。",
+            "metadata": "影像元數據",
+            "dimensions": "尺寸",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "像素類型",
+            "resolutionLevels": "解析度級別",
+            "loading": "正在載入 OME 影像..."
         }
     },
     "models": {

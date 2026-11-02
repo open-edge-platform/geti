@@ -282,9 +282,37 @@ class VideoRange(BaseModel):
         return self
 
 
+class IndexRange(BaseModel):
+    start: Annotated[int, Field(description="First index, inclusive", ge=0)]
+    end: Annotated[int, Field(description="Last index, inclusive", ge=0)]
+    stride: Annotated[int, Field(description="Take every nth index in the range", ge=1)] = 1
+
+    @model_validator(mode="after")
+    def validate_index_range(self) -> "IndexRange":
+        if self.end < self.start:
+            raise ValueError(f"end ({self.end}) must be >= start ({self.start})")
+        return self
+
+    @property
+    def indexes(self) -> list[int]:
+        return list(range(self.start, self.end + 1, self.stride))
+
+
+class PlaneRange(BaseModel):
+    """Range of (Z, T) planes of an OME image; every combination of the Z and T indexes is selected."""
+
+    z: IndexRange = Field(default_factory=lambda: IndexRange(start=0, end=0))
+    t: IndexRange = Field(default_factory=lambda: IndexRange(start=0, end=0))
+
+    @property
+    def count(self) -> int:
+        return len(self.z.indexes) * len(self.t.indexes)
+
+
 class MediaPredictionRequest(BaseModel):
     media_id: UUID
     range: VideoRange | None
+    plane_range: Annotated[PlaneRange | None, Field(description="Planes to predict, for OME images only")] = None
 
 
 class MediaListPredictionRequest(BaseModel):

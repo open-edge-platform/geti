@@ -849,6 +849,24 @@
                 "unableToPlay": "Impossible de lire la vidéo. Veuillez réessayer.",
                 "unsupportedFormat": "Impossible de lire la vidéo. Veuillez essayer un autre format vidéo (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Coupe Z",
+            "timePoint": "Point temporel",
+            "annotatedPlanes": "Plans annotés : {{count}}",
+            "channels": "Canaux",
+            "channelName": "Canal {{index}}",
+            "displayRange": "Plage d'affichage",
+            "red": "Rouge",
+            "green": "Vert",
+            "blue": "Bleu",
+            "displayOnlyHint": "Les paramètres d'affichage n'affectent pas l'entraînement.",
+            "metadata": "Métadonnées de l'image",
+            "dimensions": "Dimensions",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Type de pixel",
+            "resolutionLevels": "Niveaux de résolution",
+            "loading": "Chargement de l'image OME..."
         }
     },
     "models": {

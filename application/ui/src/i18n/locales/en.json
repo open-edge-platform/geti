@@ -830,6 +830,24 @@
                 "unableToPlay": "Unable to play video, please try again.",
                 "unsupportedFormat": "Unable to play video, please try a different video format (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Z slice",
+            "timePoint": "Time point",
+            "annotatedPlanes": "Annotated planes: {{count}}",
+            "channels": "Channels",
+            "channelName": "Channel {{index}}",
+            "displayRange": "Display range",
+            "red": "Red",
+            "green": "Green",
+            "blue": "Blue",
+            "displayOnlyHint": "Display settings do not affect training.",
+            "metadata": "Image metadata",
+            "dimensions": "Dimensions",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Pixel type",
+            "resolutionLevels": "Resolution levels",
+            "loading": "Loading OME image..."
         }
     },
     "models": {

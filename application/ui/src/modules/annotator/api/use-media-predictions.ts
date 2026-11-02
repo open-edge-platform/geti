@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchClient } from '@/api';
-import type { PredictionDTO, PredictionVideoRangePayload } from '@/api/types';
+import type { PredictionDTO, PredictionPlaneRangePayload, PredictionRangePayload } from '@/api/types';
 import { queryOptions, useIsFetching, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
@@ -18,6 +18,14 @@ import { useVideoPlayerContext } from '../video-player/video-player-provider.com
 // Prefix matching every prediction query of a project, so callers can cancel them all at once.
 export const getMediaPredictionsQueryKeyPrefix = (projectId: string) => [projectId, 'media-predictions'];
 
+const isPlaneRange = (range: PredictionRangePayload): range is PredictionPlaneRangePayload => 'z' in range;
+
+// Videos are predicted over a frame range, OME images over a (Z, T) plane range
+const getMediaPredictionPayload = (mediaId: string, range: PredictionRangePayload | null) =>
+    range !== null && isPlaneRange(range)
+        ? { media_id: mediaId, range: null, plane_range: range }
+        : { media_id: mediaId, range };
+
 export const mediaPredictionsQueryOptions = ({
     projectId,
     selectedModel,
@@ -31,7 +39,7 @@ export const mediaPredictionsQueryOptions = ({
     mediaId: string;
     device: string;
     confidenceThreshold: number | null;
-    range?: PredictionVideoRangePayload | null;
+    range?: PredictionRangePayload | null;
 }) =>
     queryOptions({
         queryKey: [
@@ -52,7 +60,7 @@ export const mediaPredictionsQueryOptions = ({
                     ...getModelIdentifierPayload(selectedModel),
                     device,
                     confidence_threshold: confidenceThreshold,
-                    media: [{ media_id: mediaId, range }],
+                    media: [getMediaPredictionPayload(mediaId, range)],
                 },
             });
 
@@ -91,7 +99,7 @@ export const useMediaPredictions = ({
 }: {
     mediaId: string;
     selectedModel: SelectableModel | undefined;
-    range?: PredictionVideoRangePayload | null;
+    range?: PredictionRangePayload | null;
     device: string;
     confidenceThreshold: number | null;
     enabled?: boolean;
@@ -120,7 +128,7 @@ export const useIsFetchingMediaPredictions = ({
     selectedModel: SelectableModel | undefined;
     device: string;
     confidenceThreshold: number | null;
-    range?: PredictionVideoRangePayload | null;
+    range?: PredictionRangePayload | null;
 }) => {
     const projectId = useProjectIdentifier();
     const { queryKey } = mediaPredictionsQueryOptions({

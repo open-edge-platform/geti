@@ -27,3 +27,14 @@ export const getDatasetRevisionThumbnailUrl = (projectId: string, datasetRevisio
 
 export const getVideoFrameThumbnailUrl = (projectId: string, itemId: string, frameNumber: number) =>
     `${getMediaBaseUrl(projectId, itemId)}/thumbnail?frame_index=${frameNumber}`;
+
+type OmeRenderParams = { z: number; t: number; level: number; version: string };
+
+// `v` is ignored by the server: it only makes the URL change when the channel display settings change.
+export const getOmeRenderUrl = (projectId: string, itemId: string, { z, t, level, version }: OmeRenderParams) =>
+    `${getMediaBaseUrl(projectId, itemId)}/render?${new URLSearchParams({
+        z: String(z),
+        t: String(t),
+        level: String(level),
+        v: version,
+    })}`;

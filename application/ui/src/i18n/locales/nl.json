@@ -830,6 +830,24 @@
                 "unableToPlay": "Kan de video niet afspelen. Probeer het opnieuw.",
                 "unsupportedFormat": "Kan de video niet afspelen. Probeer een andere video-indeling (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Z-doorsnede",
+            "timePoint": "Tijdpunt",
+            "annotatedPlanes": "Geannoteerde vlakken: {{count}}",
+            "channels": "Kanalen",
+            "channelName": "Kanaal {{index}}",
+            "displayRange": "Weergavebereik",
+            "red": "Rood",
+            "green": "Groen",
+            "blue": "Blauw",
+            "displayOnlyHint": "Weergave-instellingen hebben geen invloed op training.",
+            "metadata": "Afbeeldingsmetadata",
+            "dimensions": "Afmetingen",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Pixeltype",
+            "resolutionLevels": "Resolutieniveaus",
+            "loading": "OME-afbeelding laden..."
         }
     },
     "models": {

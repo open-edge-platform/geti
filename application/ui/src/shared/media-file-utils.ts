@@ -11,3 +11,6 @@ export const acceptedVideoExtensions = VALID_VIDEO_EXT.map((ext) => `.${ext}`).j
 const getFileExtension = (file: File): string => file.name.split('.').pop()?.toLowerCase() ?? '';
 
 export const isVideoFile = (file: File) => VALID_VIDEO_EXT.includes(getFileExtension(file));
+
+// OME-TIFF images use a compound extension (e.g. `.ome.tiff`), already accepted through the TIFF extensions
+export const isOmeFile = (file: File) => /\.ome\.tiff?$/i.test(file.name);

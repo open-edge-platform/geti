@@ -22,6 +22,7 @@ class BatchInferenceInput:
 @dataclass(frozen=True)
 class BatchInferenceMedia:
     id: UUID
+    # Video frame index, or linear plane index (z + t * size_z) for OME images
     frame_index: int | None = None
 
 

@@ -22,7 +22,7 @@ import { ToolManagerProvider } from '../../../modules/annotator/tools/tool-manag
 import { ToolOptions } from '../../../modules/annotator/tools/tool-options/tool-options.component';
 import { VideoPlayerProvider } from '../../../modules/annotator/video-player/video-player-provider.component';
 import { VideoToolbar } from '../../../modules/annotator/video-player/video-toolbar/video-toolbar.component';
-import { getMediaItemKey, isVideo, isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemKey, isOmeImage, isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { SecondaryToolbar } from './secondary-toolbar/secondary-toolbar.component';
 import { useNextPredictionPrefetch } from './use-next-prediction-prefetch.hook';
 
@@ -108,7 +108,9 @@ const Annotator = ({
 
     return (
         <>
-            {isPredictionMode && nextMediaItem && <NextPredictionPrefetch nextMediaItem={nextMediaItem} />}
+            {isPredictionMode && nextMediaItem && !isOmeImage(nextMediaItem) && (
+                <NextPredictionPrefetch nextMediaItem={nextMediaItem} />
+            )}
             <View gridArea={'header'}>
                 <SecondaryToolbar
                     mode={mode}

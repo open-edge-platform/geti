@@ -830,6 +830,24 @@
                 "unableToPlay": "No se pudo reproducir el vídeo. Inténtalo de nuevo.",
                 "unsupportedFormat": "No se pudo reproducir el vídeo. Prueba con otro formato (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Corte Z",
+            "timePoint": "Punto temporal",
+            "annotatedPlanes": "Planos anotados: {{count}}",
+            "channels": "Canales",
+            "channelName": "Canal {{index}}",
+            "displayRange": "Rango de visualización",
+            "red": "Rojo",
+            "green": "Verde",
+            "blue": "Azul",
+            "displayOnlyHint": "La configuración de visualización no afecta al entrenamiento.",
+            "metadata": "Metadatos de la imagen",
+            "dimensions": "Dimensiones",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Tipo de píxel",
+            "resolutionLevels": "Niveles de resolución",
+            "loading": "Cargando imagen OME..."
         }
     },
     "models": {

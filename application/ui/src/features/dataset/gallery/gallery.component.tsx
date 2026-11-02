@@ -11,8 +11,10 @@ import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
 
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
+import { isOmeMedia } from '../../../shared/media-item-utils';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
 import { MediaPreview } from '../media-preview/media-preview.component';
+import { OmeMediaPreview } from '../ome-preview/ome-media-preview.component';
 import { useSelectedData } from '../providers/selected-data-provider.component';
 import { AnnotationStatusIcon } from './annotation-state-icon.component';
 import { BulkLabelsAssignmentDialog } from './bulk-labels-assignment/bulk-labels-assignment-dialog.component';
@@ -180,12 +182,18 @@ export const Gallery = ({
                 {content}
 
                 <DialogContainer type={'fullscreenTakeover'} onDismiss={() => onSelectedMediaItemChange(null)}>
-                    {selectedMediaItem !== null && (
-                        <MediaPreview
-                            close={() => onSelectedMediaItemChange(null)}
-                            onSelectedMediaItem={onSelectedMediaItemChange}
-                        />
-                    )}
+                    {selectedMediaItem !== null &&
+                        (isOmeMedia(selectedMediaItem) ? (
+                            <OmeMediaPreview
+                                close={() => onSelectedMediaItemChange(null)}
+                                onSelectedMediaItem={onSelectedMediaItemChange}
+                            />
+                        ) : (
+                            <MediaPreview
+                                close={() => onSelectedMediaItemChange(null)}
+                                onSelectedMediaItem={onSelectedMediaItemChange}
+                            />
+                        ))}
                 </DialogContainer>
             </DatasetDropZone>
 

@@ -1,0 +1,17 @@
+.markers {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--spectrum-global-dimension-size-50);
+    pointer-events: none;
+}
+
+.marker {
+    position: absolute;
+    width: var(--spectrum-global-dimension-size-50);
+    height: var(--spectrum-global-dimension-size-50);
+    margin-left: calc(var(--spectrum-global-dimension-size-25) * -1);
+    border-radius: 50%;
+    background-color: var(--energy-blue);
+}

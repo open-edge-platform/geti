@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { useProject } from 'hooks/api/project.hook';
 
-import { isVideoFile } from '../../../shared/media-file-utils';
+import { isOmeFile, isVideoFile } from '../../../shared/media-file-utils';
 import { isClassificationTask } from '../../../shared/task-type-guards';
 import { useMediaUpload } from '../api/use-media-upload';
 import { useIsUploading } from '../providers/media-upload-context';
@@ -23,7 +23,8 @@ export const useUploadFiles = () => {
             return;
         }
 
-        if (isClassification && !files.every(isVideoFile)) {
+        // Videos and OME images are annotated frame by frame (or plane by plane), so they get no label on upload
+        if (isClassification && !files.every((file) => isVideoFile(file) || isOmeFile(file))) {
             setFilesForLabelAssignment(files);
         } else {
             await uploadMedia(files);

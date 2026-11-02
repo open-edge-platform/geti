@@ -893,7 +893,9 @@ def media_predict(
     """
     items_count = sum(
         [
-            1
+            media_request.plane_range.count
+            if media_request.plane_range is not None
+            else 1
             if media_request.range is None
             else len(
                 range(media_request.range.start_frame, media_request.range.end_frame + 1, media_request.range.stride)
@@ -950,17 +952,21 @@ def get_media_embeddings(
     """
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
-    if isinstance(media, OmeImage | NotAnnotatedOmePlane):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Embeddings are only available for annotated OME planes."
-        )
+    if isinstance(media, OmeImage):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=OME_PLANE_NOT_PROVIDED)
     device = device if device is not None else "cpu"
     if not system_service.is_valid_inference_device(device):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=f"Device '{device}' is not available on this system"
         )
     try:
-        media_id = f"{media.video.id}_{media.frame_index}" if isinstance(media, NotAnnotatedVideoFrame) else media.id
+        match media:
+            case NotAnnotatedVideoFrame():
+                media_id = f"{media.video.id}_{media.frame_index}"
+            case NotAnnotatedOmePlane():
+                media_id = f"{media.ome_image.id}_z{media.z_index}_t{media.t_index}"
+            case _:
+                media_id = str(media.id)
         embeddings_bytes = media_segment_service.encode_media(
             project=project, media=media, device=system_service.inference_device(device)
         )

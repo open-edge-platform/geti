@@ -9,11 +9,12 @@ from safetensors.numpy import save as safetensors_save
 from sqlalchemy.orm import Session
 
 from app.models import Image, Project, VideoFrame
-from app.models.media import Media, NotAnnotatedVideoFrame, OmeImage, OmePlane, Video
+from app.models.media import Media, NotAnnotatedOmePlane, NotAnnotatedVideoFrame, OmeImage, OmePlane, Video
 from app.models.system import DeviceInfo
 from app.services.base import BaseSessionManagedService
 from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_service import MediaService
+from app.services.ome_service import OmeService
 from app.utils.images import to_uint8_rgb
 
 if TYPE_CHECKING:
@@ -60,10 +61,12 @@ class MediaSegmentService(BaseSessionManagedService):
         model_xml_path: Path,
         ov_cache_path: Path | None = None,
         db_session: Session | None = None,
+        ome_service: OmeService | None = None,
     ) -> None:
         super().__init__(db_session)
         self._media_service = media_service
         self._media_numpy_loader = media_numpy_loader
+        self._ome_service = ome_service
 
         self.model_xml_path = model_xml_path
         self.ov_cache_path = ov_cache_path
@@ -137,7 +140,7 @@ class MediaSegmentService(BaseSessionManagedService):
     def encode_media(
         self,
         project: Project,
-        media: Media | NotAnnotatedVideoFrame,
+        media: Media | NotAnnotatedVideoFrame | NotAnnotatedOmePlane,
         device: DeviceInfo,
     ) -> bytes:
         if isinstance(media, Image | VideoFrame | OmePlane):
@@ -149,6 +152,13 @@ class MediaSegmentService(BaseSessionManagedService):
             media_binary = extracted[media.frame_index]
         elif isinstance(media, Video):
             raise ValueError("Video media type is not supported for segmentation")
+        elif isinstance(media, NotAnnotatedOmePlane):
+            if self._ome_service is None:
+                raise ValueError("OME planes cannot be segmented without an OME service")
+            plane_image = self._ome_service.render_training_plane(
+                project_id=project.id, ome_image=media.ome_image, z=media.z_index, t=media.t_index
+            )
+            media_binary = np.asarray(plane_image)
         elif isinstance(media, OmeImage):
             raise ValueError("OME image media type is not supported for segmentation, use its planes instead")
 
@@ -165,9 +175,13 @@ class MediaSegmentService(BaseSessionManagedService):
 
         model = self._load_model(device=device.as_openvino)
 
-        media_id = (
-            f"{media.video.id}_{media.frame_index}" if isinstance(media, NotAnnotatedVideoFrame) else str(media.id)
-        )
+        match media:
+            case NotAnnotatedVideoFrame():
+                media_id = f"{media.video.id}_{media.frame_index}"
+            case NotAnnotatedOmePlane():
+                media_id = f"{media.ome_image.id}_z{media.z_index}_t{media.t_index}"
+            case _:
+                media_id = str(media.id)
         try:
             logger.debug("Performing image '{}' segmentation", media_id)
             embeddings = model(model_input)

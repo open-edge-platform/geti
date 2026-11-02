@@ -321,6 +321,7 @@ def get_media_prediction_service(
     inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
     inference_keyframe_stride: Annotated[int, Depends(get_inference_keyframe_stride)],
     media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     db: Annotated[Session, Depends(get_db)],
 ) -> MediaPredictionService:
     """Provides a MediaPredictionService instance."""
@@ -330,6 +331,7 @@ def get_media_prediction_service(
         inference_server=inference_server,
         inference_keyframe_stride=inference_keyframe_stride,
         media_numpy_loader=media_numpy_loader,
+        ome_service=ome_service,
         db_session=db,
     )
 
@@ -337,6 +339,7 @@ def get_media_prediction_service(
 def get_media_segment_service(
     media_service: Annotated[MediaService, Depends(get_media_service)],
     media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
+    ome_service: Annotated[OmeService, Depends(get_ome_service)],
     model_xml_path: Annotated[Path, Depends(get_sam_encoder_xml_path)],
     ov_cache_path: Annotated[Path | None, Depends(get_sam_ov_cache_path)],
     db: Annotated[Session, Depends(get_db)],
@@ -345,6 +348,7 @@ def get_media_segment_service(
     return MediaSegmentService(
         media_service=media_service,
         media_numpy_loader=media_numpy_loader,
+        ome_service=ome_service,
         model_xml_path=model_xml_path,
         ov_cache_path=ov_cache_path,
         db_session=db,

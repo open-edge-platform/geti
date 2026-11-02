@@ -876,6 +876,24 @@
                 "unableToPlay": "Не удалось воспроизвести видео. Попробуйте ещё раз.",
                 "unsupportedFormat": "Не удалось воспроизвести видео. Попробуйте файл в формате MP4 или WebM."
             }
+        },
+        "ome": {
+            "zSlice": "Срез Z",
+            "timePoint": "Момент времени",
+            "annotatedPlanes": "Размечено срезов: {{count}}",
+            "channels": "Каналы",
+            "channelName": "Канал {{index}}",
+            "displayRange": "Диапазон отображения",
+            "red": "Красный",
+            "green": "Зелёный",
+            "blue": "Синий",
+            "displayOnlyHint": "Настройки отображения не влияют на обучение.",
+            "metadata": "Метаданные изображения",
+            "dimensions": "Размеры",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Тип пикселя",
+            "resolutionLevels": "Уровни разрешения",
+            "loading": "Загрузка OME-изображения..."
         }
     },
     "models": {

@@ -830,6 +830,24 @@
                 "unableToPlay": "Impossibile riprodurre il video, riprova.",
                 "unsupportedFormat": "Impossibile riprodurre il video, prova un formato video diverso (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Sezione Z",
+            "timePoint": "Punto temporale",
+            "annotatedPlanes": "Piani annotati: {{count}}",
+            "channels": "Canali",
+            "channelName": "Canale {{index}}",
+            "displayRange": "Intervallo di visualizzazione",
+            "red": "Rosso",
+            "green": "Verde",
+            "blue": "Blu",
+            "displayOnlyHint": "Le impostazioni di visualizzazione non influiscono sull'addestramento.",
+            "metadata": "Metadati dell'immagine",
+            "dimensions": "Dimensioni",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Tipo di pixel",
+            "resolutionLevels": "Livelli di risoluzione",
+            "loading": "Caricamento immagine OME..."
         }
     },
     "models": {

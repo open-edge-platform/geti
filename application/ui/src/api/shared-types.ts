@@ -52,9 +52,28 @@ export type MediaVideoFrame = Omit<MediaVideo, 'type'> & {
     type: 'video_frame';
 };
 
-export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO;
+export type MediaOmeImage = components['schemas']['OmeImageView'];
+type MediaOmePlaneDTO = components['schemas']['OmePlaneView'];
+// A (Z, T) plane of an OME image displayed in the annotator. Like video frames, planes share the id of their image.
+export type MediaOmePlane = Omit<MediaOmeImage, 'type'> & {
+    type: 'ome_plane';
+    z_index: number;
+    t_index: number;
+    size_z: number;
+    size_t: number;
+    // Pyramid level to render, and a token identifying the channel display settings it is rendered with
+    render_level: number;
+    render_version: string;
+};
 
-export type Media = MediaImage | MediaVideo | MediaVideoFrame;
+export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO | MediaOmeImage | MediaOmePlaneDTO;
+
+export type Media = MediaImage | MediaVideo | MediaVideoFrame | MediaOmeImage | MediaOmePlane;
+
+export type OmeImageInfo = components['schemas']['OmeImageInfoView'];
+export type OmeChannelDisplaySetting = components['schemas']['ChannelDisplaySetting'];
+export type OmeChannelView = components['schemas']['OmeChannelViewResponse'];
+export type AnnotatedOmePlane = components['schemas']['AnnotatedOmePlane'];
 
 export type TrainingDevice = components['schemas']['DeviceInfoView'];
 
@@ -99,6 +118,9 @@ export type VideoFramePrediction = {
 };
 
 export type PredictionVideoRangePayload = components['schemas']['VideoRange'];
+export type PredictionPlaneRangePayload = components['schemas']['PlaneRange'];
+// Range of a media to predict: frames of a video or (Z, T) planes of an OME image
+export type PredictionRangePayload = PredictionVideoRangePayload | PredictionPlaneRangePayload;
 
 export type AnnotationType = components['schemas']['AnnotationType'];
 

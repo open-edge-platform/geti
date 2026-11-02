@@ -8,12 +8,34 @@ from uuid import uuid4
 import pytest
 from fastapi import status
 
-from app.api.dependencies import get_dataset_service, get_media_service, get_ome_service
+from app.api.dependencies import (
+    get_dataset_service,
+    get_inference_media_limit,
+    get_media_prediction_service,
+    get_media_service,
+    get_ome_service,
+)
 from app.api.schemas.media import SetMediaAnnotations
 from app.models import DatasetItem, DatasetItemAnnotation, DatasetItemSubset, LabelReference, Rectangle
-from app.models.media import MediaType, OmeFormat, OmeImage, OmePlane
+from app.models.media import (
+    IndexRange,
+    MediaListPredictionRequest,
+    MediaPredictionRequest,
+    MediaType,
+    OmeFormat,
+    OmeImage,
+    OmePlane,
+    PlaneRange,
+)
 from app.models.ome import ChannelMapping, OmeChannel, OmeChannelView, OmeContainerFormat, OmeImageInfo, RgbTarget
-from app.services import DatasetService, MediaService, OmeService, ResourceNotFoundError, ResourceType
+from app.services import (
+    DatasetService,
+    MediaPredictionService,
+    MediaService,
+    OmeService,
+    ResourceNotFoundError,
+    ResourceType,
+)
 from app.services.media_service import InvalidImageError
 from app.services.ome.rendering import InvalidChannelSettingsError
 from app.services.ome_service import OmePlaneOutOfRangeError
@@ -255,6 +277,27 @@ def fxt_ome_info() -> OmeImageInfo:
         channel_mapping=[ChannelMapping(channel=0, target=RgbTarget.RED, window_min=0, window_max=65535)],
         pyramid_levels=[],
     )
+
+
+class TestOmePlanePrediction:
+    def test_plane_range_counts_against_inference_limit(self, fxt_app, fxt_get_project, fxt_client):
+        prediction_service = MagicMock(spec=MediaPredictionService)
+        fxt_app.dependency_overrides[get_media_prediction_service] = lambda: prediction_service
+        fxt_app.dependency_overrides[get_inference_media_limit] = lambda: 5
+        plane_range = PlaneRange(z=IndexRange(start=0, end=2), t=IndexRange(start=0, end=1))
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[MediaPredictionRequest(media_id=uuid4(), range=None, plane_range=plane_range)],
+            device="AUTO",
+        )
+
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict", json=request.model_dump(mode="json")
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "requested number is 6" in response.json()["detail"]
+        prediction_service.predict_media.assert_not_called()
 
 
 class TestOmeEndpoints:

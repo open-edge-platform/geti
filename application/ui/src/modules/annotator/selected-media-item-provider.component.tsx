@@ -7,7 +7,7 @@ import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
 import { useParams } from 'react-router';
 
-import { isVideo, isVideoFrame } from '../../shared/media-item-utils';
+import { isOmeImage, isVideo, isVideoFrame } from '../../shared/media-item-utils';
 import type { RegionOfInterest } from '../../shared/types';
 import { useLoadImageQuery } from './hooks/use-load-image-query.hook';
 import { getImageData } from './tools/utils';
@@ -54,6 +54,21 @@ const convertMediaItem = (mediaItem: Media, frameNumber: number): Media => {
             fps: Math.round(mediaItem.fps),
             frame_stride: Math.round(mediaItem.fps),
             frame_number: frameNumber,
+        };
+    }
+
+    // OME images are annotated plane by plane, starting from the first one. Their dimensions are only known from their
+    // metadata, so without it every plane is treated as a Z slice.
+    if (isOmeImage(mediaItem)) {
+        return {
+            ...mediaItem,
+            type: 'ome_plane',
+            z_index: 0,
+            t_index: 0,
+            size_z: mediaItem.plane_count,
+            size_t: 1,
+            render_level: 0,
+            render_version: 'initial',
         };
     }
 

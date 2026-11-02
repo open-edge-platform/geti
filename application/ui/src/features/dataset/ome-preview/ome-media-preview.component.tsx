@@ -1,0 +1,262 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import { useEffect, useMemo } from 'react';
+
+import type { DatasetSubset, Media, MediaOmeImage, MediaOmePlane, OmeImageInfo } from '@/api/types';
+import { useTranslation } from '@/i18n';
+import { Content, Dialog, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+
+import type { AnnotatorMode } from '../../../modules/annotator/annotator-mode';
+import {
+    getMediaPredictionsQueryKeyPrefix,
+    useMediaPredictions,
+} from '../../../modules/annotator/api/use-media-predictions';
+import {
+    PredictionsSetupProvider,
+    usePredictionSetup,
+} from '../../../modules/annotator/predictions-setup-provider.component';
+import {
+    SelectedMediaItemProvider,
+    useSelectedMediaItem,
+} from '../../../modules/annotator/selected-media-item-provider.component';
+import { AnnotatorProviders } from '../../../modules/annotator/shell/annotator-providers.component';
+import { useAnnotationsQuery } from '../../../modules/annotator/shell/api/use-annotations-query';
+import { getInitialAnnotations, useAnnotatorMode } from '../../../modules/annotator/shell/utils';
+import { ToolProvider } from '../../../modules/annotator/tool-provider.component';
+import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../modules/annotator/tools/segment-anything-tool/use-segment-anything.hook';
+import { getMediaItemPredictionRange } from '../../../shared/media-item-utils';
+import { useSelectDatasetItem } from '../gallery/hooks/use-select-dataset-item.hook';
+import { SIDEBAR_WIDTH } from '../media-preview/constants';
+import { SidebarItems } from '../media-preview/sidebar-items/sidebar-items.component';
+import { useAnnotatorMediaTransition } from '../media-preview/use-annotator-media-transition.hook';
+import { useOmeChannelView, useOmeImageInfo } from './api/use-ome-image';
+import { OmeAnnotatorContainer } from './ome-annotator.component';
+import { getRenderLevel, getRenderVersion } from './ome-render.utils';
+
+type OmeMediaPreviewProps = {
+    close: () => void;
+    onSelectedMediaItem: (item: Media) => void;
+};
+
+type OmeMediaPreviewContentProps = {
+    info: OmeImageInfo;
+    items: Media[];
+    onClose: () => void;
+    onSelectedMediaItem: (item: Media) => void;
+    isFetchingNextPage: boolean;
+    fetchNextPage: () => void;
+    isMediaItemReviewedById: (mediaItemId: string) => boolean;
+};
+
+type OmeMediaPreviewPanelsProps = Omit<OmeMediaPreviewContentProps, 'onSelectedMediaItem'> & {
+    mode: AnnotatorMode;
+    changeAnnotatorMode: (mode: AnnotatorMode) => void;
+    onSelectedMediaItem: (item: Media) => void;
+    isCurrentMediaReviewed: boolean;
+    subset: DatasetSubset;
+};
+
+const OmeMediaPreviewPanels = ({
+    info,
+    mode,
+    subset,
+    changeAnnotatorMode,
+    items,
+    onClose,
+    onSelectedMediaItem,
+    isFetchingNextPage,
+    fetchNextPage,
+    isMediaItemReviewedById,
+    isCurrentMediaReviewed,
+}: OmeMediaPreviewPanelsProps) => {
+    const { mediaItem } = useSelectedMediaItem();
+    const handleMediaTransition = useAnnotatorMediaTransition({ onSelectedMediaItem });
+
+    return (
+        <>
+            <OmeAnnotatorContainer
+                info={info}
+                mode={mode}
+                items={items}
+                subset={subset}
+                onClose={onClose}
+                isUserReviewed={isCurrentMediaReviewed}
+                changeAnnotatorMode={changeAnnotatorMode}
+                onSelectedMediaItem={handleMediaTransition}
+            />
+
+            <View gridArea={'aside'}>
+                <SidebarItems
+                    items={items}
+                    mediaItem={mediaItem}
+                    isFetchingNextPage={isFetchingNextPage}
+                    fetchNextPage={fetchNextPage}
+                    isUserReviewed={isMediaItemReviewedById}
+                    onSelectedMediaItem={handleMediaTransition}
+                />
+            </View>
+        </>
+    );
+};
+
+/**
+ * Aborts inference and embedding requests if the user closes the annotator dialog.
+ *
+ * It won't stop the server side processing but it will prevent the client from waiting for the results.
+ */
+const useCancelInferenceOnUnmount = () => {
+    const queryClient = useQueryClient();
+    const projectId = useProjectIdentifier();
+
+    useEffect(() => {
+        return () => {
+            void queryClient.cancelQueries({ queryKey: getMediaPredictionsQueryKeyPrefix(projectId) });
+            void queryClient.cancelQueries({ queryKey: SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX });
+        };
+    }, [queryClient, projectId]);
+};
+
+const OmeMediaPreviewContent = ({ onSelectedMediaItem, ...props }: OmeMediaPreviewContentProps) => {
+    const { mediaItem } = useSelectedMediaItem();
+    const { selectedModel, selectedDevice, confidenceThreshold } = usePredictionSetup();
+
+    useCancelInferenceOnUnmount();
+
+    const { data: annotationsData } = useAnnotationsQuery(mediaItem);
+    const { data: predictionsData } = useMediaPredictions({
+        mediaId: mediaItem.id,
+        selectedModel,
+        device: selectedDevice,
+        confidenceThreshold,
+        range: getMediaItemPredictionRange(mediaItem),
+    });
+
+    const isCurrentMediaReviewed = annotationsData?.user_reviewed ?? false;
+    const subset: DatasetSubset = annotationsData?.subset ?? 'unassigned';
+
+    const initialAnnotations = useMemo(
+        () => getInitialAnnotations(isCurrentMediaReviewed, annotationsData?.annotations ?? []),
+        [isCurrentMediaReviewed, annotationsData?.annotations]
+    );
+
+    const initialPredictions = useMemo(
+        () => predictionsData?.flatMap((predictionData) => predictionData.prediction) ?? [],
+        [predictionsData]
+    );
+
+    const [mode, setMode] = useAnnotatorMode();
+
+    return (
+        <ToolProvider>
+            <AnnotatorProviders
+                initialAnnotationsDTO={initialAnnotations}
+                initialPredictionsDTO={initialPredictions}
+                mode={mode}
+            >
+                <OmeMediaPreviewPanels
+                    {...props}
+                    mode={mode}
+                    changeAnnotatorMode={setMode}
+                    onSelectedMediaItem={onSelectedMediaItem}
+                    isCurrentMediaReviewed={isCurrentMediaReviewed}
+                    subset={subset}
+                />
+            </AnnotatorProviders>
+        </ToolProvider>
+    );
+};
+
+type OmeImageLoaderProps = Omit<OmeMediaPreviewContentProps, 'info'> & {
+    omeImage: MediaOmeImage | MediaOmePlane;
+};
+
+// The first plane is only displayed once the pyramid level and the channel display settings to render it with are known
+const OmeImageLoader = ({ omeImage, ...props }: OmeImageLoaderProps) => {
+    const { t } = useTranslation();
+    const { data: info } = useOmeImageInfo(omeImage.id);
+    const { data: channelView } = useOmeChannelView(omeImage.id);
+
+    if (info === undefined || channelView === undefined) {
+        return (
+            <View gridArea={'canvas'}>
+                <Flex direction={'column'} alignItems={'center'} justifyContent={'center'} height={'100%'}>
+                    <Loading mode={'inline'} />
+                    <Text>{t('annotator.ome.loading')}</Text>
+                </Flex>
+            </View>
+        );
+    }
+
+    const firstPlane: MediaOmePlane = {
+        ...omeImage,
+        type: 'ome_plane',
+        z_index: 0,
+        t_index: 0,
+        size_z: info.size_z,
+        size_t: info.size_t,
+        render_level: getRenderLevel(info),
+        render_version: getRenderVersion(channelView.settings),
+    };
+
+    return (
+        <SelectedMediaItemProvider mediaItem={firstPlane}>
+            <PredictionsSetupProvider>
+                <OmeMediaPreviewContent info={info} {...props} />
+            </PredictionsSetupProvider>
+        </SelectedMediaItemProvider>
+    );
+};
+
+/** Annotator dialog for OME images: the regular annotator, navigating through (Z, T) planes instead of video frames. */
+export const OmeMediaPreview = ({ close, onSelectedMediaItem }: OmeMediaPreviewProps) => {
+    const { items, isFetchingNextPage, fetchNextPage, isMediaItemReviewedById } = useDatasetMediaWithReviewStatus();
+
+    // Reading the route param unmounts the content on close, without waiting for the dialog's exit animation.
+    const { selectedMediaItem } = useSelectDatasetItem();
+    const omeImage =
+        selectedMediaItem?.type === 'ome_image' || selectedMediaItem?.type === 'ome_plane' ? selectedMediaItem : null;
+
+    return (
+        <Dialog
+            aria-label='OME annotator'
+            UNSAFE_style={{
+                backgroundColor: 'var(--spectrum-global-color-gray-50)',
+                '--spectrum-dialog-padding-x': 'var(--spectrum-global-dimension-size-250)',
+                '--spectrum-dialog-padding-y': 'var(--spectrum-global-dimension-size-250)',
+            }}
+        >
+            <Content>
+                <Grid
+                    gap='size-125'
+                    width='100%'
+                    height='100%'
+                    rows='auto 1fr auto auto'
+                    columns={['size-700', 'minmax(0, 1fr)', SIDEBAR_WIDTH]}
+                    areas={[
+                        'header header aside',
+                        'toolbar canvas aside',
+                        'toolbar navigation-toolbar aside',
+                        'toolbar bottom aside',
+                    ]}
+                >
+                    {omeImage !== null && (
+                        <OmeImageLoader
+                            key={omeImage.id}
+                            omeImage={omeImage}
+                            items={items}
+                            onClose={close}
+                            onSelectedMediaItem={onSelectedMediaItem}
+                            isFetchingNextPage={isFetchingNextPage}
+                            fetchNextPage={fetchNextPage}
+                            isMediaItemReviewedById={isMediaItemReviewedById}
+                        />
+                    )}
+                </Grid>
+            </Content>
+        </Dialog>
+    );
+};

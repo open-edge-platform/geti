@@ -71,22 +71,29 @@ export const buildDatasetMediaQueryFilters = (options?: UseGetDatasetMediaItemsO
 };
 
 const getMediaEntities = (items: MediaDTO[]): Media[] => {
-    return items.map((item) => {
+    return items.flatMap((item): Media[] => {
         // We will never get the video frame using '/api/projects/{project_id}/dataset/media', it's added only because
         // of documentation reasons. We use MediaVideoFrame as a local type to work with the played frame in the video.
         if (item.type === 'video_frame') {
-            return {
-                duration: 0,
-                frame_count: 0,
-                annotated_frame_count: 0,
-                fps: 0,
-                frame_number: 0,
-                frame_stride: 0,
-                ...item,
-            };
+            return [
+                {
+                    duration: 0,
+                    frame_count: 0,
+                    annotated_frame_count: 0,
+                    fps: 0,
+                    frame_number: 0,
+                    frame_stride: 0,
+                    ...item,
+                },
+            ];
         }
 
-        return item;
+        // Same for OME planes: the listing returns their OME images, which are opened plane by plane.
+        if (item.type === 'ome_plane') {
+            return [];
+        }
+
+        return [item];
     });
 };
 

@@ -3,7 +3,12 @@
 
 import type { AnnotationDTO } from '@/api/types';
 import { act } from '@testing-library/react';
-import { getMockedMediaImage, getMockedVideoFrame, getMultipleMockedMediaImage } from 'mocks/mock-media';
+import {
+    getMockedMediaImage,
+    getMockedOmePlane,
+    getMockedVideoFrame,
+    getMultipleMockedMediaImage,
+} from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
 import { useVideoPlayerContext } from '../video-player/video-player-provider.component';
@@ -115,6 +120,24 @@ describe('getNextMediaItem', () => {
             const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 5, frame_count: 10 });
             const result = getNextMediaItem(frame, [frame], 3);
             expect(result).toEqual({ ...frame, frame_number: 6 });
+        });
+    });
+
+    describe('OME planes', () => {
+        it('moves to the next Z slice', () => {
+            const plane = getMockedOmePlane({ z_index: 1, t_index: 2 });
+            expect(getNextMediaItem(plane, [], 1)).toEqual({ ...plane, z_index: 2 });
+        });
+
+        it('moves to the first slice of the next time point after the last slice', () => {
+            const plane = getMockedOmePlane({ z_index: 4, t_index: 1 });
+            expect(getNextMediaItem(plane, [], 1)).toEqual({ ...plane, z_index: 0, t_index: 2 });
+        });
+
+        it('moves to the next media item after the last plane', () => {
+            const plane = getMockedOmePlane({ z_index: 4, t_index: 2 });
+            const nextImage = getMockedMediaImage({ id: 'image-1' });
+            expect(getNextMediaItem(plane, [plane, nextImage], 1)).toEqual(nextImage);
         });
     });
 });

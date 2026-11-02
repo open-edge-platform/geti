@@ -836,6 +836,24 @@
                 "unableToPlay": "Nie można odtworzyć wideo. Spróbuj ponownie.",
                 "unsupportedFormat": "Nie można odtworzyć wideo. Spróbuj innego formatu wideo (mp4/webm)."
             }
+        },
+        "ome": {
+            "zSlice": "Przekrój Z",
+            "timePoint": "Punkt czasowy",
+            "annotatedPlanes": "Oznaczone płaszczyzny: {{count}}",
+            "channels": "Kanały",
+            "channelName": "Kanał {{index}}",
+            "displayRange": "Zakres wyświetlania",
+            "red": "Czerwony",
+            "green": "Zielony",
+            "blue": "Niebieski",
+            "displayOnlyHint": "Ustawienia wyświetlania nie wpływają na trening.",
+            "metadata": "Metadane obrazu",
+            "dimensions": "Wymiary",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "Typ piksela",
+            "resolutionLevels": "Poziomy rozdzielczości",
+            "loading": "Wczytywanie obrazu OME..."
         }
     },
     "models": {

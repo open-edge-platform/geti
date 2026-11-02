@@ -830,6 +830,24 @@
                 "unableToPlay": "无法播放视频，请重试。",
                 "unsupportedFormat": "无法播放视频，请换用其他视频格式（mp4/webm）。"
             }
+        },
+        "ome": {
+            "zSlice": "Z 切片",
+            "timePoint": "时间点",
+            "annotatedPlanes": "已标注平面：{{count}}",
+            "channels": "通道",
+            "channelName": "通道 {{index}}",
+            "displayRange": "显示范围",
+            "red": "红色",
+            "green": "绿色",
+            "blue": "蓝色",
+            "displayOnlyHint": "显示设置不会影响训练。",
+            "metadata": "图像元数据",
+            "dimensions": "尺寸",
+            "dimensionsValue": "X {{x}} × Y {{y}} × Z {{z}} × C {{c}} × T {{t}}",
+            "pixelType": "像素类型",
+            "resolutionLevels": "分辨率级别",
+            "loading": "正在加载 OME 图像..."
         }
     },
     "models": {

@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MediaImage, MediaVideo, MediaVideoFrame } from '@/api/types';
+import type { MediaImage, MediaOmePlane, MediaVideo, MediaVideoFrame } from '@/api/types';
 
 export const getMockedMediaImage = (props: Partial<MediaImage> = {}): MediaImage => ({
     id: 'item-1',
@@ -55,3 +55,21 @@ export const getMultipleMockedMediaImage = (count: number, prefixId = '1'): Medi
         })
     );
 };
+
+export const getMockedOmePlane = (props: Partial<MediaOmePlane> = {}): MediaOmePlane => ({
+    id: 'ome-1',
+    type: 'ome_plane',
+    name: 'plate',
+    format: 'ome.tiff',
+    width: 64,
+    height: 32,
+    size: 1024,
+    plane_count: 15,
+    z_index: 0,
+    t_index: 0,
+    size_z: 5,
+    size_t: 3,
+    render_level: 0,
+    render_version: 'v1',
+    ...props,
+});

@@ -8,7 +8,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { range } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { isOmePlane, isVideoFrame } from '../../../shared/media-item-utils';
 import type { AnnotatorMode } from '../annotator-mode';
 import { usePrefetchMediaItem } from '../hooks/use-prefetch-media-item.hook';
 import { useVideoPlayerContext } from '../video-player/video-player-provider.component';
@@ -18,6 +18,17 @@ export const getInitialAnnotations = (isUserReviewed: boolean, annotationsDTO: A
 };
 
 export const getNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[], step: number): Media | undefined => {
+    // OME planes are walked through slice by slice, then time point by time point
+    if (isOmePlane(currentMediaItem)) {
+        if (currentMediaItem.z_index + 1 < currentMediaItem.size_z) {
+            return { ...currentMediaItem, z_index: currentMediaItem.z_index + 1 };
+        }
+
+        if (currentMediaItem.t_index + 1 < currentMediaItem.size_t) {
+            return { ...currentMediaItem, z_index: 0, t_index: currentMediaItem.t_index + 1 };
+        }
+    }
+
     if (isVideoFrame(currentMediaItem)) {
         const videoFrames = range(0, currentMediaItem.frame_count, step);
         const currentIndex = videoFrames.findIndex((frame) => frame === currentMediaItem.frame_number);
