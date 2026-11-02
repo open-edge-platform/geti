@@ -2,7 +2,7 @@
 
 - Scope: `application/backend/` (primary), `application/ui/` (separate workstream), `libraries/getitune/` (no change)
 - Supersedes: nothing
-- Related docs: [`entities.md`](../entities.md), [`dataset.md`](../dataset.md), [`migration-guidelines.md`](../migration-guidelines.md)
+- Related docs: [`entities.md`](entities.md), [`dataset.md`](dataset.md), [`migration-guidelines.md`](migration-guidelines.md)
 
 ---
 
@@ -174,6 +174,25 @@ class MediaDB(BaseID):
 The `video_id` → `parent_id` rename is the only invasive change. It is a pure DDL rename with no data migration, and it
 prevents a second self-FK column being added for every future container type.
 
+**This rename is internal to the ORM/DB layer only.** The public `VideoFrame` (`app/models/media.py`) and
+`VideoFrameView` (`app/api/schemas/media.py`) Pydantic models keep their existing `video_id: UUID` field name on the
+wire - that is part of the stable API contract and must not change. The risk is not the wire schema, it's the
+construction path: both models are currently built with
+`VideoFrame.model_validate(db_media, from_attributes=True)`, which resolves `video_id` via
+`getattr(db_media, "video_id")`. Once the ORM attribute becomes `parent_id`, that `getattr` silently breaks
+(`AttributeError` / missing-field validation error) even though nothing about the public API changed.
+
+Do **not** rely on `from_attributes` auto-mapping for this field after the rename. Instead:
+
+- Construct `VideoFrame`/`VideoFrameView` explicitly for the `video_id` field (e.g.
+  `VideoFrame.model_validate({**db_media.__dict__, "video_id": db_media.parent_id}, ...)`, or build the model via
+  explicit kwargs), **or**
+- Add a `model_validator(mode="before")` on `VideoFrame`/`VideoFrameView` that reads `.parent_id` off an ORM object and
+  injects it as `video_id` before the rest of validation runs.
+
+`OmePlane` is a new type with no legacy field name to preserve; decide its public field name (`parent_id` vs. a more
+descriptive `ome_image_id`) once, since it becomes part of the stable contract from day one.
+
 ### 4.2 `OmeImageDB` - new table, 1:1 with an `ome_image` media row
 
 ```python
@@ -250,11 +269,15 @@ SQLite requires `op.batch_alter_table` for (1) and (3); follow the existing patt
 Downgrade is symmetric and lossless as long as no OME media exists; the downgrade must therefore refuse to run if any
 `ome_image` row is present.
 
+The rename in (1) is DB/ORM-internal only - see the callout in §4.1. Every `MediaDB.video_id` attribute reference must
+become `MediaDB.parent_id` (repositories, filters, services), but the public `video_id` field on `VideoFrame` /
+`VideoFrameView` must keep serializing under that name.
+
 ---
 
 ## 5. API contract
 
-All additive, under the existing `/api/projects/{project_id}/media` router.
+All additive, under the existing `/api/projects/{project_id}/dataset/media` router.
 
 ### 5.1 Upload
 
@@ -284,7 +307,7 @@ decision today and an API break if skipped.
 ### 5.2 Structure
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/ome
+GET /api/projects/{project_id}/dataset/media/{media_id}/ome
 
 200 ->
 {
@@ -302,10 +325,10 @@ GET /api/projects/{project_id}/media/{media_id}/ome
 ### 5.3 Channel view
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/channel-view
+GET /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 200 -> {"settings": [ … ], "is_default": true}
 
-PUT /api/projects/{project_id}/media/{media_id}/channel-view
+PUT /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 {"settings": [{"channel": 2, "target": "red", "enabled": true,
                "window_min": 120, "window_max": 4000}, …]}
 200 -> {"settings": [ … ], "is_default": false}
@@ -315,7 +338,7 @@ PUT /api/projects/{project_id}/media/{media_id}/channel-view
 ### 5.4 Rendering
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/render?z=12&t=0&level=2
+GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2
 200 -> image/png, Cache-Control: private, max-age=…, ETag: {settings_hash}
 ```
 
@@ -325,7 +348,7 @@ cacheable and identical to what training will see. `PUT /channel-view` invalidat
 Optional, added only if profiling demands it (and the natural fit for Zarr chunks):
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0
+GET /api/projects/{project_id}/dataset/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0
 200 -> image/png
 ```
 
@@ -334,10 +357,10 @@ GET /api/projects/{project_id}/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0
 Mirrors the existing `list_video_frames`:
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/planes?z=&t=&limit=&offset=
+GET /api/projects/{project_id}/dataset/media/{media_id}/planes?z=&t=&limit=&offset=
 200 -> paginated OmePlane views (annotated planes only), for Z-slider / T-timeline overlays
 
-GET /api/projects/{project_id}/media/{media_id}/thumbnail?z=12&t=0
+GET /api/projects/{project_id}/dataset/media/{media_id}/thumbnail?z=12&t=0
 200 -> image/jpeg
 ```
 
@@ -348,8 +371,8 @@ media is an `ome_image`, it resolves - or lazily creates - the corresponding `om
 branch does today. The existing annotation `GET`/`PUT` then work verbatim:
 
 ```http
-GET /api/projects/{project_id}/media/{media_id}/annotations?z=12&t=0
-PUT /api/projects/{project_id}/media/{media_id}/annotations?z=12&t=0
+GET  /api/projects/{project_id}/dataset/media/{media_id}/annotations?z=12&t=0
+POST /api/projects/{project_id}/dataset/media/{media_id}/annotations?z=12&t=0
 400 -> z or t out of range for this image
 ```
 
@@ -425,10 +448,16 @@ Each step is independently mergeable and leaves `main` green.
 
 Rename `video_id` → `parent_id`, add `z_index`/`t_index`, widen both `size` columns, create `ome_images` and
 `ome_channel_views`. Update `MediaRepository`, `dataset_view_repo` and all `video_id` references. No behaviour change.
+This includes the two `VideoFrame.model_validate(db_media, from_attributes=True)` call sites in
+`media_service.py::save_video_frame` / `get_video_frame_by_video_id_and_index`, and the `MediaDB(video_id=...)`
+constructor call - all must be updated to map `parent_id` to the public `video_id` field explicitly (see §4.1).
 
 _Testing._ Alembic upgrade/downgrade test on a DB seeded with projects, videos and video frames, asserting row counts
 and FK integrity are preserved. Run the existing video integration suite unchanged - it is the regression gate for the
-rename. Add a `testcontainers` integration test asserting a `size` value above 2^31 round-trips.
+rename. Add a `testcontainers` integration test asserting a `size` value above 2^31 round-trips. **Add a contract
+regression test** that uploads a video, creates a video frame, and asserts the `GET .../media/{id}` response still
+serializes `video_id` (not `parent_id`) with the correct value - this is the gate for the "no breaking API changes"
+decision driver and would not be caught by the existing suite if it only checks ORM-level behaviour.
 
 ### Step 2 - `MediaStorage` and `OmeReader` skeleton
 
@@ -452,7 +481,7 @@ Parametrize plane selection over `(z, t)` and assert shape, dtype and a known pi
 
 `ImageFormat` gains `ome.tiff`/`ome.tif`; replace the `ImageFormat[ext.upper()]` lookup with a longest-suffix value
 match in `_parse_media_format` **and** in `dataset_revision_service._parse_revision_item_from_df_row_dict`, which will
-otherwise raise on compound suffixes. Add `MediaService.create_ome_image()`, the `:from-uploads` endpoint, and the `/ome`
+otherwise raise on compound suffixes. Add `MediaService.create_ome_image()`, the `:from-upload` endpoint, and the `/ome`
 endpoint. Thumbnail from the lowest pyramid level at mid-Z/mid-T, mirroring `create_video`.
 
 _Testing._ Router unit tests for compound-extension parsing, including that `a.ome.tiff` resolves to `OME_TIFF` and
@@ -480,7 +509,7 @@ Validation tests for the 422 cases in §5.3.
 _Testing._ Integration test: annotate `(z=12, t=0)`, assert exactly one `ome_plane` row plus one `dataset_item`;
 re-annotate and assert no duplicate row (this is what `uq_parent_id_frame_index` guards). Out-of-range `z`/`t`
 returns 400. Media listing and counting must exclude `ome_plane` rows exactly as they exclude `video_frame`. Deleting
-the parent returns 401. cascades to planes, items and labels.
+the parent returns 204 - cascades to planes, items and labels.
 
 ### Step 7 - Training
 
@@ -502,7 +531,7 @@ existing video `range` behaviour is byte-identical (regression gate for the addi
 ### Step 9 - Contract handoff
 
 `just gen-api-spec`, copy to `application/ui/src/api/openapi-spec.json`, `npm run build:api`, add mock handlers for the
-new endpoints, update [`dataset.md`](../dataset.md) and [`entities.md`](../entities.md).
+new endpoints, update [`dataset.md`](dataset.md) and [`entities.md`](entities.md).
 
 _Testing._ `just lint`, `just pyrefly`, `just lint-imports` on the backend; `npm run type-check` on the UI to prove the
 regenerated types compile.
@@ -516,14 +545,15 @@ migration, no API break.
 
 ## 9. Risks
 
-| Risk                                                 | Mitigation                                                                                                                                                                 |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| New `tifffile` dependency                            | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                          |
-| `video_id` → `parent_id` rename churn                | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected. |
-| Render latency makes Z/T scrubbing unusable          | Measure at step 5 on a pyramidal BigTIFF fixture. If it fails, promote `/tiles` from optional to required; the endpoint shape is already specified.                        |
-| Large stores blow past disk limits                   | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                          |
-| RGB projection loses information needed for accuracy | Accepted for v1 and consistent with the requirements. Record the projection in the revision so N-channel training can later be compared against it fairly.                 |
-| Downgrade path with OME media present                | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](../migration-guidelines.md).                                             |
+| Risk                                                                       | Mitigation                                                                                                                                                                                            |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                     |
+| `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                            |
+| `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1. |
+| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If it fails, promote `/tiles` from optional to required; the endpoint shape is already specified.                                                   |
+| Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                     |
+| RGB projection loses information needed for accuracy                       | Accepted for v1 and consistent with the requirements. Record the projection in the revision so N-channel training can later be compared against it fairly.                                            |
+| Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                           |
 
 ---
 
