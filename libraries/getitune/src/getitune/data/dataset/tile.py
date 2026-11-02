@@ -15,6 +15,7 @@ from datumaro.experimental.filtering.filter_registry import create_filtering_tra
 from datumaro.experimental.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
+from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
 from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
@@ -134,8 +135,22 @@ class TileDataset(VisionDataset):
             log.warning(msg)
             self.label_info = dataset.label_info
 
+        # Intensity mapping + Resize can run on the device instead of in the worker, so raw pixels
+        # travel unchanged. The device pipeline is built from the same transforms as the worker one.
+        self.device_preprocess: CPUAugmentationPipeline | None = (
+            self.transforms
+            if isinstance(self.transforms, CPUAugmentationPipeline) and self.transforms.is_intensity_resize_only()
+            else None
+        )
+
     def __len__(self) -> int:
         return len(self._dataset)
+
+    def _apply_transforms(self, entity: BaseSample) -> BaseSample | None:
+        # Only raw integer tiles are deferred; float tiles (e.g. float storage) keep the CPU path.
+        if self.device_preprocess is not None and not entity.image.is_floating_point():
+            return entity
+        return super()._apply_transforms(entity)
 
     @property
     def collate_fn(self) -> Callable:

@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader, RandomSampler
 
 from getitune.config.data import SubsetConfig, TileConfig
 from getitune.data.augmentation import CPUAugmentationPipeline
-from getitune.data.dataset.tile import TileDatasetFactory
+from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
 from getitune.data.utils import get_adaptive_num_workers, instantiate_sampler
@@ -439,6 +439,14 @@ class DataModule(LightningDataModule):
             msg = f"Dataset has no '{subset}'. Available subsets = {list(self.subsets.keys())}"
             raise KeyError(msg)
         return dataset
+
+    def device_preprocess_pipeline(self, subset: str) -> CPUAugmentationPipeline | None:
+        """Return the intensity + resize pipeline that the tile dataset of ``subset`` defers to the device.
+
+        The pipeline comes from the dataset itself, so the device side always matches the worker side.
+        """
+        dataset = self.subsets.get(subset)
+        return dataset.device_preprocess if isinstance(dataset, TileDataset) else None
 
     def train_dataloader(self) -> DataLoader:
         """Get train dataloader."""
