@@ -636,3 +636,4 @@ migration, no API break.
 - Multiple OME series per file (series 0 only).
 - Non-XYCZT axes.
 - UI implementation (separate workstream; this document fixes the contract it consumes).
+- Full-fidelity dataset export/import of OME media — export/import carries materialized PNGs and annotations only.
