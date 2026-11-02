@@ -498,21 +498,37 @@ class DataModule(LightningDataModule):
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+        return DataLoader(
+            **self._eval_loader_kwargs(
+                dataset, config, persistent_workers=False if self.tile_config.enable_tiler else None
+            )
+        )
 
     def predict_dataloader(self) -> DataLoader:
         """Get predict dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+        return DataLoader(
+            **self._eval_loader_kwargs(
+                dataset, config, persistent_workers=False if self.tile_config.enable_tiler else None
+            )
+        )
 
-    def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
+    def _eval_loader_kwargs(
+        self,
+        dataset: VisionDataset,
+        config: SubsetConfig,
+        persistent_workers: bool | None = None,
+    ) -> dict:
         """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
 
         The number of workers and pinned-memory behaviour are taken directly from
         the subset config (i.e. the recipe). This keeps evaluation loading
         configurable per recipe rather than hardcoded here.
+        ``persistent_workers`` defaults to the recipe-driven behaviour (workers stay
+        alive while num_workers > 0); test and predict pass ``False`` when tiling is
+        enabled so their workers are shut down as soon as the loader finishes.
 
         For tiled evaluation a single original image expands into *every* grid tile
         (tiles are not filtered by annotation at inference time), so one dataset item
@@ -540,7 +556,7 @@ class DataModule(LightningDataModule):
             "num_workers": num_workers,
             "pin_memory": self._pin_memory,
             "collate_fn": dataset.collate_fn,
-            "persistent_workers": num_workers > 0,
+            "persistent_workers": num_workers > 0 if persistent_workers is None else persistent_workers,
             "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
         }
 

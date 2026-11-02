@@ -122,6 +122,36 @@ class TestDataModule:
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
 
+    def test_tiled_test_and_predict_loaders_are_not_persistent(self, mocker) -> None:
+        """Data loaders for tiled test and predict subsets must not keep workers alive.
+
+        Tiled test/predict run once, so persistent workers only hold idle copies of the
+        dataset and interpreter state while the test stage runs. The val loader keeps
+        its current behaviour: validation runs every epoch, so healthy worker reuse
+        still saves spawn cost there.
+        """
+
+        plain_dataset = MagicMock()
+        plain_dataset.collate_fn = lambda batch: batch
+        config = MagicMock(spec=SubsetConfig)
+        config.batch_size = 1
+        config.num_workers = 2
+        config.subset_name = "test"
+
+        dm = DataModule.__new__(DataModule)
+        dm.tile_config = TileConfig(enable_tiler=True)
+        mocker.patch.object(dm, "_get_dataset", return_value=plain_dataset)
+        dm.val_subset = MagicMock(spec=SubsetConfig)
+        dm.val_subset.batch_size = 1
+        dm.val_subset.num_workers = 2
+        dm.val_subset.subset_name = "val"
+        dm.test_subset = config
+        dm.device = DeviceType.cpu  # pin_memory resolves False without a GPU runtime
+
+        assert dm.test_dataloader().persistent_workers is False
+        assert dm.predict_dataloader().persistent_workers is False
+        assert dm.val_dataloader().persistent_workers is True
+
     def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
         """Eval loaders honor the recipe-configured batch size, workers and pinned memory.
 
