@@ -32,7 +32,7 @@ export const AddSource = <T extends SourceConfigPayload>({
         config,
         isNewSource: true,
         onSaved: async (sourceId) => {
-            await connectToPipelineMutation(sourceId);
+            await connectToPipelineMutation.mutateAsync(sourceId);
             onSaved();
         },
         bodyFormatter,

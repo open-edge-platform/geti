@@ -19,6 +19,11 @@ import { EditSource } from './edit-source.component';
 rs.mock('../hooks/use-source-mutation.hook');
 rs.mock('../../../../hooks/api/pipeline.hook');
 
+const mockConnectMutation = (mutateAsync: ReturnType<typeof rs.fn>) =>
+    rs
+        .mocked(useConnectSourceToPipeline)
+        .mockReturnValue({ mutateAsync, isPending: false } as unknown as ReturnType<typeof useConnectSourceToPipeline>);
+
 describe('EditIpCamera', () => {
     const { t } = createI18nInstance({ lng: 'en' });
 
@@ -53,7 +58,7 @@ describe('EditIpCamera', () => {
         const mockSourceMutation = rs.fn().mockResolvedValue(updatedConfig.id);
         const mockConnectToPipeline = rs.fn().mockResolvedValue(undefined);
 
-        rs.mocked(useConnectSourceToPipeline).mockReturnValue(mockConnectToPipeline);
+        mockConnectMutation(mockConnectToPipeline);
         rs.mocked(useSourceMutation).mockReturnValue(mockSourceMutation);
 
         renderApp(mockOnSaved);
@@ -79,7 +84,7 @@ describe('EditIpCamera', () => {
         const mockSourceMutation = rs.fn().mockResolvedValue(updatedConfig.id);
         const mockConnectToPipeline = rs.fn().mockResolvedValue(undefined);
 
-        rs.mocked(useConnectSourceToPipeline).mockReturnValue(mockConnectToPipeline);
+        mockConnectMutation(mockConnectToPipeline);
         rs.mocked(useSourceMutation).mockReturnValue(mockSourceMutation);
 
         renderApp(mockOnSaved);
@@ -101,7 +106,7 @@ describe('EditIpCamera', () => {
     });
 
     it('hides "Save & Connect" button when already connected', () => {
-        rs.mocked(useConnectSourceToPipeline).mockReturnValue(rs.fn());
+        mockConnectMutation(rs.fn());
         rs.mocked(useSourceMutation).mockReturnValue(rs.fn());
 
         renderApp(rs.fn(), true);
@@ -110,7 +115,7 @@ describe('EditIpCamera', () => {
     });
 
     it('shows "Save & Connect" button when not connected', () => {
-        rs.mocked(useConnectSourceToPipeline).mockReturnValue(rs.fn());
+        mockConnectMutation(rs.fn());
         rs.mocked(useSourceMutation).mockReturnValue(rs.fn());
 
         renderApp(rs.fn(), false);

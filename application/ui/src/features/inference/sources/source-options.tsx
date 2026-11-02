@@ -7,8 +7,8 @@ import type { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig
 import { IpCamera as IpCameraIcon, VideoFile as VideoFileIcon, Webcam as WebcamIcon } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
+import { DisclosureGroup } from '../shared/disclosure-group/disclosure-group.component';
 import { AddSource } from './add-source/add-source.component';
-import { DisclosureGroup } from './disclosure-group.component';
 import { IpCamera } from './ip-camera/ip-camera.component';
 import { getIpCameraInitialConfig, ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
