@@ -135,11 +135,74 @@ trivially movable to object storage later.
 
 ### 3.6 Training
 
+Training uses a **fixed, deterministic channel-to-RGB mapping** computed once from immutable OME metadata
+(§3.6.1), independent of anything the annotator UI does.
+
 A dataset revision materializes **annotated planes only**, rendered to plain PNG into `dataset_revisions/<id>/images/`,
-using the channel view settings in force at revision time. Those settings are recorded in the revision so it stays
-reproducible and so inference-time preprocessing can be made to match training-time preprocessing.
+using that fixed mapping. The mapping actually used is written alongside the revision as a sidecar file,
+`dataset_revisions/<id>/ome_channel_mapping.json` - the revision's on-disk artifacts are the documented source of
+truth for "what did training see", exactly as the rendered PNGs themselves already are. This avoids adding a
+revision-scoped settings table or JSON column (§4.4 stays correct: `dataset_revisions` is unchanged), while still
+making the preprocessing fully reproducible from what is stored for that revision.
 
 This is exactly how annotated video frames are already handled, which is why requirements 5–8 need no work in `getitune`.
+
+#### 3.6.1 Fixed training channel mapping
+
+Computed once, at ingest time (`OmeTiffReader.parse`), from `size_c` and the OME-XML channel metadata, and stored
+immutably on `OmeImageDB.channel_mapping` (§4.2) - **not** the `OmeChannelView` row, which only affects rendering for
+the annotator and can change at any time. Because it's derived solely from already-immutable OME metadata and
+persisted once, it's as reproducible as the pixel data itself.
+
+Strategy, in priority order:
+
+1. **`size_c == 3` and no better signal available**: identity mapping, channel `i` → RGB target `i`. Covers the common
+   "already RGB" OME-TIFF case.
+2. **OME-XML declares `EmissionWavelength` for each channel**: map each channel to the nearest of {red, green, blue} by
+   wavelength (e.g. `<500nm` → blue, `500-580nm` → green, `>580nm` → red), picking at most one channel per target and
+   preferring the one whose declared `Color` is closest to the target hue if more than one collides. Covers
+   fluorescence imaging, the primary OME-TIFF use case and the one place a naive first-three-channels choice would be
+   actively wrong (e.g. DAPI/GFP/Cy5 in channel order 0,1,2 vs. 2,0,1).
+3. **Fallback, any `size_c` with no wavelength metadata**: first `min(size_c, 3)` channels, in index order, mapped to
+   R, G, B; channels beyond index 2 are dropped. `size_c < 3` pads unused targets with zero (black).
+
+The mapping is recorded as `[{"channel": 2, "target": "red"}, …]` - the same shape as `OmeChannelView.settings` minus
+the window/level fields, since training always uses the channel's full declared range rather than a user-tuned
+window. Re-ingesting an image recomputes it the same way, so refining the strategy later never needs a migration of
+its own - only newly-ingested images pick up the change, and each image's revision sidecar still truthfully records
+whichever mapping was used for it.
+
+Proposed file structure:
+
+```
+// dataset_revisions/<revision_id>/ome_channel_mappings.json
+{
+  "mapping_strategy_version": 1,          // bump if §3.6.1's algorithm changes; lets readers detect
+                                           // "this revision predates strategy vN" without re-deriving it
+  "images": [
+    {
+      "media_id": "3fae2b1e-....-ome_image_1",
+      "container_format": "ome_tiff",
+      "size_c": 3,
+      "channel_mapping": [
+        {"channel": 0, "target": "blue"},
+        {"channel": 1, "target": "green"},
+        {"channel": 2, "target": "red"}
+      ]
+    },
+    {
+      "media_id": "9b1caa02-....-ome_image_2",
+      "container_format": "ome_zarr",
+      "size_c": 5,
+      "channel_mapping": [
+        {"channel": 2, "target": "red"},
+        {"channel": 0, "target": "green"},
+        {"channel": 4, "target": "blue"}
+      ]
+    }
+  ]
+}
+```
 
 ---
 
@@ -218,6 +281,10 @@ class OmeImageDB(Base):
     is_big_tiff: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     # [{"index": 0, "name": "DAPI", "color": "#0000ff", "emission_wavelength": 461}, ...]
     channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # Fixed, deterministic channel->RGB projection used for training (see §3.6.1). Computed once at ingest
+    # time and never mutated; independent of OmeChannelView, which is mutable and display-only.
+    # [{"channel": 2, "target": "red"}, ...]
+    channel_mapping: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     # [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, ...]; empty if not pyramidal
     pyramid_levels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     # Multi-file layouts: entrypoint + constituent files, relative to the media root.
@@ -250,6 +317,9 @@ class OmeChannelViewDB(Base):
 Kept separate from `ome_images` so resetting the view never rewrites structural metadata. An absent row means
 "server-computed default": first one or three channels, auto-contrast from a percentile sample. This shape maps 1:1 onto
 NGFF `omero.channels[].window` + `.color`, so OME-Zarr reuses it as-is.
+
+**Scope boundary:** this table is display-only (annotator rendering). Training never reads it - see §3.6/§3.6.1 for
+the separate, immutable mapping used for revision materialization.
 
 ### 4.4 Unchanged
 
@@ -513,12 +583,14 @@ the parent returns 204 - cascades to planes, items and labels.
 
 ### Step 7 - Training
 
-Materialize annotated planes into the revision `images/` directory using the stored channel view; record the settings
-in the revision.
+Materialize annotated planes into the revision `images/` directory using the fixed channel mapping computed at
+ingest time (§3.6.1); write `ome_channel_mapping.json` alongside the revision for provenance.
 
 _Testing._ Integration test building a revision from a project containing an OME image with three annotated planes,
-asserting the rendered PNG count, the parquet rows and the subset counts. BDD scenario (`behave`) covering
-upload → annotate → train → quantize → export on a small fixture, which is the single end-to-end gate for requirements 5–8.
+asserting the rendered PNG count, the parquet rows, the subset counts, and the sidecar mapping file content. Add a
+unit test per mapping strategy in §3.6.1 (3-channel identity, wavelength-based, >3-channel fallback, <3-channel
+padding). BDD scenario (`behave`) covering upload → annotate → train → quantize → export on a small fixture, which is
+the single end-to-end gate for requirements 5–8.
 
 ### Step 8 - Prediction
 
@@ -545,15 +617,15 @@ migration, no API break.
 
 ## 9. Risks
 
-| Risk                                                                       | Mitigation                                                                                                                                                                                            |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                     |
-| `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                            |
-| `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1. |
-| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If it fails, promote `/tiles` from optional to required; the endpoint shape is already specified.                                                   |
-| Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                     |
-| RGB projection loses information needed for accuracy                       | Accepted for v1 and consistent with the requirements. Record the projection in the revision so N-channel training can later be compared against it fairly.                                            |
-| Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                           |
+| Risk                                                                       | Mitigation                                                                                                                                                                                                                       |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                                                |
+| `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                                                       |
+| `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1.                            |
+| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If it fails, promote `/tiles` from optional to required; the endpoint shape is already specified.                                                                              |
+| Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                                                |
+| RGB projection loses information needed for accuracy                       | Accepted for v1. The projection is a fixed, deterministic mapping (§3.6.1), decoupled from the mutable `OmeChannelView`, and recorded per-image and per-revision so it can be compared fairly against future N-channel training. |
+| Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                                                      |
 
 ---
 
