@@ -57,7 +57,7 @@ test.describe('Inference', () => {
         );
     });
 
-    test('Inference workflow', async ({ streamPage, inferencePage, page, network }) => {
+    test('Inference workflow', async ({ streamPage, inferencePage, sourcesPage, sinksPage, page, network }) => {
         await test.step('starts stream', async () => {
             network.use(
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
@@ -409,10 +409,10 @@ test.describe('Inference', () => {
                 })
             );
 
-            await expect(inferencePage.getAddSourceButton()).toBeVisible();
+            await expect(sourcesPage.getAddSourceButton()).toBeVisible();
 
-            await inferencePage.addUsbCameraSource({ name: usbCamera });
-            await inferencePage.addFolderSink({
+            await sourcesPage.addUsbCameraSource({ name: usbCamera });
+            await sinksPage.addFolderSink({
                 name: 'My Sink',
                 folderPath: 'my-output',
                 outputFormats: ['Predictions'],
@@ -420,11 +420,11 @@ test.describe('Inference', () => {
             });
 
             await inferencePage.getSourceTab().click();
-            await expect(inferencePage.getSourceCard(usbCamera)).toBeVisible();
+            await expect(sourcesPage.getSourceCard(usbCamera)).toBeVisible();
             await expect(page.getByText('Device: FaceTime HD Camera')).toBeVisible();
 
             await inferencePage.getSinkTab().click();
-            await expect(inferencePage.getSinkCard('My Sink')).toBeVisible();
+            await expect(sinksPage.getSinkCard('My Sink')).toBeVisible();
             await expect(page.getByText('Folder path: e2e-output')).toBeVisible();
             await expect(page.getByText('Rate limit: 5 samples every 1 second')).toBeVisible();
             await expect(page.getByText('Output formats: predictions')).toBeVisible();

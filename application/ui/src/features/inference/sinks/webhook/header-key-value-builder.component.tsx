@@ -56,7 +56,7 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                         </Content>
                     </ContextualHelp>
                 </Flex>
-                <ActionButton isQuiet onPress={addPair}>
+                <ActionButton isQuiet aria-label='Add header' onPress={addPair}>
                     <Add />
                 </ActionButton>
             </Flex>
