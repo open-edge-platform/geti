@@ -6,35 +6,32 @@ import { Button, ButtonGroup, Divider } from '@geti-ui/ui';
 
 interface EditSourceButtonsProps {
     isPending: boolean;
+    isDisabled: boolean;
     isConnected: boolean;
     onSave: () => void;
     onSaveAndConnect: () => void;
 }
 
-export const EditSourceButtons = ({ isPending, isConnected, onSave, onSaveAndConnect }: EditSourceButtonsProps) => {
+export const EditSourceButtons = ({
+    isPending,
+    isDisabled,
+    isConnected,
+    onSave,
+    onSaveAndConnect,
+}: EditSourceButtonsProps) => {
     const { t } = useTranslation();
 
     return (
         <>
             <Divider size='S' marginY={'size-200'} />
 
-            <ButtonGroup marginTop={'0px'}>
-                <Button
-                    type='submit'
-                    isDisabled={isPending}
-                    UNSAFE_style={{ maxWidth: 'fit-content' }}
-                    onPress={onSave}
-                >
+            <ButtonGroup marginTop={0}>
+                <Button type='submit' isDisabled={isDisabled} isPending={isPending} onPress={onSave}>
                     {t('common.actions.save')}
                 </Button>
 
                 {!isConnected && (
-                    <Button
-                        type='submit'
-                        isDisabled={isPending}
-                        UNSAFE_style={{ maxWidth: 'fit-content' }}
-                        onPress={onSaveAndConnect}
-                    >
+                    <Button type='submit' isDisabled={isDisabled} isPending={isPending} onPress={onSaveAndConnect}>
                         {t('common.actions.saveAndConnect')}
                     </Button>
                 )}

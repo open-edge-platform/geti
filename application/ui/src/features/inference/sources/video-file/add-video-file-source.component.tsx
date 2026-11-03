@@ -1,31 +1,67 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useTranslation } from '@/i18n';
+import { useState, type FormEvent } from 'react';
 
-import { AddSource } from '../deprecated/add-source/add-source.component';
-import { useVideoFileUpload } from '../deprecated/video-file/use-video-file-upload.hook';
-import { getVideoFileInitialConfig, videoFileBodyFormatter } from '../deprecated/video-file/utils';
-import { VideoFile } from '../deprecated/video-file/video-file.component';
+import { useTranslation } from '@/i18n';
+import { Flex, Form } from '@geti-ui/ui';
+import { useConnectSourceToPipeline } from 'hooks/api/pipeline.hook';
+
+import { AddSourceButton } from '../add-source/add-source-button.component';
+import { useCreateSource } from '../api/use-create-source';
 import type { AddSourceProps } from '../types';
+import { useDeleteSourceVideo } from './api/use-delete-source-video.hook';
+import { useUploadVideoFile } from './api/use-upload-video-file.hook';
+import { getVideoFileInitialConfig, type VideoFileFormState } from './utils';
+import { VideoFileFields } from './video-file-fields.component';
 
 export const AddVideoFileSource = ({ existingNames, onSaved }: AddSourceProps) => {
     const { t } = useTranslation();
-    const videoFileUpload = useVideoFileUpload();
+    const [config, setConfig] = useState<VideoFileFormState>(() => getVideoFileInitialConfig(t, existingNames));
+    const [file, setFile] = useState<File | null>(null);
+    const upload = useUploadVideoFile();
+    const deleteVideo = useDeleteSourceVideo();
+    const createSource = useCreateSource();
+    const connectSource = useConnectSourceToPipeline();
+
+    const handleSubmit = async (event: FormEvent) => {
+        event.preventDefault();
+
+        try {
+            const uploaded = file ? await upload.mutateAsync(file) : null;
+            const { id } = await createSource
+                .mutateAsync({ body: { ...config, video_path: uploaded?.videoPath ?? config.video_path } })
+                .catch((error: unknown) => {
+                    // Best effort: the upload is orphaned once the source is not created.
+                    if (uploaded?.mediaId) deleteVideo.mutate(uploaded.mediaId);
+                    throw error;
+                });
+            await connectSource.mutateAsync(String(id));
+            onSaved();
+        } catch {
+            // toasts are handled by the hooks / MutationCache
+        }
+    };
 
     return (
-        <AddSource
-            onSaved={onSaved}
-            config={getVideoFileInitialConfig(t, existingNames)}
-            componentFields={(state) => (
-                <VideoFile
-                    defaultState={state}
-                    uploadProgress={videoFileUpload.progress}
-                    onCancelUpload={videoFileUpload.cancel}
+        <Form validationBehavior='native' onSubmit={handleSubmit}>
+            <Flex gap='size-200' direction='column'>
+                <VideoFileFields
+                    value={config}
+                    onChange={setConfig}
+                    file={file}
+                    onFileChange={setFile}
+                    uploadProgress={upload.progress}
+                    onCancelUpload={upload.cancel}
                 />
-            )}
-            bodyFormatter={videoFileBodyFormatter}
-            prepareFormData={videoFileUpload.prepareFormData}
-        />
+
+                <AddSourceButton
+                    isPending={upload.isPending || createSource.isPending || connectSource.isPending}
+                    isDisabled={
+                        config.name.trim().length === 0 || (file === null && config.video_path.trim().length === 0)
+                    }
+                />
+            </Flex>
+        </Form>
     );
 };
