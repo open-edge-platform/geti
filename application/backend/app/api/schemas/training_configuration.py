@@ -145,7 +145,7 @@ class TrainingConfigurationView(BaseModel):
     )
 
     @classmethod
-    def _get_literal_strenum_class(cls, annotation: type) -> type[StrEnum] | None:
+    def _get_literal_strenum_class(cls, annotation: object) -> type[StrEnum] | None:
         """If annotation is Literal[<StrEnum member>, ...], return the StrEnum class. Otherwise return None."""
         if get_origin(annotation) is not Literal:
             return None
