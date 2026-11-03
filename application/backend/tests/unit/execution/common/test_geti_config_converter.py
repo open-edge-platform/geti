@@ -456,9 +456,11 @@ class TestGetiConfigConverterConvert:
 
     @pytest.mark.parametrize("num_workers", [0, 6])
     def test_convert_applies_num_workers(self, num_workers: int) -> None:
+        recipe_test_workers = 3  # whatever the recipe configures; the converter must not touch it
+
         def recipe_config() -> dict:
             cfg = _make_getitune_config()
-            cfg["data"]["test_subset"]["num_workers"] = 2  # recipe value for the test loader
+            cfg["data"]["test_subset"]["num_workers"] = recipe_test_workers
             return cfg
 
         geti_cfg = _make_geti_config(hyper_parameters={"training": {"num_workers": num_workers}})
@@ -473,8 +475,8 @@ class TestGetiConfigConverterConvert:
         for subset in ("train_subset", "val_subset"):
             assert result["data"][subset]["num_workers"] == num_workers
         # The test loader keeps the recipe worker count (tiled test loaders are memory-heavy).
-        assert result["data"]["test_subset"]["num_workers"] == 2
-        assert baseline["data"]["test_subset"]["num_workers"] == 2
+        assert result["data"]["test_subset"]["num_workers"] == recipe_test_workers
+        assert baseline["data"]["test_subset"]["num_workers"] == recipe_test_workers
 
     def test_convert_huggingface_applies_num_workers(self) -> None:
         from getitune.utils import get_getitune_root_path

@@ -6,8 +6,8 @@ from unittest.mock import Mock
 
 import pytest
 import torch
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields.datasets import TileInfo
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields.datasets import TileInfo
 from torchvision import tv_tensors
 
 from getitune.backend.lightning.callbacks.gpu_augmentation import GPUAugmentationCallback
