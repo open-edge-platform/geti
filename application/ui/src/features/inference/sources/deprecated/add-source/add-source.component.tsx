@@ -7,7 +7,7 @@ import type { SourceConfigPayload } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, Flex, Form } from '@geti-ui/ui';
 
-import { useConnectSourceToPipeline } from '../../../../hooks/api/pipeline.hook';
+import { useConnectSourceToPipeline } from '../../../../../hooks/api/pipeline.hook';
 import { useSourceAction, type PrepareFormData } from '../hooks/use-source-action.hook';
 
 interface AddSourceProps<T> {

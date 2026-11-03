@@ -4,7 +4,7 @@
 import type { IPCameraSourceConfig } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
-import { getUniqueName } from '../utils';
+import { getUniqueName } from '../../utils';
 
 export const getIpCameraInitialConfig = (t: TranslateFn, existingNames: string[] = []): IPCameraSourceConfig => ({
     id: '',

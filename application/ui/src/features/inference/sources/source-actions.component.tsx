@@ -3,17 +3,19 @@
 
 import { useState } from 'react';
 
-import type { SourceConfig } from '@/api/types';
+import type { SourceConfig, SourceConfigPayload } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
-import { isEmpty, orderBy } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { useSourcesQuery } from './api/use-sources';
-import { EditSourceForm } from './edit-source-form.component';
+import { EditSourceForm } from './deprecated/edit-source-form.component';
+import { SourcesList as DeprecatedSourcesList } from './deprecated/source-list/source-list.component';
+import { SourceOptions } from './deprecated/source-options';
 import { SourcesList } from './source-list/source-list.component';
-import { SourceOptions } from './source-options';
 
 export const SourceActions = () => {
     const { t } = useTranslation();
@@ -21,7 +23,7 @@ export const SourceActions = () => {
     const [currentSource, setCurrentSource] = useState<SourceConfig | null>(null);
     const { data: sources = [], isPending } = useSourcesQuery();
     const filteredSources = sources.filter(
-        (source) => source.source_type !== 'disconnected' && source.source_type !== 'images_folder'
+        (source): source is SourceConfigPayload => source.source_type !== 'disconnected'
     );
     const existingNames = filteredSources.map((source) => source.name);
 
@@ -45,7 +47,7 @@ export const SourceActions = () => {
         return <Loading mode={'inline'} size='M' />;
     }
 
-    if (view === 'edit' && !isEmpty(currentSource)) {
+    if (view === 'edit' && currentSource !== null) {
         return (
             <EditSourceForm
                 config={currentSource}
@@ -59,8 +61,10 @@ export const SourceActions = () => {
     if (view === 'list') {
         const sourcesWithConnectedFirst = orderBy(filteredSources, (source) => source.id === connectedSourceId, 'desc');
 
+        const SourcesListComponent = FEATURE_FLAGS.SOURCES_SINKS_REFACTOR ? SourcesList : DeprecatedSourcesList;
+
         return (
-            <SourcesList
+            <SourcesListComponent
                 sources={sourcesWithConnectedFirst}
                 onAddSource={handleAddSource}
                 onEditSource={handleEditSource}

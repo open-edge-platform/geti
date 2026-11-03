@@ -6,8 +6,8 @@ import type { SourceConfigPayload } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 
-import { getQueryKey } from '../../../../query-client/query-client';
-import { testSourceQueryOptions } from '../api/use-test-source';
+import { getQueryKey } from '../../../../../query-client/query-client';
+import { testSourceQueryOptions } from '../../api/use-test-source';
 
 const useUpdateSource = () => {
     const queryClient = useQueryClient();
