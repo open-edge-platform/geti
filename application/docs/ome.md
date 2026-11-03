@@ -389,7 +389,8 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/ome
   "channels": [{"index": 0, "name": "DAPI", "color": "#0000ff"}, …],
   "pyramid_levels": [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, …]
 }
-404 -> media is not an OME image
+400 -> media is not an OME image
+404 -> media is not found
 ```
 
 ### 5.3 Channel view
