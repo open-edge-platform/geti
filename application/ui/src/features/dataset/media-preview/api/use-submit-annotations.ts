@@ -21,7 +21,11 @@ import { isEmptyLabel, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '.
 import { getMediaItemQueryParams, isVideoFrame } from '../../../../shared/media-item-utils';
 import type { Annotation } from '../../../../shared/types';
 import { isNonEmptyArray } from '../../../../shared/util';
-import { markCachedMediaAsAnnotated, refreshCachedMedia } from './update-cached-dataset-media';
+import {
+    invalidateMediaFilteredByAnnotations,
+    markCachedMediaAsAnnotated,
+    refreshCachedMedia,
+} from './update-cached-dataset-media';
 
 const filterOutAnnotationWithEmptyLabel = (annotations: Annotation[]): Annotation[] => {
     return annotations.filter((annotation) => annotation.labels.some(isNonEmptyLabel));
@@ -52,6 +56,9 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
             ],
         },
         onSuccess: async () => {
+            // Not awaited: the submission must not wait for every loaded page of the filtered listings
+            void invalidateMediaFilteredByAnnotations(queryClient);
+
             // The dataset media listing backs the gallery and sidebar annotation-status badges. Instead of
             // invalidating it (which would refetch every page already scrolled through), patch the cached media.
             if (isVideoFrame(mediaItem)) {

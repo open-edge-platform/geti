@@ -89,15 +89,49 @@ describe('dataset media cache after submitting', () => {
         );
     });
 
-    it('marks a submitted image as annotated', async () => {
+    it('marks a submitted image as annotated, even with no objects (empty annotation list)', async () => {
         const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
         const queryClient = createQueryClientWithMedia([image]);
+        let savedAnnotations: AnnotationDTO[] | undefined;
+
+        server.use(
+            http.post('/api/projects/{project_id}/dataset/media/{media_id}/annotations', async ({ request }) => {
+                savedAnnotations = ((await request.json()) as { annotations: AnnotationDTO[] }).annotations;
+
+                return HttpResponse.json({});
+            })
+        );
 
         const { result } = renderSubmitAnnotations({ mediaItem: image, mode: 'annotation', labels: [], queryClient });
 
         await waitFor(() => expect(result.current).not.toBeNull());
         await act(() => result.current.submit('unassigned'));
 
+        // The server stores an empty list as the "no objects" annotation and reports the image as annotated
+        expect(savedAnnotations).toEqual([]);
+        expect(getCachedMedia(queryClient)).toEqual([{ ...image, annotation_status: { has_annotations: true } }]);
+    });
+
+    it('refetches the listings filtered by annotation status instead of patching them', async () => {
+        const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
+        const queryClient = createQueryClientWithMedia([image]);
+        const filteredQueryKey = [
+            'get',
+            '/api/projects/{project_id}/dataset/media',
+            { params: { path: { project_id: '123' }, query: { annotation_status: 'missing_annotations' } } },
+        ] as const;
+        queryClient.setQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey, {
+            pages: [{ items: [image], pagination: { offset: 0, limit: 40, count: 1, total: 1 } }],
+            pageParams: [0],
+        });
+
+        const { result } = renderSubmitAnnotations({ mediaItem: image, mode: 'annotation', labels: [], queryClient });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        expect(queryClient.getQueryState(filteredQueryKey)?.isInvalidated).toBe(true);
+        expect(queryClient.getQueryState(mediaQueryKey)?.isInvalidated).toBe(false);
         expect(getCachedMedia(queryClient)).toEqual([{ ...image, annotation_status: { has_annotations: true } }]);
     });
 

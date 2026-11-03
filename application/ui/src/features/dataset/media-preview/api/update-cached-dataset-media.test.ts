@@ -8,15 +8,22 @@ import { delay, HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
-import { markCachedMediaAsAnnotated, refreshCachedMedia } from './update-cached-dataset-media';
+import {
+    invalidateMediaFilteredByAnnotations,
+    markCachedMediaAsAnnotated,
+    refreshCachedMedia,
+} from './update-cached-dataset-media';
 
 const PROJECT_ID = 'project-1';
 
-const MEDIA_QUERY_KEY = [
-    'get',
-    '/api/projects/{project_id}/dataset/media',
-    { params: { path: { project_id: PROJECT_ID }, query: { offset: 0, limit: 40 } } },
-] as const;
+const getMediaQueryKey = (filters: object = {}) =>
+    [
+        'get',
+        '/api/projects/{project_id}/dataset/media',
+        { params: { path: { project_id: PROJECT_ID }, query: { offset: 0, limit: 40, ...filters } } },
+    ] as const;
+
+const MEDIA_QUERY_KEY = getMediaQueryKey();
 
 const createQueryClientWithPages = (pages: MediaDTO[][]) => {
     const queryClient = new QueryClient();
@@ -35,7 +42,43 @@ const createQueryClientWithPages = (pages: MediaDTO[][]) => {
 const getCachedItems = (queryClient: QueryClient) =>
     queryClient.getQueryData<InfiniteData<MediaWithPagination>>(MEDIA_QUERY_KEY)?.pages.map(({ items }) => items);
 
+describe('invalidateMediaFilteredByAnnotations', () => {
+    it.each([
+        [{ annotation_status: 'missing_annotations' }, true],
+        [{ labels: ['label-1'] }, true],
+        [{ subsets: ['training'] }, true],
+        [{}, false],
+        [{ labels: [], subsets: [] }, false],
+        [{ dataset_view_id: 'view-1', start_date: '2026-01-01', sort_direction: 'asc' }, false],
+    ])('with filters %o, invalidates the listing: %s', async (filters, isInvalidated) => {
+        const queryKey = getMediaQueryKey(filters);
+        const queryClient = new QueryClient();
+        queryClient.setQueryData<InfiniteData<MediaWithPagination>>(queryKey, { pages: [], pageParams: [] });
+
+        await invalidateMediaFilteredByAnnotations(queryClient);
+
+        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(isInvalidated);
+    });
+});
+
 describe('markCachedMediaAsAnnotated', () => {
+    it('does not patch the listings filtered by annotations, which are refetched instead', () => {
+        const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
+        const filteredQueryKey = getMediaQueryKey({ annotation_status: 'missing_annotations' });
+        const queryClient = createQueryClientWithPages([[image]]);
+        queryClient.setQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey, {
+            pages: [{ items: [image], pagination: { offset: 0, limit: 40, count: 1, total: 1 } }],
+            pageParams: [0],
+        });
+
+        markCachedMediaAsAnnotated(queryClient, image.id);
+
+        expect(getCachedItems(queryClient)).toEqual([[{ ...image, annotation_status: { has_annotations: true } }]]);
+        expect(queryClient.getQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey)?.pages[0].items).toEqual([
+            image,
+        ]);
+    });
+
     it('marks only the matching media as annotated, on any cached page', () => {
         const target = getMockedMediaImage({ id: 'image-1' });
         const other = getMockedMediaImage({ id: 'image-2' });

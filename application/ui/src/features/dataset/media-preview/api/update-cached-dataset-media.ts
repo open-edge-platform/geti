@@ -3,14 +3,38 @@
 
 import { fetchClient } from '@/api';
 import type { MediaDTO, MediaWithPagination } from '@/api/types';
-import { InfiniteData, QueryClient } from '@tanstack/react-query';
+import { InfiniteData, Query, QueryClient } from '@tanstack/react-query';
+import type { DatasetMediaQueryFilters } from 'hooks/use-get-dataset-media-items.hook';
+import { isEmpty } from 'lodash-es';
 
 import { isVideo } from '../../../../shared/media-item-utils';
 
-// Patches the already cached pages of the dataset media listing, instead of refetching every page scrolled through.
+const DATASET_MEDIA_QUERY_KEY = ['get', '/api/projects/{project_id}/dataset/media'] as const;
+
+// Saving annotations can change whether a media matches these filters
+const ANNOTATION_DEPENDENT_FILTERS = ['annotation_status', 'labels', 'subsets'] as const;
+
+type DatasetMediaQueryKey = readonly [string, string, { params?: { query?: DatasetMediaQueryFilters } }?];
+
+const isFilteredByAnnotations = (query: Query): boolean => {
+    const [, , init] = query.queryKey as DatasetMediaQueryKey;
+    const filters = init?.params?.query ?? {};
+
+    return ANNOTATION_DEPENDENT_FILTERS.some((filter) => !isEmpty(filters[filter]));
+};
+
+/**
+ * Refetches the dataset media listings filtered by annotation status, labels or subsets, since saved annotations may
+ * add media to them or remove media from them. Removing the item locally would shift the offset-based pages instead.
+ */
+export const invalidateMediaFilteredByAnnotations = (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: DATASET_MEDIA_QUERY_KEY, predicate: isFilteredByAnnotations });
+
+// Patches the already cached pages of the other dataset media listings, instead of refetching every page scrolled
+// through: their content does not depend on annotations.
 const updateCachedMedia = (queryClient: QueryClient, updateItem: (item: MediaDTO) => MediaDTO) => {
     queryClient.setQueriesData<InfiniteData<MediaWithPagination>>(
-        { queryKey: ['get', '/api/projects/{project_id}/dataset/media'] },
+        { queryKey: DATASET_MEDIA_QUERY_KEY, predicate: (query) => !isFilteredByAnnotations(query) },
         (oldData) => {
             if (!oldData?.pages) return oldData;
 
@@ -23,6 +47,8 @@ const updateCachedMedia = (queryClient: QueryClient, updateItem: (item: MediaDTO
 };
 
 export const markCachedMediaAsAnnotated = (queryClient: QueryClient, mediaId: string) => {
+    // Any successful save annotates the media: an empty annotation list is stored as the "no objects" annotation
+    // (empty label), which the server reports as `has_annotations: true`.
     updateCachedMedia(queryClient, (item) =>
         item.id === mediaId && !isVideo(item) ? { ...item, annotation_status: { has_annotations: true } } : item
     );
