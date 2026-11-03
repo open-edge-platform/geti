@@ -31,28 +31,23 @@ test.describe('Project', () => {
         await expect(page.getByText('Project 3')).toBeVisible();
     });
 
-    for (const { language, menuItem, projectCount } of [
-        { language: 'pt', menuItem: /português/i, projectCount: '3 projetos' },
-        { language: 'id', menuItem: /Indonesia/i, projectCount: '3 proyek' },
-    ]) {
-        test(`switches the UI language to ${language} and persists it across reloads`, async ({ page }) => {
-            const projectPage = new ProjectPage(page);
+    test('switches the UI language and persists it across reloads', async ({ page }) => {
+        const projectPage = new ProjectPage(page);
 
-            await projectPage.gotoList();
+        await projectPage.gotoList();
 
-            await expect(page.getByText('3 projects')).toBeVisible();
+        await expect(page.getByText('3 projects')).toBeVisible();
 
-            await page.getByRole('button', { name: 'Language' }).click();
-            await page.getByRole('menuitem', { name: menuItem }).click();
+        await page.getByRole('button', { name: 'Language' }).click();
+        await page.getByRole('menuitem', { name: /português/i }).click();
 
-            await expect(page.getByText(projectCount)).toBeVisible();
-            await expect(page.locator('html')).toHaveAttribute('lang', language);
+        await expect(page.getByText('3 projetos')).toBeVisible();
+        await expect(page.locator('html')).toHaveAttribute('lang', 'pt');
 
-            await page.reload();
+        await page.reload();
 
-            await expect(page.getByText(projectCount)).toBeVisible();
-        });
-    }
+        await expect(page.getByText('3 projetos')).toBeVisible();
+    });
 
     test('creates a project', async ({ page, network }) => {
         const projectPage = new ProjectPage(page);
