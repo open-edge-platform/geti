@@ -53,7 +53,7 @@ export const MagneticLasso = () => {
         setPointerLine,
         lassoSegment,
         setLassoSegment,
-        isMounted,
+        isMountedRef,
         segments,
         setSegments,
         resetTool,
@@ -134,7 +134,7 @@ export const MagneticLasso = () => {
         },
 
         onSuccess: (newPoints?: Point[]) => {
-            if (isMounted && isNonEmptyArray(newPoints)) {
+            if (isMountedRef.current && isNonEmptyArray(newPoints)) {
                 setLassoSegment(newPoints);
                 setPointerLine(() => [...segments.flat(), ...lassoSegment]);
             }

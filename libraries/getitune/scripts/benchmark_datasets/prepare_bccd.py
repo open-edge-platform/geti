@@ -20,10 +20,10 @@ import shutil
 from typing import TYPE_CHECKING
 
 import numpy as np
-from datumaro.experimental import Dataset
-from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoSample
-from datumaro.experimental.data_formats.voc.io import load_voc_dataset
-from datumaro.experimental.export_import import export_dataset
+from getidata import Dataset
+from getidata.data_formats.coco.sample import CocoCategories, CocoSample
+from getidata.data_formats.voc.io import load_voc_dataset
+from getidata.export_import import export_dataset
 
 from getitune.benchmark.dataset_helpers import download, extract_archive, parse_args
 

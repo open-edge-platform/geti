@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
 
 interface CanvasSettingsProviderProps {
     children: ReactNode;
@@ -58,7 +58,9 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettingsState = {
 export const CanvasSettingsProvider = ({ children }: CanvasSettingsProviderProps) => {
     const [canvasSettings, setCanvasSettings] = useState<CanvasSettingsState>(DEFAULT_CANVAS_SETTINGS);
 
-    return <CanvasSettingsContext value={{ canvasSettings, setCanvasSettings }}>{children}</CanvasSettingsContext>;
+    const value = useMemo(() => ({ canvasSettings, setCanvasSettings }), [canvasSettings]);
+
+    return <CanvasSettingsContext value={value}>{children}</CanvasSettingsContext>;
 };
 
 export const useCanvasSettings = () => {

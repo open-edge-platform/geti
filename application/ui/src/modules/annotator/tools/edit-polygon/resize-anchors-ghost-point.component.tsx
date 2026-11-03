@@ -41,37 +41,39 @@ export const ResizeAnchorsGhostPoint = ({
         updateGhostPoint(undefined);
     };
 
+    const handlePointerMove =
+        ({ point, nextPoint, idx }: { point: Point; nextPoint: Point; idx: number }) =>
+        (event: PointerEvent) => {
+            if (svgRef.current === null) {
+                return;
+            }
+
+            const mouse = getRelativePoint(svgRef.current, { x: event.clientX, y: event.clientY }, zoom);
+
+            const pointOnLine = projectPointOnLine([point, nextPoint], mouse);
+
+            if (pointOnLine !== undefined) {
+                const newGhostPoint = { idx: idx + 1, point: pointOnLine };
+                updateGhostPoint(newGhostPoint);
+            } else {
+                removeGhostPoint();
+            }
+        };
+
+    const handlePointerDown = (event: PointerEvent) => {
+        const currentGhostPoint = ghostPointRef.current;
+        if (isLeftButton(event) && currentGhostPoint !== undefined) {
+            addPoint(currentGhostPoint.idx, currentGhostPoint.point.x, currentGhostPoint.point.y);
+        }
+    };
+
     return (
         <>
             {shape.points.map((point, idx) => {
                 const nextPoint = idx + 1 >= shape.points.length ? shape.points[0] : shape.points[idx + 1];
 
-                const onPointerMove = (event: PointerEvent) => {
-                    if (svgRef.current === null) {
-                        return;
-                    }
-
-                    const mouse = getRelativePoint(svgRef.current, { x: event.clientX, y: event.clientY }, zoom);
-
-                    const pointOnLine = projectPointOnLine([point, nextPoint], mouse);
-
-                    if (pointOnLine !== undefined) {
-                        const newGhostPoint = { idx: idx + 1, point: pointOnLine };
-                        updateGhostPoint(newGhostPoint);
-                    } else {
-                        removeGhostPoint();
-                    }
-                };
-
-                const onPointerDown = (event: PointerEvent) => {
-                    const currentGhostPoint = ghostPointRef.current;
-                    if (isLeftButton(event) && currentGhostPoint !== undefined) {
-                        addPoint(currentGhostPoint.idx, currentGhostPoint.point.x, currentGhostPoint.point.y);
-                    }
-                };
-
                 return (
-                    <g onPointerLeave={removeGhostPoint} onPointerDown={onPointerDown} key={`${idx}`}>
+                    <g onPointerLeave={removeGhostPoint} onPointerDown={handlePointerDown} key={`${idx}`}>
                         <line
                             x1={point.x}
                             y1={point.y}
@@ -80,12 +82,10 @@ export const ResizeAnchorsGhostPoint = ({
                             opacity={0}
                             stroke='black'
                             strokeWidth={`calc(${2 * ANCHOR_SIZE}px / var(--zoom-scale))`}
-                            onPointerMove={onPointerMove}
+                            onPointerMove={handlePointerMove({ point, nextPoint, idx })}
                             aria-label={`Line between point ${idx} and ${idx + 1}`}
                         />
-                        {ghostPointRef.current === undefined ||
-                        ghostPoint === undefined ||
-                        ghostPoint.idx - 1 !== idx ? null : (
+                        {ghostPoint === undefined || ghostPoint.idx - 1 !== idx ? null : (
                             <ResizeAnchor
                                 zoom={zoom}
                                 cursor='default'

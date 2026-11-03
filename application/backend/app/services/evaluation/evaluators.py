@@ -6,8 +6,8 @@ from enum import StrEnum
 from typing import Any, cast
 
 import numpy as np
-from datumaro.experimental import Dataset
 from faster_coco_eval import COCO, COCOeval_faster
+from getidata import Dataset
 from numpy.typing import NDArray
 
 
@@ -22,7 +22,7 @@ def datumaro_dataset_to_coco(dataset: Dataset) -> dict:
     Returns:
         dict: COCO formatted dataset.
     """
-    from datumaro.experimental.categories import LabelCategories
+    from getidata.categories import LabelCategories
 
     coco_dataset_dict: dict[str, list] = {"images": [], "annotations": [], "categories": []}
 
@@ -227,7 +227,7 @@ class MultiClassClassificationEvaluator(AccuracyEvaluator, ConfusionMatrixEvalua
     """Evaluator for multi-class classification tasks."""
 
     def __init__(self, predictions_dataset: Dataset, ground_truth_dataset: Dataset):
-        from datumaro.experimental.fields import LabelField
+        from getidata.fields import LabelField
 
         if (
             cast(LabelField, predictions_dataset.schema.attributes["label"].field).multi_label
@@ -252,7 +252,7 @@ class MultiLabelClassificationEvaluator(AccuracyEvaluator):
     """Evaluator for multi-label classification tasks."""
 
     def __init__(self, predictions_dataset: Dataset, ground_truth_dataset: Dataset):
-        from datumaro.experimental.fields import LabelField
+        from getidata.fields import LabelField
 
         if not (
             cast(LabelField, predictions_dataset.schema.attributes["label"].field).multi_label

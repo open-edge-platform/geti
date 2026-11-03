@@ -7,19 +7,11 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { mediaPredictionsQueryOptions } from '../../../modules/annotator/api/use-media-predictions';
 import { usePredictionSetup } from '../../../modules/annotator/predictions-setup-provider.component';
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemPredictionRange } from '../../../shared/media-item-utils';
 
 export const useNextPredictionPrefetch = (nextMediaItem: Media) => {
     const projectId = useProjectIdentifier();
     const { selectedModel, selectedDevice, confidenceThreshold } = usePredictionSetup();
-
-    const range = isVideoFrame(nextMediaItem)
-        ? {
-              stride: nextMediaItem.frame_stride,
-              end_frame: nextMediaItem.frame_number,
-              start_frame: nextMediaItem.frame_number,
-          }
-        : null;
 
     usePrefetchQuery(
         mediaPredictionsQueryOptions({
@@ -28,7 +20,7 @@ export const useNextPredictionPrefetch = (nextMediaItem: Media) => {
             mediaId: nextMediaItem.id,
             device: selectedDevice,
             confidenceThreshold,
-            range,
+            range: getMediaItemPredictionRange(nextMediaItem),
         })
     );
 };

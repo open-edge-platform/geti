@@ -22,7 +22,6 @@ const SOURCE_TYPE_LABEL_KEYS = {
     usb_camera: 'inference.sources.types.usbCamera',
     ip_camera: 'inference.sources.types.ipCamera',
     video_file: 'inference.sources.types.videoFile',
-    images_folder: 'inference.sources.types.imagesFolder',
     disconnected: 'inference.sources.types.disconnected',
 } as const satisfies Record<SourceConfig['source_type'], string>;
 

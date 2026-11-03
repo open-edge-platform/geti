@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 import type { DatasetRevision } from '@/api/types';
 import { useGetModels } from 'hooks/api/use-get-models.hook';
@@ -53,13 +53,13 @@ export const ModelListingProvider = ({ children }: ModelListingProviderProps) =>
         showFailedModels,
     });
 
-    const onGroupByChange = (mode: GroupByMode) => {
+    const onGroupByChange = useCallback((mode: GroupByMode) => {
         // Groups are keyed by dataset revision or by architecture, so their sort state does not carry over.
         setSortBy({});
         setGroupBy(mode);
-    };
+    }, []);
 
-    const onSortChange = (groupId: string, key: SortBy) => {
+    const onSortChange = useCallback((groupId: string, key: SortBy) => {
         setSortBy((previous) => {
             const current = previous[groupId] ?? DEFAULT_SORT;
 
@@ -71,17 +71,17 @@ export const ModelListingProvider = ({ children }: ModelListingProviderProps) =>
                         : { key, direction: DEFAULT_SORT_DIRECTIONS[key] },
             };
         });
-    };
+    }, []);
 
-    const toggleShowFailedModels = () => {
+    const toggleShowFailedModels = useCallback(() => {
         setShowFailedModels((prev) => !prev);
-    };
+    }, []);
 
-    const onSearchChange = (query: string) => {
+    const onSearchChange = useCallback((query: string) => {
         setSearchBy(query);
-    };
+    }, []);
 
-    const onExpandModel = (modelId: string) => {
+    const onExpandModel = useCallback((modelId: string) => {
         setExpandedModelIds((prev) => {
             const newExpandedModelIds = new Set(prev);
 
@@ -93,23 +93,39 @@ export const ModelListingProvider = ({ children }: ModelListingProviderProps) =>
 
             return newExpandedModelIds;
         });
-    };
+    }, []);
 
-    const value: ModelListingContextValue = {
-        groupBy,
-        sortBy,
-        expandedModelIds,
-        groupedModels,
-        searchBy,
-        datasetRevisions,
-        showFailedModels,
+    const value: ModelListingContextValue = useMemo(
+        () => ({
+            groupBy,
+            sortBy,
+            expandedModelIds,
+            groupedModels,
+            searchBy,
+            datasetRevisions,
+            showFailedModels,
 
-        onGroupByChange,
-        onSortChange,
-        onExpandModel,
-        onSearchChange,
-        onToggleShowFailedModels: toggleShowFailedModels,
-    };
+            onGroupByChange,
+            onSortChange,
+            onExpandModel,
+            onSearchChange,
+            onToggleShowFailedModels: toggleShowFailedModels,
+        }),
+        [
+            groupBy,
+            sortBy,
+            expandedModelIds,
+            groupedModels,
+            searchBy,
+            datasetRevisions,
+            showFailedModels,
+            onGroupByChange,
+            onSortChange,
+            onExpandModel,
+            onSearchChange,
+            toggleShowFailedModels,
+        ]
+    );
 
     return <ModelListingContext.Provider value={value}>{children}</ModelListingContext.Provider>;
 };

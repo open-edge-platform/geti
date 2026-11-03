@@ -1289,6 +1289,20 @@ def test_resolve_type_from_qualified_name_helper():
     assert _resolve_type_from_qualified_name("nonexistent.module.Type") is object
 
 
+def test_type_module_aliases(monkeypatch):
+    from getidata import schema
+    from getidata.media import LazyImage
+
+    monkeypatch.setattr(schema, "_TYPE_MODULE_ALIASES", {})
+    schema.register_type_module_alias("old_dataset", "getidata")
+    assert schema._resolve_type("LazyImage", "old_dataset.media") is LazyImage
+    assert schema._resolve_type_from_qualified_name("old_dataset.media.LazyImage") is LazyImage
+    assert schema._resolve_type("LazyImage", "old_datasetevil.media") is object
+    assert schema._resolve_type("image_field", "old_dataset.fields.images") is object
+    with pytest.raises(ValueError, match="trusted package"):
+        schema.register_type_module_alias("old_dataset", "subprocess")
+
+
 def test_is_allowed_type_module():
     """Test that only trusted top-level packages are allowed for type resolution."""
     from getidata.schema import _is_allowed_type_module

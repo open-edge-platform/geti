@@ -37,7 +37,7 @@ from getitune.types.label import LabelInfo, LabelInfoTypes, SegLabelInfo
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
-    from datumaro.experimental.fields import TileInfo
+    from getidata.fields import TileInfo
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
     from torch import Tensor
 

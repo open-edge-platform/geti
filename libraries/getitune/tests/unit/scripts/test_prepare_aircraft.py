@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from datumaro.experimental.fields import Subset
+from getidata.fields import Subset
 from PIL import Image
 from scripts.benchmark_datasets.prepare_aircraft import _build_dataset, _find_data_root
 

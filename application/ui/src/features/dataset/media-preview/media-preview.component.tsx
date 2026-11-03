@@ -27,7 +27,7 @@ import { useAnnotationsQuery } from '../../../modules/annotator/shell/api/use-an
 import { getInitialAnnotations, useAnnotatorMode } from '../../../modules/annotator/shell/utils';
 import { ToolProvider } from '../../../modules/annotator/tool-provider.component';
 import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../modules/annotator/tools/segment-anything-tool/use-segment-anything.hook';
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemPredictionRange } from '../../../shared/media-item-utils';
 import { useSelectDatasetItem } from '../gallery/hooks/use-select-dataset-item.hook';
 import { AnnotatorContainer } from './annotator.component';
 import { SIDEBAR_WIDTH } from './constants';
@@ -138,9 +138,7 @@ const MediaPreviewContent = ({
         selectedModel,
         device: selectedDevice,
         confidenceThreshold,
-        range: isVideoFrame(mediaItem)
-            ? { start_frame: mediaItem.frame_number, end_frame: mediaItem.frame_number, stride: mediaItem.frame_stride }
-            : null,
+        range: getMediaItemPredictionRange(mediaItem),
     });
 
     const isCurrentMediaReviewed = annotationsData?.user_reviewed ?? false;

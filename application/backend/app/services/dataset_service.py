@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from datumaro.experimental import Dataset
+from getidata import Dataset
 from sqlalchemy.orm import Session
 
 from app.datumaro_converter import SampleMode

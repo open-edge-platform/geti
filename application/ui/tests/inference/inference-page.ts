@@ -26,12 +26,12 @@ export class InferencePage {
         }
     }
 
-    getInputTab() {
-        return this.page.getByRole('tab').filter({ hasText: 'Input' });
+    getSourceTab() {
+        return this.page.getByRole('tab').filter({ hasText: 'Source' });
     }
 
-    getOutputTab() {
-        return this.page.getByRole('tab').filter({ hasText: 'Output' });
+    getSinkTab() {
+        return this.page.getByRole('tab').filter({ hasText: 'Sink' });
     }
 
     getAddSourceButton() {
@@ -47,7 +47,7 @@ export class InferencePage {
     }
 
     async deleteSource(name: string) {
-        await this.getInputTab().click();
+        await this.getSourceTab().click();
 
         await this.removeCard(this.getSourceCard(name), 'source menu', name);
     }
@@ -57,7 +57,7 @@ export class InferencePage {
     }
 
     async deleteSink(name: string) {
-        await this.getOutputTab().click();
+        await this.getSinkTab().click();
 
         await this.removeCard(this.getSinkCard(name), 'sink menu', name);
     }
@@ -95,7 +95,7 @@ export class InferencePage {
 
     /** Adds a USB camera source, picking the first camera the backend reports. */
     async addUsbCameraSource({ name }: { name: string }) {
-        await this.getInputTab().click();
+        await this.getSourceTab().click();
         await this.getAddSourceButton().click();
         await this.page.getByRole('button', { name: 'USB Camera', exact: true }).click();
 
@@ -123,7 +123,7 @@ export class InferencePage {
         videoPath: string;
         loop?: boolean;
     }): Promise<string> {
-        await this.getInputTab().click();
+        await this.getSourceTab().click();
         await this.getAddSourceButton().click();
 
         await this.page.getByRole('button', { name: 'Video file', exact: true }).click();
@@ -162,7 +162,7 @@ export class InferencePage {
         rateLimitSamples?: number;
         rateLimitSeconds?: number;
     }) {
-        await this.getOutputTab().click();
+        await this.getSinkTab().click();
         await this.getAddSinkButton().click();
 
         await this.page.getByRole('button', { name: 'Folder', exact: true }).click();

@@ -39,7 +39,7 @@ test.describe('Model training flow E2E', () => {
     test.afterEach(async ({ projectPage, inferencePage }) => {
         // Sources and sinks are not project scoped, so deleting the project leaves them behind.
         await test.step('Delete source and sink', async () => {
-            if (await inferencePage.getInputTab().isVisible()) {
+            if (await inferencePage.getSourceTab().isVisible()) {
                 await inferencePage.deleteSource(sourceName);
                 await inferencePage.deleteSink(sinkName);
 

@@ -3,7 +3,6 @@
 
 export { ReactComponent as Earth } from './earth.svg';
 export { ReactComponent as Folder } from './folder.svg';
-export { ReactComponent as ImagesFolder } from './images-folder.svg';
 export { ReactComponent as IpCamera } from './ip-camera.svg';
 export { ReactComponent as Jobs } from './jobs.svg';
 export { ReactComponent as MagneticLasso } from './magnetic-lasso.svg';

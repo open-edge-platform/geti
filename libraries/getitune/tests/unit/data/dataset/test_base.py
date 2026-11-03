@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 import torch
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from getitune import LabelInfo
 from getitune.data.dataset.base import VisionDataset, _default_collate_fn

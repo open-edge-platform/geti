@@ -73,6 +73,7 @@ BUILTIN_TYPES = {
 # (see Field.from_polars implementations).
 # Only these trusted top-level packages are ever imported here.
 _ALLOWED_TYPE_PACKAGES = frozenset({"numpy", "torch", "torchvision", "getidata"})
+_TYPE_MODULE_ALIASES: dict[str, str] = {}
 
 
 def _is_allowed_type_module(type_module: str) -> bool:
@@ -80,9 +81,24 @@ def _is_allowed_type_module(type_module: str) -> bool:
     return type_module.split(".", 1)[0] in _ALLOWED_TYPE_PACKAGES
 
 
+def register_type_module_alias(old_module: str, new_module: str) -> None:
+    """Register a former schema module prefix with a trusted replacement package."""
+    if not old_module or not _is_allowed_type_module(new_module):
+        raise ValueError("Schema module aliases must target a trusted package")
+    _TYPE_MODULE_ALIASES[old_module] = new_module
+
+
+def _remap_type_module(module_name: str) -> str:
+    for old_module, new_module in _TYPE_MODULE_ALIASES.items():
+        if module_name == old_module or module_name.startswith(old_module + "."):
+            return new_module + module_name[len(old_module) :]
+    return module_name
+
+
 def _resolve_type(type_name: str, type_module: str | None) -> type:
     """Resolve a type from its name and module."""
     if type_module and type_module != "builtins":
+        type_module = _remap_type_module(type_module)
         if not _is_allowed_type_module(type_module):
             return object
         try:
@@ -108,6 +124,7 @@ def _resolve_type_from_qualified_name(qualified_name: str) -> type:
     parts = qualified_name.rsplit(".", 1)
     if len(parts) == 2:
         module_name, attr_name = parts
+        module_name = _remap_type_module(module_name)
         if not _is_allowed_type_module(module_name):
             return object
         try:

@@ -19,9 +19,9 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-from datumaro.experimental.categories import LabelCategories, MaskCategories
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.categories import LabelCategories, MaskCategories
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 from PIL import Image
 
 from getitune.benchmark.dataset_helpers import DatasetArgs

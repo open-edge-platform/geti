@@ -363,6 +363,7 @@
             "label": "Inferentieapparaat"
         },
         "sources": {
+            "title": "Bron",
             "uploadError": "Uploaden van videobestand mislukt.",
             "deleteVideoError": "Verwijderen van geüpload videobestand mislukt.",
             "list": {
@@ -372,7 +373,6 @@
                 "usbCamera": "usb-camera",
                 "ipCamera": "ip-camera",
                 "videoFile": "videobestand",
-                "imagesFolder": "afbeeldingenmap",
                 "disconnected": "verbinding verbroken"
             },
             "options": {
@@ -404,13 +404,10 @@
                 "loading": "Laden...",
                 "device": "Apparaat: {{name}}",
                 "unknownDevice": "Onbekend apparaat (id: {{deviceId}})",
-                "ignoreExistingImages": "Bestaande afbeeldingen negeren: {{value}}",
                 "streamUrl": "Stream-URL: {{url}}",
                 "videoPath": "Videopad: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Pad naar afbeeldingenmap",
-                "ignoreExistingImages": "Bestaande afbeeldingen negeren",
                 "streamUrl": "Stream-URL:",
                 "requireAuthentication": "Verificatie vereisen",
                 "camera": "Camera",
@@ -425,6 +422,7 @@
             }
         },
         "sinks": {
+            "title": "Put",
             "types": {
                 "folder": "map",
                 "mqtt": "mqtt",
@@ -511,9 +509,7 @@
                 "disabledSuccess": "Pipeline succesvol uitgeschakeld"
             },
             "configuration": {
-                "sidebarLabel": "Pipelineconfiguratie",
-                "sourcesTab": "Invoer",
-                "sinksTab": "Uitvoer"
+                "sidebarLabel": "Pipelineconfiguratie"
             }
         },
         "collection": {
@@ -557,10 +553,6 @@
                 "healthy": "In orde",
                 "finished": "Afgerond",
                 "unavailable": "Niet beschikbaar"
-            },
-            "componentLabels": {
-                "source": "Bron",
-                "sink": "Uitvoer"
             }
         },
         "stream": {
@@ -891,7 +883,6 @@
                 "dialogTitle": "Trainingslogboeken",
                 "loadError": "Laden van logboeken mislukt: {{message}}",
                 "noJobOrModel": "Geen taak of model opgegeven",
-                "fetchError": "Ophalen van modellogboeken mislukt: {{status}} {{statusText}}",
                 "downloadStarted": "Download van trainingslogboeken gestart"
             },
             "parameters": {

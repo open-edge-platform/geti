@@ -3,7 +3,7 @@
 
 from collections.abc import Callable, Sequence
 
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from app.models import DatasetItem, Label, Media, Task, TaskType
 

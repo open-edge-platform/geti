@@ -11,11 +11,11 @@ from unittest.mock import Mock
 import polars as pl
 import pytest
 import torch
-from datumaro.experimental import Dataset, register_sample
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.dataset import Sample
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset, image_field, image_info_field, label_field, subset_field
+from getidata import Dataset, register_sample
+from getidata.categories import LabelCategories
+from getidata.dataset import Sample
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset, image_field, image_info_field, label_field, subset_field
 from torchvision import tv_tensors
 
 from getitune.data.dataset.base import _default_collate_fn

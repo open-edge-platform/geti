@@ -5,10 +5,10 @@ from contextlib import AbstractContextManager
 from pathlib import Path
 from uuid import UUID, uuid4
 
-from datumaro.experimental import Dataset
-from datumaro.experimental.data_formats.base import DataFormat
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.data_formats.base import DataFormat
+from getidata.export_import import export_dataset
+from getidata.fields import Subset
 from loguru import logger
 from pathvalidate import sanitize_filename
 from sqlalchemy.orm import Session

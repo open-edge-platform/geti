@@ -8,7 +8,7 @@ ARG EXCLUDE_AGPL_MODELS=0
 ##############
 # Backend base
 ##############
-FROM python:3.14-slim@sha256:82abc9f53600280b0757126f83c5a7d47088592d2acb6b4c0b9e97f76865508c AS backend-base
+FROM python:3.14-slim@sha256:cd89c30eda26ee911a4611b18680086e0ea42e6f5f8cbe653d07fa7958c9cec8 AS backend-base
 
 # uv / uvx
 COPY --from=docker.io/astral/uv:0.10.4@sha256:4cac394b6b72846f8a85a7a0e577c6d61d4e17fe2ccee65d9451a8b3c9efb4ac /uv /uvx /bin/
@@ -54,9 +54,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
+    --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package av --extra mqtt --extra cpu
+    --no-install-package getidata --no-install-package av --extra mqtt --extra cpu
 
 # Step 2: Build and install the local getitune package + the project itself.
 # This layer is invalidated by library source changes, but is fast since all
@@ -66,6 +67,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
+    --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cpu
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
@@ -86,9 +88,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
+    --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package av --extra mqtt --extra cuda
+    --no-install-package getidata --no-install-package av --extra mqtt --extra cuda
 
 # Step 2: Build and install the local getitune package + the project itself.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -96,6 +99,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
+    --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cuda
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
@@ -116,9 +120,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
+    --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package av --extra mqtt --extra xpu
+    --no-install-package getidata --no-install-package av --extra mqtt --extra xpu
 
 # Step 2: Build and install the local getitune package + the project itself.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -126,6 +131,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/backend/pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
+    --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra xpu
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
@@ -163,7 +169,7 @@ RUN npm run build
 #===========================================================================
 # pyav + ffmpeg
 # ===========================================================================
-FROM python:3.14-slim@sha256:82abc9f53600280b0757126f83c5a7d47088592d2acb6b4c0b9e97f76865508c AS ffmpeg-builder
+FROM python:3.14-slim@sha256:cd89c30eda26ee911a4611b18680086e0ea42e6f5f8cbe653d07fa7958c9cec8 AS ffmpeg-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -295,7 +301,7 @@ RUN python -m pip wheel --no-binary av --no-build-isolation "av==${PYAV_VERSION}
 #########################
 # Base for CPU, GPU and XPU runtime images
 #########################
-FROM python:3.14-slim@sha256:82abc9f53600280b0757126f83c5a7d47088592d2acb6b4c0b9e97f76865508c AS runtime-base
+FROM python:3.14-slim@sha256:cd89c30eda26ee911a4611b18680086e0ea42e6f5f8cbe653d07fa7958c9cec8 AS runtime-base
 
 LABEL org.opencontainers.image.source="https://github.com/open-edge-platform/training_extensions"
 LABEL org.opencontainers.image.description="Geti – train, optimize and deploy deep-learning models"

@@ -15,7 +15,7 @@ from .dataset.base import Transforms, VisionDataset
 from .utils.utils import fill_null_annotation_lists
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
 
     from getitune.config.data import SubsetConfig
 

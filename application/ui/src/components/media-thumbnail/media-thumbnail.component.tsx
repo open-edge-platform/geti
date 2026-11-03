@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Media, MediaVideo } from '@/api/types';
 import { Flex, Skeleton } from '@geti-ui/ui';
@@ -53,6 +53,19 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
         setStatus('loading');
     }
 
+    // Re-assigning the same value restarts the fetch, so every scroll stop would abort and
+    // re-request the thumbnails that are already loading.
+    const setImageRef = useCallback(
+        (img: HTMLImageElement | null) => {
+            imgRef.current = img;
+
+            if (img !== null && img.getAttribute('src') === url && img.complete) {
+                setStatus(img.naturalWidth > 0 ? 'loaded' : 'error');
+            }
+        },
+        [url]
+    );
+
     // Tiles that fly past during a fast scroll would otherwise start a request and immediately
     // cancel it; enough of those wedge the connection and leave the gallery blank.
     useEffect(() => {
@@ -62,14 +75,7 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
             return;
         }
 
-        // Re-assigning the same value restarts the fetch, so every scroll stop would abort and
-        // re-request the thumbnails that are already loading.
         if (img.getAttribute('src') === url) {
-            // A tile recycled back to its previous item won't fire `load` again.
-            if (img.complete) {
-                setStatus(img.naturalWidth > 0 ? 'loaded' : 'error');
-            }
-
             return;
         }
 
@@ -92,7 +98,7 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
     return (
         <div onDoubleClick={onDoubleClick} onClick={onClick} className={classes.imgContainer}>
             <img
-                ref={imgRef}
+                ref={setImageRef}
                 alt={alt}
                 className={clsx(classes.img, {
                     [classes.imgHidden]: status !== 'loaded',

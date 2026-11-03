@@ -41,7 +41,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -182,7 +182,7 @@ jobs:
           artifact_name: zapfull
 
       - name: Run Schemathesis Scan
-        uses: schemathesis/action@806cace2053cbbac93188e1281ff7da415643160 # v3
+        uses: schemathesis/action@b0cacf86f25caaa79ac110cc2077afd70fdd67ff # v3
         continue-on-error: true
         with:
           schema: "https://localhost:7860/api/openapi.json"
@@ -272,7 +272,7 @@ jobs:
         ai-device: [cpu, cuda, xpu]
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -281,6 +281,6 @@ jobs:
         with:
           image: "ghcr.io/open-edge-platform/geti-${{ matrix.ai-device }}:develop"
           # renovate: datasource=docker depName=python
-          base-image: "python:3.15-slim@sha256:f786b2e19cf9bb54e96bfcd4c1b40c4c56336c22e60607ffd4b080ae5b5dee83"
+          base-image: "python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913"
           artifact-name: "trivy-scan-diff-${{ matrix.ai-device }}"
           ignore_unfixed: true

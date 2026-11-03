@@ -5,8 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
+import playwright from 'eslint-plugin-playwright';
 
 import sharedEslintConfig from './eslint.shared.config.js';
 
@@ -14,11 +13,6 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 const currentYear = new Date().getFullYear();
 const allowedYears = Array.from({ length: Math.max(currentYear - 2025 + 1, 1) }, (_, index) => 2025 + index);
-const compat = new FlatCompat({
-    baseDirectory: dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all,
-});
 
 const restrictedImportPaths = [
     {
@@ -344,27 +338,22 @@ export default [
             ],
         },
     },
-    ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
-        ...config,
+    {
+        ...playwright.configs['flat/recommended'],
         files: ['tests/**/*.ts'],
-    })),
+    },
     {
         files: ['tests/**/*.ts'],
 
         rules: {
-            'playwright/no-wait-for-selector': ['off'],
             'playwright/no-conditional-expect': ['off'],
-            'playwright/no-standalone-expect': ['off'],
-            'playwright/missing-playwright-await': ['warn'],
-            'playwright/valid-expect': ['warn'],
-            'playwright/no-useless-not': ['warn'],
-            'playwright/no-page-pause': ['warn'],
-            'playwright/prefer-to-have-length': ['warn'],
             'playwright/no-conditional-in-test': ['off'],
-            'playwright/expect-expect': ['off'],
-            'playwright/no-skipped-test': ['off'],
-            'playwright/no-wait-for-timeout': ['off'],
-            'playwright/no-nested-step': ['off'],
+            'playwright/expect-expect': [
+                'error',
+                {
+                    assertFunctionPatterns: ['^expect.*'],
+                },
+            ],
         },
     },
 ];

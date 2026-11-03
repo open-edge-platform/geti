@@ -20,10 +20,10 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.data_formats.coco.sample import CocoSample
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.categories import LabelCategories
+from getidata.data_formats.coco.sample import CocoSample
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 
 # Path to the script under test.
 _SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_aid_multilabel.py"
