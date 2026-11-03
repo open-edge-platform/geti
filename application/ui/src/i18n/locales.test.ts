@@ -8,6 +8,7 @@ import ts from 'typescript';
 
 import { DEFAULT_LANGUAGE, resources, SUPPORTED_LANGUAGES } from './locales';
 import en from './locales/en.json';
+import id from './locales/id.json';
 
 const sourceRoot = join(process.cwd(), 'src');
 const sourceFiles = readdirSync(sourceRoot, { recursive: true, encoding: 'utf8' })
@@ -47,6 +48,7 @@ describe('locale registry', () => {
             'en',
             'es',
             'fr',
+            'id',
             'it',
             'nl',
             'pl',
@@ -62,6 +64,15 @@ describe('locale registry', () => {
 });
 
 describe('translation coverage', () => {
+    it('preserves interpolation variables and component tags in the Indonesian catalog', () => {
+        const indonesian = new Map(flattenTranslations(id));
+        const tokens = (value: string) => (value.match(/{{.*?}}|<\/?\w+>/g) ?? []).sort();
+
+        translations.forEach(([key, value]) => {
+            expect(tokens(indonesian.get(key) ?? ''), key).toEqual(tokens(value));
+        });
+    });
+
     it('has no unused English keys, including plural variants and computed keys', () => {
         const references = new Set<string>();
         const dynamicPrefixes = new Set<string>();
