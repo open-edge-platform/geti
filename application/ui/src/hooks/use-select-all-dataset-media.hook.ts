@@ -8,6 +8,7 @@ import { i18n } from '@/i18n';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual, omit } from 'lodash-es';
 
+import { isImage } from '../shared/media-item-utils';
 import { useDatasetMediaFilterOptions } from './use-dataset-media-filter-options.hook';
 import { buildDatasetMediaQueryFilters } from './use-get-dataset-media-items.hook';
 import { useProjectIdentifier } from './use-project-identifier.hook';
@@ -49,7 +50,7 @@ export const useSelectAllDatasetMedia = () => {
 
             return {
                 mediaIds: data.items.map(({ id }) => id),
-                imageIds: data.items.filter(({ type }) => type === 'image').map(({ id }) => id),
+                imageIds: data.items.filter(isImage).map(({ id }) => id),
             };
         },
     });

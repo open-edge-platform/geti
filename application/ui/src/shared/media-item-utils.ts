@@ -12,6 +12,13 @@ export const isVideoFrame = (media: Pick<Media, 'type'> | undefined): media is M
 
 export const isImage = (media: Pick<Media, 'type'> | undefined): media is MediaImage => media?.type === 'image';
 
+// Annotatable media is a single 2D picture that annotations, embeddings and predictions refer to directly (an image or
+// a video frame). A video isn't: the annotator resolves it to one of its frames first. Same set as the backend's
+// `LEAF_MEDIA_TYPES`. Positive on purpose, so a new media type stays non-annotatable until it is added here.
+// TODO(#7810): include OME planes (one (Z, T) of an OME-TIFF / OME-Zarr image, all channels composited).
+export const isAnnotatableMedia = (media: Pick<Media, 'type'> | undefined): media is MediaImage | MediaVideoFrame =>
+    isImage(media) || isVideoFrame(media);
+
 // The helpers below translate a media item (an image or a single video frame) into the shapes the API expects, so
 // callers never branch on how each media type is addressed.
 // TODO(#7810): extend with the Z/C/T coordinates of OME-TIFF / OME-Zarr images.

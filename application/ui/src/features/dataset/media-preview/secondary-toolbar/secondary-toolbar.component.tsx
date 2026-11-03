@@ -44,49 +44,6 @@ import { PredictionButtons } from './predictions-buttons.component';
 
 import classes from './secondary-toolbar.module.scss';
 
-type ImageAnnotationButtonsProps = {
-    onDeleteItem: ([deletedItem]: string[]) => void;
-    mediaId: string;
-    onSubmit: () => void;
-    isDisabled: boolean;
-    isSaving: boolean;
-};
-
-const ImageAnnotationButtons = ({
-    onDeleteItem,
-    mediaId,
-    onSubmit,
-    isDisabled,
-    isSaving,
-}: ImageAnnotationButtonsProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            <DeleteMediaItem itemsIds={[mediaId]} onDeleted={onDeleteItem} />
-            <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-                {t('common.actions.submit')}
-            </Button>
-        </>
-    );
-};
-
-type VideoAnnotationButtonsProps = {
-    onSubmit: () => void;
-    isDisabled: boolean;
-    isSaving: boolean;
-};
-
-const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotationButtonsProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-            {t('common.actions.submit')}
-        </Button>
-    );
-};
-
 const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
     const { t } = useTranslation();
 
@@ -217,20 +174,21 @@ export const SecondaryToolbar = ({
                             />
                         )}
                         {isAnnotationMode && isImage(mediaItem) && (
-                            <ImageAnnotationButtons
-                                mediaId={mediaItem.id}
-                                onDeleteItem={(deleteItems) => handleDeleteItem(deleteItems, items.length - 1)}
-                                onSubmit={handleSubmit}
-                                isSaving={isSaving}
-                                isDisabled={isSubmitDisabled}
+                            // Only standalone images can be deleted here: a video frame is part of its video.
+                            <DeleteMediaItem
+                                itemsIds={[mediaItem.id]}
+                                onDeleted={(deleteItems) => handleDeleteItem(deleteItems, items.length - 1)}
                             />
                         )}
-                        {isAnnotationMode && !isImage(mediaItem) && (
-                            <VideoAnnotationButtons
-                                onSubmit={handleSubmit}
+                        {isAnnotationMode && (
+                            <Button
+                                variant='accent'
+                                onPress={handleSubmit}
+                                isPending={isSaving}
                                 isDisabled={isSubmitDisabled}
-                                isSaving={isSaving}
-                            />
+                            >
+                                {t('common.actions.submit')}
+                            </Button>
                         )}
 
                         <Divider size={'S'} height={'size-400'} width={'size-10'} />
