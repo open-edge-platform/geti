@@ -1,15 +1,15 @@
-.reviewed,
-.toReview {
+.annotated,
+.notAnnotated {
     border-radius: var(--spectrum-global-dimension-size-200);
     padding: var(--spectrum-global-dimension-size-50) var(--spectrum-global-dimension-size-100);
 }
 
-.reviewed {
+.annotated {
     background: var(--moss-tint-1);
     color: var(--spectrum-global-color-gray-50);
 }
 
-.toReview {
+.notAnnotated {
     background: var(--coral-shade-1);
     color: var(--spectrum-global-color-gray-50);
 

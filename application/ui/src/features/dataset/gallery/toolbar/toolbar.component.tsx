@@ -8,7 +8,7 @@ import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery
 import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Checkbox, dimensionValue, Divider, Flex, Heading, ViewModes } from '@geti-ui/ui';
 import { useDatasetViewsQuery } from 'hooks/api/dataset-views.hook';
-import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
 import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hook';
 
 import { isImage } from '../../../../shared/media-item-utils';
@@ -92,7 +92,7 @@ export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarPro
     const { t } = useTranslation();
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
-    const { totalCount } = useDatasetMediaWithReviewStatus();
+    const { totalCount } = useFilteredDatasetMedia();
     const selectAllMedia = useSelectAllDatasetMedia();
 
     // Which of the ids resolved by "select all" are images, for the classification label actions.

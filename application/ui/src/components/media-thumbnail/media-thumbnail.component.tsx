@@ -18,7 +18,7 @@ type MediaThumbnailProps = {
     onDoubleClick?: () => void;
     url: string;
     alt: string;
-    item: Pick<Media, 'type'> | Pick<MediaVideo, 'type' | 'frame_count' | 'annotated_frame_count' | 'duration'>;
+    item: Pick<Media, 'type'> | Pick<MediaVideo, 'type' | 'duration'>;
 };
 
 type VideoIndicatorProps = {

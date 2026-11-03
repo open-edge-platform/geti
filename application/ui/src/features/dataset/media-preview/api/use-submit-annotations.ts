@@ -4,8 +4,8 @@
 import { useMemo } from 'react';
 
 import { $api } from '@/api';
-import type { AnnotationDTO, DatasetItem, DatasetSubset, Media } from '@/api/types';
-import { InfiniteData, matchQuery, useQueryClient } from '@tanstack/react-query';
+import type { AnnotationDTO, DatasetSubset, Media } from '@/api/types';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
 
@@ -17,14 +17,11 @@ import {
     mapLocalAnnotationsToServer,
     mapServerAnnotationsToLocal,
 } from '../../../../modules/annotator/annotation-mappers';
-import { getQueryKey } from '../../../../query-client/query-client';
 import { isEmptyLabel, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
 import { getMediaItemQueryParams, isVideoFrame } from '../../../../shared/media-item-utils';
 import type { Annotation } from '../../../../shared/types';
 import { isNonEmptyArray } from '../../../../shared/util';
-import { incrementCachedAnnotatedFrameCount } from './increment-cached-annotated-frame-count';
-
-type DatasetItemsPage = { items: DatasetItem[] };
+import { markCachedMediaAsAnnotated, refreshCachedMedia } from './update-cached-dataset-media';
 
 const filterOutAnnotationWithEmptyLabel = (annotations: Annotation[]): Annotation[] => {
     return annotations.filter((annotation) => annotation.labels.some(isNonEmptyLabel));
@@ -54,40 +51,15 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
                 ],
             ],
         },
-        onSuccess: (data) => {
-            // The dataset item list backs the sidebar's review-status badges. Instead of
-            // invalidating it over the network (which would refetch every page the user has
-            // already scrolled through - potentially dozens of requests on every single
-            // submit), patch the affected item directly in the already-cached pages.
-            const datasetItemsQueryKey = getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/items',
-                { params: { path: { project_id: projectId } } },
-            ]);
-
-            queryClient.setQueriesData<InfiniteData<DatasetItemsPage>>(
-                { predicate: (query) => matchQuery({ queryKey: datasetItemsQueryKey }, query) },
-                (previousData) => {
-                    if (previousData === undefined) {
-                        return previousData;
-                    }
-
-                    return {
-                        ...previousData,
-                        pages: previousData.pages.map((page) => ({
-                            ...page,
-                            items: page.items.map((item) =>
-                                item.id === data.media_id
-                                    ? { ...item, subset: data.subset, user_reviewed: data.user_reviewed }
-                                    : item
-                            ),
-                        })),
-                    };
-                }
-            );
-
+        onSuccess: () => {
+            // The dataset media listing backs the gallery and sidebar annotation-status badges. Instead of
+            // invalidating it (which would refetch every page already scrolled through), patch the cached media.
             if (isVideoFrame(mediaItem)) {
-                incrementCachedAnnotatedFrameCount(queryClient, mediaItem);
+                // Frames share their video's id. Whether this frame was annotated before is unknown, so the video's
+                // annotated frame count is fetched again. If that fails, the count is only stale until the next listing.
+                void refreshCachedMedia(queryClient, projectId, mediaItem.id).catch(() => undefined);
+            } else {
+                markCachedMediaAsAnnotated(queryClient, mediaItem.id);
             }
         },
     });

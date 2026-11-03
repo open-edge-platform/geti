@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
-import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
 import { isEqual } from 'lodash-es';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
@@ -16,7 +16,7 @@ export const useSelectDatasetItem = () => {
     const navigate = useNavigate();
     const { search } = useLocation();
     const projectId = useProjectIdentifier();
-    const { items } = useDatasetMediaWithReviewStatus();
+    const { items } = useFilteredDatasetMedia();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
 
     const [prevSelectedMediaItem, setPrevSelectedMediaItem] = useState<Media | null>(null);
