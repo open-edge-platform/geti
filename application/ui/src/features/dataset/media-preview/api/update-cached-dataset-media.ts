@@ -54,29 +54,16 @@ export const markCachedMediaAsAnnotated = (queryClient: QueryClient, mediaId: st
     );
 };
 
-export const replaceCachedMedia = (queryClient: QueryClient, media: MediaDTO) => {
+const replaceCachedMedia = (queryClient: QueryClient, media: MediaDTO) => {
     updateCachedMedia(queryClient, (item) => (item.id === media.id ? media : item));
 };
 
-// Refreshes of the same media can resolve out of order (e.g. frames of a video saved in quick succession): only the
-// response of the latest one is applied, so the cache never goes back to an older state.
-const latestRefreshes = new Map<string, symbol>();
-
 export const refreshCachedMedia = async (queryClient: QueryClient, projectId: string, mediaId: string) => {
-    const refresh = Symbol(mediaId);
-    latestRefreshes.set(mediaId, refresh);
+    const { data } = await fetchClient.GET('/api/projects/{project_id}/dataset/media/{media_id}', {
+        params: { path: { project_id: projectId, media_id: mediaId } },
+    });
 
-    try {
-        const { data } = await fetchClient.GET('/api/projects/{project_id}/dataset/media/{media_id}', {
-            params: { path: { project_id: projectId, media_id: mediaId } },
-        });
-
-        if (data !== undefined && latestRefreshes.get(mediaId) === refresh) {
-            replaceCachedMedia(queryClient, data);
-        }
-    } finally {
-        if (latestRefreshes.get(mediaId) === refresh) {
-            latestRefreshes.delete(mediaId);
-        }
+    if (data !== undefined) {
+        replaceCachedMedia(queryClient, data);
     }
 };

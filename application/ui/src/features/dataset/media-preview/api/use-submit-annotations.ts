@@ -63,8 +63,9 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
             // invalidating it (which would refetch every page already scrolled through), patch the cached media.
             if (isVideoFrame(mediaItem)) {
                 // Frames share their video's id. Whether this frame was annotated before is unknown, so the video's
-                // annotated frame count is fetched again, before the submission completes. A failed refresh does not
-                // fail the (successful) submission: the count is only stale until the next listing.
+                // annotated frame count is fetched again. Awaited, so that saving stays pending (and the next save
+                // disabled) until then: refreshes cannot overlap and resolve out of order. A failed refresh does not
+                // fail the (successful) save: the count is only stale until the next listing.
                 await refreshCachedMedia(queryClient, projectId, mediaItem.id).catch(() => undefined);
             } else {
                 markCachedMediaAsAnnotated(queryClient, mediaItem.id);
