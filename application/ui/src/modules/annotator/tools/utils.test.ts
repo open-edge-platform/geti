@@ -89,13 +89,15 @@ describe('getImageData', () => {
 
 describe('loadImageData', () => {
     let fetchSpy: ReturnType<typeof rs.spyOn>;
+    let decodeSpy: ReturnType<typeof rs.fn>;
     let bitmap: ImageBitmap;
 
     beforeEach(() => {
         // Rasterising is covered by the getImageData tests; an empty bitmap keeps the canvas out of these.
         bitmap = createImage(0, 0);
         fetchSpy = rs.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('png'));
-        rs.stubGlobal('createImageBitmap', async () => bitmap);
+        decodeSpy = rs.fn(async () => bitmap);
+        rs.stubGlobal('createImageBitmap', decodeSpy);
     });
 
     afterEach(() => {
@@ -109,6 +111,12 @@ describe('loadImageData', () => {
 
         expect(fetchSpy).toHaveBeenCalledWith('/binary', expect.objectContaining({ signal }));
         expect(bitmap.close).toHaveBeenCalled();
+    });
+
+    it('applies EXIF orientation, like <img>', async () => {
+        await loadImageData('/binary');
+
+        expect(decodeSpy).toHaveBeenCalledWith(expect.any(Blob), { imageOrientation: 'from-image' });
     });
 
     it('rejects when the server responds with an error', async () => {

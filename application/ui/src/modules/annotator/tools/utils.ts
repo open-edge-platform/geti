@@ -438,9 +438,12 @@ export const loadImageData = async (url: string, signal?: AbortSignal): Promise<
         throw new Error(`Failed to load image: ${response.status} ${response.statusText}`);
     }
 
-    const bitmap = await createImageBitmap(await response.blob());
+    const blob = await response.blob();
+    // Explicit, as older engines defaulted to ignoring EXIF rotation, unlike the <img> path this replaced.
+    const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
 
     try {
+        // Decoding can't be cancelled, so a request aborted meanwhile still skips rasterising.
         signal?.throwIfAborted();
 
         return getImageData(bitmap);
