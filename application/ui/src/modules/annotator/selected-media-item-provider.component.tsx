@@ -10,7 +10,9 @@ import { useParams } from 'react-router';
 import { isVideo, isVideoFrame } from '../../shared/media-item-utils';
 import type { RegionOfInterest } from '../../shared/types';
 import { useLoadImageQuery } from './hooks/use-load-image-query.hook';
-import { getImageData } from './tools/utils';
+
+// Placeholder until an image has loaded (or when loading fails).
+const EMPTY_IMAGE = new ImageData(1, 1);
 
 // See tools/utils.ts for the oversized image handling flow (downscale → display
 // in media-space → disable smart tools or coordinate-transform at boundaries).
@@ -93,11 +95,7 @@ export const SelectedMediaItemProvider = ({
 }: SelectedMediaItemProviderProps) => {
     const [mediaItem, setMediaItem] = useMediaItem(initialMediaItem);
 
-    const {
-        data: loadedImage = getImageData(new Image()),
-        isSuccess,
-        isPlaceholderData,
-    } = useLoadImageQuery(mediaItem);
+    const { data: loadedImage = EMPTY_IMAGE, isSuccess, isPlaceholderData } = useLoadImageQuery(mediaItem);
 
     // For oversized media: wrap downscaled data in full-size dimensions so
     // drawing tools clamp to media-space, not the smaller buffer dimensions.
