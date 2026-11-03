@@ -10,7 +10,7 @@ import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
 import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
-import { HttpResponse } from 'msw';
+import { delay, HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
 import {
@@ -101,7 +101,7 @@ describe('dataset media cache after submitting', () => {
         expect(getCachedMedia(queryClient)).toEqual([{ ...image, annotation_status: { has_annotations: true } }]);
     });
 
-    it("updates the video of a submitted frame with the server's annotated frame count", async () => {
+    it("completes the submission of a frame once its video has the server's annotated frame count", async () => {
         const video = getMockedVideo({
             id: 'video-1',
             annotation_status: { has_annotations: false, annotated_video_frames: 0 },
@@ -112,7 +112,11 @@ describe('dataset media cache after submitting', () => {
         const queryClient = createQueryClientWithMedia([video]);
 
         server.use(
-            http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => HttpResponse.json(refreshedVideo))
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}', async () => {
+                await delay(100);
+
+                return HttpResponse.json(refreshedVideo);
+            })
         );
 
         const { result } = renderSubmitAnnotations({
@@ -125,7 +129,26 @@ describe('dataset media cache after submitting', () => {
         await waitFor(() => expect(result.current).not.toBeNull());
         await act(() => result.current.submit('unassigned'));
 
-        await waitFor(() => expect(getCachedMedia(queryClient)).toEqual([refreshedVideo]));
+        expect(getCachedMedia(queryClient)).toEqual([refreshedVideo]);
+    });
+
+    it('completes the submission of a frame even if its video cannot be refreshed', async () => {
+        const video = getMockedVideo({ id: 'video-1' });
+        const queryClient = createQueryClientWithMedia([video]);
+
+        server.use(http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => HttpResponse.error()));
+
+        const { result } = renderSubmitAnnotations({
+            mediaItem: getMockedVideoFrame({ id: video.id, frame_number: 3 }),
+            mode: 'annotation',
+            labels: [],
+            queryClient,
+        });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        expect(getCachedMedia(queryClient)).toEqual([video]);
     });
 });
 

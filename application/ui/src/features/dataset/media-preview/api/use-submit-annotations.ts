@@ -51,13 +51,14 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
                 ],
             ],
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             // The dataset media listing backs the gallery and sidebar annotation-status badges. Instead of
             // invalidating it (which would refetch every page already scrolled through), patch the cached media.
             if (isVideoFrame(mediaItem)) {
                 // Frames share their video's id. Whether this frame was annotated before is unknown, so the video's
-                // annotated frame count is fetched again. If that fails, the count is only stale until the next listing.
-                void refreshCachedMedia(queryClient, projectId, mediaItem.id).catch(() => undefined);
+                // annotated frame count is fetched again, before the submission completes. A failed refresh does not
+                // fail the (successful) submission: the count is only stale until the next listing.
+                await refreshCachedMedia(queryClient, projectId, mediaItem.id).catch(() => undefined);
             } else {
                 markCachedMediaAsAnnotated(queryClient, mediaItem.id);
             }
