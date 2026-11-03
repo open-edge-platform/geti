@@ -9,11 +9,11 @@ from app.db.schema import DatasetViewDB
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItem
 from app.models.dataset_view import DatasetView
-from app.models.media import Media, MediaAdapter, MediaType, Video
+from app.models.media import Media, MediaType
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.repositories.base import UniqueConstraintIntegrityError
 from app.services.dataset_service import DatasetItemFilters
-from app.services.media_service import MediaFilters
+from app.services.media_service import MediaFilters, to_media_with_annotation_status
 
 from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType, ResourceWithNameAlreadyExistsError
 
@@ -182,14 +182,7 @@ class DatasetViewService(BaseSessionManagedService):
             sort_direction=filters.sort_direction,
         )
         media_repo = MediaRepository(project_id=str(project_id), db=self.db_session)
-        return [
-            Video.model_validate(media_db).model_copy(
-                update={"annotated_frame_count": media_repo.count_annotated_video_frames_by_video_id(media_db.id)}
-            )
-            if media_db.type == MediaType.VIDEO
-            else MediaAdapter.validate_python(media_db)
-            for media_db in media_dbs
-        ]
+        return to_media_with_annotation_status(media_repo, media_dbs)
 
     def list_dataset_view_media_ids(
         self, project_id: UUID, dataset_view_id: UUID, filters: MediaFilters | None = None

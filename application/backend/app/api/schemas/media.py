@@ -9,6 +9,23 @@ from app.core.models import BaseRequiredIDNameModel, Pagination
 from app.models import DatasetItemAnnotation, DatasetItemSubset, MediaFormat, MediaType
 
 
+class MediaAnnotationStatusView(BaseModel):
+    """
+    Annotation status of an image or a video frame
+    """
+
+    has_annotations: bool = Field(description="Whether the media is annotated")
+
+
+class VideoAnnotationStatusView(BaseModel):
+    """
+    Annotation status of a video, aggregated over its frames
+    """
+
+    has_annotations: bool = Field(description="Whether at least one frame of the video is annotated")
+    annotated_video_frames: int = Field(description="Number of annotated frames of the video")
+
+
 class ImageView(BaseRequiredIDNameModel):
     """
     Image
@@ -20,6 +37,7 @@ class ImageView(BaseRequiredIDNameModel):
     height: int
     size: int
     source_id: UUID | None = None
+    annotation_status: MediaAnnotationStatusView
 
     model_config = {
         "json_schema_extra": {
@@ -32,6 +50,7 @@ class ImageView(BaseRequiredIDNameModel):
                 "height": 720,
                 "size": 2211840,
                 "source_id": "c1feaabc-da2b-442e-9b3e-55c11c2c2ff3",
+                "annotation_status": {"has_annotations": True},
             }
         }
     }
@@ -50,6 +69,7 @@ class VideoFrameView(BaseRequiredIDNameModel):
     video_id: UUID
     frame_index: int
     source_id: UUID | None = None
+    annotation_status: MediaAnnotationStatusView
 
     model_config = {
         "json_schema_extra": {
@@ -64,6 +84,7 @@ class VideoFrameView(BaseRequiredIDNameModel):
                 "video_id": "7b073838-99d3-42ff-9018-4e901eb047fd",
                 "frame_index": 4,
                 "source_id": "c1feaabc-da2b-442e-9b3e-55c11c2c2ff3",
+                "annotation_status": {"has_annotations": True},
             }
         }
     }
@@ -81,9 +102,11 @@ class VideoView(BaseRequiredIDNameModel):
     size: int
     fps: float
     frame_count: int
-    annotated_frame_count: int
+    # TODO: remove in a future release, together with `Video.annotated_frame_count` in the domain model.
+    annotated_frame_count: int = Field(deprecated="Use `annotation_status.annotated_video_frames` instead.")
     source_id: UUID | None = None
     duration: float
+    annotation_status: VideoAnnotationStatusView
 
     model_config = {
         "json_schema_extra": {
@@ -100,6 +123,7 @@ class VideoView(BaseRequiredIDNameModel):
                 "duration": 4.0,
                 "size": 2211840,
                 "source_id": "c1feaabc-da2b-442e-9b3e-55c11c2c2ff3",
+                "annotation_status": {"has_annotations": True, "annotated_video_frames": 25},
             }
         }
     }

@@ -83,6 +83,7 @@ const getMediaEntities = (items: MediaDTO[]): Media[] => {
                 frame_number: 0,
                 frame_stride: 0,
                 ...item,
+                annotation_status: { ...item.annotation_status, annotated_video_frames: 0 },
             };
         }
 

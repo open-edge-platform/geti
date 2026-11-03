@@ -19,7 +19,15 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project, Video
-from app.models.media import ImageFormat, MediaSortBy, MediaType, SortDirection, VideoFormat
+from app.models.media import (
+    ImageFormat,
+    MediaAnnotationStatus,
+    MediaSortBy,
+    MediaType,
+    SortDirection,
+    VideoAnnotationStatus,
+    VideoFormat,
+)
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters, MediaService
 
@@ -1151,7 +1159,7 @@ class TestMediaServiceIntegration:
 
         videos = [m for m in media_list if isinstance(m, Video)]
         assert len(videos) == 1
-        assert videos[0].annotated_frame_count == 1
+        assert videos[0].annotation_status == VideoAnnotationStatus(annotated_video_frames=1)
 
     @pytest.mark.parametrize("subset", ["unassigned", "training"])
     def test_list_media_with_annotated_frame_subsets(
@@ -1181,7 +1189,7 @@ class TestMediaServiceIntegration:
 
         videos = [m for m in media_list if isinstance(m, Video)]
         assert len(videos) == 1
-        assert videos[0].annotated_frame_count == 1
+        assert videos[0].annotation_status == VideoAnnotationStatus(annotated_video_frames=1)
 
     @pytest.mark.parametrize(
         "annotation_status, expected_video_count",
@@ -1345,7 +1353,60 @@ class TestMediaServiceIntegration:
         media = fxt_media_service.get_media_by_id(project_id=project.id, media_id=UUID(db_video.id))
 
         assert isinstance(media, Video)
-        assert media.annotated_frame_count == 1
+        assert media.annotation_status == VideoAnnotationStatus(annotated_video_frames=1)
+
+    def test_list_media_annotation_status(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media: tuple[Project, list[MediaDB]],
+        db_session: Session,
+    ) -> None:
+        """Each media reports whether it is annotated; a video aggregates the status of its frames."""
+        project, db_media_list = fxt_project_with_media
+        annotated_image, empty_label_image, unannotated_image, db_video, db_video_frame = db_media_list
+        annotation = {"labels": [{"id": str(uuid4())}], "shape": {"type": "full_image"}}
+        db_session.add_all(
+            [
+                DatasetItemDB(
+                    id=annotated_image.id, project_id=str(project.id), subset="unassigned", annotation_data=[annotation]
+                ),
+                DatasetItemDB(
+                    id=empty_label_image.id, project_id=str(project.id), subset="unassigned", annotation_data=[]
+                ),
+                DatasetItemDB(id=unannotated_image.id, project_id=str(project.id), subset="unassigned"),
+                DatasetItemDB(
+                    id=db_video_frame.id, project_id=str(project.id), subset="unassigned", annotation_data=[annotation]
+                ),
+            ]
+        )
+        db_session.flush()
+
+        media_list = fxt_media_service.list_media(project_id=project.id, filters=MediaFilters(limit=100))
+
+        assert {str(media.id): media.annotation_status for media in media_list} == {
+            annotated_image.id: MediaAnnotationStatus(has_annotations=True),
+            empty_label_image.id: MediaAnnotationStatus(has_annotations=True),
+            unannotated_image.id: MediaAnnotationStatus(has_annotations=False),
+            db_video.id: VideoAnnotationStatus(annotated_video_frames=1),
+            db_video_frame.id: MediaAnnotationStatus(has_annotations=True),
+        }
+
+    def test_get_media_by_id_annotation_status(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media: tuple[Project, list[MediaDB]],
+        db_session: Session,
+    ) -> None:
+        """A video without annotated frames, or an image without dataset item, is reported as not annotated."""
+        project, db_media_list = fxt_project_with_media
+        db_image, db_video = db_media_list[0], db_media_list[3]
+
+        image = fxt_media_service.get_media_by_id(project_id=project.id, media_id=UUID(db_image.id))
+        video = fxt_media_service.get_media_by_id(project_id=project.id, media_id=UUID(db_video.id))
+
+        assert image.annotation_status == MediaAnnotationStatus(has_annotations=False)
+        assert video.annotation_status == VideoAnnotationStatus(annotated_video_frames=0)
+        assert not video.annotation_status.has_annotations
 
     def test_get_media_by_id_not_found(
         self,

@@ -1,5 +1,6 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import cast
 
@@ -184,15 +185,29 @@ class MediaRepository:
         )
         return [(dataset_item, media) for (dataset_item, media) in self.db.execute(stmt).all()]
 
-    def count_annotated_video_frames_by_video_id(self, video_id: str) -> int:
+    def list_annotated_media_ids(self, media_ids: Sequence[str]) -> set[str]:
+        """Get the subset of the given image/video frame ids whose dataset item has annotations."""
+        if not media_ids:
+            return set()
+        stmt = select(DatasetItemDB.id).where(
+            DatasetItemDB.project_id == self.project_id,
+            DatasetItemDB.id.in_(media_ids),
+            DatasetItemDB.annotation_data.is_not(None),
+        )
+        return set(self.db.scalars(stmt).all())
+
+    def count_annotated_video_frames_by_video_ids(self, video_ids: Sequence[str]) -> dict[str, int]:
+        """Count the annotated frames of each given video. Videos without annotated frames are omitted."""
+        if not video_ids:
+            return {}
         stmt = (
-            select(func.count(MediaDB.id))
-            .select_from(MediaDB)
+            select(MediaDB.video_id, func.count(MediaDB.id))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 MediaDB.project_id == self.project_id,
-                MediaDB.video_id == video_id,
+                MediaDB.video_id.in_(video_ids),
                 DatasetItemDB.annotation_data.is_not(None),
             )
+            .group_by(MediaDB.video_id)
         )
-        return self.db.scalar(stmt) or 0
+        return {video_id: count for video_id, count in self.db.execute(stmt).tuples() if video_id is not None}
