@@ -227,12 +227,7 @@ class MediaDB(BaseID):
     # Populated only for ome_plane rows. Redundant with frame_index, but needed for filtering/sorting.
     z_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
     t_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
-
-    # Widened: BigTIFF and Zarr stores exceed 2^31 bytes.
-    size: Mapped[int] = mapped_column(BigInteger, nullable=False)
 ```
-
-`DatasetRevisionDB.size` is widened to `BigInteger` for the same reason.
 
 The `video_id` → `parent_id` rename is the only invasive change. It is a pure DDL rename with no data migration, and it
 prevents a second self-FK column being added for every future container type.
@@ -332,10 +327,9 @@ One Alembic revision:
 
 1. `media.video_id` → `media.parent_id`; rename `idx_media_video_id` and `uq_video_id_frame_index`.
 2. Add `media.z_index`, `media.t_index`.
-3. Widen `media.size` and `dataset_revisions.size` to `BigInteger`.
-4. Create `ome_images`, `ome_channel_views`.
+3. Create `ome_images`, `ome_channel_views`.
 
-SQLite requires `op.batch_alter_table` for (1) and (3); follow the existing pattern in `app/alembic/versions/`.
+SQLite requires `op.batch_alter_table` for (1); follow the existing pattern in `app/alembic/versions/`.
 Downgrade is symmetric and lossless as long as no OME media exists; the downgrade must therefore refuse to run if any
 `ome_image` row is present.
 
