@@ -7,8 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, Form } from '@geti-ui/ui';
 
-import { usePatchPipeline } from '../../../../hooks/api/pipeline.hook';
-import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
+import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
 
 interface AddSinkProps<T> {
@@ -20,14 +19,13 @@ interface AddSinkProps<T> {
 
 export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, componentFields }: AddSinkProps<T>) => {
     const { t } = useTranslation();
-    const pipeline = usePatchPipeline();
-    const project_id = useProjectIdentifier();
+    const connectToPipelineMutation = useConnectSinkToPipeline();
 
     const [state, submitAction, isPending] = useSinkAction({
         config,
         isNewSink: true,
         onSaved: async (sink_id) => {
-            await pipeline.mutateAsync({ params: { path: { project_id } }, body: { sink_id } });
+            await connectToPipelineMutation.mutateAsync(sink_id);
             onSaved();
         },
         bodyFormatter,
@@ -39,7 +37,7 @@ export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, 
 
             <Button
                 type='submit'
-                isDisabled={isPending || pipeline.isPending}
+                isDisabled={isPending || connectToPipelineMutation.isPending}
                 UNSAFE_style={{ maxWidth: 'fit-content' }}
             >
                 {t('common.actions.addAndUse')}

@@ -43,7 +43,7 @@ export const EditSource = <T extends SourceConfigPayload>({
         config,
         isNewSource: false,
         onSaved: async (sourceId) => {
-            connectToPipeline.current && (await connectToPipelineMutation(sourceId));
+            connectToPipeline.current && (await connectToPipelineMutation.mutateAsync(sourceId));
             connectToPipeline.current = false;
             onSaved();
             void queryClient.fetchQuery(testSourceQueryOptions(sourceId)).catch(() => undefined);

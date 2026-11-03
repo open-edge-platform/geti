@@ -19,6 +19,11 @@ import { EditSink } from './edit-sink.component';
 rs.mock('../hooks/use-sink-mutation.hook');
 rs.mock('../../../../hooks/api/pipeline.hook');
 
+const mockConnectMutation = (mutateAsync: ReturnType<typeof rs.fn>) =>
+    rs
+        .mocked(useConnectSinkToPipeline)
+        .mockReturnValue({ mutateAsync, isPending: false } as unknown as ReturnType<typeof useConnectSinkToPipeline>);
+
 describe('EditSink', () => {
     beforeEach(() => {
         rs.clearAllMocks();
@@ -52,7 +57,7 @@ describe('EditSink', () => {
         const mockSinkMutation = rs.fn().mockResolvedValue(updatedConfig.id);
         const mockConnectToPipeline = rs.fn().mockResolvedValue(undefined);
 
-        rs.mocked(useConnectSinkToPipeline).mockReturnValue(mockConnectToPipeline);
+        mockConnectMutation(mockConnectToPipeline);
         rs.mocked(useSinkMutation).mockReturnValue(mockSinkMutation);
 
         renderApp(mockOnSaved);
@@ -74,7 +79,7 @@ describe('EditSink', () => {
         const mockSinkMutation = rs.fn().mockResolvedValue(updatedConfig.id);
         const mockConnectToPipeline = rs.fn().mockResolvedValue(undefined);
 
-        rs.mocked(useConnectSinkToPipeline).mockReturnValue(mockConnectToPipeline);
+        mockConnectMutation(mockConnectToPipeline);
         rs.mocked(useSinkMutation).mockReturnValue(mockSinkMutation);
 
         renderApp(mockOnSaved);
@@ -92,7 +97,7 @@ describe('EditSink', () => {
     });
 
     it('hides "Save & Connect" button when already connected', () => {
-        rs.mocked(useConnectSinkToPipeline).mockReturnValue(rs.fn());
+        mockConnectMutation(rs.fn());
         rs.mocked(useSinkMutation).mockReturnValue(rs.fn());
 
         renderApp(rs.fn(), true);
@@ -101,7 +106,7 @@ describe('EditSink', () => {
     });
 
     it('shows "Save & Connect" button when not connected', () => {
-        rs.mocked(useConnectSinkToPipeline).mockReturnValue(rs.fn());
+        mockConnectMutation(rs.fn());
         rs.mocked(useSinkMutation).mockReturnValue(rs.fn());
 
         renderApp(rs.fn(), false);
