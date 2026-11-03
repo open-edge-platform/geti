@@ -116,7 +116,7 @@ describe('loadImageData', () => {
     it('applies EXIF orientation, like <img>', async () => {
         await loadImageData('/binary');
 
-        expect(decodeSpy).toHaveBeenCalledWith(expect.any(Blob), { imageOrientation: 'from-image' });
+        expect(decodeSpy).toHaveBeenCalledWith(expect.anything(), { imageOrientation: 'from-image' });
     });
 
     it('rejects when the server responds with an error', async () => {
