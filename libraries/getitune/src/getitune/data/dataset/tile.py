@@ -232,9 +232,13 @@ class TileDataset(VisionDataset):
                 return tile_entities
 
         tile_entities: list[BaseSample] = []
+        # Decode the source image once and crop every tile from it. Reading `tile.image` lazily would re-decode the
+        # whole source for each tile and keep each decoded copy alive through the tile's transform chain.
+        source_image = _ensure_chw_format(parent_slice_ds[0].image)
         for tile in tile_ds:
-            # Fix datumaro HWC→CHW format issue for tile images
-            tile.image = _ensure_chw_format(tile.image)
+            info = tile.tile
+            # `clone` so the tile does not pin the source image.
+            tile.image = source_image[:, info.y : info.y + info.height, info.x : info.x + info.width].clone()
             # apply the same transforms as the original dataset
             object.__setattr__(tile.tile, "source_sample_idx", parent_idx)
             transformed_tile = self._apply_transforms(tile)
