@@ -64,5 +64,5 @@ overrides:
       augmentations_gpu: []
 
     test_subset:
-      num_workers: 2
+      num_workers: 1
       augmentations_gpu: []
