@@ -121,7 +121,8 @@ class DatasetItemDB(Base):
 
     id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    annotation_data: Mapped[list | None] = mapped_column(JSON, nullable=True, default=None)
+    # none_as_null: queries rely on `annotation_data IS NULL`, which a JSON 'null' value would not match.
+    annotation_data: Mapped[list | None] = mapped_column(JSON(none_as_null=True), nullable=True, default=None)
     user_reviewed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     prediction_model_id: Mapped[str | None] = mapped_column(
         Text, ForeignKey("model_revisions.id", ondelete="SET NULL"), nullable=True

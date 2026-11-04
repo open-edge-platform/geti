@@ -937,6 +937,10 @@ class TestDatasetServiceIntegration:
         dataset_item = db_session.get(DatasetItemDB, db_dataset_items[1].id)
         assert dataset_item is not None
         assert dataset_item.annotation_data is None
+        # Stored as SQL NULL (not JSON 'null'), so the item no longer counts as annotated in queries.
+        assert db_session.scalar(
+            select(DatasetItemDB.annotation_data.is_(None)).where(DatasetItemDB.id == db_dataset_items[1].id)
+        )
         assert db_session.get(DatasetItemLabelDB, item_label_id) is None
 
     def test_delete_dataset_item_annotations_not_found(

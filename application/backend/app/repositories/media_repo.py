@@ -189,10 +189,16 @@ class MediaRepository:
         """Get the subset of the given image/video frame ids whose dataset item has annotations."""
         if not media_ids:
             return set()
-        stmt = select(DatasetItemDB.id).where(
-            DatasetItemDB.project_id == self.project_id,
-            DatasetItemDB.id.in_(media_ids),
-            DatasetItemDB.annotation_data.is_not(None),
+        # Scope through `media` rather than `dataset_items.project_id`: the latter makes SQLite pick the
+        # (project_id, user_reviewed) index and scan every dataset item of the project instead of PK lookups.
+        stmt = (
+            select(MediaDB.id)
+            .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
+            .where(
+                MediaDB.project_id == self.project_id,
+                MediaDB.id.in_(media_ids),
+                DatasetItemDB.annotation_data.is_not(None),
+            )
         )
         return set(self.db.scalars(stmt).all())
 
