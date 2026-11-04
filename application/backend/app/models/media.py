@@ -57,6 +57,40 @@ class SortDirection(StrEnum):
     DESC = "desc"
 
 
+class MediaAnnotationStatus(BaseModel):
+    """
+    Annotation status of an image or a video frame.
+
+    It is loaded when media are listed or fetched by id (see ``MediaService``); elsewhere it keeps its default.
+
+    Attributes:
+        has_annotations: Whether the media is annotated. An annotation with an empty label counts as annotated.
+    """
+
+    model_config = ConfigDict(frozen=True)
+    has_annotations: bool = False
+
+
+class VideoAnnotationStatus(BaseModel):
+    """
+    Annotation status of a video, aggregated over its frames.
+
+    It is loaded when media are listed or fetched by id (see ``MediaService``); elsewhere it keeps its default.
+
+    Attributes:
+        annotated_video_frames: Number of annotated frames of the video.
+    """
+
+    model_config = ConfigDict(frozen=True)
+    annotated_video_frames: int = 0
+
+    @computed_field
+    @property
+    def has_annotations(self) -> bool:
+        """Whether at least one frame of the video is annotated"""
+        return self.annotated_video_frames > 0
+
+
 class BaseMedia(BaseEntity):
     """
     Media represents an uploaded or fetched media within a dataset, it can be one of Image, Video or VideoFrame.
@@ -85,7 +119,13 @@ class BaseMedia(BaseEntity):
 
 
 class Image(BaseMedia):
+    """
+    Attributes:
+        annotation_status: Annotation status of the image
+    """
+
     type: Literal[MediaType.IMAGE]
+    annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
 
 
 class VideoFrame(BaseMedia):
@@ -93,11 +133,13 @@ class VideoFrame(BaseMedia):
     Attributes:
         video_id: Video identifier
         frame_index: Frame index
+        annotation_status: Annotation status of the frame
     """
 
     type: Literal[MediaType.VIDEO_FRAME]
     video_id: UUID
     frame_index: int
+    annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
 
 
 class Video(BaseMedia):
@@ -105,18 +147,25 @@ class Video(BaseMedia):
     Attributes:
         fps: Video fps
         frame_count: Total number of frames
+        annotation_status: Annotation status of the video, aggregated over its frames
     """
 
     type: Literal[MediaType.VIDEO]
     fps: float
     frame_count: int
-    annotated_frame_count: int = 0
+    annotation_status: VideoAnnotationStatus = Field(default_factory=VideoAnnotationStatus)
 
     @computed_field
     @property
     def duration(self) -> float:
         """Return duration in seconds"""
         return self.frame_count / self.fps
+
+    # TODO: remove together with the deprecated `VideoView.annotated_frame_count` API field.
+    @property
+    def annotated_frame_count(self) -> int:
+        """Deprecated alias of ``annotation_status.annotated_video_frames``"""
+        return self.annotation_status.annotated_video_frames
 
 
 class NotAnnotatedVideoFrame(BaseModel):

@@ -81,6 +81,19 @@
 > only the media assigned to that [dataset view](#views) are returned. This is the only endpoint to list the
 > content of a dataset view.
 
+> Every media info returned by these endpoints includes an `annotation_status` object, so that clients do not
+> need to cross-reference the [dataset items](#dataset-items) to know which media are annotated:
+>
+> - images and video frames: `{"has_annotations": true}` if the media is annotated (an annotation with an empty
+>   label counts as annotated);
+> - videos: `{"has_annotations": true, "annotated_video_frames": 14}`, where `has_annotations` is true if at least
+>   one frame is annotated. Compare `annotated_video_frames` with `frame_count` to know whether every frame is
+>   annotated.
+
+> **Deprecated:** the video field `annotated_frame_count` is deprecated in favor of
+> `annotation_status.annotated_video_frames`. It is marked `deprecated: true` in the OpenAPI spec and will be
+> removed in a future version.
+
 > `GET /api/projects/<id>/dataset/media/<id>/binary` returns images that browsers cannot display (TIFF and high
 > bit depth images, e.g. 16-bit) as an 8-bit PNG. Pass `?raw=true` to get the original file instead. The media
 > `format` field always reports the format of the stored file, not of the returned content.
