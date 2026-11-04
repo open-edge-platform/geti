@@ -23,7 +23,7 @@ from getidata.data_formats.yolo.constants import (
     TRADITIONAL_SUBSET_CONFIG_KEYS,
     TRADITIONAL_SUBSET_DIR_NAMES,
 )
-from getidata.data_formats.yolo.sample import YoloSample
+from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample
 from getidata.fields import ImageInfo, Subset
 
 logger = logging.getLogger(__name__)
@@ -123,6 +123,62 @@ def _detect_yolo_format(root_path: Path) -> Literal["ultralytics", "traditional"
         return "ultralytics"
 
     return "unknown"
+
+
+# =============================================================================
+# Ultralytics Classification Format
+# =============================================================================
+
+
+# Directories with these names inside a subset directory indicate the YOLO detection/segmentation
+# layout (``<subset>/images`` + ``<subset>/labels``, as exported by Roboflow) rather than the
+# classification layout, even though they technically hold image files directly.
+_NON_CLASS_DIR_NAMES = frozenset({"images", "labels"})
+
+
+def _find_class_dirs(subset_dir: Path) -> list[Path]:
+    """
+    Find the per-class image directories directly inside a subset directory.
+
+    A child directory of ``subset_dir`` counts as a class directory when it holds at least one
+    image file directly. Directories named ``images``/``labels`` are excluded so that the
+    split-first detection layout (``train/images`` + ``train/labels``) is not mistaken for the
+    classification layout.
+    """
+    class_dirs = []
+    for child in sorted(subset_dir.iterdir()):
+        if not child.is_dir() or child.name.lower() in _NON_CLASS_DIR_NAMES:
+            continue
+        if _find_image_files(child):
+            class_dirs.append(child)
+    return class_dirs
+
+
+def _resolve_yolo_cls_splits(root_path: Path) -> list[tuple[str, Path, list[Path]]]:
+    """
+    Resolve the ``(subset_name, subset_dir, class_dirs)`` triples of an Ultralytics classification dataset.
+
+    A subset directory is any direct child of the dataset root whose name matches one of the known
+    subset directory names and that holds at least one per-class image directory.
+    """
+    splits: list[tuple[str, Path, list[Path]]] = []
+    seen_subsets: set[Subset] = set()
+    for subset_name, subset_enum in DIR_NAME_TO_SUBSET.items():
+        if subset_enum in seen_subsets:
+            continue
+        subset_dir = root_path / subset_name
+        if not subset_dir.is_dir():
+            continue
+        class_dirs = _find_class_dirs(subset_dir)
+        if class_dirs:
+            seen_subsets.add(subset_enum)
+            splits.append((subset_name, subset_dir, class_dirs))
+    return splits
+
+
+def _is_yolo_cls_layout(root_path: Path) -> bool:
+    """Check whether a directory contains an Ultralytics YOLO classification dataset."""
+    return bool(_resolve_yolo_cls_splits(root_path))
 
 
 def _load_categories_from_yaml(yaml_path: Path) -> LabelCategories:
@@ -638,6 +694,58 @@ def _load_yolo_traditional(root_path: Path) -> Dataset:
     return dataset
 
 
+def _load_yolo_cls(root_path: Path) -> Dataset:
+    """
+    Load an Ultralytics YOLO classification dataset.
+
+    The class names are taken from the per-class directory names, collected across all subsets and
+    sorted alphabetically so that the label indices are deterministic.
+    """
+    splits = _resolve_yolo_cls_splits(root_path)
+    if not splits:
+        raise FileNotFoundError(
+            f"Could not locate any classification split under YOLO root: {root_path}. Expected the "
+            "ImageNet-style layout with one directory per subset (train/val/test), each holding one "
+            "subdirectory per class with the images inside it."
+        )
+
+    class_names = sorted({class_dir.name for _, _, class_dirs in splits for class_dir in class_dirs})
+    categories = LabelCategories(labels=tuple(class_names))
+    dataset = Dataset(YoloClsSample, categories={"label": categories})
+
+    for subset_name, subset_dir, class_dirs in splits:
+        subset_enum = DIR_NAME_TO_SUBSET[subset_name]
+
+        logger.info("[YOLO-CLS] Loading subset '%s' from '%s'", subset_name, subset_dir)
+
+        samples = []
+        for class_dir in class_dirs:
+            label_idx, _ = categories.find(class_dir.name)
+            if label_idx is None:
+                continue
+            for image_path in _find_image_files(class_dir):
+                try:
+                    height, width = _get_image_size(image_path)
+                    samples.append(
+                        YoloClsSample(
+                            image=str(image_path),
+                            image_info=ImageInfo(height=height, width=width),
+                            label=label_idx,
+                            subset=subset_enum,
+                        )
+                    )
+                except Exception as e:
+                    logger.warning("[YOLO-CLS] Failed to load image %s: %s", image_path, e)
+
+        if samples:
+            dataset.append_batch(samples)
+
+        logger.info("[YOLO-CLS] Loaded %d samples from subset '%s'", len(samples), subset_name)
+
+    logger.info("[YOLO-CLS] Finished loading dataset with %d samples", len(dataset))
+    return dataset
+
+
 # =============================================================================
 # Format-Specific Savers
 # =============================================================================
@@ -737,4 +845,68 @@ def _save_yolo_traditional(
     written["obj.data"] = data_path
 
     logger.info("[YOLO] Finished saving dataset to '%s'", root_path)
+    return written
+
+
+def _get_cls_label_names_from_dataset(dataset: Dataset[YoloClsSample]) -> list[str]:
+    """Extract label names from the ``label`` attribute of the dataset schema."""
+    label_categories = dataset.schema.attributes.get("label")
+    categories = label_categories.categories if label_categories else None
+    return list(categories.labels) if categories and hasattr(categories, "labels") else []
+
+
+def _group_cls_samples_by_subset(dataset: Dataset[YoloClsSample]) -> dict[Subset, list[YoloClsSample]]:
+    """Group classification dataset samples by their subset."""
+    subset_to_samples: dict[Subset, list[YoloClsSample]] = defaultdict(list)
+    for sample in dataset:
+        subset_to_samples[sample.subset].append(sample)
+    return subset_to_samples
+
+
+def _save_yolo_cls(
+    dataset: Dataset[YoloClsSample],
+    root_path: Path,
+    save_images: bool,
+) -> dict[str, Path]:
+    """Save a dataset in the Ultralytics YOLO classification (ImageNet-style) layout."""
+    label_names = _get_cls_label_names_from_dataset(dataset)
+    subset_to_samples = _group_cls_samples_by_subset(dataset)
+
+    written: dict[str, Path] = {}
+    for subset, samples in subset_to_samples.items():
+        if not samples:
+            continue
+
+        subset_name = SUBSET_TO_DIR_NAME.get(subset, "unassigned")
+        subset_dir = root_path / subset_name
+
+        logger.info("[YOLO-CLS] Saving subset '%s' with %d samples", subset_name, len(samples))
+
+        # Destination file names only need to be unique within a single class directory.
+        used_names: dict[str, dict[str, str]] = {}
+        saved = 0
+        for sample in samples:
+            if sample.label is None or not 0 <= int(sample.label) < len(label_names):
+                logger.warning("[YOLO-CLS] Skipping sample without a valid class label: %s", sample.image)
+                continue
+
+            image_path = Path(sample.image) if sample.image else None
+            if not image_path:
+                continue
+
+            class_name = label_names[int(sample.label)]
+            class_dir = subset_dir / class_name
+            names = used_names.setdefault(class_name, {})
+            file_name = unique_destination_filename(image_path, names)
+            dst_image_path = class_dir / file_name
+            class_dir.mkdir(parents=True, exist_ok=True)
+
+            if save_images and image_path.exists() and not dst_image_path.exists():
+                shutil.copy2(image_path, dst_image_path)
+            saved += 1
+
+        if saved:
+            written[subset_name] = subset_dir
+
+    logger.info("[YOLO-CLS] Finished saving dataset to '%s'", root_path)
     return written

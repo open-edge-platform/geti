@@ -10,6 +10,29 @@ from getidata.fields import ImageInfo, Subset, bbox_field, image_info_field, ima
 
 
 @register_sample
+class YoloClsSample(Sample):
+    """
+    Sample class for Ultralytics YOLO classification format datasets.
+
+    The Ultralytics YOLO classification format follows the ImageNet-style
+    folder layout: one directory per subset (train/val/test), each holding
+    one subdirectory per class, with the images of that class stored directly
+    inside it. There are no annotation files; the class is inferred from the
+    folder that contains the image, so each image carries exactly one label.
+    """
+
+    # Basic image information
+    image: LazyImage = image_path_field()
+    image_info: ImageInfo = image_info_field()
+
+    # Single class label per image
+    label: int | None = label_field(dtype=pl.UInt16(), is_list=False)
+
+    # Dataset organization
+    subset: Subset = subset_field()
+
+
+@register_sample
 class YoloSample(Sample):
     """
     Sample class for YOLO format datasets.

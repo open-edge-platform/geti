@@ -11,12 +11,15 @@ from getidata import Dataset
 from getidata.data_formats.base import DataFormat
 from getidata.data_formats.yolo.helpers import (
     _detect_yolo_format,
+    _is_yolo_cls_layout,
+    _load_yolo_cls,
     _load_yolo_traditional,
     _load_yolo_ultralytics,
+    _save_yolo_cls,
     _save_yolo_traditional,
     _save_yolo_ultralytics,
 )
-from getidata.data_formats.yolo.sample import YoloSample
+from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +46,101 @@ def is_yolo_format(input_dir: Path) -> bool:
         return True
 
     return (input_dir / "images").is_dir() and (input_dir / "labels").is_dir()
+
+
+def is_yolo_cls_format(input_dir: Path) -> bool:
+    """
+    Detect if a directory contains an Ultralytics YOLO classification dataset.
+
+    The classification layout is identified by subset directories (train/val/test and common
+    spelling variants) holding one image directory per class::
+
+        train/
+            <class_a>/
+                img1.jpg
+            <class_b>/
+                img2.jpg
+        val/
+            ...
+
+    Args:
+        input_dir: Path to the directory to check
+
+    Returns:
+        True if the directory contains a YOLO classification-format dataset
+    """
+    return _is_yolo_cls_layout(input_dir)
+
+
+def import_yolo_cls_dataset(input_dir: Path) -> Dataset:
+    """
+    Import an Ultralytics YOLO classification dataset from a directory.
+
+    Args:
+        input_dir: Path to the YOLO classification dataset directory
+
+    Returns:
+        Dataset containing YoloClsSample instances
+    """
+    return load_yolo_cls_dataset(root_dir=str(input_dir))
+
+
+def load_yolo_cls_dataset(root_dir: str) -> Dataset:
+    """
+    Load an Ultralytics YOLO classification dataset from its top-level directory.
+
+    Ultralytics classification format (ImageNet-style layout)::
+
+        train/
+            <class_a>/
+            <class_b>/
+        val/
+            <class_a>/
+            <class_b>/
+        test/  (optional)
+
+    There are no annotation files: each image is labeled by the class directory that
+    contains it, so every image carries exactly one label.
+
+    Args:
+        root_dir: Path to the top-level YOLO classification dataset directory.
+
+    Returns:
+        Dataset containing YoloClsSample instances.
+    """
+    root_path = Path(root_dir)
+    if not root_path.exists():
+        raise FileNotFoundError(f"YOLO classification root directory does not exist: {root_dir}")
+
+    logger.info("[YOLO-CLS] Loading classification dataset from '%s'", root_dir)
+    return _load_yolo_cls(root_path)
+
+
+def save_yolo_cls_dataset(
+    dataset: Dataset[YoloClsSample],
+    root_dir: str,
+    save_images: bool = True,
+) -> dict[str, Path]:
+    """
+    Save a Dataset of YoloClsSample to disk in Ultralytics YOLO classification format.
+
+    Creates the ImageNet-style layout with one directory per subset, each holding one
+    subdirectory per class with the images copied into it. Samples without a label are
+    skipped, as the format has no way to represent them.
+
+    Args:
+        dataset: Dataset containing YoloClsSample samples.
+        root_dir: Path to the output directory.
+        save_images: Whether to copy images to the output directory.
+
+    Returns:
+        Mapping from subset names to written subset directories.
+    """
+    root_path = Path(root_dir)
+    root_path.mkdir(parents=True, exist_ok=True)
+
+    logger.info("[YOLO-CLS] Saving classification dataset to '%s'", root_dir)
+    return _save_yolo_cls(dataset, root_path, save_images)
 
 
 def import_yolo_dataset(input_dir: Path) -> Dataset:
