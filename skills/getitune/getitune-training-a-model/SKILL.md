@@ -1,6 +1,6 @@
 ---
 name: getitune-training-a-model
-description: Train a computer-vision model with the getitune library (the Geti training library) using its Python API or CLI. Use when a user wants to train, fine-tune, or evaluate a model with `create_engine(...)` and `engine.train()/engine.test()`, run `getitune train`/`getitune test`, pick or override a recipe under `getitune.recipe.<task>`, choose a device (cpu/gpu/xpu/cuda), warm-start from a checkpoint, or debug a training run. Covers classification, detection, instance/semantic segmentation, and keypoint detection.
+description: Train a computer-vision model with the getitune library (the Geti training library) using its Python API or CLI. Use when a user wants to train, fine-tune, or evaluate a model with `create_engine(...)` and `engine.train()/engine.test()`, run `getitune train`/`getitune test`, pick or override a recipe under `getitune.recipe.TASK`, choose a device (cpu/gpu/xpu/cuda), warm-start from a checkpoint, or debug a training run. Covers classification, detection, instance/semantic segmentation, and keypoint detection.
 ---
 
 # Training a model with getitune
