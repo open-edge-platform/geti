@@ -1,8 +1,15 @@
 # Installing Intel Geti™
 
 Geti™ is a full-stack web application to build and deploy computer vision AI models, powered by the
-[getitune](../../library) library. This guide covers all the supported ways to install and run Geti™ so you
+[getitune](../../libraries/getitune) library. This guide covers all the supported ways to install and run Geti™ so you
 can choose the method that best fits your workflow.
+
+> [!IMPORTANT]
+> Geti™ is designed to run on a trusted host or private network. It has no built-in user authentication,
+> authorization, or access control, and its default TLS certificate is self-signed. By default the server
+> listens on all network interfaces, so anyone who can reach the port can use the full REST API. Restrict
+> access with a firewall, or put Geti™ behind infrastructure you control (e.g. a reverse proxy with
+> authentication and a trusted TLS certificate).
 
 ## System requirements
 
@@ -37,20 +44,15 @@ If you encounter problems during the installation, check the [Troubleshooting](#
 Installing Geti™ as a Windows app is the simplest way to run it on Windows.
 
 1. Download the Windows Installer suitable for your hardware (prebuilt packages for Intel® XPU, NVIDIA® CUDA, and CPU-only environments):
-   - [CPU-only](https://storage.geti.intel.com/geti/packages/3.2.0/geti-cpu-3.2.0.msix)
-   - [Intel® XPU](https://storage.geti.intel.com/geti/packages/3.2.0/geti-xpu-3.2.0.msix)
-   - [NVIDIA® CUDA](https://storage.geti.intel.com/geti/packages/3.2.0/geti-cuda-3.2.0.msix)
+   - [CPU-only](https://storage.geti.intel.com/geti/packages/3.3.0/geti-cpu-3.3.0.msix)
+   - [Intel® XPU](https://storage.geti.intel.com/geti/packages/3.3.0/geti-xpu-3.3.0.msix)
+   - [NVIDIA® CUDA](https://storage.geti.intel.com/geti/packages/3.3.0/geti-cuda-3.3.0.msix)
 2. Double-click the `.msix` package and click **Install** in the Windows installer dialog.
 3. Launch Geti™ from the **Start** menu.
 
 If Windows shows a security prompt, verify that the package is from the official Geti™ release before continuing.
 
 ![Launch Geti™ from Start menu](media/geti-task-bar.jpg)
-
-> [!IMPORTANT]
-> Windows apps do not include Ultralytics models due to AGPL licensing constraints. If you need them,
-> please use the [install script](#install-script) or [build a Docker image from source](#option-2-build-the-image)
-> as described below.
 
 ## Run with Docker
 
@@ -83,22 +85,18 @@ Retag the pulled image as `geti-{cpu,xpu,cuda}:latest` for use with `just run-im
 docker tag ghcr.io/open-edge-platform/geti-xpu:latest geti-xpu:latest
 ```
 
-> [!IMPORTANT]
-> Pre-built container images do not include Ultralytics models due to AGPL licensing constraints. If you need them,
-> [build the image from source](#option-2-build-the-image) as described below.
-
 ### (Option 2) Build the image
 
 Geti™ Docker images can be built from source using the [`Dockerfile`](../docker/Dockerfile) in the `application`
-directory. This is useful if you want to customize the application or include Ultralytics models. The instructions
-below use `just` to simplify the build process, but you can also build the image manually with `docker build` if you prefer.
+directory. This is useful if you want to customize the application and/or experiment with an unreleased version.
+The instructions below use `just` to simplify the build process, but you can also build the image manually with `docker build` if you prefer.
 
 > [!TIP]
 > The `develop` branch contains the latest, potentially unstable, changes. To build a specific, stable release
-> instead, check out the corresponding tag (e.g. `app/v3.2.0`) before building:
+> instead, check out the corresponding tag (e.g. `app/v3.3.0`) before building:
 >
 > ```bash
-> git checkout app/v3.2.0
+> git checkout app/v3.3.0
 > ```
 
 From the `application` directory:
@@ -111,6 +109,8 @@ just build-image --accelerator xpu
 The above command builds an image optimized for modern Intel® hardware. If you have an Intel® GPU (discrete or integrated),
 this is the recommended configuration for best performance. Alternatively, you can build with support for NVIDIA GPUs
 (`--accelerator cuda`) or with CPU-only support (`--accelerator cpu`).
+
+If you wish to exclude AGPL-licensed models (and their related components/dependencies) from the image, pass `--exclude-agpl-models`.
 
 Run `just --usage build-image` to see all build options.
 
@@ -279,10 +279,10 @@ For development purposes, you can run the Geti™ server and UI as standalone co
 
 > [!TIP]
 > The `develop` branch contains the latest, potentially unstable, changes. To run a specific, stable release
-> instead, check out the corresponding tag (e.g. `app/v3.2.0`) before proceeding:
+> instead, check out the corresponding tag (e.g. `app/v3.3.0`) before proceeding:
 >
 > ```bash
-> git checkout app/v3.2.0
+> git checkout app/v3.3.0
 > ```
 
 ### Run the server
@@ -330,10 +330,6 @@ registers a `geti` command you can use to launch the application.
 The installer sets up its own copy of `uv`, Node.js and npm under `.build/`, then builds the backend and UI and starts
 the app. The first build downloads several GB of packages (PyTorch, OpenVINO, …) and can take a while — progress is shown
 for each step. Re-running the installer reuses the cached tools and dependencies, so only the first build is slow.
-
-Installing from source also enables native Ultralytics YOLO26 models — the latest NMS-free, edge-optimized models
-(Nano / Small / Medium) for object detection and instance segmentation. The integration covers the full model lifecycle:
-training, inference, quantization, and OpenVINO™ model export.
 
 ### Prerequisites
 
@@ -656,10 +652,3 @@ Fixes, in order of preference:
 <br>
 
 Still can't find a solution for your issue? Feel free to [open a Github issue](https://github.com/open-edge-platform/geti/issues) and the Geti™ team will help you.
-
-## Notes
-
-> [!NOTE]
-> Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source
-> research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please
-> explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.

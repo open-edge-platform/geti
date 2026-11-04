@@ -377,6 +377,7 @@
             "label": "Périphérique d’inférence"
         },
         "sources": {
+            "title": "Source",
             "uploadError": "Échec du téléversement du fichier vidéo.",
             "deleteVideoError": "Échec de la suppression du fichier vidéo téléversé.",
             "list": {
@@ -386,7 +387,6 @@
                 "usbCamera": "caméra usb",
                 "ipCamera": "caméra ip",
                 "videoFile": "fichier vidéo",
-                "imagesFolder": "dossier d’images",
                 "disconnected": "déconnecté"
             },
             "options": {
@@ -418,13 +418,10 @@
                 "loading": "Chargement...",
                 "device": "Périphérique : {{name}}",
                 "unknownDevice": "Périphérique inconnu (id : {{deviceId}})",
-                "ignoreExistingImages": "Ignorer les images existantes : {{value}}",
                 "streamUrl": "URL du flux : {{url}}",
                 "videoPath": "Chemin de la vidéo : {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Chemin du dossier d’images",
-                "ignoreExistingImages": "Ignorer les images existantes",
                 "streamUrl": "URL du flux :",
                 "requireAuthentication": "Exiger une authentification",
                 "camera": "Caméra",
@@ -439,6 +436,7 @@
             }
         },
         "sinks": {
+            "title": "Destination",
             "types": {
                 "folder": "dossier",
                 "mqtt": "mqtt",
@@ -527,9 +525,7 @@
                 "disabledSuccess": "Pipeline désactivé avec succès"
             },
             "configuration": {
-                "sidebarLabel": "Configuration du pipeline",
-                "sourcesTab": "Entrée",
-                "sinksTab": "Sortie"
+                "sidebarLabel": "Configuration du pipeline"
             }
         },
         "collection": {
@@ -573,10 +569,6 @@
                 "healthy": "Opérationnel",
                 "finished": "Terminé",
                 "unavailable": "Indisponible"
-            },
-            "componentLabels": {
-                "source": "Source",
-                "sink": "Destination"
             }
         },
         "stream": {
@@ -807,6 +799,7 @@
                 "unknownError": "Erreur inconnue, veuillez actualiser la page.",
                 "timeoutError": "{{operation}} : délai dépassé après {{timeoutMs}} ms. Veuillez actualiser la page.",
                 "embeddingError": "Impossible de récupérer l’embedding de l’image ({{status}}{{statusText}}).",
+                "hint": "Maj + clic pour inclure une zone, Alt + clic pour l’exclure. Cliquez pour créer l’annotation, Échap pour effacer les points.",
                 "operations": {
                     "workerBuild": "Construction du worker SAM",
                     "workerInit": "Initialisation du worker SAM",
@@ -909,7 +902,6 @@
                 "dialogTitle": "Journaux d’entraînement",
                 "loadError": "Échec du chargement des journaux : {{message}}",
                 "noJobOrModel": "Aucune tâche ni aucun modèle spécifié",
-                "fetchError": "Échec de la récupération des journaux du modèle : {{status}} {{statusText}}",
                 "downloadStarted": "Le téléchargement des journaux d’entraînement a commencé"
             },
             "parameters": {

@@ -238,7 +238,9 @@ export function convertToolShapeToGetiShape(shape: SmartToolsShape): Shape {
                 width: shape.width,
                 height: shape.height,
             };
-        default:
+        case 'pose':
+        case 'circle':
+        case 'rotated-rect':
             throw new Error('Unknown shape type');
     }
 }
@@ -392,39 +394,6 @@ export const getRelativePoint = (element: ElementType, point: Point, zoom: numbe
     };
 };
 
-export const loadImage = (link: string): Promise<HTMLImageElement> =>
-    new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image();
-        image.crossOrigin = 'anonymous';
-
-        image.onload = () => resolve(image);
-        image.onerror = (error) => reject(error);
-
-        image.fetchPriority = 'high';
-        image.src = link;
-
-        if (process.env.NODE_ENV === 'test') {
-            // Immediately load the media item's image
-            resolve(image);
-        }
-    });
-
-const drawImageOnCanvas = (img: HTMLImageElement, filter = ''): HTMLCanvasElement => {
-    const canvas: HTMLCanvasElement = document.createElement('canvas');
-
-    canvas.width = img.naturalWidth ? img.naturalWidth : img.width;
-    canvas.height = img.naturalHeight ? img.naturalHeight : img.height;
-
-    const ctx = canvas.getContext('2d');
-
-    if (ctx) {
-        ctx.filter = filter;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    }
-
-    return canvas;
-};
-
 // Canvas rasterization limits (Chrome: 16384² ≈ 268 Mpx total area).
 // Check dimensions upfront: some browsers return a valid 2D context for
 // oversized canvases but then fail/throw at getImageData time (returning
@@ -434,22 +403,52 @@ const MAX_CANVAS_SIDE = 16384;
 export const canRasteriseAtFullSize = (width: number, height: number): boolean =>
     width <= MAX_CANVAS_SIDE && height <= MAX_CANVAS_SIDE;
 
-export const getImageData = (img: HTMLImageElement): ImageData => {
+export const getImageData = (img: ImageBitmap): ImageData => {
     if (img.width === 0 && img.height === 0) return new ImageData(1, 1);
-
-    const sourceWidth = img.naturalWidth || img.width;
-    const sourceHeight = img.naturalHeight || img.height;
 
     // Oversized media cannot be rasterised to a canvas (and smart tools can't
     // run on it either), so return a placeholder; it is displayed via <img>.
-    if (!canRasteriseAtFullSize(sourceWidth, sourceHeight)) {
+    if (!canRasteriseAtFullSize(img.width, img.height)) {
         return new ImageData(1, 1);
     }
 
-    const canvas = drawImageOnCanvas(img);
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-    return ctx !== null ? ctx.getImageData(0, 0, canvas.width, canvas.height) : new ImageData(1, 1);
+    // A CPU-backed canvas avoids a GPU readback, roughly halving `getImageData` time on large images.
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    if (ctx === null) {
+        return new ImageData(1, 1);
+    }
+
+    ctx.drawImage(img, 0, 0);
+
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+};
+
+// Fetches and decodes an image into ImageData. Unlike <img> + drawImage, `createImageBitmap` decodes off the main
+// thread, and `signal` stops the download (and skips rasterising) once the user has moved on to another item.
+export const loadImageData = async (url: string, signal?: AbortSignal): Promise<ImageData> => {
+    const response = await fetch(url, { signal, priority: 'high' });
+
+    if (!response.ok) {
+        throw new Error(`Failed to load image: ${response.status} ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    // Explicit, as older engines defaulted to ignoring EXIF rotation, unlike the <img> path this replaced.
+    const bitmap = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+
+    try {
+        // Decoding can't be cancelled, so a request aborted meanwhile still skips rasterising.
+        signal?.throwIfAborted();
+
+        return getImageData(bitmap);
+    } finally {
+        bitmap.close();
+    }
 };
 
 export const isKeyboardDelete = (event: KeyboardEvent): boolean =>
@@ -487,9 +486,8 @@ export const projectPointOnLine = ([startPoint, endPoint]: ProjectLine, point: P
 /**
  * Oversized image handling (Chrome canvas limit ~268 Mpx):
  * - `getImageData` returns a 1×1 placeholder for media too large to rasterise.
- * - Such media is displayed via an <img> tag (see annotator-canvas.tsx).
- * - Smart tools (SAM, magnetic lasso, SSIM) are disabled for it, because they
- *   rely on a full-resolution canvas/OpenCV buffer that cannot be produced.
+ * - Such media is displayed via an <img> tag (see media-image.component.tsx).
+ * - Smart tools (SAM, magnetic lasso, SSIM) are disabled for it (see `useAvailableTools`).
  */
 
 /**

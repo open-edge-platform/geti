@@ -17,12 +17,15 @@ import { HttpResponse } from 'msw';
 import { handlers, http } from '../src/api/utils';
 import { BoundingBoxToolPage } from './annotator/bounding-box-tool-page';
 import { PolygonToolPage } from './annotator/polygon-tool-page';
+import { SegmentAnythingToolPage } from './annotator/segment-anything-tool-page';
 import { SSIMToolPage } from './annotator/ssim-tool-page';
 import { VideoPage } from './annotator/video/video-page';
 import { AnnotatorPage } from './datasets/annotator-page';
 import { DatasetPage } from './datasets/dataset-page';
 import { ImportDatasetPage } from './datasets/import-dataset-page';
 import { InferencePage } from './inference/inference-page';
+import { SinksPage } from './inference/sinks-page';
+import { SourcesPage } from './inference/sources-page';
 import { StreamPage } from './inference/stream-page';
 import { JobsDialogPage } from './jobs/jobs-dialog-page';
 import { JobsPage } from './jobs/jobs-page';
@@ -52,12 +55,15 @@ interface Fixtures {
     network: NetworkFixture;
     streamPage: StreamPage;
     inferencePage: InferencePage;
+    sourcesPage: SourcesPage;
+    sinksPage: SinksPage;
     modelsPage: ModelsPage;
     jobsPage: JobsPage;
     jobsDialogPage: JobsDialogPage;
     polygonTool: PolygonToolPage;
     boundingBoxTool: BoundingBoxToolPage;
     ssimTool: SSIMToolPage;
+    segmentAnythingTool: SegmentAnythingToolPage;
     videoPage: VideoPage;
     annotatorPage: AnnotatorPage;
     importDatasetPage: ImportDatasetPage;
@@ -253,6 +259,16 @@ const test = testBase.extend<Fixtures>({
 
         await use(inferencePage);
     },
+    sourcesPage: async ({ page }, use) => {
+        const sourcesPage = new SourcesPage(page);
+
+        await use(sourcesPage);
+    },
+    sinksPage: async ({ page }, use) => {
+        const sinksPage = new SinksPage(page);
+
+        await use(sinksPage);
+    },
     modelsPage: async ({ page }, use) => {
         const modelsPage = new ModelsPage(page);
 
@@ -275,6 +291,10 @@ const test = testBase.extend<Fixtures>({
     ssimTool: async ({ page }, use) => {
         const ssimTool = new SSIMToolPage(page);
         await use(ssimTool);
+    },
+    segmentAnythingTool: async ({ page }, use) => {
+        const segmentAnythingTool = new SegmentAnythingToolPage(page);
+        await use(segmentAnythingTool);
     },
     polygonTool: async ({ page }, use) => {
         const polygonTool = new PolygonToolPage(page);

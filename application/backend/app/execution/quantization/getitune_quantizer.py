@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from getitune.data.module import DataModule
 
 import yaml
-from datumaro.experimental.fields import Subset
+from getidata.fields import Subset
 from loguru import logger
 from sqlalchemy.orm import Session
 

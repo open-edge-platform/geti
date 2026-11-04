@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
 import pytest
-from datumaro.experimental import Dataset
-from datumaro.experimental.data_formats.base import DataFormat
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.data_formats.base import DataFormat
+from getidata.fields import Subset
 
 from app.datumaro_converter import SampleMode
 from app.execution import ExportDataset

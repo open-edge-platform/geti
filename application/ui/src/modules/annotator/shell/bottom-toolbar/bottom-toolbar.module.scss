@@ -1,5 +1,14 @@
 .filename {
     font-size: var(--spectrum-global-dimension-size-150);
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reviewed,
+.forReview {
+    white-space: nowrap;
 }
 
 .reviewed {

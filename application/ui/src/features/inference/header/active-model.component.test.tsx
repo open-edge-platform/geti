@@ -53,7 +53,7 @@ const modelWithOnnxVariant = getMockedModel({
 
 describe('ActiveModel', () => {
     const renderApp = ({ models, pipeline }: { models: Model[]; pipeline: Pipeline }) => {
-        const patchSpy = vi.fn();
+        const patchSpy = rs.fn();
 
         server.use(
             http.get('/api/projects/{project_id}/models', () => HttpResponse.json(models)),
@@ -61,7 +61,7 @@ describe('ActiveModel', () => {
             http.patch('/api/projects/{project_id}/pipeline', async ({ request }) => {
                 patchSpy(await request.json());
 
-                return HttpResponse.json({ project_id: '', status: 'idle', device: 'images_folder' });
+                return HttpResponse.json({ project_id: '', status: 'idle', device: 'cpu' });
             })
         );
 
@@ -71,7 +71,7 @@ describe('ActiveModel', () => {
     };
 
     beforeEach(() => {
-        vi.resetAllMocks();
+        rs.resetAllMocks();
     });
 
     it('shows only openvino variants of successful models', async () => {

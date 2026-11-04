@@ -3,7 +3,7 @@
 
 import type { DatasetSubset, Media } from '@/api/types';
 import { useTranslation } from '@/i18n';
-import { Flex, Grid, Item, Key, Picker, Tag, Text } from '@geti-ui/ui';
+import { Flex, Grid, Item, Key, Picker, Tag } from '@geti-ui/ui';
 import { Accept, Search } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 
@@ -41,8 +41,12 @@ export const BottomToolbar = ({
 
     return (
         <Flex justifyContent={'end'}>
-            <Toolbar.Container>
-                <Grid autoFlow={'column'} autoColumns={'max-content'} gap={'size-50'}>
+            <Toolbar.Container minWidth={0}>
+                <Grid
+                    // The file name section shrinks first, so a long name cannot push the other sections out of view.
+                    columns={[...(hideHotkeys ? [] : ['max-content']), 'minmax(0, auto)', 'max-content']}
+                    gap={'size-50'}
+                >
                     {!hideHotkeys && (
                         <Toolbar.Section>
                             <Hotkeys />
@@ -51,7 +55,9 @@ export const BottomToolbar = ({
 
                     <Toolbar.Section>
                         <Flex gap={'size-100'} alignItems={'center'} height={'100%'}>
-                            <Text UNSAFE_className={classes.filename}>{fileName}</Text>
+                            <span className={classes.filename} title={fileName}>
+                                {fileName}
+                            </span>
                             {hasAnnotationStatus && (
                                 <Tag
                                     className={clsx({

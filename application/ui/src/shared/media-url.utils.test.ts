@@ -7,13 +7,12 @@ import {
     getMediaDownloadUrl,
     getProjectThumbnailUrl,
     getThumbnailUrl,
-    getVideoFrameBinaryUrl,
     getVideoFrameThumbnailUrl,
 } from './media-url.utils';
 
-const mocks = vi.hoisted(() => ({ apiBaseUrl: '' }));
+const mocks = rs.hoisted(() => ({ apiBaseUrl: '' }));
 
-vi.mock('../api/client', () => ({
+rs.mock('../api/client', () => ({
     get API_BASE_URL() {
         return mocks.apiBaseUrl;
     },
@@ -35,9 +34,6 @@ describe.each([
         expect(getMediaDownloadUrl('p1', 'm1')).toBe(`${prefix}/api/projects/p1/dataset/media/m1/binary?raw=true`);
         expect(getDatasetRevisionThumbnailUrl('p1', 'r1', 'm1')).toBe(
             `${prefix}/api/projects/p1/dataset_revisions/r1/items/m1/thumbnail`
-        );
-        expect(getVideoFrameBinaryUrl('p1', 'm1', 7)).toBe(
-            `${prefix}/api/projects/p1/dataset/media/m1/binary?frame_index=7`
         );
         expect(getVideoFrameThumbnailUrl('p1', 'm1', 7)).toBe(
             `${prefix}/api/projects/p1/dataset/media/m1/thumbnail?frame_index=7`

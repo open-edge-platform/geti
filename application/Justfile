@@ -364,7 +364,8 @@ tauri-build:
     fi
     echo "✅ Bundle ready at $APP"
 
-# `tauri build` on non-macOS platforms (Windows .msi/.exe, Linux AppImage/.deb).
+# `tauri build` on non-macOS platforms. `bundle.targets` is macOS-only (`app`), so
+# this only produces the binaries; CI packs the Windows MSIX from them.
 # The flat install layout doesn't trigger PyInstaller's bundle detection, so
 # no post-build patching is needed.
 [linux]
@@ -399,7 +400,7 @@ stop-coturn:
 # Patch Geti source code to use CUDA 12.6 instead of 13.0 for the 'cuda' target, needed for legacy Nvidia GPUs
 # (Volta, Maxwell, Pascal). See https://github.com/open-edge-platform/geti/issues/7163
 patch-for-legacy-gpu-support:
-    cd {{ justfile_directory() }}/../library && just patch-for-legacy-gpu-support
+    cd {{ justfile_directory() }}/../libraries/getitune && just patch-for-legacy-gpu-support
     cd {{ justfile_directory() }}/backend && just venv-lock
     @echo "Patched the code to use CUDA 12.6 for the 'cuda' target (legacy Nvidia GPU support)."
     @echo "For Docker users: run 'just build-image --accelerator cuda' to rebuild the image with the patched code."

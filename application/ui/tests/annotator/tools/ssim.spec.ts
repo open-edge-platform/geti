@@ -38,6 +38,7 @@ for (const { taskType, annotationLabel } of SCENARIOS) {
     });
 
     test.describe(`SSIM tool (${taskType})`, () => {
+        // eslint-disable-next-line playwright/no-skipped-test
         test.skip(!FEATURE_FLAGS.SSIM_TOOL, 'SSIM tool is behind the SSIM_TOOL feature flag');
 
         test.beforeEach(async ({ network }) => {

@@ -3,7 +3,8 @@
 
 from pathlib import Path
 
-from datumaro.experimental import Sample, import_dataset
+import pytest
+from getidata import Sample, import_dataset
 
 from app.datumaro_converter import (
     DetectionImportExportSample,
@@ -21,9 +22,13 @@ ANNOTATION_TYPE_TO_SAMPLE: dict[str, type[Sample]] = {
 
 
 def test_import_dataset(archive: Path) -> None:
-    """Verify that each regression zip archive can be imported by datumaro."""
+    """Import supported regression archives and reject the removed legacy format."""
+    annotation_type, dataset_format = archive.stem.split("-", 1)
+    if dataset_format == "datumaro":
+        with pytest.raises(ValueError, match="Could not detect dataset format"):
+            import_dataset(archive)
+        return
     dataset = import_dataset(archive)
-    annotation_type, _ = archive.stem.split("-", 1)
     sample_type = ANNOTATION_TYPE_TO_SAMPLE[annotation_type]
     dataset = dataset.convert_to_schema(sample_type)
     assert len(dataset) > 0

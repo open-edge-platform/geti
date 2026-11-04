@@ -100,7 +100,7 @@ export const usePlayPauseVideoBySystem = (isLoadingRangePredictions: boolean) =>
             pauseRef.current?.();
         } else if (!isLoadingRangePredictions && isPausedBySystem.current) {
             isPausedBySystem.current = false;
-            playRef.current?.();
+            void playRef.current?.();
         }
     }, [isLoadingRangePredictions, context?.videoControls.isPlaying]);
 };

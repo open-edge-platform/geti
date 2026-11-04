@@ -19,7 +19,7 @@ import {
 } from '../../../../modules/annotator/annotation-mappers';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { isEmptyLabel, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
-import { isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaItemQueryParams, isVideoFrame } from '../../../../shared/media-item-utils';
 import type { Annotation } from '../../../../shared/types';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { incrementCachedAnnotatedFrameCount } from './increment-cached-annotated-frame-count';
@@ -110,10 +110,11 @@ export const useSubmitAnnotations = ({
     const isPredictionMode = mode === 'prediction';
 
     const saveAnnotations = async (annotationsDTO: AnnotationDTO[], subset: DatasetSubset) => {
-        const query = isVideoFrame(mediaItem) ? { frame_index: mediaItem.frame_number } : undefined;
-
         await saveMutation.mutateAsync({
-            params: { path: { media_id: mediaItem.id, project_id: projectId }, query },
+            params: {
+                path: { media_id: mediaItem.id, project_id: projectId },
+                query: getMediaItemQueryParams(mediaItem),
+            },
             body: { annotations: annotationsDTO, subset },
         });
 

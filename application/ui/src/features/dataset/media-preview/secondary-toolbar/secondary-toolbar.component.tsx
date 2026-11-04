@@ -23,7 +23,6 @@ import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotations } from '../../../../modules/annotator/annotation-document-provider.component';
 import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import { Labels } from '../../../../modules/annotator/labels/labels.component';
@@ -33,7 +32,7 @@ import { getNextItem } from '../../../../modules/annotator/shell/secondary-toolb
 import { Toolbar } from '../../../../modules/annotator/shell/toolbar-container/toolbar-container.component';
 import { useVideoPlayerContext } from '../../../../modules/annotator/video-player/video-player-provider.component';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
-import { isImage, isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaItemKey, isImage } from '../../../../shared/media-item-utils';
 import { isClassificationTask, isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { useSubmitAnnotations } from '../api/use-submit-annotations';
@@ -44,49 +43,6 @@ import { PredictionModelSelector } from './prediction-model-selector/prediction-
 import { PredictionButtons } from './predictions-buttons.component';
 
 import classes from './secondary-toolbar.module.scss';
-
-type ImageAnnotationButtonsProps = {
-    onDeleteItem: ([deletedItem]: string[]) => void;
-    mediaId: string;
-    onSubmit: () => void;
-    isDisabled: boolean;
-    isSaving: boolean;
-};
-
-const ImageAnnotationButtons = ({
-    onDeleteItem,
-    mediaId,
-    onSubmit,
-    isDisabled,
-    isSaving,
-}: ImageAnnotationButtonsProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            <DeleteMediaItem itemsIds={[mediaId]} onDeleted={onDeleteItem} />
-            <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-                {t('common.actions.submit')}
-            </Button>
-        </>
-    );
-};
-
-type VideoAnnotationButtonsProps = {
-    onSubmit: () => void;
-    isDisabled: boolean;
-    isSaving: boolean;
-};
-
-const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotationButtonsProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-            {t('common.actions.submit')}
-        </Button>
-    );
-};
 
 const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
     const { t } = useTranslation();
@@ -108,7 +64,7 @@ const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
                     <Flex gap={'size-300'} direction={'column'}>
                         <PredictionModelSelector isDisabled={isDisabled} />
                         <PredictionInferenceDevices isDisabled={isDisabled} />
-                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PredictionConfidenceThreshold />}
+                        <PredictionConfidenceThreshold />
                     </Flex>
                 </Content>
             </Dialog>
@@ -176,7 +132,7 @@ export const SecondaryToolbar = ({
         (event) => {
             event.preventDefault();
 
-            handleSubmit();
+            void handleSubmit();
         },
         { enabled: !isSubmitDisabled },
         [isSubmitDisabled, handleSubmit]
@@ -189,7 +145,7 @@ export const SecondaryToolbar = ({
                     <Toolbar.Section>
                         <AnnotatorModes
                             // We want to reset annotation and/or prediction cue when media item changes
-                            key={isVideoFrame(mediaItem) ? `${mediaItem.id}-${mediaItem.frame_number}` : mediaItem.id}
+                            key={getMediaItemKey(mediaItem)}
                             mode={mode}
                             onModeChange={onModeChange}
                             hasAnnotations={!isEmpty(initialAnnotations)}
@@ -218,20 +174,21 @@ export const SecondaryToolbar = ({
                             />
                         )}
                         {isAnnotationMode && isImage(mediaItem) && (
-                            <ImageAnnotationButtons
-                                mediaId={mediaItem.id}
-                                onDeleteItem={(deleteItems) => handleDeleteItem(deleteItems, items.length - 1)}
-                                onSubmit={handleSubmit}
-                                isSaving={isSaving}
-                                isDisabled={isSubmitDisabled}
+                            // Only standalone images can be deleted here: a video frame is part of its video.
+                            <DeleteMediaItem
+                                itemsIds={[mediaItem.id]}
+                                onDeleted={(deleteItems) => handleDeleteItem(deleteItems, items.length - 1)}
                             />
                         )}
-                        {isAnnotationMode && !isImage(mediaItem) && (
-                            <VideoAnnotationButtons
-                                onSubmit={handleSubmit}
+                        {isAnnotationMode && (
+                            <Button
+                                variant='accent'
+                                onPress={handleSubmit}
+                                isPending={isSaving}
                                 isDisabled={isSubmitDisabled}
-                                isSaving={isSaving}
-                            />
+                            >
+                                {t('common.actions.submit')}
+                            </Button>
                         )}
 
                         <Divider size={'S'} height={'size-400'} width={'size-10'} />

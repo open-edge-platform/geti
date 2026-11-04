@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 import type { Model } from '@/api/types';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -58,7 +58,7 @@ const useSelectedModelId = (models: Model[]) => {
 export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) => {
     const { data: models } = useGetSuccessfulModels();
 
-    const selectableModels = getAllModelsWithOpenVINOVariants(models);
+    const selectableModels = useMemo(() => getAllModelsWithOpenVINOVariants(models), [models]);
 
     const [selectedModelId, setSelectedModelId] = useSelectedModelId(models);
 
@@ -69,34 +69,36 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
     );
 
     // The threshold is a model specific parameter, so it always follows the selected model
-    const changeSelectedModelId = (modelId: string | null) => {
-        setSelectedModelId(modelId);
+    const changeSelectedModelId = useCallback(
+        (modelId: string | null) => {
+            setSelectedModelId(modelId);
 
-        const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
+            const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
 
-        setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
-    };
+            setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
+        },
+        [selectableModels, setSelectedModelId]
+    );
 
     const { data: pipeline } = usePipeline();
 
     const [selectedDevice, setSelectedDevice] = useState<string>(pipeline.device);
 
-    return (
-        <PredictionSetupContext
-            value={{
-                selectedModelId,
-                selectedModel,
-                changeSelectedModelId,
-                selectableModels,
-                selectedDevice,
-                changeSelectedDevice: setSelectedDevice,
-                confidenceThreshold,
-                changeConfidenceThreshold: setConfidenceThreshold,
-            }}
-        >
-            {children}
-        </PredictionSetupContext>
+    const value = useMemo(
+        () => ({
+            selectedModelId,
+            selectedModel,
+            changeSelectedModelId,
+            selectableModels,
+            selectedDevice,
+            changeSelectedDevice: setSelectedDevice,
+            confidenceThreshold,
+            changeConfidenceThreshold: setConfidenceThreshold,
+        }),
+        [selectedModelId, selectedModel, changeSelectedModelId, selectableModels, selectedDevice, confidenceThreshold]
     );
+
+    return <PredictionSetupContext value={value}>{children}</PredictionSetupContext>;
 };
 
 export const usePredictionSetup = () => {

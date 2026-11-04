@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { DatasetSubset, Media } from '@/api/types';
 import { Key, View } from '@geti-ui/ui';
@@ -22,7 +22,7 @@ import { ToolManagerProvider } from '../../../modules/annotator/tools/tool-manag
 import { ToolOptions } from '../../../modules/annotator/tools/tool-options/tool-options.component';
 import { VideoPlayerProvider } from '../../../modules/annotator/video-player/video-player-provider.component';
 import { VideoToolbar } from '../../../modules/annotator/video-player/video-toolbar/video-toolbar.component';
-import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemKey, isVideoFrame } from '../../../shared/media-item-utils';
 import { SecondaryToolbar } from './secondary-toolbar/secondary-toolbar.component';
 import { useNextPredictionPrefetch } from './use-next-prediction-prefetch.hook';
 
@@ -30,23 +30,13 @@ const DATASET_SUBSETS: DatasetSubset[] = ['unassigned', 'training', 'validation'
 
 const isDatasetSubset = (key: Key | null): key is DatasetSubset => DATASET_SUBSETS.includes(key as DatasetSubset);
 
-const constructMediaItemId = (mediaItem: Media): string => {
-    return isVideoFrame(mediaItem) ? `${mediaItem.id}-${mediaItem.frame_number}` : mediaItem.id;
-};
-
 const useSubset = (subset: DatasetSubset, mediaItem: Media) => {
+    const mediaItemKey = getMediaItemKey(mediaItem);
     const [pendingSubset, setPendingSubset] = useState<DatasetSubset>(subset);
-    const prevMediaItemIdRef = useRef<string>(constructMediaItemId(mediaItem));
-    const currentMediaItemId = constructMediaItemId(mediaItem);
-    const prevSubsetRef = useRef(subset);
+    const [prev, setPrev] = useState({ mediaItemKey, subset });
 
-    if (prevMediaItemIdRef.current !== currentMediaItemId) {
-        prevMediaItemIdRef.current = currentMediaItemId;
-        setPendingSubset(subset);
-    }
-
-    if (prevSubsetRef.current !== subset) {
-        prevSubsetRef.current = subset;
+    if (prev.mediaItemKey !== mediaItemKey || prev.subset !== subset) {
+        setPrev({ mediaItemKey, subset });
         setPendingSubset(subset);
     }
 
@@ -140,7 +130,7 @@ const Annotator = ({
                 </View>
             )}
 
-            {(isVideo(mediaItem) || isVideoFrame(mediaItem)) && (
+            {isVideoFrame(mediaItem) && (
                 <View gridArea={'video-toolbar'}>
                     <VideoToolbar mode={mode} />
                 </View>

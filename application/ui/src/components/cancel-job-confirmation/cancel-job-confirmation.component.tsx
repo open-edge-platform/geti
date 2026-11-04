@@ -15,21 +15,20 @@ type CancelJobConfirmationProps = {
 export const CancelJobConfirmation = ({ jobId, onRemove }: CancelJobConfirmationProps) => {
     const { t } = useTranslation();
     const dialogState = useOverlayTriggerState({});
-    const cancelMutation = $api.useMutation('post', `/api/jobs/{job_id}:cancel`);
+    const cancelMutation = $api.useMutation('post', `/api/jobs/{job_id}:cancel`, {
+        onSuccess: onRemove,
+        onError: async (error) => {
+            if (isInvalidJob(error)) {
+                await onRemove();
+            }
+        },
+        onSettled: () => {
+            dialogState.close();
+        },
+    });
 
     const handleCancel = () => {
-        cancelMutation.mutate(
-            { params: { path: { job_id: jobId } } },
-            {
-                onSuccess: async () => await onRemove(),
-                onError: async (error) => {
-                    isInvalidJob(error) && (await onRemove());
-                },
-                onSettled: () => {
-                    dialogState.close();
-                },
-            }
-        );
+        cancelMutation.mutate({ params: { path: { job_id: jobId } } });
     };
 
     return (

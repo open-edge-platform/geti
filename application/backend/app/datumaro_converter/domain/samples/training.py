@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import polars as pl
-from datumaro.experimental import LazyImage, Sample, register_sample
-from datumaro.experimental.fields import (
+from getidata import LazyImage, Sample, register_sample
+from getidata.fields import (
     ImageInfo,
     Subset,
     bbox_field,
@@ -46,7 +46,7 @@ class MulticlassClassificationTrainingSample(BaseTrainingSample):
         confidence: Confidence score for the label. Only for model predictions.
     """
 
-    label: int | None = label_field(dtype=pl.UInt8(), is_list=False)
+    label: int | None = label_field(dtype=pl.UInt16(), is_list=False)
     confidence: float | None = numeric_field(dtype=pl.Float32(), semantic="confidence")
 
 
@@ -60,7 +60,7 @@ class MultilabelClassificationTrainingSample(BaseTrainingSample):
         confidence: Array of confidence scores for each label. Only for model predictions.
     """
 
-    label: NDArrayInt = label_field(dtype=pl.UInt8(), multi_label=True)
+    label: NDArrayInt = label_field(dtype=pl.UInt16(), multi_label=True)
     confidence: NDArrayFloat32 | None = numeric_field(dtype=pl.Float32(), is_list=True, semantic="confidence")
 
 
@@ -76,7 +76,7 @@ class DetectionTrainingSample(BaseTrainingSample):
     """
 
     bboxes: NDArrayInt = bbox_field(dtype=pl.Int32())
-    label: NDArrayInt = label_field(dtype=pl.UInt8(), is_list=True)
+    label: NDArrayInt = label_field(dtype=pl.UInt16(), is_list=True)
     confidence: NDArrayFloat32 | None = numeric_field(dtype=pl.Float32(), is_list=True, semantic="confidence")
 
 
@@ -92,5 +92,5 @@ class InstanceSegmentationTrainingSample(BaseTrainingSample):
     """
 
     polygons: NDArrayFloat32 = polygon_field(dtype=pl.Float32())  # Ragged array (num_polygons, num_vertices, 2)
-    label: NDArrayInt = label_field(dtype=pl.UInt8(), is_list=True)
+    label: NDArrayInt = label_field(dtype=pl.UInt16(), is_list=True)
     confidence: NDArrayFloat32 | None = numeric_field(dtype=pl.Float32(), is_list=True, semantic="confidence")

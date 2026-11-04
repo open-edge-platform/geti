@@ -4,31 +4,16 @@
 import { EmptyFolder } from '@/assets/illustrations';
 import { Trans, useTranslation } from '@/i18n';
 import { Button, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router';
 
-import { paths } from '../../../../constants/paths';
-import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 import { ImportDatasetAsNewProject } from '../import-dataset-as-new-project/import-dataset-as-new-project.component';
+import { useCreateProjectActions } from '../use-create-project-actions.hook';
 import { WorkflowSteps } from './workflow-steps.component';
 
 import classes from './empty-project-list.module.scss';
 
 export const EmptyProjectList = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
-
-    const handleCreateProject = () => {
-        navigate(paths.project.new.pattern, {
-            viewTransition: true,
-        });
-    };
-
-    const handleCreateFromDataset = () => {
-        setCurrentStep('uploading');
-        setCurrentStagedId(null);
-        datasetImportDialogState.open();
-    };
+    const { datasetImportDialogState, createProject, createProjectFromDataset } = useCreateProjectActions();
 
     return (
         <div className={classes.emptyState}>
@@ -52,10 +37,10 @@ export const EmptyProjectList = () => {
                 <EmptyFolder aria-label='empty list' />
 
                 <Flex alignItems={'center'} gap={'size-100'}>
-                    <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>
+                    <Button variant='accent' id='create-new-project-button' onPress={createProject}>
                         <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.createNewProject')}</Text>
                     </Button>
-                    <Button variant='accent' id='create-from-dataset-button' onPress={handleCreateFromDataset}>
+                    <Button variant='accent' id='create-from-dataset-button' onPress={createProjectFromDataset}>
                         <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>
                             {t('project.list.createProjectFromDataset')}
                         </Text>

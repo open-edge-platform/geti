@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Content, Dialog, DialogTrigger, DimensionValue, Flex, PressableElement, Text } from '@geti-ui/ui';
+import { Content, Dialog, DialogTrigger, DimensionValue, Flex, Pressable, Text } from '@geti-ui/ui';
 
 import { isNonEmptyString } from '../../shared/util';
 
@@ -38,7 +38,7 @@ export const FilterPopoverButton = ({
 }: FilterPopoverButtonProps) => {
     return (
         <DialogTrigger hideArrow type='popover'>
-            <PressableElement>
+            <Pressable>
                 <div role='button' aria-label={ariaLabel}>
                     <Flex
                         gap={gap}
@@ -57,7 +57,7 @@ export const FilterPopoverButton = ({
                         )}
                     </Flex>
                 </div>
-            </PressableElement>
+            </Pressable>
 
             <Dialog
                 width={dialogWidth}

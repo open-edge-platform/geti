@@ -67,7 +67,7 @@ from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
 from app.services.sam import MediaSegmentService
-from app.utils.images import needs_display_normalization, normalize_image_to_png_bytes
+from app.utils.images import convert_image_to_display_png_bytes, needs_display_conversion
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset/media", tags=["Media"])
 
@@ -508,7 +508,9 @@ def get_media_binary(
     project: Annotated[Project, Depends(get_project)],
     media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
-    raw: Annotated[bool, Query(description="Return the original file without normalization")] = False,
+    raw: Annotated[
+        bool, Query(description="Return the original file instead of a browser-displayable PNG for TIFF/high bit depth")
+    ] = False,
 ) -> Response:
     """Get media binary content"""
     if isinstance(media, NotAnnotatedVideoFrame):
@@ -521,14 +523,14 @@ def get_media_binary(
 
     binary_path = media_service.get_media_binary_path_by_id(project_id=project.id, media_id=media.id)
 
-    # Normalize high bit depth images on the fly for display; cheap mode-check first
+    # Convert images browsers cannot display (TIFF, high bit depth) on the fly; cheap header check first
     if (
         not raw
         and media.type == MediaType.IMAGE
         and isinstance(media.format, ImageFormat)
-        and needs_display_normalization(binary_path)
+        and needs_display_conversion(binary_path)
     ):
-        png_bytes = normalize_image_to_png_bytes(binary_path)
+        png_bytes = convert_image_to_display_png_bytes(binary_path)
         return write_bytes_to_response(content=png_bytes, filename=f"{media.name}.png", media_type="image/png")
 
     filename = f"{media.name}.{media.format.value.lower()}"

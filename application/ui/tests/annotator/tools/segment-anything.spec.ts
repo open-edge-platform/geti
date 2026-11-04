@@ -69,6 +69,12 @@ const getMockedSamProject = (taskType: 'detection' | 'instance_segmentation') =>
         task: { exclusive_labels: true, task_type: taskType, labels: [redLabel] },
     });
 
+const embeddingHandler = http.get('/api/projects/{project_id}/dataset/media/{media_id}/embeddings', () =>
+    HttpResponse.arrayBuffer(buildEmbeddingPayload(IMAGE_SIZE), {
+        headers: { 'Content-Type': 'application/octet-stream' },
+    })
+);
+
 const CASES = [
     { taskType: 'detection', shapeType: 'rectangle', annotationLabel: 'annotation rect' },
     { taskType: 'instance_segmentation', shapeType: 'polygon', annotationLabel: 'annotation polygon' },
@@ -77,9 +83,9 @@ const CASES = [
 test.describe('Segment anything tool', () => {
     for (const { taskType, shapeType, annotationLabel } of CASES) {
         test(`${taskType}: hovering previews a ${shapeType} and clicking adds it`, async ({
-            page,
             network,
             annotatorPage,
+            segmentAnythingTool,
         }) => {
             const project = getMockedSamProject(taskType);
             const prompt = { x: 500, y: 375 };
@@ -87,11 +93,7 @@ test.describe('Segment anything tool', () => {
             network.use(
                 http.get('/api/projects/{project_id}', () => HttpResponse.json(project)),
                 candyBinaryHandler,
-                http.get('/api/projects/{project_id}/dataset/media/{media_id}/embeddings', () =>
-                    HttpResponse.arrayBuffer(buildEmbeddingPayload(IMAGE_SIZE), {
-                        headers: { 'Content-Type': 'application/octet-stream' },
-                    })
-                ),
+                embeddingHandler,
                 http.post('/api/projects/{project_id}/dataset/media/{media_id}/annotations', async ({ request }) => {
                     const body = (await request.json()) as { annotations: AnnotationDTO[] };
 
@@ -105,14 +107,11 @@ test.describe('Segment anything tool', () => {
             await annotatorPage.goto(project.id, 'item-1');
 
             await test.step('Select the tool and wait for the model', async () => {
-                await page.getByRole('button', { name: 'Auto segmentation' }).click();
-
-                await expect(page.getByLabel('SAM tool canvas')).toBeVisible({ timeout: 60_000 });
-                await expect(annotatorPage.getProcessingImage()).toBeHidden();
+                await segmentAnythingTool.selectTool();
             });
 
             await test.step('Hover over the image and click to accept the preview', async () => {
-                await annotatorPage.annotateAt(prompt.x, prompt.y);
+                await segmentAnythingTool.hoverAndAccept(prompt.x, prompt.y);
 
                 await expect(async () => {
                     expect(await annotatorPage.getAnnotationsListItems(annotationLabel)).toHaveLength(1);
@@ -131,7 +130,77 @@ test.describe('Segment anything tool', () => {
         });
     }
 
-    test('shows an error when the image embedding cannot be fetched', async ({ page, network, annotatorPage }) => {
+    test('refines the preview with included and excluded points', async ({
+        page,
+        network,
+        annotatorPage,
+        segmentAnythingTool,
+    }) => {
+        const project = getMockedSamProject('instance_segmentation');
+
+        network.use(
+            http.get('/api/projects/{project_id}', () => HttpResponse.json(project)),
+            candyBinaryHandler,
+            embeddingHandler
+        );
+
+        await annotatorPage.goto(project.id, 'item-1');
+        await segmentAnythingTool.selectTool();
+
+        const positivePoints = segmentAnythingTool.getPositivePoints();
+        const negativePoints = segmentAnythingTool.getNegativePoints();
+        const preview = segmentAnythingTool.getPreview();
+
+        await expect(annotatorPage.getToolOptions()).toContainText('Shift + click to include an area');
+
+        await test.step('Shift + click includes an area and Alt + click excludes one', async () => {
+            await segmentAnythingTool.addPoint(500, 375, 'Shift');
+            await segmentAnythingTool.addPoint(200, 200, 'Alt');
+
+            await expect(positivePoints).toHaveCount(1);
+            await expect(negativePoints).toHaveCount(1);
+            await expect(preview).toBeVisible({ timeout: 15_000 });
+
+            // Points keep a fixed on-screen size (2 * 5px radius + 1.5px stroke) regardless of the zoom level.
+            const pointBox = await positivePoints.boundingBox();
+            expect(pointBox?.width).toBeCloseTo(11.5, 0);
+        });
+
+        await test.step('Clicking on an existing point removes it', async () => {
+            await segmentAnythingTool.addPoint(200, 200, 'Alt');
+
+            await expect(negativePoints).toHaveCount(0);
+            await expect(positivePoints).toHaveCount(1);
+        });
+
+        await test.step('Escape clears the points without closing the annotator', async () => {
+            await page.keyboard.press('Escape');
+
+            await expect(positivePoints).toHaveCount(0);
+            await expect(segmentAnythingTool.getCanvas()).toBeVisible();
+            expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(0);
+        });
+
+        await test.step('A plain click creates the annotation from the points', async () => {
+            await segmentAnythingTool.addPoint(500, 375, 'Shift');
+            await expect(preview).toBeVisible({ timeout: 15_000 });
+
+            await page.mouse.down();
+            await page.mouse.up();
+
+            await expect(positivePoints).toHaveCount(0);
+            await expect(async () => {
+                expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(1);
+            }).toPass();
+        });
+    });
+
+    test('shows an error when the image embedding cannot be fetched', async ({
+        page,
+        network,
+        annotatorPage,
+        segmentAnythingTool,
+    }) => {
         const project = getMockedSamProject('instance_segmentation');
 
         network.use(
@@ -144,7 +213,7 @@ test.describe('Segment anything tool', () => {
         );
 
         await annotatorPage.goto(project.id, 'item-1');
-        await page.getByRole('button', { name: 'Auto segmentation' }).click();
+        await segmentAnythingTool.getTool().click();
 
         // Client errors are not retried, so the error shows up without the retry back-off.
         await expect(

@@ -363,6 +363,7 @@
             "label": "Dispositivo de inferencia"
         },
         "sources": {
+            "title": "Fuente",
             "uploadError": "No se pudo cargar el archivo de vídeo.",
             "deleteVideoError": "No se pudo eliminar el archivo de vídeo cargado.",
             "list": {
@@ -372,7 +373,6 @@
                 "usbCamera": "cámara usb",
                 "ipCamera": "cámara ip",
                 "videoFile": "archivo de vídeo",
-                "imagesFolder": "carpeta de imágenes",
                 "disconnected": "desconectado"
             },
             "options": {
@@ -404,13 +404,10 @@
                 "loading": "Cargando...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconocido (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignorar imágenes existentes: {{value}}",
                 "streamUrl": "URL del flujo: {{url}}",
                 "videoPath": "Ruta del vídeo: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Ruta de la carpeta de imágenes",
-                "ignoreExistingImages": "Ignorar imágenes existentes",
                 "streamUrl": "URL del flujo:",
                 "requireAuthentication": "Requerir autenticación",
                 "camera": "Cámara",
@@ -425,6 +422,7 @@
             }
         },
         "sinks": {
+            "title": "Destino",
             "types": {
                 "folder": "carpeta",
                 "mqtt": "mqtt",
@@ -511,9 +509,7 @@
                 "disabledSuccess": "Pipeline desactivado correctamente"
             },
             "configuration": {
-                "sidebarLabel": "Configuración del pipeline",
-                "sourcesTab": "Entrada",
-                "sinksTab": "Salida"
+                "sidebarLabel": "Configuración del pipeline"
             }
         },
         "collection": {
@@ -557,10 +553,6 @@
                 "healthy": "Correcto",
                 "finished": "Finalizado",
                 "unavailable": "No disponible"
-            },
-            "componentLabels": {
-                "source": "Fuente",
-                "sink": "Destino"
             }
         },
         "stream": {
@@ -788,6 +780,7 @@
                 "unknownError": "Error desconocido; prueba a actualizar la página.",
                 "timeoutError": "{{operation}} superó el tiempo de espera de {{timeoutMs}}ms. Prueba a actualizar la página.",
                 "embeddingError": "No se pudo obtener el embedding de la imagen ({{status}}{{statusText}}).",
+                "hint": "Mayús + clic para incluir un área, Alt + clic para excluirla. Haz clic para crear la anotación y pulsa Esc para borrar los puntos.",
                 "operations": {
                     "workerBuild": "Compilación del worker de SAM",
                     "workerInit": "Inicialización del worker de SAM",
@@ -890,7 +883,6 @@
                 "dialogTitle": "Registros de entrenamiento",
                 "loadError": "No se pudieron cargar los registros: {{message}}",
                 "noJobOrModel": "No se ha especificado ninguna tarea o modelo",
-                "fetchError": "No se pudieron obtener los registros del modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Descarga de los registros de entrenamiento iniciada"
             },
             "parameters": {

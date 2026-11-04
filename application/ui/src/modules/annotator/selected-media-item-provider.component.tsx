@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
@@ -10,7 +10,9 @@ import { useParams } from 'react-router';
 import { isVideo, isVideoFrame } from '../../shared/media-item-utils';
 import type { RegionOfInterest } from '../../shared/types';
 import { useLoadImageQuery } from './hooks/use-load-image-query.hook';
-import { getImageData } from './tools/utils';
+
+// Placeholder until an image has loaded (or when loading fails).
+const EMPTY_IMAGE = new ImageData(1, 1);
 
 // See tools/utils.ts for the oversized image handling flow (downscale → display
 // in media-space → disable smart tools or coordinate-transform at boundaries).
@@ -21,10 +23,6 @@ type SelectedMediaItemContextProps = {
     // Media-space view of the image: width/height always match the media item so
     // coordinate clamping in drawing tools stays in annotation space.
     image: ImageData;
-    // True once the current item's full-resolution pixels are loaded and decoded.
-    // False during loading, while a placeholder is shown, or for images too large
-    // to rasterise at full size (smart tools are disabled in that case).
-    isImageReady: boolean;
 };
 
 const SelectedMediaItemContext = createContext<SelectedMediaItemContextProps | null>(null);
@@ -67,10 +65,10 @@ const useMediaItem = (initialMediaItem: Media) => {
     const frameNumber = Math.max(0, Math.min(frameNumberFromPathParam, maxFrameNumber));
 
     const [mediaItem, setMediaItem] = useState<Media>(() => convertMediaItem(initialMediaItem, frameNumber));
-    const prevInitialMediaItem = useRef(initialMediaItem);
+    const [prevInitialMediaItem, setPrevInitialMediaItem] = useState<Media>(initialMediaItem);
 
-    if (initialMediaItem.id !== prevInitialMediaItem.current.id) {
-        prevInitialMediaItem.current = initialMediaItem;
+    if (initialMediaItem.id !== prevInitialMediaItem.id) {
+        setPrevInitialMediaItem(initialMediaItem);
         setMediaItem(convertMediaItem(initialMediaItem, frameNumber));
     }
 
@@ -93,32 +91,32 @@ export const SelectedMediaItemProvider = ({
 }: SelectedMediaItemProviderProps) => {
     const [mediaItem, setMediaItem] = useMediaItem(initialMediaItem);
 
-    const {
-        data: loadedImage = getImageData(new Image()),
-        isSuccess,
-        isPlaceholderData,
-    } = useLoadImageQuery(mediaItem);
+    const { data: loadedImage = EMPTY_IMAGE } = useLoadImageQuery(mediaItem);
 
     // For oversized media: wrap downscaled data in full-size dimensions so
     // drawing tools clamp to media-space, not the smaller buffer dimensions.
     const decodedAtFullSize = loadedImage.width === mediaItem.width && loadedImage.height === mediaItem.height;
-    const image = decodedAtFullSize
-        ? loadedImage
-        : ({
-              width: mediaItem.width,
-              height: mediaItem.height,
-              data: loadedImage.data,
-              colorSpace: 'srgb',
-          } as ImageData);
-    const isImageReady = isSuccess && !isPlaceholderData && decodedAtFullSize;
-
-    const roi: RegionOfInterest = { x: 0, y: 0, width: mediaItem.width, height: mediaItem.height };
-
-    return (
-        <SelectedMediaItemContext value={{ mediaItem, roi, setMediaItem, image, isImageReady }}>
-            {children}
-        </SelectedMediaItemContext>
+    const image = useMemo(
+        () =>
+            decodedAtFullSize
+                ? loadedImage
+                : ({
+                      width: mediaItem.width,
+                      height: mediaItem.height,
+                      data: loadedImage.data,
+                      colorSpace: 'srgb',
+                  } as ImageData),
+        [decodedAtFullSize, loadedImage, mediaItem.width, mediaItem.height]
     );
+
+    const roi: RegionOfInterest = useMemo(
+        () => ({ x: 0, y: 0, width: mediaItem.width, height: mediaItem.height }),
+        [mediaItem.width, mediaItem.height]
+    );
+
+    const value = useMemo(() => ({ mediaItem, roi, setMediaItem, image }), [mediaItem, roi, setMediaItem, image]);
+
+    return <SelectedMediaItemContext value={value}>{children}</SelectedMediaItemContext>;
 };
 
 export const useSelectedMediaItem = (): SelectedMediaItemContextProps => {

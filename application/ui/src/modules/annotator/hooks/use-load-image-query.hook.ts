@@ -5,28 +5,20 @@ import type { Media } from '@/api/types';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { isVideoFrame } from '../../../shared/media-item-utils';
-import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
-import { getImageDataFromTiffUrl, isTiffFormat } from '../../../shared/media-utils';
-import { getImageData, loadImage } from '../tools/utils';
+import { getMediaItemBinaryUrl, getMediaItemKey } from '../../../shared/media-item-utils';
+import { canRasteriseAtFullSize, loadImageData } from '../tools/utils';
 
 export const loadImageQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
-        queryKey: isVideoFrame(media)
-            ? ['mediaItem', projectId, media.id, media.frame_number]
-            : ['mediaItem', projectId, media.id],
-        queryFn: async () => {
-            const url = isVideoFrame(media)
-                ? getVideoFrameBinaryUrl(projectId, media.id, media.frame_number)
-                : getMediaBinaryUrl(projectId, media.id);
-
-            if (isTiffFormat(media)) {
-                return getImageDataFromTiffUrl(url);
+        queryKey: ['mediaItem', projectId, getMediaItemKey(media)],
+        queryFn: async ({ signal }) => {
+            // Oversized media is displayed by an <img> instead (see tools/utils.ts), so downloading and decoding it
+            // here would only produce a placeholder.
+            if (!canRasteriseAtFullSize(media.width, media.height)) {
+                return new ImageData(1, 1);
             }
 
-            const image = await loadImage(url);
-
-            return getImageData(image);
+            return loadImageData(getMediaItemBinaryUrl(projectId, media), signal);
         },
         staleTime: Infinity,
         retry: 0,
