@@ -1,14 +1,24 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TaskType } from '@/api/types';
+import type { Task } from '@/api/types';
 
-export const getFormatOptions = (taskType: TaskType) => {
-    const options: Record<TaskType, { label: string; value: string }[]> = {
-        classification: [
-            { label: 'Geti', value: 'geti' },
-            { label: 'VOC', value: 'voc' },
-        ],
+export const getFormatOptions = (task: Task) => {
+    // The YOLO classification format stores each image in the folder of a single class, so it is
+    // only offered for single-label (multiclass) classification projects.
+    const classificationOptions = task.exclusive_labels
+        ? [
+              { label: 'Geti', value: 'geti' },
+              { label: 'VOC', value: 'voc' },
+              { label: 'YOLO', value: 'yolo_cls' },
+          ]
+        : [
+              { label: 'Geti', value: 'geti' },
+              { label: 'VOC', value: 'voc' },
+          ];
+
+    const options: Record<Task['task_type'], { label: string; value: string }[]> = {
+        classification: classificationOptions,
         instance_segmentation: [
             { label: 'Geti', value: 'geti' },
             { label: 'COCO', value: 'coco' },
@@ -20,5 +30,5 @@ export const getFormatOptions = (taskType: TaskType) => {
         ],
     };
 
-    return options[taskType];
+    return options[task.task_type];
 };
