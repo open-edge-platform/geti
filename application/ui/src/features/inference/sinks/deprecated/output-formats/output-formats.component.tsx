@@ -5,9 +5,9 @@ import type { SinkOutputFormats } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Checkbox, CheckboxGroup } from '@geti-ui/ui';
 
-import { OutputFormat } from '../utils';
+import { OutputFormat } from '../../utils';
 
-import classes from './output-formats.module.scss';
+import classes from '../../output-formats/output-formats.module.scss';
 
 type OutputFormatsProps = {
     config?: SinkOutputFormats;

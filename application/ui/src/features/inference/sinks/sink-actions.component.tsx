@@ -11,9 +11,9 @@ import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
 import { useSinksQuery } from './api/use-sinks-query';
-import { EditSinkForm } from './edit-sink-form.component';
-import { SinkList } from './sink-list/sink-list.component';
-import { SinkOptions } from './sink-options';
+import { EditSinkForm } from './deprecated/edit-sink-form.component';
+import { SinkList } from './deprecated/sink-list/sink-list.component';
+import { SinkOptions } from './deprecated/sink-options';
 
 export const SinkActions = () => {
     const { t } = useTranslation();

@@ -9,14 +9,14 @@ import { Add as AddIcon } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEqual } from 'lodash-es';
 
-import { usePipeline } from '../../../../hooks/api/pipeline.hook';
-import { getErrorMessage } from '../../../../query-client/query-client';
-import { useTestSink } from '../api/use-test-sink';
+import { usePipeline } from '../../../../../hooks/api/pipeline.hook';
+import { getErrorMessage } from '../../../../../query-client/query-client';
+import { useTestSink } from '../../api/use-test-sink';
+import { SinkMenu } from '../../sink-list/sink-menu/sink-menu.component';
 import { SettingsList } from './settings-list/settings-list.component';
 import { SinkIcon } from './sink-icon/sink-icon.component';
-import { SinkMenu } from './sink-menu/sink-menu.component';
 
-import classes from './sink-list.module.scss';
+import classes from '../../sink-list/sink-list.module.scss';
 
 const SINK_TYPE_LABEL_KEYS = {
     folder: 'inference.sinks.types.folder',

@@ -7,7 +7,7 @@ import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '@
 import { Folder as FolderIcon, Mqtt as MqttIcon, Webhook as WebhookIcon } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
-import { DisclosureGroup } from '../shared/disclosure-group/disclosure-group.component';
+import { DisclosureGroup } from '../../shared/disclosure-group/disclosure-group.component';
 import { AddSink } from './add-sink/add-sink.component';
 import { LocalFolder } from './local-folder/local-folder.component';
 import { getLocalFolderInitialConfig, localFolderBodyFormatter } from './local-folder/utils';

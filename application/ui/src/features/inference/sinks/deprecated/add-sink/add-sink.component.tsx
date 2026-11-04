@@ -7,7 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, Form } from '@geti-ui/ui';
 
-import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
+import { useConnectSinkToPipeline } from '../../../../../hooks/api/pipeline.hook';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
 
 interface AddSinkProps<T> {

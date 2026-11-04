@@ -7,7 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 
-import { getErrorMessage } from '../../../../query-client/query-client';
+import { getErrorMessage } from '../../../../../query-client/query-client';
 import { useSinkMutation } from './use-sink-mutation.hook';
 
 interface useSinkActionProps<T> {

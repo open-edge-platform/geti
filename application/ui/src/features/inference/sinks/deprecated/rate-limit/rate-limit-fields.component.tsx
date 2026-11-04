@@ -4,7 +4,7 @@
 import { useTranslation } from '@/i18n';
 import { Flex, NumberField, Text } from '@geti-ui/ui';
 
-import { positiveNumberOrUndefined } from '../utils';
+import { positiveNumberOrUndefined } from '../../utils';
 
 type RateLimitFieldsProps = {
     rateLimit: number | null | undefined;
