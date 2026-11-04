@@ -4,10 +4,10 @@
 import type { SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 
-import { formatRateLimit, OutputFormat } from '../../utils';
+import { formatRateLimit, OutputFormat } from '../../../utils';
 import { getPairsFromObject } from '../../webhook/utils';
 
-import classes from './settings-list.module.scss';
+import classes from '../../../sink-list/settings-list/settings-list.module.scss';
 
 type SettingsListProps = {
     sink: SinkConfig;

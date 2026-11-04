@@ -7,17 +7,17 @@ import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { http } from '../../../../api/utils';
-import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
-import { server } from '../../../../msw-node-setup';
+import { http } from '../../../../../api/utils';
+import { useConnectSinkToPipeline } from '../../../../../hooks/api/pipeline.hook';
+import { server } from '../../../../../msw-node-setup';
+import { OutputFormat } from '../../utils';
 import { useSinkMutation } from '../hooks/use-sink-mutation.hook';
 import { LocalFolder } from '../local-folder/local-folder.component';
 import { getLocalFolderInitialConfig, localFolderBodyFormatter } from '../local-folder/utils';
-import { OutputFormat } from '../utils';
 import { EditSink } from './edit-sink.component';
 
 rs.mock('../hooks/use-sink-mutation.hook');
-rs.mock('../../../../hooks/api/pipeline.hook');
+rs.mock('../../../../../hooks/api/pipeline.hook');
 
 const mockConnectMutation = (mutateAsync: ReturnType<typeof rs.fn>) =>
     rs

@@ -9,11 +9,11 @@ import { ActionButton, Button, ButtonGroup, Divider, Flex, Form, Text, View } fr
 import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
-import { testSinkQueryOptions } from '../api/use-test-sink';
+import { useConnectSinkToPipeline } from '../../../../../hooks/api/pipeline.hook';
+import { testSinkQueryOptions } from '../../api/use-test-sink';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
 
-import classes from './edit-sink.module.scss';
+import classes from '../../edit-sink/edit-sink.module.scss';
 
 interface EditSinkProps<T> {
     config: Awaited<T>;
