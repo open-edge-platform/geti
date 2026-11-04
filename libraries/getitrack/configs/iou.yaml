@@ -1,8 +1,21 @@
-# High-Speed IOU Tracker: thresholds should be tuned to the detector and dataset.
+# High-Speed IOU Tracker: tune thresholds to the detector and dataset.
 algorithm: iou
+verbose: false
+# Detection filtering, applied before tracking.
 score_threshold: 0.1 # sigma_l (inclusive)
-high_score_threshold: 0.5 # sigma_h (inclusive peak score)
+class_filter: null
+# Greedy matching against the last observed box.
+distance_metric: iou
 iou_threshold: 0.5 # sigma_iou (inclusive)
+high_score_threshold: 0.5 # sigma_h (inclusive peak score)
 match_class_only: true
+# IOU tracks end on the first miss; age limits do not apply.
 lifecycle:
+  max_age: 30
   min_hits: 2 # t_min; no first-frame bypass
+  tentative_max_age: 0
+# IOU does not use motion prediction; these shared settings have no effect.
+motion:
+  process_noise: 1.0
+  measurement_noise: 1.0
+  velocity_decay: 1.0
