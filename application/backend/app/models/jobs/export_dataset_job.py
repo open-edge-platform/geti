@@ -10,7 +10,7 @@ from app.models.project import Task
 from app.models.task import TaskType
 
 VALID_FORMATS_PER_TASK = {
-    TaskType.CLASSIFICATION: [DatasetFormat.GETI, DatasetFormat.VOC],
+    TaskType.CLASSIFICATION: [DatasetFormat.GETI, DatasetFormat.VOC, DatasetFormat.YOLO_CLS],
     TaskType.DETECTION: [DatasetFormat.GETI, DatasetFormat.COCO, DatasetFormat.YOLO],
     TaskType.INSTANCE_SEGMENTATION: [DatasetFormat.GETI, DatasetFormat.COCO],
 }
@@ -37,6 +37,12 @@ class ExportDatasetJobParams(JobParams):
             raise ValueError(
                 f"Export format '{self.export_format}' is not supported for {self.task.task_type} task. "
                 f"Allowed formats are: {allowed}"
+            )
+        if self.export_format is DatasetFormat.YOLO_CLS and not self.task.is_multiclass:
+            raise ValueError(
+                "Export format 'yolo_cls' is only supported for single-label classification projects. "
+                "Multi-label classification datasets cannot be represented in the YOLO classification "
+                "format, which stores each image in the folder of a single class."
             )
         return self
 
