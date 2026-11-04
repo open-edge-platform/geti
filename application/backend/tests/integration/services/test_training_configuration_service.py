@@ -52,9 +52,9 @@ def fxt_training_configuration() -> TrainingConfiguration:
                 max_epochs=100,
                 early_stopping=EarlyStopping(enable=True, patience=5),
                 learning_rate=0.001,
-                input_size_width=256,
-                input_size_height=256,
-                allowed_values_input_size=[128, 256, 512],
+                input_size_width=640,
+                input_size_height=640,
+                allowed_values_input_size=[640],
             ),
         ),
     )
