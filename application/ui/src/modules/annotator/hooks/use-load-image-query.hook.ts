@@ -5,13 +5,19 @@ import type { Media } from '@/api/types';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { getMediaItemBinaryUrl, getMediaItemKey } from '../../../shared/media-item-utils';
+import { getMediaItemBinaryUrl, getMediaItemKey, isOmePlane } from '../../../shared/media-item-utils';
+import { renderOmeDemoPlane } from '../../../shared/ome-demo';
 import { canRasteriseAtFullSize, loadImageData } from '../tools/utils';
 
 export const loadImageQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
-        queryKey: ['mediaItem', projectId, getMediaItemKey(media)],
+        // An OME plane's pixels also depend on how its channels are displayed
+        queryKey: ['mediaItem', projectId, getMediaItemKey(media), isOmePlane(media) ? media.channels : null],
         queryFn: async ({ signal }) => {
+            if (isOmePlane(media)) {
+                return renderOmeDemoPlane(media);
+            }
+
             // Oversized media is displayed by an <img> instead (see tools/utils.ts), so downloading and decoding it
             // here would only produce a placeholder.
             if (!canRasteriseAtFullSize(media.width, media.height)) {

@@ -1,7 +1,15 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Media, MediaImage, MediaVideo, MediaVideoFrame, PredictionVideoRangePayload } from '@/api/types';
+import type {
+    Media,
+    MediaImage,
+    MediaOmeImage,
+    MediaOmePlane,
+    MediaVideo,
+    MediaVideoFrame,
+    PredictionVideoRangePayload,
+} from '@/api/types';
 
 import { getMediaBinaryUrl } from './media-url.utils';
 
@@ -11,6 +19,12 @@ export const isVideoFrame = (media: Pick<Media, 'type'> | undefined): media is M
     media?.type === 'video_frame';
 
 export const isImage = (media: Pick<Media, 'type'> | undefined): media is MediaImage => media?.type === 'image';
+
+export const isOmeImage = (media: Pick<Media, 'type'> | undefined): media is MediaOmeImage =>
+    media?.type === 'ome_image';
+
+export const isOmePlane = (media: Pick<Media, 'type'> | undefined): media is MediaOmePlane =>
+    media?.type === 'ome_plane';
 
 // Annotatable media is a single 2D picture that annotations, embeddings and predictions refer to directly (an image or
 // a video frame). A video isn't: the annotator resolves it to one of its frames first. Same set as the backend's
@@ -23,9 +37,18 @@ export const isAnnotatableMedia = (media: Pick<Media, 'type'> | undefined): medi
 // callers never branch on how each media type is addressed.
 // TODO(#7810): extend with the Z/C/T coordinates of OME-TIFF / OME-Zarr images.
 
-// Frames of the same video share the video's id, so the frame number is needed to tell them apart.
-export const getMediaItemKey = (media: Media): string =>
-    isVideoFrame(media) ? `${media.id}-${media.frame_number}` : media.id;
+// Frames of the same video and planes of the same OME image share their parent's id.
+export const getMediaItemKey = (media: Media): string => {
+    if (isVideoFrame(media)) {
+        return `${media.id}-${media.frame_number}`;
+    }
+
+    if (isOmePlane(media)) {
+        return `${media.id}-z${media.z_index}-t${media.t_index}`;
+    }
+
+    return media.id;
+};
 
 // Query params for the endpoints that act on a single media item: binary, thumbnail, annotations and embeddings.
 export const getMediaItemQueryParams = (media: Media): { frame_index: number } | undefined =>

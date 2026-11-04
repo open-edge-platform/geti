@@ -13,6 +13,7 @@ import {
     useIsFetchingCurrentRangeFramesPredictions,
     useIsFetchingPredictions,
 } from '../../../modules/annotator/api/use-media-predictions';
+import { OmeToolbar } from '../../../modules/annotator/ome/ome-toolbar.component';
 import { useSelectedMediaItem } from '../../../modules/annotator/selected-media-item-provider.component';
 import { BottomToolbar } from '../../../modules/annotator/shell/bottom-toolbar/bottom-toolbar.component';
 import { PrimaryToolbar } from '../../../modules/annotator/shell/primary-toolbar/primary-toolbar.component';
@@ -22,7 +23,7 @@ import { ToolManagerProvider } from '../../../modules/annotator/tools/tool-manag
 import { ToolOptions } from '../../../modules/annotator/tools/tool-options/tool-options.component';
 import { VideoPlayerProvider } from '../../../modules/annotator/video-player/video-player-provider.component';
 import { VideoToolbar } from '../../../modules/annotator/video-player/video-toolbar/video-toolbar.component';
-import { getMediaItemKey, isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemKey, isOmePlane, isVideoFrame } from '../../../shared/media-item-utils';
 import { SecondaryToolbar } from './secondary-toolbar/secondary-toolbar.component';
 import { useNextPredictionPrefetch } from './use-next-prediction-prefetch.hook';
 
@@ -133,6 +134,12 @@ const Annotator = ({
             {isVideoFrame(mediaItem) && (
                 <View gridArea={'video-toolbar'}>
                     <VideoToolbar mode={mode} />
+                </View>
+            )}
+
+            {isOmePlane(mediaItem) && (
+                <View gridArea={'video-toolbar'}>
+                    <OmeToolbar plane={mediaItem} onSelectPlane={onSelectedMediaItem} />
                 </View>
             )}
 

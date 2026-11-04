@@ -75,7 +75,12 @@ describe('Toolbar', () => {
                 });
             }),
             http.get('/api/projects/{project_id}/dataset/media/ids', () => {
-                return HttpResponse.json({ items: allMedia.map(({ id, type }) => ({ id, type })) });
+                return HttpResponse.json({
+                    items: allMedia.map(({ id, type }) => ({
+                        id,
+                        type: type as Exclude<Media['type'], 'ome_image' | 'ome_plane'>,
+                    })),
+                });
             }),
             http.get('/api/projects/{project_id}/dataset/items', () => {
                 return HttpResponse.json({

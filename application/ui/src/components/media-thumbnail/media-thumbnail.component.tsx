@@ -3,12 +3,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { Media, MediaVideo } from '@/api/types';
+import type { Media, MediaOmeImage, MediaVideo } from '@/api/types';
 import { Flex, Skeleton } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
 import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
-import { isVideo } from '../../shared/media-item-utils';
+import { isOmeImage, isVideo } from '../../shared/media-item-utils';
 import { formatCompactDuration } from './util';
 
 import classes from './media-thumbnail.module.scss';
@@ -18,7 +18,10 @@ type MediaThumbnailProps = {
     onDoubleClick?: () => void;
     url: string;
     alt: string;
-    item: Pick<Media, 'type'> | Pick<MediaVideo, 'type' | 'duration'>;
+    item:
+        | Pick<Media, 'type'>
+        | Pick<MediaVideo, 'type' | 'duration'>
+        | Pick<MediaOmeImage, 'type' | 'size_z' | 'size_c' | 'size_t'>;
 };
 
 type VideoIndicatorProps = {
@@ -118,6 +121,16 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
             />
             {status === 'loading' && <Skeleton width={'100%'} height={'100%'} className={classes.skeleton} />}
             {isVideo(item) && <VideoIndicator duration={item.duration} />}
+            {isOmeImage(item) && (
+                <Flex
+                    left={'size-50'}
+                    bottom={'size-50'}
+                    position={'absolute'}
+                    UNSAFE_className={classes.videoIndicator}
+                >
+                    {`Z ${item.size_z} · C ${item.size_c} · T ${item.size_t}`}
+                </Flex>
+            )}
         </div>
     );
 };

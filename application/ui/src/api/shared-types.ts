@@ -52,9 +52,32 @@ export type MediaVideoFrame = Omit<MediaVideo, 'type'> & {
     type: 'video_frame';
 };
 
-export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO;
+// TODO(#7810): demo-only OME types; replace with the generated schemas once the backend serves OME images.
+export type MediaOmeImage = Omit<MediaImage, 'type'> & {
+    type: 'ome_image';
+    size_z: number;
+    size_c: number;
+    size_t: number;
+};
+export type OmeChannelSetting = {
+    channel: number;
+    enabled: boolean;
+    // #RRGGBB
+    color: string;
+    window_min: number;
+    window_max: number;
+};
+// A (Z, T) plane of an OME image, with all its channels composited. Like video frames, planes share the image's id.
+export type MediaOmePlane = Omit<MediaOmeImage, 'type'> & {
+    type: 'ome_plane';
+    z_index: number;
+    t_index: number;
+    channels: OmeChannelSetting[];
+};
 
-export type Media = MediaImage | MediaVideo | MediaVideoFrame;
+export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO | MediaOmeImage;
+
+export type Media = MediaImage | MediaVideo | MediaVideoFrame | MediaOmeImage | MediaOmePlane;
 
 export type TrainingDevice = components['schemas']['DeviceInfoView'];
 

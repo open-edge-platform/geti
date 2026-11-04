@@ -8,7 +8,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { range } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { isOmePlane, isVideoFrame } from '../../../shared/media-item-utils';
 import type { AnnotatorMode } from '../annotator-mode';
 import { usePrefetchMediaItem } from '../hooks/use-prefetch-media-item.hook';
 import { useVideoPlayerContext } from '../video-player/video-player-provider.component';
@@ -36,6 +36,17 @@ export const getNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]
                     frame_number: nextFrame ?? 0,
                 };
             }
+        }
+    }
+
+    // Z-stacks are annotated slice by slice, then time point by time point
+    if (isOmePlane(currentMediaItem)) {
+        if (currentMediaItem.z_index < currentMediaItem.size_z - 1) {
+            return { ...currentMediaItem, z_index: currentMediaItem.z_index + 1 };
+        }
+
+        if (currentMediaItem.t_index < currentMediaItem.size_t - 1) {
+            return { ...currentMediaItem, z_index: 0, t_index: currentMediaItem.t_index + 1 };
         }
     }
 

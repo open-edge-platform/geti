@@ -11,7 +11,9 @@ import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
 
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
+import { isOmeImage } from '../../../shared/media-item-utils';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
+import { getOmeDemoThumbnailUrl } from '../../../shared/ome-demo';
 import { MediaPreview } from '../media-preview/media-preview.component';
 import { useSelectedData } from '../providers/selected-data-provider.component';
 import { AnnotationStatusIcon } from './annotation-state-icon.component';
@@ -88,7 +90,7 @@ const GalleryList = ({
             isLoadingMore={isFetchingNextPage}
             onLoadMore={fetchNextPage}
             contentItem={(item) => {
-                const mediaUrl = getThumbnailUrl(projectId, item.id);
+                const mediaUrl = isOmeImage(item) ? getOmeDemoThumbnailUrl(item) : getThumbnailUrl(projectId, item.id);
                 const downloadUrl = getMediaDownloadUrl(projectId, item.id);
                 const mediaFileName = `${item.name}.${item.format}`;
                 const selected = isSelected(item.id);

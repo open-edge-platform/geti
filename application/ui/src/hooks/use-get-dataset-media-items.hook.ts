@@ -8,6 +8,8 @@ import type { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagin
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import isEmpty from 'lodash-es/isEmpty';
 
+import { FEATURE_FLAGS } from '../constants/feature-flags';
+import { OME_DEMO_IMAGES } from '../shared/ome-demo';
 import { type SortDirection } from './sort-direction.interface';
 
 const DATASET_ITEMS_LIMIT = 40;
@@ -124,7 +126,14 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         }
     );
 
-    const items = useMemo(() => getMediaEntities(data?.pages?.flatMap((page) => page.items) ?? []), [data?.pages]);
+    const items = useMemo(
+        () =>
+            getMediaEntities([
+                ...(FEATURE_FLAGS.OME_DEMO ? OME_DEMO_IMAGES : []),
+                ...(data?.pages?.flatMap((page) => page.items) ?? []),
+            ]),
+        [data?.pages]
+    );
 
     const totalCount = data?.pages[0]?.pagination?.total ?? 0;
 
