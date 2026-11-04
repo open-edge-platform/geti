@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "La clave no puede estar vacía",
+            "keyDuplicate": "La clave debe ser única",
             "valueEmpty": "El valor no puede estar vacío"
         },
         "connection": {

@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Sleutel mag niet leeg zijn",
+            "keyDuplicate": "Sleutel moet uniek zijn",
             "valueEmpty": "Waarde mag niet leeg zijn"
         },
         "connection": {

@@ -382,6 +382,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Введите ключ",
+            "keyDuplicate": "Ключ должен быть уникальным",
             "valueEmpty": "Введите значение"
         },
         "connection": {
