@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { LocalFolderSinkConfig, MqttSinkConfig, RosSinkConfig, WebhookSinkConfig } from '@/api/types';
+import type { Locator } from '@playwright/test';
 import { HttpResponse } from 'msw';
 
 import { FEATURE_FLAGS } from '../../src/constants/feature-flags';
@@ -48,6 +49,17 @@ const rosSink: RosSinkConfig = {
     topic: '/geti/predictions',
     rate_limit: 1,
     output_formats: ['predictions'],
+};
+
+// The new flow disables "Add & Use" until the required fields are provided; the deprecated flow leaves it enabled
+// and relies on native validation after the click.
+const expectCannotSubmit = async (button: Locator, assertInvalid: () => Promise<void>) => {
+    if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
+        await expect(button).toBeDisabled();
+    } else {
+        await button.click();
+        await assertInvalid();
+    }
 };
 
 test.describe('Pipeline sinks', () => {
@@ -132,40 +144,38 @@ test.describe('Pipeline sinks', () => {
             await page.getByRole('textbox', { name: 'Webhook URL' }).fill('https://hooks.local/geti');
             await sinksPage.selectOutputFormats(['Predictions']);
             await sinksPage.addWebhookHeader('X-Api-Key', '');
-            await sinksPage.getAddAndUseButton().click();
-
-            await expect(page.getByRole('textbox', { name: 'headers-values' })).toHaveAttribute('aria-invalid', 'true');
+            await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
+                expect(page.getByRole('textbox', { name: 'headers-values' })).toHaveAttribute('aria-invalid', 'true')
+            );
             await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
             await sinksPage.openSinkList();
             await expect(sinksPage.getSinkCards()).toHaveCount(0);
         });
 
-        test.fail(
-            'does not add a webhook sink with duplicate header keys',
-            async ({ inferencePage, sinksPage, page }) => {
-                // Known bug: rows with the same key collapse into one and the sink is saved.
-                // Expected: the duplicate key is rejected. Remove `test.fail()` once fixed.
+        test('does not add a webhook sink with duplicate header keys', async ({ inferencePage, sinksPage, page }) => {
+            test.fail(!FEATURE_FLAGS.SOURCES_SINKS_REFACTOR, 'Known bug #3 in the deprecated flow');
+            // Known bug in the deprecated flow: rows with the same key collapse into one and the sink is saved.
+            // Expected: the duplicate key is rejected.
 
-                await inferencePage.goto();
-                await sinksPage.openAddSinkForm('Webhook');
+            await inferencePage.goto();
+            await sinksPage.openAddSinkForm('Webhook');
 
-                await page.getByRole('textbox', { name: 'Webhook URL' }).fill('https://hooks.local/geti');
-                await sinksPage.selectOutputFormats(['Predictions']);
-                await sinksPage.addWebhookHeader('X-Key', 'first');
-                await sinksPage.addWebhookHeader('X-Key', 'second');
-                await sinksPage.getAddAndUseButton().click();
+            await page.getByRole('textbox', { name: 'Webhook URL' }).fill('https://hooks.local/geti');
+            await sinksPage.selectOutputFormats(['Predictions']);
+            await sinksPage.addWebhookHeader('X-Key', 'first');
+            await sinksPage.addWebhookHeader('X-Key', 'second');
 
-                await expect(page.getByRole('textbox', { name: 'headers-keys' }).last()).toHaveAttribute(
-                    'aria-invalid',
-                    'true'
-                );
-                await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
+            await expect(page.getByRole('textbox', { name: 'headers-keys' }).last()).toHaveAttribute(
+                'aria-invalid',
+                'true'
+            );
+            await expectCannotSubmit(sinksPage.getAddAndUseButton(), async () => {});
+            await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
-                await sinksPage.openSinkList();
-                await expect(sinksPage.getSinkCards()).toHaveCount(0);
-            }
-        );
+            await sinksPage.openSinkList();
+            await expect(sinksPage.getSinkCards()).toHaveCount(0);
+        });
 
         test('adds an MQTT sink that requires authentication', async ({ inferencePage, sinksPage, page }) => {
             await inferencePage.goto();
@@ -207,11 +217,8 @@ test.describe('Pipeline sinks', () => {
                 await sinksPage.openAddSinkForm(type);
 
                 await sinksPage.selectOutputFormats(['Predictions']);
-                await sinksPage.getAddAndUseButton().click();
-
-                await expect(page.getByRole('textbox', { name: requiredField })).toHaveAttribute(
-                    'aria-invalid',
-                    'true'
+                await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
+                    expect(page.getByRole('textbox', { name: requiredField })).toHaveAttribute('aria-invalid', 'true')
                 );
                 await expect(sinksPage.getAddAndUseButton()).toBeVisible();
                 await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
@@ -226,52 +233,52 @@ test.describe('Pipeline sinks', () => {
             await sinksPage.openAddSinkForm('Folder');
 
             await page.getByRole('textbox', { name: 'Folder Path' }).fill('/data/snapshots');
-            await sinksPage.getAddAndUseButton().click();
-
-            await expect(page.getByRole('checkbox', { name: 'Predictions', exact: true })).toHaveAttribute(
-                'aria-invalid',
-                'true'
+            await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
+                expect(page.getByRole('checkbox', { name: 'Predictions', exact: true })).toHaveAttribute(
+                    'aria-invalid',
+                    'true'
+                )
             );
-            await expect(sinksPage.getAddAndUseButton()).toBeVisible();
             await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
             await sinksPage.openSinkList();
             await expect(sinksPage.getSinkCards()).toHaveCount(0);
         });
 
-        test.fail(
-            'shows the error and keeps the entered values when saving fails',
-            async ({ inferencePage, sinksPage, network, page }) => {
-                // Known bug: after the failed save React resets the uncontrolled form, so the ticked "Predictions" output
-                // format becomes unchecked again.
-                // Expected: every field keeps what the user entered. Remove `test.fail()` once fixed.
+        test('shows the error and keeps the entered values when saving fails', async ({
+            inferencePage,
+            sinksPage,
+            network,
+            page,
+        }) => {
+            test.fail(!FEATURE_FLAGS.SOURCES_SINKS_REFACTOR, 'Known bug #1 in the deprecated flow');
+            // Known bug in the deprecated flow: after the failed save React resets the uncontrolled form, so the
+            // ticked "Predictions" output format becomes unchecked again.
+            // Expected: every field keeps what the user entered.
 
-                network.use(
-                    http.post('/api/sinks', () => {
-                        // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
-                        return HttpResponse.json({ detail: 'Folder is not writable' }, { status: 400 });
-                    })
-                );
+            network.use(
+                http.post('/api/sinks', () => {
+                    // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
+                    return HttpResponse.json({ detail: 'Folder is not writable' }, { status: 400 });
+                })
+            );
 
-                await inferencePage.goto();
-                await sinksPage.openAddSinkForm('Folder');
-                await page.getByRole('textbox', { name: 'Folder Path' }).fill('/root');
-                await sinksPage.fillRateLimit(3, 1);
-                await sinksPage.selectOutputFormats(['Predictions']);
-                await sinksPage.getAddAndUseButton().click();
+            await inferencePage.goto();
+            await sinksPage.openAddSinkForm('Folder');
+            await page.getByRole('textbox', { name: 'Folder Path' }).fill('/root');
+            await sinksPage.fillRateLimit(3, 1);
+            await sinksPage.selectOutputFormats(['Predictions']);
+            await sinksPage.getAddAndUseButton().click();
 
-                await expect(
-                    sinksPage.getToast('Failed to save sink configuration, Folder is not writable')
-                ).toBeVisible();
-                await expect(page.getByRole('textbox', { name: 'Folder Path' })).toHaveValue('/root');
-                await expect(page.getByRole('checkbox', { name: 'Predictions', exact: true })).toBeChecked();
-                await expect(page.getByRole('textbox', { name: 'Samples' })).toHaveValue('3');
-                await expect(page.getByRole('textbox', { name: 'Seconds' })).toHaveValue('1');
+            await expect(sinksPage.getToast('Failed to save sink configuration, Folder is not writable')).toBeVisible();
+            await expect(page.getByRole('textbox', { name: 'Folder Path' })).toHaveValue('/root');
+            await expect(page.getByRole('checkbox', { name: 'Predictions', exact: true })).toBeChecked();
+            await expect(page.getByRole('textbox', { name: 'Samples' })).toHaveValue('3');
+            await expect(page.getByRole('textbox', { name: 'Seconds' })).toHaveValue('1');
 
-                await sinksPage.openSinkList();
-                await expect(sinksPage.getSinkCards()).toHaveCount(0);
-            }
-        );
+            await sinksPage.openSinkList();
+            await expect(sinksPage.getSinkCards()).toHaveCount(0);
+        });
 
         test('keeps the form open when the new sink cannot be connected', async ({
             inferencePage,
