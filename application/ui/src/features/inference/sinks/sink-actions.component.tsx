@@ -17,8 +17,8 @@ import { SinkList as DeprecatedSinkList } from './deprecated/sink-list/sink-list
 import { SinkOptions as DeprecatedSinkOptions } from './deprecated/sink-options';
 import { EditSinkForm } from './edit-sink-form.component';
 import { SinkList } from './sink-list/sink-list.component';
-import { SinkOptions } from './sink-options';
 import type { SupportedSinkConfig } from './types';
+import { SinkOptions } from './deprecated/sink-options';
 
 const isSupportedSink = (sink: SinkConfig): sink is SupportedSinkConfig => sink.sink_type !== 'ros';
 
