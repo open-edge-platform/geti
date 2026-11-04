@@ -6,12 +6,19 @@ import { Button, ButtonGroup, Divider } from '@geti-ui/ui';
 
 interface EditSinkButtonsProps {
     isPending: boolean;
+    isDisabled: boolean;
     isConnected: boolean;
     onSave: () => void;
     onSaveAndConnect: () => void;
 }
 
-export const EditSinkButtons = ({ isPending, isConnected, onSave, onSaveAndConnect }: EditSinkButtonsProps) => {
+export const EditSinkButtons = ({
+    isPending,
+    isDisabled,
+    isConnected,
+    onSave,
+    onSaveAndConnect,
+}: EditSinkButtonsProps) => {
     const { t } = useTranslation();
 
     return (
@@ -19,12 +26,12 @@ export const EditSinkButtons = ({ isPending, isConnected, onSave, onSaveAndConne
             <Divider size='S' marginY={'size-200'} />
 
             <ButtonGroup marginTop={0}>
-                <Button type='submit' isPending={isPending} onPress={onSave}>
+                <Button type='submit' isPending={isPending} isDisabled={isDisabled} onPress={onSave}>
                     {t('common.actions.save')}
                 </Button>
 
                 {!isConnected && (
-                    <Button type='submit' isPending={isPending} onPress={onSaveAndConnect}>
+                    <Button type='submit' isPending={isPending} isDisabled={isDisabled} onPress={onSaveAndConnect}>
                         {t('common.actions.saveAndConnect')}
                     </Button>
                 )}
