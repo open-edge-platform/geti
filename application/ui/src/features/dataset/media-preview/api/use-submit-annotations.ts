@@ -57,7 +57,7 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
         },
         onSuccess: async () => {
             // Not awaited: the submission must not wait for every loaded page of the filtered listings
-            void invalidateMediaFilteredByAnnotations(queryClient);
+            void invalidateMediaFilteredByAnnotations(queryClient, projectId);
 
             // The dataset media listing backs the gallery and sidebar annotation-status badges. Instead of
             // invalidating it (which would refetch every page already scrolled through), patch the cached media.
@@ -68,7 +68,7 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
                 // fail the (successful) save: the count is only stale until the next listing.
                 await refreshCachedMedia(queryClient, projectId, mediaItem.id).catch(() => undefined);
             } else {
-                markCachedMediaAsAnnotated(queryClient, mediaItem.id);
+                markCachedMediaAsAnnotated(queryClient, projectId, mediaItem.id);
             }
         },
     });

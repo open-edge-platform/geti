@@ -3,11 +3,16 @@
 
 import type { MediaDTO, MediaWithPagination } from '@/api/types';
 import { InfiniteData, QueryClient } from '@tanstack/react-query';
+import {
+    buildDatasetMediaQueryFilters,
+    type UseGetDatasetMediaItemsOptions,
+} from 'hooks/use-get-dataset-media-items.hook';
 import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
+import { getQueryKey } from '../../../../query-client/query-client';
 import {
     invalidateMediaFilteredByAnnotations,
     markCachedMediaAsAnnotated,
@@ -16,12 +21,17 @@ import {
 
 const PROJECT_ID = 'project-1';
 
-const getMediaQueryKey = (filters: object = {}) =>
-    [
+const getMediaQueryKey = (options?: UseGetDatasetMediaItemsOptions) =>
+    getQueryKey([
         'get',
         '/api/projects/{project_id}/dataset/media',
-        { params: { path: { project_id: PROJECT_ID }, query: { offset: 0, limit: 40, ...filters } } },
-    ] as const;
+        {
+            params: {
+                path: { project_id: PROJECT_ID },
+                query: { offset: 0, limit: 40, ...buildDatasetMediaQueryFilters(options) },
+            },
+        },
+    ]);
 
 const MEDIA_QUERY_KEY = getMediaQueryKey();
 
@@ -43,19 +53,19 @@ const getCachedItems = (queryClient: QueryClient) =>
     queryClient.getQueryData<InfiniteData<MediaWithPagination>>(MEDIA_QUERY_KEY)?.pages.map(({ items }) => items);
 
 describe('invalidateMediaFilteredByAnnotations', () => {
-    it.each([
-        [{ annotation_status: 'missing_annotations' }, true],
-        [{ labels: ['label-1'] }, true],
+    it.each<[UseGetDatasetMediaItemsOptions, boolean]>([
+        [{ annotationStatus: 'missing_annotations' }, true],
+        [{ labelIds: ['label-1'] }, true],
         [{ subsets: ['training'] }, true],
         [{}, false],
-        [{ labels: [], subsets: [] }, false],
-        [{ dataset_view_id: 'view-1', start_date: '2026-01-01', sort_direction: 'asc' }, false],
-    ])('with filters %o, invalidates the listing: %s', async (filters, isInvalidated) => {
-        const queryKey = getMediaQueryKey(filters);
+        [{ labelIds: [], subsets: [] }, false],
+        [{ datasetViewId: 'view-1', startDate: '2026-01-01', sortDirection: 'asc' }, false],
+    ])('with options %o, invalidates the listing: %s', async (options, isInvalidated) => {
+        const queryKey = getMediaQueryKey(options);
         const queryClient = new QueryClient();
         queryClient.setQueryData<InfiniteData<MediaWithPagination>>(queryKey, { pages: [], pageParams: [] });
 
-        await invalidateMediaFilteredByAnnotations(queryClient);
+        await invalidateMediaFilteredByAnnotations(queryClient, PROJECT_ID);
 
         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(isInvalidated);
     });
@@ -64,14 +74,14 @@ describe('invalidateMediaFilteredByAnnotations', () => {
 describe('markCachedMediaAsAnnotated', () => {
     it('does not patch the listings filtered by annotations, which are refetched instead', () => {
         const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
-        const filteredQueryKey = getMediaQueryKey({ annotation_status: 'missing_annotations' });
+        const filteredQueryKey = getMediaQueryKey({ annotationStatus: 'missing_annotations' });
         const queryClient = createQueryClientWithPages([[image]]);
         queryClient.setQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey, {
             pages: [{ items: [image], pagination: { offset: 0, limit: 40, count: 1, total: 1 } }],
             pageParams: [0],
         });
 
-        markCachedMediaAsAnnotated(queryClient, image.id);
+        markCachedMediaAsAnnotated(queryClient, PROJECT_ID, image.id);
 
         expect(getCachedItems(queryClient)).toEqual([[{ ...image, annotation_status: { has_annotations: true } }]]);
         expect(queryClient.getQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey)?.pages[0].items).toEqual([
@@ -84,7 +94,7 @@ describe('markCachedMediaAsAnnotated', () => {
         const other = getMockedMediaImage({ id: 'image-2' });
         const queryClient = createQueryClientWithPages([[other], [target]]);
 
-        markCachedMediaAsAnnotated(queryClient, target.id);
+        markCachedMediaAsAnnotated(queryClient, PROJECT_ID, target.id);
 
         expect(getCachedItems(queryClient)).toEqual([
             [other],
@@ -99,7 +109,7 @@ describe('markCachedMediaAsAnnotated', () => {
         });
         const queryClient = createQueryClientWithPages([[video]]);
 
-        markCachedMediaAsAnnotated(queryClient, video.id);
+        markCachedMediaAsAnnotated(queryClient, PROJECT_ID, video.id);
 
         expect(getCachedItems(queryClient)).toEqual([[video]]);
     });
