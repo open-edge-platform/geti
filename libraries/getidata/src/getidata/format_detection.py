@@ -47,12 +47,13 @@ def detect_dataset_format(input_dir: Path) -> DataFormat:
     2. COCO (JSON files with images/annotations structure)
     3. YOLO (data.yaml, obj.names, or directory structure)
     4. VOC (JPEGImages/, Annotations/, ImageSets/ directories)
+    5. YOLO classification (subset directories with one image directory per class)
 
     Args:
         input_dir: Path to the directory to check
 
     Returns:
-        DataFormat enum value: GETIDATA, COCO, YOLO, VOC, or UNKNOWN
+        DataFormat enum value: GETIDATA, COCO, YOLO, YOLO_ULTRALYTICS_CLS, VOC, or UNKNOWN
     """
     if is_getidata_format(input_dir):
         return DataFormat.GETIDATA
@@ -60,7 +61,7 @@ def detect_dataset_format(input_dir: Path) -> DataFormat:
     # Inline imports to avoid circular dependency:
     from getidata.data_formats.coco.io import is_coco_format
     from getidata.data_formats.voc.io import is_voc_format
-    from getidata.data_formats.yolo.io import is_yolo_format
+    from getidata.data_formats.yolo.io import is_yolo_cls_format, is_yolo_format
 
     if is_coco_format(input_dir):
         return DataFormat.COCO
@@ -68,6 +69,8 @@ def detect_dataset_format(input_dir: Path) -> DataFormat:
         return DataFormat.YOLO
     if is_voc_format(input_dir):
         return DataFormat.VOC
+    if is_yolo_cls_format(input_dir):
+        return DataFormat.YOLO_ULTRALYTICS_CLS
     return DataFormat.UNKNOWN
 
 

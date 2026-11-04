@@ -737,6 +737,12 @@ def _save_format_to_dir(
 
         dataset = dataset.convert_to_schema(YoloSample.infer_schema(), direct_only=direct_only)
         save_yolo_dataset(dataset, root_dir=output_dir, format=data_format)
+    elif data_format == DataFormat.YOLO_ULTRALYTICS_CLS:
+        from getidata.data_formats.yolo.io import save_yolo_cls_dataset
+        from getidata.data_formats.yolo.sample import YoloClsSample
+
+        dataset = dataset.convert_to_schema(YoloClsSample.infer_schema(), direct_only=direct_only)
+        save_yolo_cls_dataset(dataset, root_dir=output_dir)
     else:
         raise ValueError(f"Unsupported data format for export: {data_format}")
 
@@ -759,6 +765,7 @@ def _save_format_dataset(
         DataFormat.VOC,
         DataFormat.YOLO,
         DataFormat.YOLO_ULTRALYTICS,
+        DataFormat.YOLO_ULTRALYTICS_CLS,
     }
     if data_format not in _SUPPORTED_EXPORT_FORMATS:
         raise ValueError(f"Unsupported data format for export: {data_format}")
@@ -824,6 +831,13 @@ def _load_format_dataset(
 
         format_hint = "ultralytics" if data_format == DataFormat.YOLO_ULTRALYTICS else "auto"
         return load_yolo_dataset(root_dir=root_dir, format=format_hint)
+    if data_format == DataFormat.YOLO_ULTRALYTICS_CLS:
+        from getidata.data_formats.yolo.io import load_yolo_cls_dataset
+
+        if root_dir is None:
+            raise ValueError("root_dir is required for YOLO classification format")
+
+        return load_yolo_cls_dataset(root_dir=root_dir)
     raise ValueError(f"Unsupported data format: {data_format}")
 
 
@@ -964,6 +978,8 @@ def import_dataset(
       with 'images' and 'annotations' keys
     - **YOLO**: Detected by data.yaml (Ultralytics), obj.names/obj.data (traditional),
       or images/ and labels/ directories
+    - **YOLO classification**: Detected by subset directories (train/val/test) holding
+      one subdirectory per class
     - **VOC**: Detected by JPEGImages/, Annotations/, and ImageSets/ directories
 
     When dtype is None the function tries to automatically determine the correct Sample
@@ -1519,6 +1535,10 @@ def _import_dataset_from_dir(
             from getidata.data_formats.yolo.io import import_yolo_dataset
 
             return import_yolo_dataset(input_dir)
+        case DataFormat.YOLO_ULTRALYTICS_CLS:
+            from getidata.data_formats.yolo.io import import_yolo_cls_dataset
+
+            return import_yolo_cls_dataset(input_dir)
         case DataFormat.VOC:
             from getidata.data_formats.voc.io import import_voc_dataset
 
@@ -1531,6 +1551,7 @@ def _import_dataset_from_dir(
                 "Expected one of: getidata (metadata.json + data.parquet), "
                 "COCO (annotations/*.json with 'images' and 'annotations' keys), "
                 "YOLO (data.yaml, obj.names, or images/ + labels/ directories), "
+                "YOLO classification (train/val/test directories with one subdirectory per class), "
                 "or VOC (JPEGImages/ + Annotations/ or ImageSets/ directories)."
             )
 
