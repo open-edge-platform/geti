@@ -7,7 +7,6 @@ const createImage = (width: number, height: number): ImageBitmap => ({ width, he
 
 const createCanvasContext = () => {
     return {
-        filter: '',
         drawImage: rs.fn(),
         getImageData: rs.fn((_x: number, _y: number, width: number, height: number) => {
             return {
@@ -67,14 +66,16 @@ describe('getImageData', () => {
         expect(imageData.height).toBe(1);
     });
 
-    it('rasterises images within the canvas limit at full size', () => {
+    it('rasterises images within the canvas limit at full size on a CPU-backed canvas', () => {
         const context = createCanvasContext();
-        mockCanvasCreation([context]);
+        const createElementSpy = mockCanvasCreation([context]);
 
         const imageData = getImageData(createImage(4000, 3000));
 
         expect(imageData.width).toBe(4000);
         expect(imageData.height).toBe(3000);
+        const canvas = createElementSpy.mock.results[0]?.value as HTMLCanvasElement;
+        expect(canvas.getContext).toHaveBeenCalledWith('2d', { willReadFrequently: true });
     });
 
     it('returns a 1x1 placeholder when the canvas context is unavailable', () => {

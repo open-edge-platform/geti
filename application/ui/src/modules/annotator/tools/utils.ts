@@ -394,17 +394,6 @@ export const getRelativePoint = (element: ElementType, point: Point, zoom: numbe
     };
 };
 
-const drawImageOnCanvas = (img: ImageBitmap): HTMLCanvasElement => {
-    const canvas: HTMLCanvasElement = document.createElement('canvas');
-
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    canvas.getContext('2d')?.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    return canvas;
-};
-
 // Canvas rasterization limits (Chrome: 16384² ≈ 268 Mpx total area).
 // Check dimensions upfront: some browsers return a valid 2D context for
 // oversized canvases but then fail/throw at getImageData time (returning
@@ -423,10 +412,20 @@ export const getImageData = (img: ImageBitmap): ImageData => {
         return new ImageData(1, 1);
     }
 
-    const canvas = drawImageOnCanvas(img);
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-    return ctx !== null ? ctx.getImageData(0, 0, canvas.width, canvas.height) : new ImageData(1, 1);
+    // A CPU-backed canvas avoids a GPU readback, roughly halving `getImageData` time on large images.
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    if (ctx === null) {
+        return new ImageData(1, 1);
+    }
+
+    ctx.drawImage(img, 0, 0);
+
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
 };
 
 // Fetches and decodes an image into ImageData. Unlike <img> + drawImage, `createImageBitmap` decodes off the main
@@ -487,9 +486,8 @@ export const projectPointOnLine = ([startPoint, endPoint]: ProjectLine, point: P
 /**
  * Oversized image handling (Chrome canvas limit ~268 Mpx):
  * - `getImageData` returns a 1×1 placeholder for media too large to rasterise.
- * - Such media is displayed via an <img> tag (see annotator-canvas.tsx).
- * - Smart tools (SAM, magnetic lasso, SSIM) are disabled for it, because they
- *   rely on a full-resolution canvas/OpenCV buffer that cannot be produced.
+ * - Such media is displayed via an <img> tag (see media-image.component.tsx).
+ * - Smart tools (SAM, magnetic lasso, SSIM) are disabled for it (see `useAvailableTools`).
  */
 
 /**

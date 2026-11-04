@@ -23,10 +23,6 @@ type SelectedMediaItemContextProps = {
     // Media-space view of the image: width/height always match the media item so
     // coordinate clamping in drawing tools stays in annotation space.
     image: ImageData;
-    // True once the current item's full-resolution pixels are loaded and decoded.
-    // False during loading, while a placeholder is shown, or for images too large
-    // to rasterise at full size (smart tools are disabled in that case).
-    isImageReady: boolean;
 };
 
 const SelectedMediaItemContext = createContext<SelectedMediaItemContextProps | null>(null);
@@ -95,7 +91,7 @@ export const SelectedMediaItemProvider = ({
 }: SelectedMediaItemProviderProps) => {
     const [mediaItem, setMediaItem] = useMediaItem(initialMediaItem);
 
-    const { data: loadedImage = EMPTY_IMAGE, isSuccess, isPlaceholderData } = useLoadImageQuery(mediaItem);
+    const { data: loadedImage = EMPTY_IMAGE } = useLoadImageQuery(mediaItem);
 
     // For oversized media: wrap downscaled data in full-size dimensions so
     // drawing tools clamp to media-space, not the smaller buffer dimensions.
@@ -112,17 +108,13 @@ export const SelectedMediaItemProvider = ({
                   } as ImageData),
         [decodedAtFullSize, loadedImage, mediaItem.width, mediaItem.height]
     );
-    const isImageReady = isSuccess && !isPlaceholderData && decodedAtFullSize;
 
     const roi: RegionOfInterest = useMemo(
         () => ({ x: 0, y: 0, width: mediaItem.width, height: mediaItem.height }),
         [mediaItem.width, mediaItem.height]
     );
 
-    const value = useMemo(
-        () => ({ mediaItem, roi, setMediaItem, image, isImageReady }),
-        [mediaItem, roi, setMediaItem, image, isImageReady]
-    );
+    const value = useMemo(() => ({ mediaItem, roi, setMediaItem, image }), [mediaItem, roi, setMediaItem, image]);
 
     return <SelectedMediaItemContext value={value}>{children}</SelectedMediaItemContext>;
 };
