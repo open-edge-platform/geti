@@ -29,6 +29,8 @@ class PrepareDataset(Execution[PrepareDatasetForImportJobParams]):
     Supported formats:
     - COCO: Images and annotations in COCO JSON format
     - YOLO: YOLO format with root directory structure
+    - YOLO classification: Ultralytics ImageNet-style layout (train/val/test directories with one
+      subdirectory per class)
     - VOC: Pascal VOC format
     - GETI: Native Geti format (pass-through)
 

@@ -290,7 +290,15 @@ class TestStagedDatasetServiceIntegration:
 
         assert len(datasets) == 0
 
-    @pytest.mark.parametrize("prefix, data_format", [("coco", DatasetFormat.COCO), ("yolo", DatasetFormat.YOLO)])
+    @pytest.mark.parametrize(
+        "prefix, data_format",
+        [
+            ("coco", DatasetFormat.COCO),
+            ("yolo", DatasetFormat.YOLO),
+            # "yolo" is a substring of "yolo_cls", so the more specific value must match first
+            ("yolo_cls", DatasetFormat.YOLO_CLS),
+        ],
+    )
     def test_find_by_id_returns_dataset_when_present(
         self, prefix: str, data_format: DatasetFormat, tmp_path: Path, fxt_staged_dataset_service: StagedDatasetService
     ):
