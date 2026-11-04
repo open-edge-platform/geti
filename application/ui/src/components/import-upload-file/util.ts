@@ -8,9 +8,8 @@ export const formatToFileArray = (files: FileList | File[] | null): File[] => {
 };
 
 export const isSupportedDatasetZip = (file: File): boolean => {
+    const fileName = file.name.toLowerCase();
     const fileType = file.type ? file.type.split('/')[1] : '';
 
-    return fileType
-        ? VALID_DATASET_TYPES.some((type) => fileType.includes(type))
-        : file.name.toLowerCase().endsWith('.zip');
+    return fileType ? VALID_DATASET_TYPES.some((type) => fileType.includes(type)) : fileName.endsWith('.zip');
 };

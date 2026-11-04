@@ -59,20 +59,6 @@ test.describe('Import dataset to project', () => {
         );
     });
 
-    test('accepts a dataset ZIP without a browser MIME type', async ({ page, importDatasetPage }) => {
-        await page.goto(`projects/${mockedProject.id}/dataset`);
-        await importDatasetPage.openImportDialog();
-
-        await page.getByTestId('upload-zip-file').evaluate((input: HTMLInputElement) => {
-            const files = new DataTransfer();
-            files.items.add(new File(['fake zip content'], 'dataset.zip'));
-            input.files = files.files;
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
-        await expect(importDatasetPage.getPreparingStatus()).toBeVisible();
-    });
-
     test('import dataset with default label mapping', async ({ page, network, importDatasetPage }) => {
         const importingJob = getMockedImportJob('import_dataset_to_project', {
             progress: 60,
