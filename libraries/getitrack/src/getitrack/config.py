@@ -27,6 +27,7 @@ class AlgorithmType(StrEnum):
 
     BYTETRACK = "bytetrack"
     SORT = "sort"
+    IOU = "iou"
     OCSORT = "ocsort"
     BOTSORT = "botsort"
     MEMORY = "memory"
