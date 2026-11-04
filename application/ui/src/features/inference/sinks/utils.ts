@@ -31,3 +31,15 @@ export const formatRateLimit = (rateLimit: number | null | undefined, t: Transla
 
     return t('inference.sinks.rateLimit.samplesPerSecond', { count: normalizedSamples });
 };
+
+export const toRateLimit = (samples: number | null, seconds: number | null): number | null => {
+    if (samples === null || seconds === null) {
+        return null;
+    }
+
+    if (!Number.isFinite(samples) || !Number.isFinite(seconds) || samples <= 0 || seconds <= 0) {
+        return null;
+    }
+
+    return samples / seconds;
+};
