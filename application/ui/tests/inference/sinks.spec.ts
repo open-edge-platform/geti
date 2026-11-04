@@ -4,6 +4,7 @@
 import type { LocalFolderSinkConfig, MqttSinkConfig, RosSinkConfig, WebhookSinkConfig } from '@/api/types';
 import { HttpResponse } from 'msw';
 
+import { FEATURE_FLAGS } from '../../src/constants/feature-flags';
 import { expect, http, test } from '../fixtures';
 import { createPipelineBackend } from './pipeline-backend';
 
@@ -318,7 +319,7 @@ test.describe('Pipeline sinks', () => {
         await inferencePage.goto();
         await inferencePage.getSinkTab().click();
 
-        await expect(sinksPage.getSinkCards()).toHaveCount(4);
+        await expect(sinksPage.getSinkCards()).toHaveCount(FEATURE_FLAGS.SOURCES_SINKS_REFACTOR ? 3 : 4);
         await expect(sinksPage.getSinkCards().first()).toHaveAttribute('data-testid', `sink-card-${mqttSink.name}`);
 
         const mqttCard = sinksPage.getSinkCard(mqttSink.name);
@@ -345,9 +346,14 @@ test.describe('Pipeline sinks', () => {
         await expect(webhookCard.getByText('Authorization: Bearer token')).toBeVisible();
 
         const rosCard = sinksPage.getSinkCard(rosSink.name);
-        await expect(rosCard.getByText('ros', { exact: true })).toBeVisible();
-        await expect(rosCard.getByText('Topic: /geti/predictions')).toBeVisible();
-        await expect(rosCard.getByText('Rate limit: 1 sample every 1 second')).toBeVisible();
+
+        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
+            await expect(rosCard).toBeHidden();
+        } else {
+            await expect(rosCard.getByText('ros', { exact: true })).toBeVisible();
+            await expect(rosCard.getByText('Topic: /geti/predictions')).toBeVisible();
+            await expect(rosCard.getByText('Rate limit: 1 sample every 1 second')).toBeVisible();
+        }
     });
 
     test.describe('sink menu', () => {

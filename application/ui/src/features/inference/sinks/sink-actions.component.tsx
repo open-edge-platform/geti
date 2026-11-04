@@ -10,10 +10,13 @@ import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { useSinksQuery } from './api/use-sinks-query';
 import { EditSinkForm } from './deprecated/edit-sink-form.component';
-import { SinkList } from './deprecated/sink-list/sink-list.component';
+import { SinkList as DeprecatedSinkList } from './deprecated/sink-list/sink-list.component';
 import { SinkOptions } from './deprecated/sink-options';
+import { SinkList } from './sink-list/sink-list.component';
+import type { SupportedSinkConfig } from './types';
 
 export const SinkActions = () => {
     const { t } = useTranslation();
@@ -21,6 +24,7 @@ export const SinkActions = () => {
     const [currentSink, setCurrentSink] = useState<SinkConfig | null>(null);
     const { data: sinks = [], isPending } = useSinksQuery();
     const filteredSinks = sinks.filter((sink) => sink.sink_type !== 'disconnected');
+    const supportedSinks = filteredSinks.filter((sink): sink is SupportedSinkConfig => sink.sink_type !== 'ros');
 
     const pipeline = usePipeline();
     const connectedSinkId = pipeline.data.sink?.id;
@@ -54,9 +58,23 @@ export const SinkActions = () => {
     }
 
     if (view === 'list') {
+        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
+            const supportedSinksConnectedFirst = orderBy(supportedSinks, (sink) => sink.id === connectedSinkId, 'desc');
+
+            return (
+                <SinkList sinks={supportedSinksConnectedFirst} onAddSink={handleAddSinks} onEditSink={handleEditSink} />
+            );
+        }
+
         const sinksWithConnectedFirst = orderBy(filteredSinks, (sink) => sink.id === connectedSinkId, 'desc');
 
-        return <SinkList sinks={sinksWithConnectedFirst} onAddSink={handleAddSinks} onEditSink={handleEditSink} />;
+        return (
+            <DeprecatedSinkList
+                sinks={sinksWithConnectedFirst}
+                onAddSink={handleAddSinks}
+                onEditSink={handleEditSink}
+            />
+        );
     }
 
     return (
