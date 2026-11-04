@@ -6,7 +6,6 @@ import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isFunction } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { getQueryKey } from '../../../query-client/query-client';
@@ -15,9 +14,28 @@ const toastId = 'deleting-notification';
 
 const useDeleteMediaItemsMutation = () => {
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
+    const projectId = useProjectIdentifier();
 
     return $api.useMutation('delete', `/api/projects/{project_id}/dataset/media`, {
         meta: { error: { notify: () => false } },
+        onSuccess: () =>
+            Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/statistics',
+                        { params: { path: { project_id: projectId } } },
+                    ]),
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/media',
+                        { params: { path: { project_id: projectId } } },
+                    ]),
+                }),
+            ]),
         onError: (error) => {
             toast({
                 id: toastId,
@@ -30,13 +48,12 @@ const useDeleteMediaItemsMutation = () => {
 
 export const useDeleteMediaItem = () => {
     const { t } = useTranslation();
-    const queryClient = useQueryClient();
     const projectId = useProjectIdentifier();
     const deleteItemsMutation = useDeleteMediaItemsMutation();
 
     const alertDialogState = useOverlayTriggerState({});
 
-    const handleDeleteItems = async (media_ids: string[], onDeleted?: (ids: string[]) => void) => {
+    const handleDeleteItems = (media_ids: string[], onDeleted?: (ids: string[]) => void) => {
         alertDialogState.close();
 
         toast({ id: toastId, type: 'info', message: t('dataset.delete.deletingItems') });
@@ -46,34 +63,18 @@ export const useDeleteMediaItem = () => {
                 body: { media_ids },
                 params: { path: { project_id: projectId } },
             },
-            { onSuccess: () => handleSuccess(media_ids, onDeleted) }
+            {
+                onSuccess: () => {
+                    onDeleted?.(media_ids);
+                    toast({
+                        id: toastId,
+                        type: 'success',
+                        message: t('dataset.delete.deletedSuccess', { count: media_ids.length }),
+                        duration: 3000,
+                    });
+                },
+            }
         );
-    };
-
-    const handleSuccess = (deletedIds: string[], onDeleted?: (ids: string[]) => void) => {
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/statistics',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/media',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
-
-        isFunction(onDeleted) && onDeleted(deletedIds);
-
-        toast({
-            id: toastId,
-            type: 'success',
-            message: t('dataset.delete.deletedSuccess', { count: deletedIds.length }),
-            duration: 3000,
-        });
     };
 
     return {

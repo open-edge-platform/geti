@@ -170,7 +170,7 @@ describe('Toolbar', () => {
     });
 
     it('opens dataset statistics modal when clicking the statistics button', async () => {
-        renderToolbar();
+        await renderToolbar();
 
         const statsButton = await screen.findByLabelText('dataset statistics');
         fireEvent.click(statsButton);

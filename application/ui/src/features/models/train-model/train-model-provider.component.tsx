@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useCallback, useMemo, useState } from 'react';
 
 import type {
     Model,
@@ -119,17 +119,20 @@ const useModelRevisions = () => {
     const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
 
-    return {
-        modelRevisions: [
-            {
-                id: DEFAULT_PRE_TRAINED_WEIGHTS,
-                name: t('models.training.setup.selectModel.defaultPretrainedWeights'),
-                architecture: '',
-                value: null,
-            },
-            ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
-        ],
-    };
+    return useMemo(
+        () => ({
+            modelRevisions: [
+                {
+                    id: DEFAULT_PRE_TRAINED_WEIGHTS,
+                    name: t('models.training.setup.selectModel.defaultPretrainedWeights'),
+                    architecture: '',
+                    value: null,
+                },
+                ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
+            ],
+        }),
+        [t, models]
+    );
 };
 
 const getModelRevisionsForArchitecture = (
@@ -197,7 +200,10 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const [isAdvancedSettingsMode, setIsAdvancedSettingsMode] = useState<boolean>(false);
 
-    const modelRevisions = getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
+    const modelRevisions = useMemo(
+        () => getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId),
+        [allModelRevisions, resolvedModelArchitectureId]
+    );
 
     // The resolved architecture also changes while the timm card stays selected, which can invalidate the selection
     const selectedModelRevisionId = modelRevisions.some(({ id }) => id === modelRevisionId)
@@ -213,48 +219,67 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const [showMoreModelArchitectures, setShowMoreModelArchitectures] = useState<boolean>(false);
 
-    const onSelectModelArchitectureId = (modelArchitectureId: string | null) => {
-        setSelectedModelArchitectureId(modelArchitectureId);
-        setModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
-    };
-
-    return (
-        <TrainModelContext
-            value={{
-                ...timmModelSelection,
-
-                modelArchitectures,
-
-                selectedModelArchitectureId,
-                onSelectModelArchitectureId,
-                resolvedModelArchitectureId,
-
-                trainingDevices,
-                selectedTrainingDevice,
-                onSelectTrainingDevice: setSelectedTrainingDevice,
-
-                datasetSources,
-                selectedDatasetSourceId,
-                onSelectDatasetSourceId: setSelectedDatasetSourceId,
-
-                modelRevisions,
-                selectedModelRevisionId,
-                onSelectModelRevisionId: setModelRevisionId,
-
-                isAdvancedSettingsMode,
-                onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
-
-                showMoreModelArchitectures,
-                onToggleShowMoreModelArchitectures: setShowMoreModelArchitectures,
-
-                trainingConfiguration,
-                defaultTrainingConfiguration,
-                onTrainingConfigurationChange: setTrainingConfiguration,
-            }}
-        >
-            {children}
-        </TrainModelContext>
+    const onSelectModelArchitectureId = useCallback(
+        (modelArchitectureId: string | null) => {
+            setSelectedModelArchitectureId(modelArchitectureId);
+            setModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
+        },
+        [allModelRevisions]
     );
+
+    const value = useMemo(
+        () => ({
+            ...timmModelSelection,
+
+            modelArchitectures,
+
+            selectedModelArchitectureId,
+            onSelectModelArchitectureId,
+            resolvedModelArchitectureId,
+
+            trainingDevices,
+            selectedTrainingDevice,
+            onSelectTrainingDevice: setSelectedTrainingDevice,
+
+            datasetSources,
+            selectedDatasetSourceId,
+            onSelectDatasetSourceId: setSelectedDatasetSourceId,
+
+            modelRevisions,
+            selectedModelRevisionId,
+            onSelectModelRevisionId: setModelRevisionId,
+
+            isAdvancedSettingsMode,
+            onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
+
+            showMoreModelArchitectures,
+            onToggleShowMoreModelArchitectures: setShowMoreModelArchitectures,
+
+            trainingConfiguration,
+            defaultTrainingConfiguration,
+            onTrainingConfigurationChange: setTrainingConfiguration,
+        }),
+        [
+            timmModelSelection,
+            modelArchitectures,
+            selectedModelArchitectureId,
+            onSelectModelArchitectureId,
+            resolvedModelArchitectureId,
+            trainingDevices,
+            selectedTrainingDevice,
+            datasetSources,
+            selectedDatasetSourceId,
+            modelRevisions,
+            selectedModelRevisionId,
+            isAdvancedSettingsMode,
+            showMoreModelArchitectures,
+            trainingConfiguration,
+            defaultTrainingConfiguration,
+            setTrainingConfiguration,
+        ]
+    );
+
+    return <TrainModelContext value={value}>{children}</TrainModelContext>;
 };
 
 export const useTrainModelState = () => {

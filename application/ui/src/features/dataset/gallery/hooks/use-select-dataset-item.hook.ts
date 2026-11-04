@@ -1,10 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { isEqual } from 'lodash-es';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { paths } from '../../../../constants/paths';
@@ -18,7 +19,7 @@ export const useSelectDatasetItem = () => {
     const { items } = useDatasetMediaWithReviewStatus();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
 
-    const prevSelectedMediaItem = useRef<Media | null>(null);
+    const [prevSelectedMediaItem, setPrevSelectedMediaItem] = useState<Media | null>(null);
 
     // This state determines the currently displayed media item in the annotator.
     // It is computed based on the `selectedDatasetItemId` param and the `items` list.
@@ -33,15 +34,15 @@ export const useSelectDatasetItem = () => {
         const newSelectedMediaItem = items.find((item) => item.id === selectedDatasetItemId);
 
         if (newSelectedMediaItem === undefined) {
-            return prevSelectedMediaItem.current?.id === selectedDatasetItemId ? prevSelectedMediaItem.current : null;
+            return prevSelectedMediaItem?.id === selectedDatasetItemId ? prevSelectedMediaItem : null;
         }
 
         return newSelectedMediaItem;
-    }, [selectedDatasetItemId, items]);
+    }, [selectedDatasetItemId, items, prevSelectedMediaItem]);
 
-    useEffect(() => {
-        prevSelectedMediaItem.current = selectedMediaItem;
-    }, [selectedMediaItem]);
+    if (!isEqual(selectedMediaItem, prevSelectedMediaItem)) {
+        setPrevSelectedMediaItem(selectedMediaItem);
+    }
 
     const onSelectedMediaItemChange = (item: Media | null) => {
         if (item === null) {

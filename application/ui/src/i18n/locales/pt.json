@@ -363,6 +363,7 @@
             "label": "Dispositivo de inferência"
         },
         "sources": {
+            "title": "Fonte",
             "uploadError": "Falha ao carregar o ficheiro de vídeo.",
             "deleteVideoError": "Falha ao eliminar o ficheiro de vídeo carregado.",
             "list": {
@@ -372,7 +373,6 @@
                 "usbCamera": "câmara usb",
                 "ipCamera": "câmara ip",
                 "videoFile": "ficheiro de vídeo",
-                "imagesFolder": "pasta de imagens",
                 "disconnected": "desligado"
             },
             "options": {
@@ -404,13 +404,10 @@
                 "loading": "A carregar...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconhecido (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignorar imagens existentes: {{value}}",
                 "streamUrl": "URL do fluxo: {{url}}",
                 "videoPath": "Caminho do vídeo: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Caminho da pasta de imagens",
-                "ignoreExistingImages": "Ignorar imagens existentes",
                 "streamUrl": "URL do fluxo:",
                 "requireAuthentication": "Requer autenticação",
                 "camera": "Câmara",
@@ -425,6 +422,7 @@
             }
         },
         "sinks": {
+            "title": "Destino",
             "types": {
                 "folder": "pasta",
                 "mqtt": "mqtt",
@@ -511,9 +509,7 @@
                 "disabledSuccess": "Pipeline desativado com sucesso"
             },
             "configuration": {
-                "sidebarLabel": "Configuração do pipeline",
-                "sourcesTab": "Entrada",
-                "sinksTab": "Saída"
+                "sidebarLabel": "Configuração do pipeline"
             }
         },
         "collection": {
@@ -557,10 +553,6 @@
                 "healthy": "Operacional",
                 "finished": "Terminado",
                 "unavailable": "Indisponível"
-            },
-            "componentLabels": {
-                "source": "Fonte",
-                "sink": "Destino (sink)"
             }
         },
         "stream": {
@@ -891,7 +883,6 @@
                 "dialogTitle": "Registos de Treino",
                 "loadError": "Falha ao carregar registos: {{message}}",
                 "noJobOrModel": "Nenhuma tarefa ou modelo especificado",
-                "fetchError": "Falha ao obter registos do modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Transferência dos registos de treino iniciada"
             },
             "parameters": {

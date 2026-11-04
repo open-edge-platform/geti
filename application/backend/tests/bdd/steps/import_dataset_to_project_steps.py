@@ -10,9 +10,9 @@ from uuid import UUID, uuid4
 from behave import given, then, when
 from behave.model import Table
 from behave.runner import Context
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import Categories, LabelCategories
-from datumaro.experimental.export_import import export_dataset
+from getidata import Dataset
+from getidata.categories import Categories, LabelCategories
+from getidata.export_import import export_dataset
 from requests import Session
 
 from app.api.schemas import ProjectView

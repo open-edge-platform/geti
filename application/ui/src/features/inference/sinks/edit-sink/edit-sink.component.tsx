@@ -41,7 +41,7 @@ export const EditSink = <T extends SinkConfig>({
         config,
         isNewSink: false,
         onSaved: async (sinkId) => {
-            connectToPipeline.current && (await connectToPipelineMutation(sinkId));
+            connectToPipeline.current && (await connectToPipelineMutation.mutateAsync(sinkId));
             connectToPipeline.current = false;
             onSaved();
             void queryClient.fetchQuery(testSinkQueryOptions(sinkId)).catch(() => undefined);

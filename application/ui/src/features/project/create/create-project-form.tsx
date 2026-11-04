@@ -157,7 +157,11 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
                                 document.referrer === '' ||
                                 new URL(document.referrer).origin !== window.location.origin;
 
-                            isExternalReferrer ? navigate(paths.project.index({})) : navigate(-1);
+                            if (isExternalReferrer) {
+                                navigate(paths.project.index({}));
+                            } else {
+                                navigate(-1);
+                            }
                         }}
                     >
                         {t('common.actions.goBack')}

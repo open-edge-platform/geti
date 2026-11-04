@@ -54,7 +54,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
                                 <View flex={'1'} width={'100%'} minHeight={'size-6000'} backgroundColor={'gray-50'}>
                                     {currentStep === 'uploading' && (
                                         <ImportUploadFile
-                                            formatOptions='Geti, Datumaro, COCO, YOLO, VOC'
+                                            formatOptions='Geti, COCO, YOLO, VOC'
                                             onFileUploaded={handleFileUploaded}
                                         />
                                     )}

@@ -21,7 +21,7 @@
         "",
         "^react$",
         "",
-        "BUILTIN_MODULES>",
+        "<BUILTIN_MODULES>",
         "",
         "<THIRD_PARTY_MODULES>",
         "",

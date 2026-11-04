@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      delete_rc_images:
+        description: "After a successful promotion, delete this version's RC-tagged images from GHCR"
+        required: false
+        type: boolean
+        default: true
 
 permissions: {} # No permissions by default
 
@@ -38,7 +43,7 @@ jobs:
       docker_patch_tag: ${{ steps.validate.outputs.docker_patch_tag }}
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -156,7 +161,7 @@ jobs:
       contents: write # Permission to push release tag to git
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -211,12 +216,12 @@ jobs:
       DEVICE: ${{ matrix.device }}
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
       - name: Log in to GHCR
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -294,3 +299,14 @@ jobs:
       MSIX_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_SIGN_CERTIFICATE_PASSWORD }}
     permissions:
       contents: read
+
+  cleanup-rc-images:
+    needs: [validate, promote-docker]
+    if: inputs.dry_run == false && inputs.delete_rc_images
+    name: Delete promoted version's RC images from GHCR
+    uses: $/.github/workflows/remove-rc-app-images.yml
+    with:
+      version: ${{ needs.validate.outputs.docker_patch_tag }}
+      dry_run: false
+    permissions:
+      packages: write

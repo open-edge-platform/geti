@@ -26,11 +26,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import KeypointCategories, LabelCategories
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.categories import KeypointCategories, LabelCategories
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import Subset
 from pycocotools.coco import COCO
 from torchvision import tv_tensors
 

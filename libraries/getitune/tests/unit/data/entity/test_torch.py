@@ -5,7 +5,7 @@
 from unittest.mock import Mock
 
 import torch
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
+from getidata.fields import ImageInfo as DmImageInfo
 from torch import LongTensor
 from torchvision import tv_tensors
 

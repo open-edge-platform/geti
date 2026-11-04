@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { LocalFolderSinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -19,10 +19,6 @@ type LocalFolderProps = {
 export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
     const { t } = useTranslation();
     const [folderPath, setFolderPath] = useState(defaultState.folder_path);
-
-    useEffect(() => {
-        setFolderPath(defaultState.folder_path);
-    }, [defaultState.folder_path]);
 
     const handleOpenFolderDialog = () => {
         void open({

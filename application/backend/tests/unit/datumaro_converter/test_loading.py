@@ -1,21 +1,16 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import json
+import shutil
 from pathlib import Path
 
 import numpy as np
 import polars as pl
 import pytest
-from datumaro.experimental import Dataset, LazyImage, Sample
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import (
-    ImageInfo,
-    Subset,
-    image_info_field,
-    image_path_field,
-    label_field,
-    subset_field,
-)
+from getidata import Dataset, LazyImage, Sample
+from getidata.categories import LabelCategories
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo, Subset, image_info_field, image_path_field, label_field, subset_field
 from PIL import Image
 
 from app.datumaro_converter import SampleMode, import_dataset
@@ -81,8 +76,10 @@ def test_import_dataset_upgrades_legacy_uint8_schema(
 
 
 @pytest.mark.parametrize("sample_mode", _SAMPLE_MODES)
+@pytest.mark.parametrize("old_modules", [False, True])
+@pytest.mark.parametrize("as_zip", [False, True])
 def test_import_dataset_roundtrips_label_index_above_uint8(
-    tmp_path: Path, fxt_task_name: str, sample_mode: SampleMode, fxt_task_dataset
+    tmp_path: Path, fxt_task_name: str, sample_mode: SampleMode, fxt_task_dataset, old_modules: bool, as_zip: bool
 ) -> None:
     label_indices = [255, 256, 299]
     dataset, expected_labels = fxt_task_dataset(
@@ -92,7 +89,18 @@ def test_import_dataset_roundtrips_label_index_above_uint8(
         media_paths=_media_paths(tmp_path, len(label_indices)),
     )
     export_dataset(dataset, tmp_path / "exported")
-    imported = import_dataset(tmp_path / "exported")
+    if old_modules:
+        metadata_path = tmp_path / "exported" / "metadata.json"
+        metadata = json.loads(metadata_path.read_text())
+        for attribute in metadata["schema"]["attributes"].values():
+            module_name = attribute.get("type_module")
+            if module_name and module_name.startswith("getidata."):
+                attribute["type_module"] = module_name.replace("getidata.", "datumaro.experimental.", 1)
+        metadata_path.write_text(json.dumps(metadata))
+    input_path = tmp_path / "exported"
+    if as_zip:
+        input_path = Path(shutil.make_archive(str(tmp_path / "archive"), "zip", input_path))
+    imported = import_dataset(input_path)
     assert imported.dtype is dataset.dtype
     assert _labels(imported) == expected_labels
 

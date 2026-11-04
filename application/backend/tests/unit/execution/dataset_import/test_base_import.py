@@ -11,9 +11,9 @@ from uuid import uuid4
 import cv2
 import numpy as np
 import pytest
-from datumaro.experimental import Dataset, LazyImage, LazyVideoFrame, MediaInfo
-from datumaro.experimental.categories import Categories, LabelCategories
-from datumaro.experimental.fields import Subset
+from getidata import Dataset, LazyImage, LazyVideoFrame, MediaInfo
+from getidata.categories import Categories, LabelCategories
+from getidata.fields import Subset
 from PIL import Image
 from sqlalchemy.orm import Session
 

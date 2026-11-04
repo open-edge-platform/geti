@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import pytest
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 
 import polars as pl
 import pytest
-from datumaro.experimental.export_import import import_dataset
+from getidata.export_import import import_dataset
 
 from getitune.data.dataset.base import VisionDataset
 from getitune.data.dataset.classification import MulticlassClsDataset
@@ -26,7 +26,7 @@ from getitune.data.entity.sample import (
 )
 
 if TYPE_CHECKING:
-    from datumaro.experimental.dataset import Sample
+    from getidata.dataset import Sample
 
 ASSETS_DIR = Path(__file__).resolve().parents[3] / "assets"
 FIXTURE_SAMPLES: dict[str, type[Sample]] = {

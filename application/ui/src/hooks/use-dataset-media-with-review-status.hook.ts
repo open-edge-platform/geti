@@ -14,11 +14,11 @@ export const useDatasetMediaWithReviewStatus = () => {
 
     const fetchNextPage = () => {
         if (mediaItemsResponse.hasNextPage && !mediaItemsResponse.isFetchingNextPage) {
-            mediaItemsResponse.fetchNextPage();
+            void mediaItemsResponse.fetchNextPage();
         }
 
         if (datasetItemsResponse.hasNextPage && !datasetItemsResponse.isFetchingNextPage) {
-            datasetItemsResponse.fetchNextPage();
+            void datasetItemsResponse.fetchNextPage();
         }
     };
 

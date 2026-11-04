@@ -20,3 +20,7 @@ export function assertIsNotNullable<T>(value: T | null | undefined, name = 'valu
         throw new Error(`${name} must not be null or undefined`);
     }
 }
+
+export function assertNever(value: never): never {
+    throw new Error(`Unexpected value: ${JSON.stringify(value)}`);
+}

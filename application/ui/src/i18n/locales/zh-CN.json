@@ -363,6 +363,7 @@
             "label": "推理设备"
         },
         "sources": {
+            "title": "输入源",
             "uploadError": "视频文件上传失败。",
             "deleteVideoError": "已上传的视频文件删除失败。",
             "list": {
@@ -372,7 +373,6 @@
                 "usbCamera": "USB 摄像头",
                 "ipCamera": "IP 摄像头",
                 "videoFile": "视频文件",
-                "imagesFolder": "图片文件夹",
                 "disconnected": "未连接"
             },
             "options": {
@@ -404,13 +404,10 @@
                 "loading": "加载中……",
                 "device": "设备：{{name}}",
                 "unknownDevice": "未知设备（id：{{deviceId}}）",
-                "ignoreExistingImages": "忽略已有图片：{{value}}",
                 "streamUrl": "视频流地址：{{url}}",
                 "videoPath": "视频路径：{{path}}"
             },
             "fields": {
-                "imagesFolderPath": "图片文件夹路径",
-                "ignoreExistingImages": "忽略已有图片",
                 "streamUrl": "视频流地址：",
                 "requireAuthentication": "需要身份验证",
                 "camera": "摄像头",
@@ -425,6 +422,7 @@
             }
         },
         "sinks": {
+            "title": "输出端",
             "types": {
                 "folder": "文件夹",
                 "mqtt": "MQTT",
@@ -511,9 +509,7 @@
                 "disabledSuccess": "流水线停用成功"
             },
             "configuration": {
-                "sidebarLabel": "流水线配置",
-                "sourcesTab": "输入",
-                "sinksTab": "输出"
+                "sidebarLabel": "流水线配置"
             }
         },
         "collection": {
@@ -557,10 +553,6 @@
                 "healthy": "健康",
                 "finished": "已完成",
                 "unavailable": "不可用"
-            },
-            "componentLabels": {
-                "source": "输入源",
-                "sink": "输出端"
             }
         },
         "stream": {
@@ -891,7 +883,6 @@
                 "dialogTitle": "训练日志",
                 "loadError": "日志加载失败：{{message}}",
                 "noJobOrModel": "未指定任务或模型",
-                "fetchError": "模型日志获取失败：{{status}} {{statusText}}",
                 "downloadStarted": "训练日志下载已开始"
             },
             "parameters": {

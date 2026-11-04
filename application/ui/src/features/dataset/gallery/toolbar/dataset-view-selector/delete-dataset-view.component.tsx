@@ -3,8 +3,6 @@
 
 import { useTranslation } from '@/i18n';
 import { AlertDialog, Content, Text } from '@geti-ui/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import { datasetViewsQueryOptions } from 'hooks/api/dataset-views.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { useDeleteDatasetViewMutation } from './api/use-delete-dataset-view';
@@ -18,7 +16,6 @@ type DeleteDatasetViewDialogProps = {
 
 const useDeleteDatasetView = () => {
     const projectId = useProjectIdentifier();
-    const queryClient = useQueryClient();
     const deleteDatasetViewMutation = useDeleteDatasetViewMutation();
 
     const deleteDatasetView = ({ datasetViewId, onSuccess }: { datasetViewId: string; onSuccess: () => void }) => {
@@ -31,12 +28,7 @@ const useDeleteDatasetView = () => {
                     },
                 },
             },
-            {
-                onSuccess: async () => {
-                    await queryClient.invalidateQueries({ queryKey: datasetViewsQueryOptions(projectId).queryKey });
-                    onSuccess();
-                },
-            }
+            { onSuccess }
         );
     };
 

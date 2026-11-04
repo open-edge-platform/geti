@@ -12,7 +12,7 @@ import { ProjectList } from './features/project/list/project-list.component';
 import { ImportDatasetDialogProvider } from './features/project/providers/import-dataset-dialog-provider.component';
 import { useProjects } from './hooks/api/project.hook';
 import { Layout } from './layout';
-import { useTerminateAnnotatorWorkersOnUnmount } from './modules/annotator/tools/terminate-annotator-workers-on-unmount.hook';
+import { useTerminateSmartToolWorkersOnUnmount } from './modules/annotator/smart-tools/terminate-smart-tool-workers-on-unmount.hook';
 import { Dataset } from './routes/dataset/dataset.component';
 import { ErrorPage } from './routes/error-page/error-page';
 import { Inference } from './routes/inference/inference';
@@ -52,7 +52,7 @@ const Redirect = () => {
 // Owns the lifetime of the annotator-tool web workers (SAM/SSIM/scissors): they boot lazily inside
 // the annotator and are terminated here, freeing the ~100 MB WASM heap when the user leaves the dataset section.
 const DatasetSection = () => {
-    useTerminateAnnotatorWorkersOnUnmount();
+    useTerminateSmartToolWorkersOnUnmount();
 
     return (
         <ImportDatasetDialogStateProvider>

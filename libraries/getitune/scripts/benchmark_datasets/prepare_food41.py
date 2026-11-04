@@ -26,10 +26,10 @@ import shutil
 from typing import TYPE_CHECKING
 
 import numpy as np
-from datumaro.experimental import Dataset, LazyImage
-from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoSample
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import Dataset, LazyImage
+from getidata.data_formats.coco.sample import CocoCategories, CocoSample
+from getidata.export_import import export_dataset
+from getidata.fields import ImageInfo, Subset
 from PIL import Image
 
 from getitune.benchmark.dataset_helpers import download_kaggle_dataset, parse_args, resolve_raw_source

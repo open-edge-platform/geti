@@ -4,8 +4,8 @@ import shutil
 from pathlib import Path
 from uuid import UUID
 
-from datumaro.experimental.categories import HierarchicalLabelCategories
-from datumaro.experimental.export_import import export_dataset
+from getidata.categories import HierarchicalLabelCategories
+from getidata.export_import import export_dataset
 from loguru import logger
 
 from app.datumaro_converter import import_dataset
@@ -17,13 +17,13 @@ class PrepareDataset(Execution[PrepareDatasetForImportJobParams]):
     """
     Execution implementation for preparing dataset archives for import into Geti format.
 
-    This class handles the conversion of various dataset formats (COCO, YOLO, VOC, Datumaro V1)
+    This class handles the conversion of various dataset formats (COCO, YOLO, VOC, Geti)
     into the Geti format. It extracts archived datasets, converts them to the standardized format,
     and cleans up temporary files.
 
     The execution follows these steps:
     1. Validate and locate the dataset archive in the staged directory
-    2. Convert the dataset to Geti format using Datumaro's import/export functionality
+    2. Convert the dataset to Geti format using getidata's import/export functionality
     3. Clean up the original archive and extracted files
 
     Supported formats:
@@ -31,7 +31,6 @@ class PrepareDataset(Execution[PrepareDatasetForImportJobParams]):
     - YOLO: YOLO format with root directory structure
     - VOC: Pascal VOC format
     - GETI: Native Geti format (pass-through)
-    - DATUMARO_V1: Legacy Datumaro v1 format
 
     Attributes:
         params_type: The parameter type for this execution (PrepareDatasetForImportJobParams).

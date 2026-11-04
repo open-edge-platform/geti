@@ -7,9 +7,9 @@ import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { Point, Polygon } from '../../../../shared/types';
+import { useIntelligentScissorsWorker } from '../../smart-tools/use-intelligent-scissors-worker.hook';
 import { usePolygonState } from '../polygon-tool/polygon-state-provider.component';
 import { convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
-import { useIntelligentScissorsWorker } from './use-intelligent-scissors-worker.hook';
 
 export const usePolygonConfig = ({
     zoom,
@@ -31,13 +31,13 @@ export const usePolygonConfig = ({
 
         return () => {
             isMounted.current = false;
-            worker?.cleanImg();
+            void worker?.cleanImg();
         };
     }, [worker]);
 
     useEffect(() => {
         if (!isMounted.current || !image || isImageOversized(image)) return;
-        worker?.loadImage(image);
+        void worker?.loadImage(image);
     }, [image, worker]);
 
     const polygon = useMemo<Polygon | null>(() => {
@@ -92,7 +92,7 @@ export const usePolygonConfig = ({
         setPointerLine,
         lassoSegment,
         setLassoSegment,
-        isMounted: isMounted.current,
+        isMountedRef: isMounted,
         segments,
         setSegments,
         optimizePolygonOrSegments,

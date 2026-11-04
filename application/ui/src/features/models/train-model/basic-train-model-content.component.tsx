@@ -3,7 +3,6 @@
 
 import { Divider, Flex, View } from '@geti-ui/ui';
 
-import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { ModelArchitecturesList } from './model-architectures-list/model-architectures-list.component';
 import { SelectDatasetSource } from './select-dataset-source.component';
 import { SelectModelRevision } from './select-model-revision.component';
@@ -14,8 +13,7 @@ import { useTrainModelState } from './train-model-provider.component';
 
 export const BasicTrainModelContent = () => {
     const { selectedModelArchitectureId } = useTrainModelState();
-    const showTIMMModelConfiguration =
-        FEATURE_FLAGS.TIMM_MODEL_CONFIGURATION && isTimmModelArchitecture(selectedModelArchitectureId);
+    const showTIMMModelConfiguration = isTimmModelArchitecture(selectedModelArchitectureId);
 
     return (
         <View backgroundColor={'gray-50'} height={'100%'}>

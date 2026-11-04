@@ -19,7 +19,7 @@ from getitune.data.entity.sample import BaseSample, SampleBatch
 from getitune.types import TaskType
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
 
 Transforms = Union[
     Compose, Callable, List[Callable], dict[str, Compose | Callable | List[Callable]], "CPUAugmentationPipeline"

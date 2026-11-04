@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Generic, TypeVar
 
-from datumaro.experimental import LazyImage, LazyVideoFrame, MediaInfo, Sample
+from getidata import LazyImage, LazyVideoFrame, MediaInfo, Sample
 
 from app.datumaro_converter.domain import LabelIndex, SampleMode
 from app.models import DatasetItem, Image, Label, Media, VideoFrame

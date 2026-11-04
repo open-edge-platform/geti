@@ -25,6 +25,9 @@
 !libraries/getitune/pyproject.toml
 !libraries/getitune/MANIFEST.in
 !libraries/getitune/src/getitune
+!libraries/getidata/pyproject.toml
+!libraries/getidata/README.md
+!libraries/getidata/src/getidata
 
 # Exclude non-essential files that sneak in via the above whitelists
 **/__pycache__

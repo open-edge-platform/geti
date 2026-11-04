@@ -46,7 +46,7 @@ const renderApp = async ({
             HttpResponse.json({
                 project_id: '',
                 status: 'idle',
-                device: 'images_folder',
+                device: 'cpu',
             })
         )
     );

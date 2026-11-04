@@ -54,7 +54,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status: 200 }
                     );
@@ -95,7 +95,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     )
@@ -122,7 +122,7 @@ describe('SinkMenu', () => {
             await userEvent.click(screen.getByRole('button', { name: /sink menu/i }));
             await userEvent.click(screen.getByRole('menuitem', { name: /^Connect$/i }));
 
-            await expect(await screen.findByLabelText('toast')).toHaveTextContent(
+            expect(await screen.findByLabelText('toast')).toHaveTextContent(
                 'An unexpected error occurred. Please try again.'
             );
         });
@@ -152,7 +152,7 @@ describe('SinkMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status: 200 }
                     );
