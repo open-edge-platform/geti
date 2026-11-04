@@ -23,7 +23,7 @@ export const ImportDatasetToProject = () => {
     const { datasetImportDialogState, currentStep, currentStagedId, setCurrentStep, setCurrentStagedId } =
         useImportDatasetDialogState();
 
-    const formatOptions = getFormatOptions(selectedProject.task.task_type)
+    const formatOptions = getFormatOptions(selectedProject.task)
         .map(({ label }) => label)
         .join(', ');
 

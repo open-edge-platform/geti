@@ -126,7 +126,7 @@ const ExportDatasetDialogContent = ({
         onSuccess: dialogState.close,
     });
 
-    const formatOptions = getFormatOptions(selectedProject.task.task_type);
+    const formatOptions = getFormatOptions(selectedProject.task);
     const [selectedExportFormat, setSelectedExportFormat] = useState<string | null>(formatOptions.at(0)?.value ?? null);
 
     const labels = selectedProject.task.labels?.map((label) => ({ id: label.name, name: label.name })) ?? [];

@@ -57,7 +57,7 @@ describe('ExportDatasetConfig', () => {
         render(<ExportDatasetConfig dialogState={mockDialogState} datasetId={null} statistics={undefined} />);
     };
 
-    it('shows only GETI export option for classification task', async () => {
+    it('shows GETI, VOC and YOLO export options for single-label classification task', async () => {
         renderApp(
             getMockedProject({
                 task: { exclusive_labels: true, task_type: 'classification' },
@@ -66,8 +66,22 @@ describe('ExportDatasetConfig', () => {
 
         expect(await screen.findByText('Export dataset')).toBeVisible();
         expect(screen.getByRole('radio', { name: 'Geti' })).toBeVisible();
-        expect(screen.queryByRole('radio', { name: 'YOLO' })).not.toBeInTheDocument();
+        expect(screen.getByRole('radio', { name: 'VOC' })).toBeVisible();
+        expect(screen.getByRole('radio', { name: 'YOLO' })).toBeVisible();
         expect(screen.queryByRole('radio', { name: 'COCO' })).not.toBeInTheDocument();
+    });
+
+    it('does not show the YOLO export option for multi-label classification task', async () => {
+        renderApp(
+            getMockedProject({
+                task: { exclusive_labels: false, task_type: 'classification' },
+            })
+        );
+
+        expect(await screen.findByText('Export dataset')).toBeVisible();
+        expect(screen.getByRole('radio', { name: 'Geti' })).toBeVisible();
+        expect(screen.getByRole('radio', { name: 'VOC' })).toBeVisible();
+        expect(screen.queryByRole('radio', { name: 'YOLO' })).not.toBeInTheDocument();
     });
 
     it('shows GETI and COCO export option for instance_segmentation task', async () => {
