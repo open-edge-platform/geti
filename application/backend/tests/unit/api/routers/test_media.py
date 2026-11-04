@@ -1113,6 +1113,33 @@ class TestMediaEndpoints:
         assert raw_response.status_code == status.HTTP_200_OK
         assert "image/tiff" in raw_response.headers.get("content-type", "")
 
+    def test_get_media_binary_display_png_revalidation(
+        self, fxt_get_project, fxt_media_service, fxt_client, tmp_path: Path
+    ):
+        """The converted PNG carries an ETag; a matching If-None-Match gets a 304 without re-converting."""
+        media = MagicMock(spec=Image, id=uuid4(), format=ImageFormat.TIFF, type=MediaType.IMAGE)
+        type(media).name = PropertyMock(return_value="test")
+        fxt_media_service.get_media_by_id.return_value = media
+        binary_path = tmp_path / "image.tiff"
+        PILImage.new("RGB", (8, 6)).save(binary_path)
+        fxt_media_service.get_media_binary_path_by_id.return_value = binary_path
+        url = f"/api/projects/{uuid4()}/dataset/media/{media.id}/binary"
+
+        first = fxt_client.get(url)
+        etag = first.headers["etag"]
+        with patch("app.api.routers.media.convert_image_to_display_png_bytes") as mock_convert:
+            revalidated = fxt_client.get(url, headers={"If-None-Match": etag})
+        PILImage.new("RGB", (16, 12)).save(binary_path)
+        after_change = fxt_client.get(url, headers={"If-None-Match": etag})
+
+        assert first.status_code == status.HTTP_200_OK
+        assert first.headers["cache-control"] == "no-cache"
+        assert revalidated.status_code == status.HTTP_304_NOT_MODIFIED
+        assert revalidated.headers["etag"] == etag
+        mock_convert.assert_not_called()
+        assert after_change.status_code == status.HTTP_200_OK
+        assert after_change.headers["etag"] != etag
+
     @pytest.mark.parametrize(
         "image_format, suffix",
         [

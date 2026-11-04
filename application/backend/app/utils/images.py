@@ -9,6 +9,8 @@ from PIL import Image
 _HIGH_BIT_DEPTH_MODES = ("I;16", "I;16B", "I;16L", "I;16S", "I;16BS", "I", "F")
 # 8-bit modes that PNG can store and browsers can display
 _PNG_DISPLAY_MODES = ("1", "L", "LA", "P", "RGB", "RGBA")
+# Bump whenever convert_image_to_display_png_bytes output changes, so browsers drop their cached copies
+DISPLAY_CONVERSION_VERSION = 1
 
 
 def crop_to_thumbnail(image: Image.Image, target_height: int, target_width: int) -> Image.Image:

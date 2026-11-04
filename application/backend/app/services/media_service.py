@@ -110,8 +110,8 @@ class MediaService(BaseSessionManagedService):
         data.seek(0)
         try:
             return Image.open(data)
-        except UnidentifiedImageError:
-            raise InvalidImageError
+        except (UnidentifiedImageError, Image.DecompressionBombError) as error:
+            raise InvalidImageError from error
 
     @staticmethod
     def _read_image_from_path(path: Path) -> Image.Image:
@@ -120,7 +120,7 @@ class MediaService(BaseSessionManagedService):
                 image.load()
                 # Detach the image from the file, so that the file can be moved (even on Windows)
                 return image.copy()
-        except (UnidentifiedImageError, OSError) as error:
+        except (UnidentifiedImageError, Image.DecompressionBombError, OSError) as error:
             raise InvalidImageError from error
 
     @staticmethod
