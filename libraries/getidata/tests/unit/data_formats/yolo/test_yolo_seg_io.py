@@ -245,6 +245,22 @@ def test_load_yolo_dataset_rejects_segmentation_labels(tmp_path: Path):
         load_yolo_dataset(str(tmp_path))
 
 
+def test_load_yolo_dataset_rejects_segmentation_labels_explicit_format(tmp_path: Path):
+    """Test that the explicit ultralytics format also refuses segmentation labels."""
+    _create_seg_dataset(tmp_path)
+
+    with pytest.raises(ValueError, match="segmentation labels"):
+        load_yolo_dataset(str(tmp_path), format="ultralytics")
+
+
+def test_import_dataset_explicit_yolo_detection_format_rejects_segmentation(tmp_path: Path):
+    """Test that importing a segmentation dataset with the explicit detection format raises."""
+    _create_seg_dataset(tmp_path)
+
+    with pytest.raises(ValueError, match="segmentation labels"):
+        import_dataset(str(tmp_path), data_format=DataFormat.YOLO_ULTRALYTICS)
+
+
 def test_import_dataset_auto_detects_yolo_seg(tmp_path: Path):
     """Test that import_dataset auto-detects and loads the segmentation format."""
     _create_seg_dataset(tmp_path)

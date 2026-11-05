@@ -7,7 +7,7 @@ Helper functions for YOLO dataset I/O.
 import logging
 import shutil
 from collections import defaultdict
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Literal, TypeVar
 
 import numpy as np
@@ -214,24 +214,26 @@ def _detect_yolo_format(root_path: Path) -> Literal["ultralytics", "traditional"
 # =============================================================================
 
 
-# Directories with these names inside a subset directory indicate the YOLO detection/segmentation
-# layout (``<subset>/images`` + ``<subset>/labels``, as exported by Roboflow) rather than the
-# classification layout, even though they technically hold image files directly.
-_NON_CLASS_DIR_NAMES = frozenset({"images", "labels"})
-
-
 def _find_class_dirs(subset_dir: Path) -> list[Path]:
     """
     Find the per-class image directories directly inside a subset directory.
 
     A child directory of ``subset_dir`` counts as a class directory when it holds at least one
-    image file directly. Directories named ``images``/``labels`` are excluded so that the
-    split-first detection layout (``train/images`` + ``train/labels``) is not mistaken for the
-    classification layout.
+    image file directly. That alone tells a ``labels`` directory of the split-first detection
+    layout (``train/images`` + ``train/labels``, holding .txt label files) apart from a class
+    named ``labels`` (holding images). An ``images`` directory holds images in both layouts, so
+    it is treated as the detection layout's image directory only when a sibling ``labels``
+    directory without image files marks the pair; a standalone ``images`` directory is a valid
+    class directory.
     """
+    child_dirs = sorted(child for child in subset_dir.iterdir() if child.is_dir())
+    has_detection_labels_dir = any(
+        child.name.lower() == "labels" and not _find_image_files(child) for child in child_dirs
+    )
+
     class_dirs = []
-    for child in sorted(subset_dir.iterdir()):
-        if not child.is_dir() or child.name.lower() in _NON_CLASS_DIR_NAMES:
+    for child in child_dirs:
+        if child.name.lower() == "images" and has_detection_labels_dir:
             continue
         if _find_image_files(child):
             class_dirs.append(child)
@@ -1124,6 +1126,24 @@ def _save_yolo_traditional(
     return written
 
 
+def _is_usable_class_dir_name(class_name: str) -> bool:
+    """
+    Check that a class name can be used as a single directory name without escaping the export root.
+
+    Class names come from the dataset's label categories, which only constrain the length of a
+    name, not its characters. A name holding path separators, a drive letter, an absolute path,
+    or the special entries ``.``/``..`` would make ``subset_dir / class_name`` point outside the
+    per-class directory, so such names cannot be represented on disk.
+    """
+    if not class_name or class_name in (".", ".."):
+        return False
+    if PureWindowsPath(class_name).is_absolute():
+        return False
+    if len(class_name) > 1 and class_name[1] == ":" and class_name[0].isalpha():
+        return False
+    return "/" not in class_name and "\\" not in class_name
+
+
 def _get_cls_label_names_from_dataset(dataset: Dataset[YoloClsSample]) -> list[str]:
     """Extract label names from the ``label`` attribute of the dataset schema."""
     label_categories = dataset.schema.attributes.get("label")
@@ -1148,6 +1168,16 @@ def _save_yolo_cls(
     label_names = _get_cls_label_names_from_dataset(dataset)
     subset_to_samples = _group_cls_samples_by_subset(dataset)
 
+    # Class names become directory names, and the label API does not restrict their characters,
+    # so names that cannot be represented as a single safe directory are skipped up front.
+    skipped_class_names = {name for name in label_names if not _is_usable_class_dir_name(name)}
+    for class_name in sorted(skipped_class_names):
+        logger.warning(
+            "[YOLO-CLS] Skipping class %r: the name cannot be used as a directory "
+            "(path separators and absolute paths are not allowed)",
+            class_name,
+        )
+
     written: dict[str, Path] = {}
     for subset, samples in subset_to_samples.items():
         if not samples:
@@ -1171,6 +1201,8 @@ def _save_yolo_cls(
                 continue
 
             class_name = label_names[int(sample.label)]
+            if class_name in skipped_class_names:
+                continue
             class_dir = subset_dir / class_name
             names = used_names.setdefault(class_name, {})
             file_name = unique_destination_filename(image_path, names)

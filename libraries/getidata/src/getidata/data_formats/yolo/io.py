@@ -301,18 +301,24 @@ def load_yolo_dataset(root_dir: str, format: str = "auto") -> Dataset:
         raise FileNotFoundError(f"YOLO root directory does not exist: {root_dir}")
 
     # Detect format if auto
+    segmentation_error = (
+        f"The YOLO dataset in {root_dir} contains segmentation labels. "
+        "Use load_yolo_seg_dataset to load instance segmentation datasets."
+    )
     if format == "auto":
         format = _detect_yolo_format(root_path)
         if format == "segmentation":
-            raise ValueError(
-                f"The YOLO dataset in {root_dir} contains segmentation labels. "
-                "Use load_yolo_seg_dataset to load instance segmentation datasets."
-            )
+            raise ValueError(segmentation_error)
         if format == "unknown":
             raise ValueError(
                 f"Could not detect YOLO format in {root_dir}. "
                 "Expected data.yaml (Ultralytics) or obj.names (traditional YOLO)."
             )
+    elif format == "ultralytics":
+        # The explicit format bypasses detection, so the segmentation check has to run here as
+        # well: the detection loader would otherwise misparse polygon rows as cxcywh boxes.
+        if _has_segmentation_rows(root_path):
+            raise ValueError(segmentation_error)
 
     logger.info("[YOLO] Loading %s format dataset from '%s'", format, root_dir)
 
