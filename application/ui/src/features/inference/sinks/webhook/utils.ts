@@ -35,15 +35,15 @@ export const getDuplicateKeyIndexes = (rows: HeaderRow[]): Set<number> => {
     const duplicates = new Set<number>();
 
     rows.forEach(({ key }, index) => {
-        const trimmed = key.trim();
+        const normalized = key.trim().toLocaleLowerCase();
 
-        if (trimmed.length === 0) return;
+        if (normalized.length === 0) return;
 
-        if (seen.has(trimmed)) {
+        if (seen.has(normalized)) {
             duplicates.add(index);
         }
 
-        seen.add(trimmed);
+        seen.add(normalized);
     });
 
     return duplicates;
@@ -79,5 +79,5 @@ export const toWebhookBody = (config: WebhookFormState): Omit<WebhookSinkConfig,
 export const isWebhookConfigValid = ({ webhook_url, headers, output_formats }: WebhookFormState): boolean =>
     webhook_url.trim().length > 0 &&
     output_formats.length > 0 &&
-    headers.every(({ key, value }) => key.trim().length > 0 && value.length > 0) &&
+    headers.every(({ key, value }) => key.trim().length > 0 && value.trim().length > 0) &&
     getDuplicateKeyIndexes(headers).size === 0;
