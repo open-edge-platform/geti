@@ -5,7 +5,6 @@ import { expect } from '@playwright/test';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { FEATURE_FLAGS } from '../../../src/constants/feature-flags';
 import type { AnnotatorPage } from '../../datasets/annotator-page';
 import { http, test } from '../../fixtures';
 import { candyBinaryHandler, redLabel } from '../annotator-fixtures';
