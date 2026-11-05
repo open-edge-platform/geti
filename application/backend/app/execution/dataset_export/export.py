@@ -33,6 +33,7 @@ def get_dm_format(dataset_format: DatasetFormat) -> DataFormat:
         DatasetFormat.COCO: DataFormat.COCO,
         DatasetFormat.YOLO: DataFormat.YOLO,
         DatasetFormat.YOLO_CLS: DataFormat.YOLO_ULTRALYTICS_CLS,
+        DatasetFormat.YOLO_SEG: DataFormat.YOLO_ULTRALYTICS_SEG,
         DatasetFormat.VOC: DataFormat.VOC,
     }
     if dataset_format not in format_mapping:
@@ -103,7 +104,13 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
         target_dir.mkdir(parents=True, exist_ok=True)
         filename = self._build_zip_archive_name(project_id, export_format)
         match export_format:
-            case DatasetFormat.COCO | DatasetFormat.YOLO | DatasetFormat.VOC | DatasetFormat.YOLO_CLS:
+            case (
+                DatasetFormat.COCO
+                | DatasetFormat.YOLO
+                | DatasetFormat.VOC
+                | DatasetFormat.YOLO_CLS
+                | DatasetFormat.YOLO_SEG
+            ):
                 export_dataset(
                     dataset=dataset,
                     data_format=get_dm_format(export_format),
