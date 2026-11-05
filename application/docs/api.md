@@ -90,10 +90,6 @@
 >   one frame is annotated. Compare `annotated_video_frames` with `frame_count` to know whether every frame is
 >   annotated.
 
-> **Deprecated:** the video field `annotated_frame_count` is deprecated in favor of
-> `annotation_status.annotated_video_frames`. It is marked `deprecated: true` in the OpenAPI spec and will be
-> removed in a future version.
-
 > `GET /api/projects/<id>/dataset/media/<id>/binary` returns images that browsers cannot display (TIFF and high
 > bit depth images, e.g. 16-bit) as an 8-bit PNG. Pass `?raw=true` to get the original file instead. The media
 > `format` field always reports the format of the stored file, not of the returned content.

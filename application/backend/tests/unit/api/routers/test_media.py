@@ -204,7 +204,6 @@ def test_convert_video_to_view(fxt_video_media) -> None:
         size=fxt_video_media.size,
         fps=fxt_video_media.fps,
         frame_count=fxt_video_media.frame_count,
-        annotated_frame_count=100,
         source_id=fxt_video_media.source_id,
         duration=fxt_video_media.duration,
         annotation_status=VideoAnnotationStatusView(has_annotations=True, annotated_video_frames=100),
@@ -320,7 +319,6 @@ class TestMediaEndpoints:
             "width": 1024,
             "fps": 25.0,
             "frame_count": 1000,
-            "annotated_frame_count": 100,
             "duration": 40,
             "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
@@ -927,7 +925,7 @@ class TestMediaEndpoints:
                 "get",
                 f"/api/projects/{uuid4()}/dataset/media/invalid-id/thumbnail",
                 "fxt_media_service",
-                "get_media_thumbnail_path",
+                "get_media_thumbnail_path_by_id",
             ),
             ("delete", f"/api/projects/{uuid4()}/dataset/media/invalid-id", "fxt_media_service", "delete_media"),
             (
@@ -945,7 +943,15 @@ class TestMediaEndpoints:
         ],
     )
     def test_invalid_ids(
-        self, request, http_method, http_path, service_name, service_method, fxt_get_project, fxt_client
+        self,
+        request,
+        http_method,
+        http_path,
+        service_name,
+        service_method,
+        fxt_get_project,
+        fxt_project_service,
+        fxt_client,
     ):
         service = request.getfixturevalue(service_name)
         response = getattr(fxt_client, http_method)(http_path)
@@ -1003,7 +1009,6 @@ class TestMediaEndpoints:
             "width": fxt_video_media.width,
             "fps": fxt_video_media.fps,
             "frame_count": fxt_video_media.frame_count,
-            "annotated_frame_count": 100,
             "duration": fxt_video_media.duration,
             "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
