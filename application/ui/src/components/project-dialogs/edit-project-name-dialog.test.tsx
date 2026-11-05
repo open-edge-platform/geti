@@ -84,8 +84,7 @@ describe('EditProjectNameDialog', () => {
 
         server.use(
             http.patch('/api/projects/{project_id}', () => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 500 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: errorMessage }, { status: 500 });
             })
         );

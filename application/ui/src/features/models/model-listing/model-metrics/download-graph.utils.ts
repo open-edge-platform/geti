@@ -1,4 +1,8 @@
-/* eslint-disable header/header */
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import { downloadFile } from '../../../../platform/download-file';
+
 const applyInlineStyles = (sourceNode: Element, targetNode: Element) => {
     const computedStyle = window.getComputedStyle(sourceNode);
 
@@ -83,11 +87,10 @@ export const downloadSvgAsImage = (svgElement: SVGSVGElement, title: string): Pr
                     ctx.fillRect(0, 0, width, height);
                     ctx.drawImage(img, 0, 0);
 
-                    const dataUrl = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.href = dataUrl;
-                    link.download = `${title.replace(/\s+/g, '_').toLowerCase()}_metrics.png`;
-                    link.click();
+                    downloadFile(
+                        canvas.toDataURL('image/png'),
+                        `${title.replace(/\s+/g, '_').toLowerCase()}_metrics.png`
+                    );
                 }
 
                 URL.revokeObjectURL(url);

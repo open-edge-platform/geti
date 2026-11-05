@@ -229,8 +229,7 @@ test.describe('Import dataset to project', () => {
             }),
             http.delete('/api/staged_datasets/{staged_dataset_id}', ({}) => {
                 return HttpResponse.json(
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
+                    // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                     { detail: errorMessage },
                     { status: 404 }
                 );

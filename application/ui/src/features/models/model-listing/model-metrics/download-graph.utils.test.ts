@@ -1,13 +1,17 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { downloadFile } from '../../../../platform/download-file';
 import { downloadSvgAsImage } from './download-graph.utils';
+
+rs.mock('../../../../platform/download-file', () => ({
+    downloadFile: rs.fn(),
+}));
 
 describe('downloadSvgAsImage', () => {
     let mockSvg: SVGSVGElement;
     let createObjectURLSpy: ReturnType<typeof rs.fn>;
     let revokeObjectURLSpy: ReturnType<typeof rs.fn>;
-    let anchorClickSpy: ReturnType<typeof rs.fn>;
     let mockContext2D: CanvasRenderingContext2D;
 
     beforeEach(() => {
@@ -44,8 +48,7 @@ describe('downloadSvgAsImage', () => {
             drawImage: rs.fn(),
         } as unknown as CanvasRenderingContext2D;
 
-        // Mock document.createElement to handle canvas and anchor
-        anchorClickSpy = rs.fn();
+        // Mock document.createElement to handle canvas
         const originalCreateElement = document.createElement.bind(document);
         rs.spyOn(document, 'createElement').mockImplementation((tagName) => {
             if (tagName === 'canvas') {
@@ -55,13 +58,6 @@ describe('downloadSvgAsImage', () => {
                     getContext: rs.fn().mockReturnValue(mockContext2D),
                     toDataURL: rs.fn().mockReturnValue('data:image/png;base64,test'),
                 } as unknown as HTMLCanvasElement;
-            }
-            if (tagName === 'a') {
-                return {
-                    href: '',
-                    download: '',
-                    click: anchorClickSpy,
-                } as unknown as HTMLAnchorElement;
             }
             // Fallback for other elements
             return originalCreateElement(tagName) as HTMLElement;
@@ -92,7 +88,7 @@ describe('downloadSvgAsImage', () => {
         expect(mockContext2D.drawImage).toHaveBeenCalled();
 
         // Assert download action
-        expect(anchorClickSpy).toHaveBeenCalled();
+        expect(downloadFile).toHaveBeenCalledWith('data:image/png;base64,test', 'test_graph_title_metrics.png');
 
         // The URL should be revoked after the image is loaded
         expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:test-url');

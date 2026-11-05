@@ -25,8 +25,7 @@ describe('useExportStatus', () => {
     it('removes job from localStorage when job not found error occurs', async () => {
         server.use(
             http.get('/api/jobs/{job_id}', () =>
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                 HttpResponse.json({ detail: 'Job not found' }, { status: 404 })
             )
         );
