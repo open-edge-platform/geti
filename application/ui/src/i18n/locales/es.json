@@ -373,8 +373,7 @@
             "types": {
                 "usbCamera": "cámara usb",
                 "ipCamera": "cámara ip",
-                "videoFile": "archivo de vídeo",
-                "disconnected": "desconectado"
+                "videoFile": "archivo de vídeo"
             },
             "options": {
                 "usbCamera": "Cámara USB",
@@ -427,8 +426,7 @@
             "types": {
                 "folder": "carpeta",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Carpeta",

@@ -1,16 +1,17 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
+
 import { assertNever } from '../../../../../shared/util';
 import { LocalFolderSummary } from '../../local-folder/local-folder-summary.component';
 import { MqttSummary } from '../../mqtt/mqtt-summary.component';
-import type { SupportedSinkConfig } from '../../types';
 import { WebhookSummary } from '../../webhook/webhook-summary.component';
 
 import classes from './settings-list.module.scss';
 
 interface SettingsListProps {
-    sink: SupportedSinkConfig;
+    sink: SinkConfig;
 }
 
 const SinkSummary = ({ sink }: SettingsListProps) => {

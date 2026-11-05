@@ -1,14 +1,14 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
 import { screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
 import { EditSinkForm } from './edit-sink-form.component';
-import type { SupportedSinkConfig } from './types';
 
 describe('EditSinkForm', () => {
-    const renderForm = (config: SupportedSinkConfig) =>
+    const renderForm = (config: SinkConfig) =>
         render(<EditSinkForm config={config} isConnected={false} onSaved={rs.fn()} onBackToList={rs.fn()} />);
 
     it('renders the folder form with the saved values', () => {

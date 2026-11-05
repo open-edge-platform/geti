@@ -1,14 +1,16 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
+
 import { assertNever } from '../../../shared/util';
 import { EditLocalFolderSink } from './local-folder/edit-local-folder-sink.component';
 import { EditMqttSink } from './mqtt/edit-mqtt-sink.component';
-import type { EditSinkProps, SupportedSinkConfig } from './types';
+import type { EditSinkProps } from './types';
 import { EditWebhookSink } from './webhook/edit-webhook-sink.component';
 
-interface EditSinkFormProps extends Omit<EditSinkProps<SupportedSinkConfig>, 'sink'> {
-    config: SupportedSinkConfig;
+interface EditSinkFormProps extends Omit<EditSinkProps<SinkConfig>, 'sink'> {
+    config: SinkConfig;
 }
 
 export const EditSinkForm = ({ config, ...props }: EditSinkFormProps) => {

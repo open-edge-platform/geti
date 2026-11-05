@@ -373,8 +373,7 @@
             "types": {
                 "usbCamera": "usb camera",
                 "ipCamera": "ip camera",
-                "videoFile": "video file",
-                "disconnected": "disconnected"
+                "videoFile": "video file"
             },
             "options": {
                 "usbCamera": "USB Camera",
@@ -427,8 +426,7 @@
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Folder",

@@ -373,8 +373,7 @@
             "types": {
                 "usbCamera": "USB 攝影機",
                 "ipCamera": "IP 攝影機",
-                "videoFile": "影片檔案",
-                "disconnected": "未連線"
+                "videoFile": "影片檔案"
             },
             "options": {
                 "usbCamera": "USB 攝影機",
@@ -427,8 +426,7 @@
             "types": {
                 "folder": "資料夾",
                 "mqtt": "MQTT",
-                "webhook": "Webhook",
-                "ros": "ROS"
+                "webhook": "Webhook"
             },
             "options": {
                 "folder": "資料夾",
