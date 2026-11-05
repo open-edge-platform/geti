@@ -10,10 +10,17 @@ import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { useSinksQuery } from './api/use-sinks-query';
-import { EditSinkForm } from './deprecated/edit-sink-form.component';
-import { SinkList } from './deprecated/sink-list/sink-list.component';
-import { SinkOptions } from './deprecated/sink-options';
+import { EditSinkForm as DeprecatedEditSinkForm } from './deprecated/edit-sink-form.component';
+import { SinkList as DeprecatedSinkList } from './deprecated/sink-list/sink-list.component';
+import { SinkOptions as DeprecatedSinkOptions } from './deprecated/sink-options';
+import { EditSinkForm } from './edit-sink-form.component';
+import { SinkList } from './sink-list/sink-list.component';
+import { SinkOptions } from './sink-options';
+import type { SupportedSinkConfig } from './types';
+
+const isSupportedSink = (sink: SinkConfig): sink is SupportedSinkConfig => sink.sink_type !== 'ros';
 
 export const SinkActions = () => {
     const { t } = useTranslation();
@@ -21,6 +28,7 @@ export const SinkActions = () => {
     const [currentSink, setCurrentSink] = useState<SinkConfig | null>(null);
     const { data: sinks = [], isPending } = useSinksQuery();
     const filteredSinks = sinks.filter((sink) => sink.sink_type !== 'disconnected');
+    const supportedSinks = filteredSinks.filter(isSupportedSink);
 
     const pipeline = usePipeline();
     const connectedSinkId = pipeline.data.sink?.id;
@@ -43,8 +51,19 @@ export const SinkActions = () => {
     }
 
     if (view === 'edit' && !isEmpty(currentSink)) {
+        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR && isSupportedSink(currentSink)) {
+            return (
+                <EditSinkForm
+                    config={currentSink}
+                    isConnected={connectedSinkId === currentSink.id}
+                    onSaved={handleShowList}
+                    onBackToList={handleShowList}
+                />
+            );
+        }
+
         return (
-            <EditSinkForm
+            <DeprecatedEditSinkForm
                 config={currentSink}
                 onSaved={handleShowList}
                 onBackToList={handleShowList}
@@ -54,13 +73,29 @@ export const SinkActions = () => {
     }
 
     if (view === 'list') {
+        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
+            const supportedSinksConnectedFirst = orderBy(supportedSinks, (sink) => sink.id === connectedSinkId, 'desc');
+
+            return (
+                <SinkList sinks={supportedSinksConnectedFirst} onAddSink={handleAddSinks} onEditSink={handleEditSink} />
+            );
+        }
+
         const sinksWithConnectedFirst = orderBy(filteredSinks, (sink) => sink.id === connectedSinkId, 'desc');
 
-        return <SinkList sinks={sinksWithConnectedFirst} onAddSink={handleAddSinks} onEditSink={handleEditSink} />;
+        return (
+            <DeprecatedSinkList
+                sinks={sinksWithConnectedFirst}
+                onAddSink={handleAddSinks}
+                onEditSink={handleEditSink}
+            />
+        );
     }
 
+    const SinkOptionsComponent = FEATURE_FLAGS.SOURCES_SINKS_REFACTOR ? SinkOptions : DeprecatedSinkOptions;
+
     return (
-        <SinkOptions onSaved={handleShowList} hasHeader>
+        <SinkOptionsComponent onSaved={handleShowList} hasHeader>
             <Flex gap={'size-100'} marginBottom={'size-100'} alignItems={'center'}>
                 <ActionButton isQuiet onPress={handleShowList}>
                     <Back />
@@ -68,6 +103,6 @@ export const SinkActions = () => {
 
                 <Text>{t('inference.sinks.add.title')}</Text>
             </Flex>
-        </SinkOptions>
+        </SinkOptionsComponent>
     );
 };
