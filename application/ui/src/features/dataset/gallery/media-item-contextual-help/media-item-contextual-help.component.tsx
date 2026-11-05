@@ -10,7 +10,7 @@ import { isVideo } from '../../../../shared/media-item-utils';
 import classes from './media-item-contextual-help.module.scss';
 
 type MediaItemContextualHelpProps = {
-    item: Pick<Media, 'type'> | Pick<MediaVideo, 'type' | 'frame_count' | 'annotated_frame_count' | 'duration'>;
+    item: Pick<Media, 'type'> | Pick<MediaVideo, 'type' | 'frame_count' | 'annotation_status'>;
 };
 
 export const MediaItemContextualHelp = ({ item }: MediaItemContextualHelpProps) => {
@@ -28,7 +28,11 @@ export const MediaItemContextualHelp = ({ item }: MediaItemContextualHelpProps) 
                 aria-label='Media information'
             >
                 <Content>
-                    <Text>{t('dataset.gallery.mediaInfo.annotatedFrames', { count: item.annotated_frame_count })}</Text>
+                    <Text>
+                        {t('dataset.gallery.mediaInfo.annotatedFrames', {
+                            count: item.annotation_status.annotated_video_frames,
+                        })}
+                    </Text>
                     <br />
                     <Text>{t('dataset.gallery.mediaInfo.totalFrames', { count: item.frame_count })}</Text>
                 </Content>

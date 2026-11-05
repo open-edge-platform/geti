@@ -3,7 +3,7 @@
 
 import { useTranslation } from '@/i18n';
 import { Divider, Flex, Text } from '@geti-ui/ui';
-import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
 
 type TotalItemsProps = {
     totalSelectedElements: number;
@@ -11,7 +11,7 @@ type TotalItemsProps = {
 
 export const TotalItems = ({ totalSelectedElements }: TotalItemsProps) => {
     const { t } = useTranslation();
-    const { totalCount } = useDatasetMediaWithReviewStatus();
+    const { totalCount } = useFilteredDatasetMedia();
 
     if (totalCount === 0) {
         return null;

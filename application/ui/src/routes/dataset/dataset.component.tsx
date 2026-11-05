@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { dimensionValue, Grid, View } from '@geti-ui/ui';
-import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
 import { useViewMode } from 'hooks/use-view-mode.hook';
 
 import {
@@ -20,8 +20,7 @@ import { GalleryViewMode } from '../../shared/gallery-view-modes';
 export const Dataset = () => {
     const [viewMode, setViewMode] = useViewMode('dataset-gallery-view-mode');
 
-    const { items, isPending, isFetchingNextPage, fetchNextPage, isMediaItemReviewedById } =
-        useDatasetMediaWithReviewStatus();
+    const { items, isPending, isFetchingNextPage, fetchNextPage } = useFilteredDatasetMedia();
 
     const hasActiveFilter = useHasActiveFilters();
 
@@ -52,7 +51,6 @@ export const Dataset = () => {
                         viewMode={viewMode as GalleryViewMode}
                         isPending={isPending}
                         fetchNextPage={fetchNextPage}
-                        isMediaItemReviewedById={isMediaItemReviewedById}
                         hasActiveFilter={hasActiveFilter}
                         isFetchingNextPage={isFetchingNextPage}
                     />

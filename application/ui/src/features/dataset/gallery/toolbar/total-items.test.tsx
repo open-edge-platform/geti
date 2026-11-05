@@ -18,17 +18,6 @@ describe('TotalItems', () => {
                     items: [getMockedMediaImage({})],
                     pagination: { offset: 0, limit: 1, count: totalItems, total: totalItems },
                 });
-            }),
-            http.get('/api/projects/{project_id}/dataset/items', () => {
-                return HttpResponse.json({
-                    pagination: {
-                        total: totalItems,
-                        offset: 0,
-                        limit: 0,
-                        count: 0,
-                    },
-                    items: [],
-                });
             })
         );
 

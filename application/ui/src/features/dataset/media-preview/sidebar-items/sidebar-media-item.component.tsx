@@ -11,11 +11,10 @@ import { AnnotationStatusIcon } from '../../gallery/annotation-state-icon.compon
 
 type SidebarMediaItemProps = {
     item: Media;
-    isUserReviewed: boolean;
     onSelectedMediaItem: (item: Media) => void;
 };
 
-export const SidebarMediaItem = ({ item, isUserReviewed, onSelectedMediaItem }: SidebarMediaItemProps) => {
+export const SidebarMediaItem = ({ item, onSelectedMediaItem }: SidebarMediaItemProps) => {
     const projectId = useProjectIdentifier();
 
     return (
@@ -29,7 +28,7 @@ export const SidebarMediaItem = ({ item, isUserReviewed, onSelectedMediaItem }: 
                 />
             )}
             bottomRightElement={() => {
-                return <AnnotationStatusIcon isReviewed={isUserReviewed} />;
+                return <AnnotationStatusIcon isAnnotated={item.annotation_status.has_annotations} />;
             }}
         />
     );
