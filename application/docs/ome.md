@@ -95,7 +95,10 @@ class MediaStorage:
 
     root: Path                 # later: a URI + an fsspec-style filesystem
     entrypoint: Path | None    # companion .ome / .zattrs; None for single-file media
-    is_directory: bool
+
+    @property
+    def is_directory(self) -> bool:
+        return self.entrypoint is not None
 ```
 
 Everything that reads, sizes, moves or deletes media bytes goes through this. The remote case is then a change to one
@@ -128,10 +131,6 @@ Rendering is **server-side**. A plane is rendered by:
 2. Reading the enabled channels at that level.
 3. Applying per-channel window/level: `v <= min -> 0`, `v >= max -> 255`, linear between.
 4. Compositing enabled channels into their assigned RGB targets.
-
-The result is cached on disk as `projects/{pid}/dataset/{media_id}-r{level}-z{z}-t{t}-{settings_hash}.png`, invalidated
-by the settings hash. Caching by hash (not by timestamp) means the cache is correct across settings changes and is
-trivially movable to object storage later.
 
 ### 3.6 Training
 
@@ -301,15 +300,14 @@ pyramid level and leaving `dimension_order` free-form is what lets OME-Zarr land
 
 ```python
 class OmeChannelViewDB(Base):
-    """Per-image channel-to-RGB mapping and display windows used by the annotator and by
-    training-set materialization."""
+    """Per-image channel-to-RGB mapping and display windows used by the annotator."""
 
     __tablename__ = "ome_channel_views"
 
     media_id: Mapped[str] = mapped_column(
         Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True
     )
-    # [{"channel": 2, "target": "red", "enabled": true, "window_min": 120, "window_max": 4000}, ...]
+    # [{"channel": 2, "color": "#3B6CFF", "enabled": true, "window_min": 120, "window_max": 4000}, ...]
     settings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 ```
 
@@ -398,7 +396,7 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 200 -> {"settings": [ … ], "is_default": true}
 
 PUT /api/projects/{project_id}/dataset/media/{media_id}/channel-view
-{"settings": [{"channel": 2, "target": "red", "enabled": true,
+{"settings": [{"channel": 2, "color": "#3B6CFF", "enabled": true,
                "window_min": 120, "window_max": 4000}, …]}
 200 -> {"settings": [ … ], "is_default": false}
 422 -> channel index out of range, window_min >= window_max, duplicate RGB target
