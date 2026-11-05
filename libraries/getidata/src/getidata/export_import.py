@@ -743,6 +743,12 @@ def _save_format_to_dir(
 
         dataset = dataset.convert_to_schema(YoloClsSample.infer_schema(), direct_only=direct_only)
         save_yolo_cls_dataset(dataset, root_dir=output_dir)
+    elif data_format == DataFormat.YOLO_ULTRALYTICS_SEG:
+        from getidata.data_formats.yolo.io import save_yolo_seg_dataset
+        from getidata.data_formats.yolo.sample import YoloSegSample
+
+        dataset = dataset.convert_to_schema(YoloSegSample.infer_schema(), direct_only=direct_only)
+        save_yolo_seg_dataset(dataset, root_dir=output_dir)
     else:
         raise ValueError(f"Unsupported data format for export: {data_format}")
 
@@ -766,6 +772,7 @@ def _save_format_dataset(
         DataFormat.YOLO,
         DataFormat.YOLO_ULTRALYTICS,
         DataFormat.YOLO_ULTRALYTICS_CLS,
+        DataFormat.YOLO_ULTRALYTICS_SEG,
     }
     if data_format not in _SUPPORTED_EXPORT_FORMATS:
         raise ValueError(f"Unsupported data format for export: {data_format}")
@@ -794,7 +801,7 @@ def _save_format_dataset(
         _save_format_to_dir(dataset, data_format, output_path, direct_only=direct_only)
 
 
-def _load_format_dataset(
+def _load_format_dataset(  # noqa: C901 - one branch per format keeps the dispatch explicit
     data_format: DataFormat,
     images_dir_path: str | dict[str, str] | None = None,
     annotations_path: str | list[str] | dict[str, str | list[str]] | None = None,
@@ -838,6 +845,13 @@ def _load_format_dataset(
             raise ValueError("root_dir is required for YOLO classification format")
 
         return load_yolo_cls_dataset(root_dir=root_dir)
+    if data_format == DataFormat.YOLO_ULTRALYTICS_SEG:
+        from getidata.data_formats.yolo.io import load_yolo_seg_dataset
+
+        if root_dir is None:
+            raise ValueError("root_dir is required for YOLO segmentation format")
+
+        return load_yolo_seg_dataset(root_dir=root_dir)
     raise ValueError(f"Unsupported data format: {data_format}")
 
 
@@ -980,6 +994,8 @@ def import_dataset(
       or images/ and labels/ directories
     - **YOLO classification**: Detected by subset directories (train/val/test) holding
       one subdirectory per class
+    - **YOLO segmentation**: Detected by label files whose rows hold a class index
+      followed by normalized polygon coordinates (seven or more fields per row)
     - **VOC**: Detected by JPEGImages/, Annotations/, and ImageSets/ directories
 
     When dtype is None the function tries to automatically determine the correct Sample
@@ -1539,6 +1555,10 @@ def _import_dataset_from_dir(
             from getidata.data_formats.yolo.io import import_yolo_cls_dataset
 
             return import_yolo_cls_dataset(input_dir)
+        case DataFormat.YOLO_ULTRALYTICS_SEG:
+            from getidata.data_formats.yolo.io import import_yolo_seg_dataset
+
+            return import_yolo_seg_dataset(input_dir)
         case DataFormat.VOC:
             from getidata.data_formats.voc.io import import_voc_dataset
 
@@ -1552,6 +1572,8 @@ def _import_dataset_from_dir(
                 "COCO (annotations/*.json with 'images' and 'annotations' keys), "
                 "YOLO (data.yaml, obj.names, or images/ + labels/ directories), "
                 "YOLO classification (train/val/test directories with one subdirectory per class), "
+                "YOLO segmentation (images/ + labels/ directories with polygon rows of seven or more "
+                "fields), "
                 "or VOC (JPEGImages/ + Annotations/ or ImageSets/ directories)."
             )
 

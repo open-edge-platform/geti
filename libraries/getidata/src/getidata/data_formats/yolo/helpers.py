@@ -8,12 +8,12 @@ import logging
 import shutil
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 import numpy as np
 import yaml
 
-from getidata import Dataset
+from getidata import Dataset, Sample
 from getidata.categories import LabelCategories
 from getidata.data_formats.base import IMAGE_EXTENSIONS, find_images, unique_destination_filename
 from getidata.data_formats.yolo.constants import (
@@ -23,10 +23,13 @@ from getidata.data_formats.yolo.constants import (
     TRADITIONAL_SUBSET_CONFIG_KEYS,
     TRADITIONAL_SUBSET_DIR_NAMES,
 )
-from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample
+from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample, YoloSegSample
 from getidata.fields import ImageInfo, Subset
 
 logger = logging.getLogger(__name__)
+
+# Generic sample type shared by the detection and segmentation grouping helpers
+DType = TypeVar("DType", bound=Sample)
 
 
 def _find_image_file(images_dir: Path, stem: str) -> Path | None:
@@ -108,10 +111,89 @@ def _parse_yolo_annotation(anno_path: Path, image_width: int, image_height: int)
     return bboxes, labels
 
 
-def _detect_yolo_format(root_path: Path) -> Literal["ultralytics", "traditional", "unknown"]:
+def _parse_yolo_seg_annotation(anno_path: Path, image_width: int, image_height: int) -> tuple[list, list]:
+    """
+    Parse an Ultralytics YOLO segmentation annotation file.
+
+    Each row describes one object instance as a class index followed by the normalized
+    ``(x, y)`` coordinates of its polygon: ``<class-index> <x1> <y1> <x2> <y2> ... <xn> <yn>``.
+    Rows must therefore hold at least seven fields (three points) with an odd field count
+    so that the coordinates form ``(x, y)`` pairs. Rows that do not match -- including
+    detection-format rows with exactly five fields -- are skipped with a warning.
+
+    Returns:
+        Tuple of (polygons in absolute xy format, labels)
+    """
+    polygons = []
+    labels = []
+
+    if not anno_path.exists():
+        return polygons, labels
+
+    with open(anno_path, encoding="utf-8") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line:
+                continue
+
+            parts = line.split()
+            if len(parts) < 7:
+                logger.warning(
+                    "Skipping non-segmentation annotation line in %s: %s (expected a class index followed by at "
+                    "least 3 normalized x, y coordinate pairs)",
+                    anno_path,
+                    line,
+                )
+                continue
+            if len(parts) % 2 == 0:
+                logger.warning("Skipping annotation line with unpaired coordinates in %s: %s", anno_path, line)
+                continue
+
+            try:
+                label_id = int(parts[0])
+                coords = [float(p) for p in parts[1:]]
+            except ValueError as e:
+                logger.warning("Skipping malformed annotation line in %s: %s (%s)", anno_path, line, e)
+                continue
+
+            # Convert normalized coordinates to absolute xy format
+            polygon = [[coords[i] * image_width, coords[i + 1] * image_height] for i in range(0, len(coords), 2)]
+            polygons.append(polygon)
+            labels.append(label_id)
+
+    return polygons, labels
+
+
+def _has_segmentation_rows(root_path: Path) -> bool:
+    """
+    Check whether any label file of an Ultralytics-layout YOLO dataset holds segmentation rows.
+
+    A valid segmentation row consists of a class index plus at least three normalized ``(x, y)``
+    pairs, i.e. seven or more fields with an odd count. Detection rows always have exactly five
+    fields, so the presence of any such row marks the dataset as an instance segmentation dataset.
+    Label files that cannot be read are skipped.
+    """
+    for _, _, labels_dir in _resolve_ultralytics_subsets(root_path):
+        if labels_dir is None or not labels_dir.is_dir():
+            continue
+        for label_file in sorted(labels_dir.glob("*.txt")):
+            try:
+                with open(label_file, encoding="utf-8") as f:
+                    for raw_line in f:
+                        parts = raw_line.split()
+                        if len(parts) >= 7 and len(parts) % 2 == 1:
+                            return True
+            except OSError as e:
+                logger.warning("Failed to read label file %s: %s", label_file, e)
+    return False
+
+
+def _detect_yolo_format(root_path: Path) -> Literal["ultralytics", "traditional", "segmentation", "unknown"]:
     """Detect the YOLO format based on directory structure."""
     # Check for Ultralytics format (data.yaml)
     if (root_path / "data.yaml").exists():
+        if _has_segmentation_rows(root_path):
+            return "segmentation"
         return "ultralytics"
 
     # Check for traditional YOLO format (obj.names or obj.data)
@@ -120,6 +202,8 @@ def _detect_yolo_format(root_path: Path) -> Literal["ultralytics", "traditional"
 
     # Check for Ultralytics-style directory structure
     if (root_path / "images").is_dir() and (root_path / "labels").is_dir():
+        if _has_segmentation_rows(root_path):
+            return "segmentation"
         return "ultralytics"
 
     return "unknown"
@@ -416,6 +500,43 @@ def _create_sample_from_image(
     )
 
 
+def _create_seg_sample_from_image(
+    image_path: Path,
+    labels_subset_dir: Path | None,
+    subset_enum: Subset,
+) -> YoloSegSample | None:
+    """Create a YoloSegSample from an image file (Ultralytics segmentation format)."""
+    height, width = _get_image_size(image_path)
+
+    # Find corresponding annotation file
+    anno_path = None
+    if labels_subset_dir:
+        anno_path = labels_subset_dir / f"{image_path.stem}.txt"
+
+    # Parse annotations
+    polygons_list = []
+    labels_list = []
+    if anno_path and anno_path.exists() and width > 0 and height > 0:
+        polygons_list, labels_list = _parse_yolo_seg_annotation(anno_path, width, height)
+
+    # Polygons are ragged (each holds a variable number of points), so they are stored
+    # in an object array holding one (num_points, 2) array per polygon.
+    polygons = None
+    if polygons_list:
+        polygons = np.empty(len(polygons_list), dtype=object)
+        for i, polygon in enumerate(polygons_list):
+            polygons[i] = np.asarray(polygon, dtype=np.float32)
+    labels = np.array(labels_list, dtype=np.int32) if labels_list else None
+
+    return YoloSegSample(
+        image=str(image_path),
+        image_info=ImageInfo(height=height, width=width),
+        polygons=polygons,
+        labels=labels,
+        subset=subset_enum,
+    )
+
+
 def _create_sample_from_traditional_image(
     image_path: Path,
     subset_enum: Subset,
@@ -448,16 +569,16 @@ def _create_sample_from_traditional_image(
 # =============================================================================
 
 
-def _group_samples_by_subset(dataset: Dataset[YoloSample]) -> dict[Subset, list[YoloSample]]:
+def _group_samples_by_subset(dataset: Dataset[DType]) -> dict[Subset, list[DType]]:
     """Group dataset samples by their subset."""
-    subset_to_samples: dict[Subset, list[YoloSample]] = defaultdict(list)
+    subset_to_samples: dict[Subset, list[DType]] = defaultdict(list)
     for sample in dataset:
         subset_to_samples[sample.subset].append(sample)
     return subset_to_samples
 
 
-def _get_label_names_from_dataset(dataset: Dataset[YoloSample]) -> list[str]:
-    """Extract label names from dataset schema."""
+def _get_label_names_from_dataset(dataset: Dataset[DType]) -> list[str]:
+    """Extract label names from the ``labels`` attribute of the dataset schema."""
     label_categories = dataset.schema.attributes.get("labels")
     categories = label_categories.categories if label_categories else None
     return list(categories.labels) if categories and hasattr(categories, "labels") else []
@@ -526,6 +647,61 @@ def _save_sample_to_dir(
     # Write annotation file
     anno_path = labels_dir / f"{Path(file_name).stem}.txt"
     _write_sample_annotation(anno_path, sample)
+
+
+def _write_sample_seg_annotation(
+    anno_path: Path,
+    sample: YoloSegSample,
+) -> None:
+    """
+    Write the annotation file of a single sample in Ultralytics segmentation format.
+
+    Every polygon is written as one row holding the class index followed by the
+    polygon coordinates normalized to [0, 1] relative to the image dimensions.
+    Polygons with fewer than three points cannot be represented in the format and
+    are skipped with a warning.
+    """
+    info = sample.image_info
+    width = int(info.width) if info and info.width else 0
+    height = int(info.height) if info and info.height else 0
+
+    with open(anno_path, "w", encoding="utf-8") as f:
+        if sample.polygons is None or sample.labels is None or width <= 0 or height <= 0:
+            return
+        for i in range(len(sample.labels)):
+            if i >= len(sample.polygons):
+                break
+            polygon = np.asarray(sample.polygons[i], dtype=np.float32).reshape(-1, 2)
+            if len(polygon) < 3:
+                logger.warning("[YOLO-SEG] Skipping polygon with fewer than 3 points in %s: %s", sample.image, polygon)
+                continue
+            label = int(sample.labels[i])
+            coords = " ".join(f"{x / width:.6f} {y / height:.6f}" for x, y in polygon)
+            f.write(f"{label} {coords}\n")
+
+
+def _save_seg_sample_to_dir(
+    sample: YoloSegSample,
+    images_dir: Path,
+    labels_dir: Path,
+    save_images: bool,
+    used_names: dict[str, str],
+) -> None:
+    """Save a single sample's image and annotation to directories (Ultralytics segmentation format)."""
+    image_path = Path(sample.image) if sample.image else None
+    if not image_path:
+        return
+
+    file_name = unique_destination_filename(image_path, used_names)
+    dst_image_path = images_dir / file_name
+
+    # Copy image if requested
+    if save_images and image_path.exists() and not dst_image_path.exists():
+        shutil.copy2(image_path, dst_image_path)
+
+    # Write annotation file
+    anno_path = labels_dir / f"{Path(file_name).stem}.txt"
+    _write_sample_seg_annotation(anno_path, sample)
 
 
 def _save_traditional_sample(
@@ -694,6 +870,51 @@ def _load_yolo_traditional(root_path: Path) -> Dataset:
     return dataset
 
 
+def _load_yolo_seg(root_path: Path) -> Dataset:
+    """
+    Load an Ultralytics YOLO instance segmentation dataset.
+
+    The directory layout is identical to the Ultralytics detection layout (images/ and
+    labels/ directories per split, class names in data.yaml); only the label file
+    content differs, with one polygon per row. Class names are taken from data.yaml
+    when present.
+    """
+    categories = _load_ultralytics_categories(root_path)
+    dataset = Dataset(YoloSegSample, categories={"labels": categories})
+
+    # Prefer the subset paths declared in data.yaml, and fall back to the on-disk layout.
+    subsets = _resolve_ultralytics_subsets(root_path)
+    if not subsets:
+        raise FileNotFoundError(
+            f"Could not locate any image directory under YOLO root: {root_path}. Expected either an "
+            "'images' directory holding one folder per subset, a '<subset>/images' directory per "
+            "subset, or a 'data.yaml' declaring the train/val/test image directories."
+        )
+
+    for subset_name, images_subset_dir, labels_subset_dir in subsets:
+        subset_enum = DIR_NAME_TO_SUBSET.get(subset_name, Subset.UNASSIGNED)
+
+        logger.info("[YOLO-SEG] Loading subset '%s' from '%s'", subset_name, images_subset_dir)
+
+        image_files = _find_image_files(images_subset_dir)
+        samples = []
+        for image_path in image_files:
+            try:
+                sample = _create_seg_sample_from_image(image_path, labels_subset_dir, subset_enum)
+                if sample:
+                    samples.append(sample)
+            except Exception as e:
+                logger.warning("[YOLO-SEG] Failed to load image %s: %s", image_path, e)
+
+        if samples:
+            dataset.append_batch(samples)
+
+        logger.info("[YOLO-SEG] Loaded %d samples from subset '%s'", len(samples), subset_name)
+
+    logger.info("[YOLO-SEG] Finished loading dataset with %d samples", len(dataset))
+    return dataset
+
+
 def _load_yolo_cls(root_path: Path) -> Dataset:
     """
     Load an Ultralytics YOLO classification dataset.
@@ -804,6 +1025,61 @@ def _save_yolo_ultralytics(
     written["data.yaml"] = yaml_path
 
     logger.info("[YOLO] Finished saving dataset to '%s'", root_path)
+    return written
+
+
+def _save_yolo_seg(
+    dataset: Dataset[YoloSegSample],
+    root_path: Path,
+    save_images: bool,
+) -> dict[str, Path]:
+    """Save a dataset in Ultralytics YOLO instance segmentation format."""
+    images_dir = root_path / "images"
+    labels_dir = root_path / "labels"
+
+    subset_to_samples = _group_samples_by_subset(dataset)
+    label_names = _get_label_names_from_dataset(dataset)
+    written: dict[str, Path] = {}
+
+    for subset, samples in subset_to_samples.items():
+        if not samples:
+            continue
+
+        subset_name = SUBSET_TO_DIR_NAME.get(subset, "unassigned")
+        images_subset_dir = images_dir / subset_name
+        labels_subset_dir = labels_dir / subset_name
+        images_subset_dir.mkdir(parents=True, exist_ok=True)
+        labels_subset_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info("[YOLO-SEG] Saving subset '%s' with %d samples", subset_name, len(samples))
+
+        used_names: dict[str, str] = {}
+        for sample in samples:
+            try:
+                _save_seg_sample_to_dir(sample, images_subset_dir, labels_subset_dir, save_images, used_names)
+            except Exception as e:
+                logger.warning("[YOLO-SEG] Failed to save sample: %s", e)
+
+        written[f"images_{subset_name}"] = images_subset_dir
+        written[f"labels_{subset_name}"] = labels_subset_dir
+
+    # Write data.yaml
+    yaml_path = root_path / "data.yaml"
+    yaml_data: dict[str, Any] = {
+        "names": dict(enumerate(label_names)),
+    }
+
+    # Add subset paths
+    for subset in subset_to_samples:
+        subset_name = SUBSET_TO_DIR_NAME.get(subset, "unassigned")
+        yaml_data[subset_name] = f"images/{subset_name}"
+
+    with open(yaml_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(yaml_data, f, sort_keys=False, allow_unicode=True)
+
+    written["data.yaml"] = yaml_path
+
+    logger.info("[YOLO-SEG] Finished saving dataset to '%s'", root_path)
     return written
 
 

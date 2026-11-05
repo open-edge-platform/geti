@@ -6,7 +6,16 @@ import numpy as np
 import polars as pl
 
 from getidata import LazyImage, Sample, register_sample
-from getidata.fields import ImageInfo, Subset, bbox_field, image_info_field, image_path_field, label_field, subset_field
+from getidata.fields import (
+    ImageInfo,
+    Subset,
+    bbox_field,
+    image_info_field,
+    image_path_field,
+    label_field,
+    polygon_field,
+    subset_field,
+)
 
 
 @register_sample
@@ -27,6 +36,33 @@ class YoloClsSample(Sample):
 
     # Single class label per image
     label: int | None = label_field(dtype=pl.UInt16(), is_list=False)
+
+    # Dataset organization
+    subset: Subset = subset_field()
+
+
+@register_sample
+class YoloSegSample(Sample):
+    """
+    Sample class for Ultralytics YOLO instance segmentation format datasets.
+
+    The Ultralytics YOLO segmentation format uses the same directory layout as the
+    detection format (images/ and labels/ directories per split, class names in
+    data.yaml). What differs is the content of the label files: each row holds a
+    class index followed by the normalized (x, y) coordinates of one polygon with
+    at least three points, so rows have a variable length of seven or more fields.
+
+    Holes inside objects cannot be represented, as every instance is a single
+    polygon.
+    """
+
+    # Basic image information
+    image: LazyImage = image_path_field()
+    image_info: ImageInfo = image_info_field()
+
+    # Instance segmentation annotations
+    polygons: np.ndarray | None = polygon_field(dtype=pl.Float32())
+    labels: np.ndarray | None = label_field(dtype=pl.UInt16(), is_list=True)
 
     # Dataset organization
     subset: Subset = subset_field()

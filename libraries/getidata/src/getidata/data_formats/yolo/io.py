@@ -11,15 +11,18 @@ from getidata import Dataset
 from getidata.data_formats.base import DataFormat
 from getidata.data_formats.yolo.helpers import (
     _detect_yolo_format,
+    _has_segmentation_rows,
     _is_yolo_cls_layout,
     _load_yolo_cls,
+    _load_yolo_seg,
     _load_yolo_traditional,
     _load_yolo_ultralytics,
     _save_yolo_cls,
+    _save_yolo_seg,
     _save_yolo_traditional,
     _save_yolo_ultralytics,
 )
-from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample
+from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample, YoloSegSample
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +146,98 @@ def save_yolo_cls_dataset(
     return _save_yolo_cls(dataset, root_path, save_images)
 
 
+def is_yolo_seg_format(input_dir: Path) -> bool:
+    """
+    Detect if a directory contains an Ultralytics YOLO instance segmentation dataset.
+
+    The segmentation layout is identical to the Ultralytics detection layout (images/
+    and labels/ directories per split, data.yaml with class names), so the two are
+    distinguished by the content of the label files: a label file holds segmentation
+    data when any of its rows consists of a class index followed by at least three
+    normalized (x, y) coordinate pairs, i.e. seven or more fields with an odd count.
+    Detection rows always have exactly five fields.
+
+    Args:
+        input_dir: Path to the directory to check
+
+    Returns:
+        True if the directory contains a YOLO segmentation-format dataset
+    """
+    if (input_dir / "obj.names").exists() or (input_dir / "obj.data").exists():
+        # The traditional YOLO layout never carries polygon rows
+        return False
+
+    if not is_yolo_format(input_dir):
+        return False
+
+    return _has_segmentation_rows(input_dir)
+
+
+def import_yolo_seg_dataset(input_dir: Path) -> Dataset:
+    """
+    Import an Ultralytics YOLO instance segmentation dataset from a directory.
+
+    Args:
+        input_dir: Path to the YOLO segmentation dataset directory
+
+    Returns:
+        Dataset containing YoloSegSample instances
+    """
+    return load_yolo_seg_dataset(root_dir=str(input_dir))
+
+
+def load_yolo_seg_dataset(root_dir: str) -> Dataset:
+    """
+    Load an Ultralytics YOLO instance segmentation dataset from its top-level directory.
+
+    The layout matches the Ultralytics detection format (images/ and labels/
+    directories per split, data.yaml with class names); the label files hold one
+    polygon per row as ``<class-index> <x1> <y1> <x2> <y2> ... <xn> <yn>`` with
+    normalized coordinates. Rows with fewer than seven fields -- including
+    detection-format rows -- are skipped with a warning.
+
+    Args:
+        root_dir: Path to the top-level YOLO segmentation dataset directory.
+
+    Returns:
+        Dataset containing YoloSegSample instances.
+    """
+    root_path = Path(root_dir)
+    if not root_path.exists():
+        raise FileNotFoundError(f"YOLO segmentation root directory does not exist: {root_dir}")
+
+    logger.info("[YOLO-SEG] Loading segmentation dataset from '%s'", root_dir)
+    return _load_yolo_seg(root_path)
+
+
+def save_yolo_seg_dataset(
+    dataset: Dataset[YoloSegSample],
+    root_dir: str,
+    save_images: bool = True,
+) -> dict[str, Path]:
+    """
+    Save a Dataset of YoloSegSample to disk in Ultralytics YOLO segmentation format.
+
+    Creates the same images/ + labels/ layout as the Ultralytics detection format,
+    with one label file per image holding a normalized polygon row per instance.
+    Polygons with fewer than three points cannot be represented and are skipped;
+    samples without polygons get an empty label file.
+
+    Args:
+        dataset: Dataset containing YoloSegSample samples.
+        root_dir: Path to the output directory.
+        save_images: Whether to copy images to the output directory.
+
+    Returns:
+        Mapping from logical names to written paths.
+    """
+    root_path = Path(root_dir)
+    root_path.mkdir(parents=True, exist_ok=True)
+
+    logger.info("[YOLO-SEG] Saving segmentation dataset to '%s'", root_dir)
+    return _save_yolo_seg(dataset, root_path, save_images)
+
+
 def import_yolo_dataset(input_dir: Path) -> Dataset:
     """
     Import a YOLO-format dataset from a directory.
@@ -208,6 +303,11 @@ def load_yolo_dataset(root_dir: str, format: str = "auto") -> Dataset:
     # Detect format if auto
     if format == "auto":
         format = _detect_yolo_format(root_path)
+        if format == "segmentation":
+            raise ValueError(
+                f"The YOLO dataset in {root_dir} contains segmentation labels. "
+                "Use load_yolo_seg_dataset to load instance segmentation datasets."
+            )
         if format == "unknown":
             raise ValueError(
                 f"Could not detect YOLO format in {root_dir}. "
