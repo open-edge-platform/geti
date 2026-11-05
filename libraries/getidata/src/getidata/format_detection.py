@@ -38,22 +38,28 @@ def is_getidata_format(input_dir: Path) -> bool:
     return (input_dir / METADATA_FILE).exists() and (input_dir / DATAFRAME_FILE).exists()
 
 
-def detect_dataset_format(input_dir: Path) -> DataFormat:
+def detect_dataset_format(input_dir: Path) -> DataFormat:  # noqa: PLR0911 - one return per format check
     """
     Detect the format of a dataset directory.
 
     Checks formats in order of specificity:
     1. getidata (most specific - requires both metadata.json and data.parquet)
     2. COCO (JSON files with images/annotations structure)
-    3. YOLO (data.yaml, obj.names, or directory structure)
-    4. VOC (JPEGImages/, Annotations/, ImageSets/ directories)
-    5. YOLO classification (subset directories with one image directory per class)
+    3. YOLO segmentation (Ultralytics layout with polygon label rows)
+    4. YOLO (data.yaml, obj.names, or directory structure)
+    5. VOC (JPEGImages/, Annotations/, ImageSets/ directories)
+    6. YOLO classification (subset directories with one image directory per class)
+
+    The segmentation check runs before the detection check because both share the
+    same directory layout; the label file content (rows of seven or more fields vs.
+    exactly five) tells them apart.
 
     Args:
         input_dir: Path to the directory to check
 
     Returns:
-        DataFormat enum value: GETIDATA, COCO, YOLO, YOLO_ULTRALYTICS_CLS, VOC, or UNKNOWN
+        DataFormat enum value: GETIDATA, COCO, YOLO, YOLO_ULTRALYTICS_SEG,
+        YOLO_ULTRALYTICS_CLS, VOC, or UNKNOWN
     """
     if is_getidata_format(input_dir):
         return DataFormat.GETIDATA
@@ -61,10 +67,12 @@ def detect_dataset_format(input_dir: Path) -> DataFormat:
     # Inline imports to avoid circular dependency:
     from getidata.data_formats.coco.io import is_coco_format
     from getidata.data_formats.voc.io import is_voc_format
-    from getidata.data_formats.yolo.io import is_yolo_cls_format, is_yolo_format
+    from getidata.data_formats.yolo.io import is_yolo_cls_format, is_yolo_format, is_yolo_seg_format
 
     if is_coco_format(input_dir):
         return DataFormat.COCO
+    if is_yolo_seg_format(input_dir):
+        return DataFormat.YOLO_ULTRALYTICS_SEG
     if is_yolo_format(input_dir):
         return DataFormat.YOLO
     if is_voc_format(input_dir):
