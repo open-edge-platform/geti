@@ -43,8 +43,7 @@ describe('useDeleteStagedDataset', () => {
 
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () =>
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                 HttpResponse.json({ detail: 'staged dataset not found' }, { status: 404 })
             )
         );
@@ -69,8 +68,7 @@ describe('useDeleteStagedDataset', () => {
 
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () =>
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 403 response has no documented schema in the OpenAPI spec.
                 HttpResponse.json({ detail: 'permission denied' }, { status: 403 })
             )
         );
@@ -95,8 +93,7 @@ describe('useDeleteStagedDataset', () => {
 
             server.use(
                 http.delete('/api/staged_datasets/{staged_dataset_id}', () =>
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
+                    // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                     HttpResponse.json({ detail: 'staged dataset not found' }, { status: 404 })
                 )
             );
@@ -120,8 +117,7 @@ describe('useDeleteStagedDataset', () => {
 
             server.use(
                 http.delete('/api/staged_datasets/{staged_dataset_id}', () =>
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
+                    // @ts-expect-error The 403 response has no documented schema in the OpenAPI spec.
                     HttpResponse.json({ detail: errorMessage }, { status: 403 })
                 )
             );

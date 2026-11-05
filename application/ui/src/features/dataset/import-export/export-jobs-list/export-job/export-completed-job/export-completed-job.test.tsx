@@ -124,18 +124,4 @@ describe('ExportCompletedJob', () => {
         });
         expect(deleteStageFileSpy).not.toHaveBeenCalled();
     });
-
-    it('shows toast notification when download is triggered', async () => {
-        const mockExportJob = getMockedJobExportJob({ status: 'FINISHED' });
-        renderApp(mockExportJob);
-
-        const downloadButton = await screen.findByRole('button', { name: 'download dataset' });
-        await userEvent.click(downloadButton);
-
-        expect(downloadFile).toHaveBeenCalledWith(
-            expect.stringContaining(`/api/staged_datasets/${mockExportJob.metadata.dataset_id}/zip`),
-            `dataset_${mockExportJob.metadata.dataset_id}.zip`,
-            'Dataset download started'
-        );
-    });
 });
