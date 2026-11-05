@@ -1,11 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { LocalFolderSinkConfig, MqttSinkConfig, RosSinkConfig, WebhookSinkConfig } from '@/api/types';
-import type { Locator } from '@playwright/test';
+import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '@/api/types';
 import { HttpResponse } from 'msw';
 
-import { FEATURE_FLAGS } from '../../src/constants/feature-flags';
 import { expect, http, test } from '../fixtures';
 import { createPipelineBackend } from './pipeline-backend';
 
@@ -40,26 +38,6 @@ const mqttSink: MqttSinkConfig = {
     auth_required: false,
     rate_limit: null,
     output_formats: ['image_with_predictions'],
-};
-
-const rosSink: RosSinkConfig = {
-    id: 'ros-sink-id',
-    name: 'Robot topic',
-    sink_type: 'ros',
-    topic: '/geti/predictions',
-    rate_limit: 1,
-    output_formats: ['predictions'],
-};
-
-// The new flow disables "Add & Use" until the required fields are provided; the deprecated flow leaves it enabled
-// and relies on native validation after the click.
-const expectCannotSubmit = async (button: Locator, assertInvalid: () => Promise<void>) => {
-    if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
-        await expect(button).toBeDisabled();
-    } else {
-        await button.click();
-        await assertInvalid();
-    }
 };
 
 test.describe('Pipeline sinks', () => {
@@ -144,9 +122,7 @@ test.describe('Pipeline sinks', () => {
             await page.getByRole('textbox', { name: 'Webhook URL' }).fill('https://hooks.local/geti');
             await sinksPage.selectOutputFormats(['Predictions']);
             await sinksPage.addWebhookHeader('X-Api-Key', '');
-            await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
-                expect(page.getByRole('textbox', { name: 'headers-values' })).toHaveAttribute('aria-invalid', 'true')
-            );
+            await expect(sinksPage.getAddAndUseButton()).toBeDisabled();
             await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
             await sinksPage.openSinkList();
@@ -154,8 +130,6 @@ test.describe('Pipeline sinks', () => {
         });
 
         test('does not add a webhook sink with duplicate header keys', async ({ inferencePage, sinksPage, page }) => {
-            test.fail(!FEATURE_FLAGS.SOURCES_SINKS_REFACTOR, 'Known bug #3 in the deprecated flow');
-            // Known bug in the deprecated flow: rows with the same key collapse into one and the sink is saved.
             // Expected: the duplicate key is rejected.
 
             await inferencePage.goto();
@@ -170,7 +144,7 @@ test.describe('Pipeline sinks', () => {
                 'aria-invalid',
                 'true'
             );
-            await expectCannotSubmit(sinksPage.getAddAndUseButton(), async () => {});
+            await expect(sinksPage.getAddAndUseButton()).toBeDisabled();
             await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
             await sinksPage.openSinkList();
@@ -208,18 +182,12 @@ test.describe('Pipeline sinks', () => {
         ] as const;
 
         for (const { type, requiredField } of requiredFieldCases) {
-            test(`does not add a ${type} sink without "${requiredField}"`, async ({
-                inferencePage,
-                sinksPage,
-                page,
-            }) => {
+            test(`does not add a ${type} sink without "${requiredField}"`, async ({ inferencePage, sinksPage }) => {
                 await inferencePage.goto();
                 await sinksPage.openAddSinkForm(type);
 
                 await sinksPage.selectOutputFormats(['Predictions']);
-                await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
-                    expect(page.getByRole('textbox', { name: requiredField })).toHaveAttribute('aria-invalid', 'true')
-                );
+                await expect(sinksPage.getAddAndUseButton()).toBeDisabled();
                 await expect(sinksPage.getAddAndUseButton()).toBeVisible();
                 await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
@@ -233,12 +201,7 @@ test.describe('Pipeline sinks', () => {
             await sinksPage.openAddSinkForm('Folder');
 
             await page.getByRole('textbox', { name: 'Folder Path' }).fill('/data/snapshots');
-            await expectCannotSubmit(sinksPage.getAddAndUseButton(), () =>
-                expect(page.getByRole('checkbox', { name: 'Predictions', exact: true })).toHaveAttribute(
-                    'aria-invalid',
-                    'true'
-                )
-            );
+            await expect(sinksPage.getAddAndUseButton()).toBeDisabled();
             await expect(sinksPage.getToast('Sink configuration created successfully.')).toBeHidden();
 
             await sinksPage.openSinkList();
@@ -251,11 +214,6 @@ test.describe('Pipeline sinks', () => {
             network,
             page,
         }) => {
-            test.fail(!FEATURE_FLAGS.SOURCES_SINKS_REFACTOR, 'Known bug #1 in the deprecated flow');
-            // Known bug in the deprecated flow: after the failed save React resets the uncontrolled form, so the
-            // ticked "Predictions" output format becomes unchecked again.
-            // Expected: every field keeps what the user entered.
-
             network.use(
                 http.post('/api/sinks', () => {
                     // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
@@ -318,7 +276,7 @@ test.describe('Pipeline sinks', () => {
     }) => {
         network.use(
             ...createPipelineBackend({
-                sinks: [folderSink, webhookSink, rosSink, mqttSink],
+                sinks: [folderSink, webhookSink, mqttSink],
                 pipeline: { sink: mqttSink },
             }).handlers
         );
@@ -326,7 +284,7 @@ test.describe('Pipeline sinks', () => {
         await inferencePage.goto();
         await inferencePage.getSinkTab().click();
 
-        await expect(sinksPage.getSinkCards()).toHaveCount(FEATURE_FLAGS.SOURCES_SINKS_REFACTOR ? 3 : 4);
+        await expect(sinksPage.getSinkCards()).toHaveCount(3);
         await expect(sinksPage.getSinkCards().first()).toHaveAttribute('data-testid', `sink-card-${mqttSink.name}`);
 
         const mqttCard = sinksPage.getSinkCard(mqttSink.name);
@@ -351,16 +309,6 @@ test.describe('Pipeline sinks', () => {
         await expect(webhookCard.getByText('Timeout: 5')).toBeVisible();
         await expect(webhookCard.getByText('Webhook URL: https://hooks.local/alerts')).toBeVisible();
         await expect(webhookCard.getByText('Authorization: Bearer token')).toBeVisible();
-
-        const rosCard = sinksPage.getSinkCard(rosSink.name);
-
-        if (FEATURE_FLAGS.SOURCES_SINKS_REFACTOR) {
-            await expect(rosCard).toBeHidden();
-        } else {
-            await expect(rosCard.getByText('ros', { exact: true })).toBeVisible();
-            await expect(rosCard.getByText('Topic: /geti/predictions')).toBeVisible();
-            await expect(rosCard.getByText('Rate limit: 1 sample every 1 second')).toBeVisible();
-        }
     });
 
     test.describe('sink menu', () => {

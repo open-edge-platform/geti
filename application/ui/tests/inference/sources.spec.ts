@@ -65,26 +65,17 @@ test.describe('Pipeline sources', () => {
             await expect(card.getByText('In use')).toBeVisible();
         });
 
-        test.fail(
-            'does not add a USB camera source without a camera',
-            async ({ inferencePage, sourcesPage, network }) => {
-                // Known bug: the "Camera" picker is required, but with
-                // no camera selected the form still submits the initial `device_id: 0`, creating a source shown as
-                // "Device: Unknown device (id: 0)". Expected: the form is not submitted. Remove `test.fail()` once fixed.
+        test('does not add a USB camera source without a camera', async ({ inferencePage, sourcesPage, network }) => {
+            network.use(http.get('/api/system/devices/camera', () => HttpResponse.json([])));
 
-                network.use(http.get('/api/system/devices/camera', () => HttpResponse.json([])));
+            await inferencePage.goto();
+            await sourcesPage.openAddSourceForm('USB Camera');
 
-                await inferencePage.goto();
-                await sourcesPage.openAddSourceForm('USB Camera');
-                await sourcesPage.getAddAndUseButton().click();
+            await expect(sourcesPage.getAddAndUseButton()).toBeDisabled();
 
-                await expect(sourcesPage.getAddAndUseButton()).toBeVisible();
-                await expect(sourcesPage.getToast('Source configuration created successfully.')).toBeHidden();
-
-                await sourcesPage.openSourceList();
-                await expect(sourcesPage.getSourceCards()).toHaveCount(0);
-            }
-        );
+            await sourcesPage.openSourceList();
+            await expect(sourcesPage.getSourceCards()).toHaveCount(0);
+        });
 
         test('lists a camera attached after refreshing the camera list', async ({
             inferencePage,
@@ -133,15 +124,11 @@ test.describe('Pipeline sources', () => {
             await expect(card.getByText('In use')).toBeVisible();
         });
 
-        test('does not add an IP camera source without a stream URL', async ({ inferencePage, sourcesPage, page }) => {
+        test('does not add an IP camera source without a stream URL', async ({ inferencePage, sourcesPage }) => {
             await inferencePage.goto();
             await sourcesPage.openAddSourceForm('IP Camera');
 
-            await sourcesPage.getAddAndUseButton().click();
-
-            await expect(page.getByRole('textbox', { name: /Stream Url/ })).toHaveAttribute('aria-invalid', 'true');
-            await expect(sourcesPage.getAddAndUseButton()).toBeVisible();
-            await expect(sourcesPage.getToast('Source configuration created successfully.')).toBeHidden();
+            await expect(sourcesPage.getAddAndUseButton()).toBeDisabled();
 
             await sourcesPage.openSourceList();
             await expect(sourcesPage.getSourceCards()).toHaveCount(0);
@@ -168,21 +155,11 @@ test.describe('Pipeline sources', () => {
             await expect(page.getByRole('switch', { name: 'loop video' })).toBeChecked();
         });
 
-        test('does not add a video file source without a path or a file', async ({
-            inferencePage,
-            sourcesPage,
-            page,
-        }) => {
+        test('does not add a video file source without a path or a file', async ({ inferencePage, sourcesPage }) => {
             await inferencePage.goto();
             await sourcesPage.openAddSourceForm('Video file');
 
-            await sourcesPage.getAddAndUseButton().click();
-
-            await expect(page.getByRole('textbox', { name: /Video file path/ })).toHaveAttribute(
-                'aria-invalid',
-                'true'
-            );
-            await expect(sourcesPage.getToast('Source configuration created successfully.')).toBeHidden();
+            await expect(sourcesPage.getAddAndUseButton()).toBeDisabled();
 
             await sourcesPage.openSourceList();
             await expect(sourcesPage.getSourceCards()).toHaveCount(0);
@@ -243,46 +220,45 @@ test.describe('Pipeline sources', () => {
             await expect.poll(() => deletedSourceMediaIds).toHaveLength(1);
         });
 
-        test.fail(
-            'keeps the selected video file after a failed save and uploads it again on retry',
-            async ({ inferencePage, sourcesPage, network, page }) => {
-                // Known bug: the failed save clears the native file input but "Selected: sample.mp4" stays, so the retry
-                // sends an empty `video_path` instead of uploading the file again. Remove `test.fail()` once fixed.
+        test('keeps the selected video file after a failed save and uploads it again on retry', async ({
+            inferencePage,
+            sourcesPage,
+            network,
+            page,
+        }) => {
+            network.use(
+                http.post(
+                    '/api/sources',
+                    () => {
+                        // @ts-expect-error The 409 response has no documented schema in the OpenAPI spec.
+                        return HttpResponse.json({ detail: 'Name already in use' }, { status: 409 });
+                    },
+                    { once: true }
+                )
+            );
 
-                network.use(
-                    http.post(
-                        '/api/sources',
-                        () => {
-                            // @ts-expect-error The 409 response has no documented schema in the OpenAPI spec.
-                            return HttpResponse.json({ detail: 'Name already in use' }, { status: 409 });
-                        },
-                        { once: true }
-                    )
-                );
+            await inferencePage.goto();
+            await sourcesPage.openAddSourceForm('Video file');
+            await sourcesPage.getVideoFileInput().setInputFiles({
+                name: 'sample.mp4',
+                mimeType: 'video/mp4',
+                buffer: Buffer.from('fake-video-bytes'),
+            });
+            await sourcesPage.getAddAndUseButton().click();
 
-                await inferencePage.goto();
-                await sourcesPage.openAddSourceForm('Video file');
-                await sourcesPage.getVideoFileInput().setInputFiles({
-                    name: 'sample.mp4',
-                    mimeType: 'video/mp4',
-                    buffer: Buffer.from('fake-video-bytes'),
-                });
-                await sourcesPage.getAddAndUseButton().click();
+            await expect(
+                sourcesPage.getToast('Failed to save source configuration, Name already in use')
+            ).toBeVisible();
+            await expect(page.getByText('Selected: sample.mp4')).toBeVisible();
 
-                await expect(
-                    sourcesPage.getToast('Failed to save source configuration, Name already in use')
-                ).toBeVisible();
-                await expect(page.getByText('Selected: sample.mp4')).toBeVisible();
+            await sourcesPage.getAddAndUseButton().click();
 
-                await sourcesPage.getAddAndUseButton().click();
-
-                await expect(
-                    sourcesPage
-                        .getSourceCard('Video file source')
-                        .getByText(/^Video path: \/data\/source_media\/.+\/sample\.mp4$/)
-                ).toBeVisible();
-            }
-        );
+            await expect(
+                sourcesPage
+                    .getSourceCard('Video file source')
+                    .getByText(/^Video path: \/data\/source_media\/.+\/sample\.mp4$/)
+            ).toBeVisible();
+        });
 
         test('keeps the form open when the new source cannot be connected', async ({
             inferencePage,
@@ -313,38 +289,36 @@ test.describe('Pipeline sources', () => {
             await expect(sourcesPage.getSourceCard('IP camera source').getByText('In use')).toBeHidden();
         });
 
-        test.fail(
-            'shows the error and keeps the entered values when saving fails',
-            async ({ inferencePage, sourcesPage, network, page }) => {
-                // Known bug: after the failed save React resets the uncontrolled form, so Name goes back to the default
-                // "IP camera source" instead of the typed value. Expected: every field keeps what the user entered.
-                // Remove `test.fail()` once fixed.
+        test('shows the error and keeps the entered values when saving fails', async ({
+            inferencePage,
+            sourcesPage,
+            network,
+            page,
+        }) => {
+            network.use(
+                http.post('/api/sources', () => {
+                    // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
+                    return HttpResponse.json({ detail: 'Stream URL is not reachable' }, { status: 400 });
+                })
+            );
 
-                network.use(
-                    http.post('/api/sources', () => {
-                        // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
-                        return HttpResponse.json({ detail: 'Stream URL is not reachable' }, { status: 400 });
-                    })
-                );
+            await inferencePage.goto();
+            await sourcesPage.openAddSourceForm('IP Camera');
+            await sourcesPage.getNameField().fill('Door camera');
+            await page.getByRole('textbox', { name: /Stream Url/ }).fill('rtsp://door.local/stream');
+            await page.getByRole('switch', { name: 'Require Authentication' }).click();
+            await sourcesPage.getAddAndUseButton().click();
 
-                await inferencePage.goto();
-                await sourcesPage.openAddSourceForm('IP Camera');
-                await sourcesPage.getNameField().fill('Door camera');
-                await page.getByRole('textbox', { name: /Stream Url/ }).fill('rtsp://door.local/stream');
-                await page.getByRole('switch', { name: 'Require Authentication' }).click();
-                await sourcesPage.getAddAndUseButton().click();
+            await expect(
+                sourcesPage.getToast('Failed to save source configuration, Stream URL is not reachable')
+            ).toBeVisible();
+            await expect(sourcesPage.getNameField()).toHaveValue('Door camera');
+            await expect(page.getByRole('textbox', { name: /Stream Url/ })).toHaveValue('rtsp://door.local/stream');
+            await expect(page.getByRole('switch', { name: 'Require Authentication' })).toBeChecked();
 
-                await expect(
-                    sourcesPage.getToast('Failed to save source configuration, Stream URL is not reachable')
-                ).toBeVisible();
-                await expect(sourcesPage.getNameField()).toHaveValue('Door camera');
-                await expect(page.getByRole('textbox', { name: /Stream Url/ })).toHaveValue('rtsp://door.local/stream');
-                await expect(page.getByRole('switch', { name: 'Require Authentication' })).toBeChecked();
-
-                await sourcesPage.openSourceList();
-                await expect(sourcesPage.getSourceCards()).toHaveCount(0);
-            }
-        );
+            await sourcesPage.openSourceList();
+            await expect(sourcesPage.getSourceCards()).toHaveCount(0);
+        });
     });
 
     test('suggests a unique default name when the default one is taken', async ({
@@ -668,32 +642,28 @@ test.describe('Pipeline sources', () => {
             await expect(sourcesPage.getSaveAndConnectButton()).toBeHidden();
         });
 
-        test.fail(
-            'shows the error and keeps the edited values when updating fails',
-            async ({ inferencePage, sourcesPage, network, page }) => {
-                // Known bug: after the failed update React resets the uncontrolled form, so Stream URL goes back to the
-                // saved value instead of the typed one.
-                // Expected: every field keeps what the user entered. Remove `test.fail()` once fixed.
+        test('shows the error and keeps the edited values when updating fails', async ({
+            inferencePage,
+            sourcesPage,
+            network,
+            page,
+        }) => {
+            network.use(...createPipelineBackend({ sources: [ipCamera] }).handlers);
+            network.use(
+                http.patch('/api/sources/{source_id}', () => {
+                    // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
+                    return HttpResponse.json({ detail: 'Invalid stream URL' }, { status: 400 });
+                })
+            );
 
-                network.use(...createPipelineBackend({ sources: [ipCamera] }).handlers);
-                network.use(
-                    http.patch('/api/sources/{source_id}', () => {
-                        // @ts-expect-error The 400 response has no documented schema in the OpenAPI spec.
-                        return HttpResponse.json({ detail: 'Invalid stream URL' }, { status: 400 });
-                    })
-                );
+            await inferencePage.goto();
+            await sourcesPage.selectSourceMenuAction(ipCamera.name, 'Edit');
+            await page.getByRole('textbox', { name: /Stream Url/ }).fill('not-a-url');
+            await sourcesPage.getSaveButton().click();
 
-                await inferencePage.goto();
-                await sourcesPage.selectSourceMenuAction(ipCamera.name, 'Edit');
-                await page.getByRole('textbox', { name: /Stream Url/ }).fill('not-a-url');
-                await sourcesPage.getSaveButton().click();
-
-                await expect(
-                    sourcesPage.getToast('Failed to save source configuration, Invalid stream URL')
-                ).toBeVisible();
-                await expect(page.getByText('Edit input source')).toBeVisible();
-                await expect(page.getByRole('textbox', { name: /Stream Url/ })).toHaveValue('not-a-url');
-            }
-        );
+            await expect(sourcesPage.getToast('Failed to save source configuration, Invalid stream URL')).toBeVisible();
+            await expect(page.getByText('Edit input source')).toBeVisible();
+            await expect(page.getByRole('textbox', { name: /Stream Url/ })).toHaveValue('not-a-url');
+        });
     });
 });

@@ -53,7 +53,7 @@ export const createPipelineBackend = ({ sources = [], sinks = [], pipeline = {} 
 
         http.get('/api/sources', () => HttpResponse.json(state.sources)),
         http.post('/api/sources', async ({ request }) => {
-            const source = (await request.json()) as SourceConfig;
+            const source = { ...(await request.json()), id: crypto.randomUUID() } as SourceConfig;
             state.sources.push(source);
 
             return HttpResponse.json(source, { status: 201 });
