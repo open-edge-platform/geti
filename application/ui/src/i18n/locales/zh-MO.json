@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "金鑰不能為空白",
+            "keyDuplicate": "金鑰必須是唯一的",
             "valueEmpty": "值不能為空白"
         },
         "connection": {

@@ -360,6 +360,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "La clé ne peut pas être vide",
+            "keyDuplicate": "La clé doit être unique",
             "valueEmpty": "La valeur ne peut pas être vide"
         },
         "connection": {

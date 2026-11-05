@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "键不能为空",
+            "keyDuplicate": "键必须唯一",
             "valueEmpty": "值不能为空"
         },
         "connection": {

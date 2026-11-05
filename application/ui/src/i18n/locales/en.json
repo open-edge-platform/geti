@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Key cannot be empty",
+            "keyDuplicate": "Key must be unique",
             "valueEmpty": "Value cannot be empty"
         },
         "connection": {

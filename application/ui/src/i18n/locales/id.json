@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Kunci tidak boleh kosong",
+            "keyDuplicate": "Kunci harus unik",
             "valueEmpty": "Nilai tidak boleh kosong"
         },
         "connection": {
