@@ -28,7 +28,7 @@ import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode
 import { Labels } from '../../../../modules/annotator/labels/labels.component';
 import { usePredictionSetup } from '../../../../modules/annotator/predictions-setup-provider.component';
 import { AnnotatorModes } from '../../../../modules/annotator/shell/secondary-toolbar/annotator-modes/annotator-modes-toggle.component';
-import { getNextItem } from '../../../../modules/annotator/shell/secondary-toolbar/util';
+import { getItemAfterDeletion } from '../../../../modules/annotator/shell/secondary-toolbar/util';
 import { Toolbar } from '../../../../modules/annotator/shell/toolbar-container/toolbar-container.component';
 import { useVideoPlayerContext } from '../../../../modules/annotator/video-player/video-player-provider.component';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
@@ -114,11 +114,15 @@ export const SecondaryToolbar = ({
     const isClassification = isClassificationTask(selectedProject.task.task_type);
     const isMultiLabelClassification = isMultiLabelClassificationTask(selectedProject.task);
 
-    const handleDeleteItem = ([deletedItem]: string[], totalItems: number) => {
-        const deletedIndex = items.findIndex((item) => item.id === deletedItem);
-        const nextItem = getNextItem(totalItems - 1, deletedIndex);
+    const handleDeleteItem = ([deletedItemId]: string[]) => {
+        const nextItem = getItemAfterDeletion(items, deletedItemId);
 
-        onSelectedMediaItem(items[nextItem]);
+        if (nextItem === undefined) {
+            onClose();
+            return;
+        }
+
+        onSelectedMediaItem(nextItem);
     };
 
     const isPredictionMode = mode === 'prediction';
@@ -175,10 +179,7 @@ export const SecondaryToolbar = ({
                         )}
                         {isAnnotationMode && isImage(mediaItem) && (
                             // Only standalone images can be deleted here: a video frame is part of its video.
-                            <DeleteMediaItem
-                                itemsIds={[mediaItem.id]}
-                                onDeleted={(deleteItems) => handleDeleteItem(deleteItems, items.length - 1)}
-                            />
+                            <DeleteMediaItem itemsIds={[mediaItem.id]} onDeleted={handleDeleteItem} />
                         )}
                         {isAnnotationMode && (
                             <Button

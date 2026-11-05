@@ -4,7 +4,7 @@
 import { getMockedAnnotation } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
 
-import { toggleLabel } from './util';
+import { getItemAfterDeletion, toggleLabel } from './util';
 
 describe('secondary toolbar utils', () => {
     describe('toggleLabel', () => {
@@ -55,6 +55,22 @@ describe('secondary toolbar utils', () => {
             const result = toggleLabel(mockLabel1, annotation.labels);
 
             expect(result).toEqual([]);
+        });
+    });
+
+    describe('getItemAfterDeletion', () => {
+        const items = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+
+        it.each([
+            ['first', 'a', 'b'],
+            ['second-to-last', 'b', 'c'],
+            ['last', 'c', 'b'],
+        ])('selects the neighbour of the %s item', (_position, deletedId, expectedId) => {
+            expect(getItemAfterDeletion(items, deletedId)?.id).toBe(expectedId);
+        });
+
+        it('returns undefined when the only item is deleted', () => {
+            expect(getItemAfterDeletion([{ id: 'a' }], 'a')).toBeUndefined();
         });
     });
 });
