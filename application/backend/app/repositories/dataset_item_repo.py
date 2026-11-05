@@ -249,15 +249,6 @@ class DatasetItemRepository:
         required_subsets = {DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING}
         return required_subsets.issubset(present_subsets)
 
-    def get_subset_distribution(self) -> dict[str, int]:
-        stmt = (
-            select(DatasetItemDB.subset, func.count(DatasetItemDB.id).label("count"))
-            .where(DatasetItemDB.project_id == self.project_id)
-            .group_by(DatasetItemDB.subset)
-        )
-        result = self.db.execute(stmt)
-        return {row.subset: row.count for row in result}  # type: ignore[misc]
-
     def get_statistics(self) -> dict[str, Any]:
         # Media Counts (images, videos, video frames):
         media_counts_stmt = (

@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from typing import cast
 
-from sqlalchemy import CursorResult, delete, select, update
+from sqlalchemy import CursorResult, delete, select
 from sqlalchemy.orm import Session
 
 from app.db.schema import ModelVariantDB
@@ -42,8 +42,3 @@ class ModelVariantRepository(BaseRepository[ModelVariantDB]):
         stmt = delete(ModelVariantDB).where(ModelVariantDB.id == obj_id)
         result = cast(CursorResult, self.db.execute(stmt))
         return result.rowcount > 0
-
-    def mark_files_deleted(self, variant_id: str) -> None:
-        """Mark a variant's files as deleted."""
-        stmt = update(ModelVariantDB).where(ModelVariantDB.id == variant_id).values(files_deleted=True)
-        self.db.execute(stmt)
