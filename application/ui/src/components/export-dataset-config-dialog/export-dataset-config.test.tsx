@@ -84,7 +84,7 @@ describe('ExportDatasetConfig', () => {
         expect(screen.queryByRole('radio', { name: 'YOLO' })).not.toBeInTheDocument();
     });
 
-    it('shows GETI and COCO export option for instance_segmentation task', async () => {
+    it('shows GETI, COCO and YOLO export options for instance_segmentation task', async () => {
         renderApp(
             getMockedProject({
                 task: { exclusive_labels: true, task_type: 'instance_segmentation' },
@@ -93,7 +93,8 @@ describe('ExportDatasetConfig', () => {
 
         expect(await screen.findByText('Export dataset')).toBeVisible();
         expect(screen.getByRole('radio', { name: 'Geti' })).toBeVisible();
-        expect(screen.queryByRole('radio', { name: 'COCO' })).toBeVisible();
+        expect(screen.getByRole('radio', { name: 'COCO' })).toBeVisible();
+        expect(screen.getByRole('radio', { name: 'YOLO' })).toBeVisible();
     });
 
     it('does not show the video export warning when the default Geti format is selected', async () => {
