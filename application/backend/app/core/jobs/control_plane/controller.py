@@ -112,6 +112,8 @@ class JobController:
             job_run = self._runner_factory.for_job(job)
             event_q: asyncio.Queue = asyncio.Queue()
 
+            # Mark it running before the runner starts, so a cancel from now on stops the runner.
+            job.start()
             # Set up event pumping and cancellation monitoring
             cancel_task = self._setup_job_execution(job, job_run, event_q)
 

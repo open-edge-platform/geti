@@ -6,7 +6,7 @@ from enum import IntEnum, StrEnum
 from typing import Any, Generic, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.models import BaseIDModel
 
@@ -48,8 +48,8 @@ class Job(BaseIDModel, Generic[JobParamsT]):
     job_type: JobType
     params: JobParamsT  # parameters of the job to be serialized and send to a runnable context
     status: JobStatus = JobStatus.PENDING
-    submitted_at: float = now_utc_ts()
-    updated_at: float = now_utc_ts()
+    submitted_at: float = Field(default_factory=now_utc_ts)
+    updated_at: float = Field(default_factory=now_utc_ts)
     started_at: float | None = None
     message: str | None = None
     progress: float = 0.0  # percentage of completion
@@ -64,6 +64,8 @@ class Job(BaseIDModel, Generic[JobParamsT]):
         """Hook called when a job that has started finishes, fails or is cancelled."""
 
     def start(self) -> None:
+        if self.status != JobStatus.PENDING:
+            return
         self.status = JobStatus.RUNNING
         self.started_at = now_utc_ts()
         self.updated_at = now_utc_ts()

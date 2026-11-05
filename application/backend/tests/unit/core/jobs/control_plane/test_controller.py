@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import threading
 from collections.abc import Iterator
 from unittest.mock import AsyncMock, Mock, call, patch
 
@@ -9,7 +10,7 @@ import pytest
 
 from app.core.jobs import CancellationResult
 from app.core.jobs.control_plane import JobController, JobQueue
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, JobType, Progress, Started
 from app.core.run import RunnerFactory
 
 
@@ -35,6 +36,23 @@ class MockRunner:
         """Mark runner as stopped."""
         self.stopped = True
         self.stop_called.set()
+
+
+class SlowStartRunner(MockRunner):
+    """Runner whose Started event is delayed, like a spawned process still importing its modules."""
+
+    def __init__(self):
+        super().__init__()
+        self._released = threading.Event()
+
+    def events(self) -> Iterator[ExecutionEvent]:
+        self._released.wait(timeout=5)
+        yield Started()
+        yield Cancelled() if self.stopped else Done()
+
+    async def stop(self) -> None:
+        await super().stop()
+        self._released.set()
 
 
 class TestJobController:
@@ -170,6 +188,29 @@ class TestJobController:
         assert job.status == expected_status
         expected_call_args = tuple(job.id if arg == "job_id" else arg for arg in expected_log_args)
         getattr(mock_logger, expected_log_method).assert_any_call(*expected_call_args)
+
+    @pytest.mark.asyncio
+    async def test_cancel_before_runner_reports_started_stops_the_runner(self, fxt_runner_factory, fxt_job):
+        """A cancel between dispatch and the runner's Started event must stop the runner, not be lost."""
+        job_queue = JobQueue()
+        controller = JobController(job_queue, fxt_runner_factory, max_parallel_jobs=1)
+        runner = SlowStartRunner()
+        fxt_runner_factory.for_job.return_value = runner
+        job = fxt_job(JobType.EXPORT_DATASET)
+
+        await controller.start()
+        await job_queue.submit(job)
+        while not runner.started:
+            await asyncio.sleep(0.01)
+
+        _, result = job_queue.cancel(job.id)
+        await asyncio.wait_for(runner.stop_called.wait(), timeout=2)
+        while job.status < JobStatus.DONE:
+            await asyncio.sleep(0.01)
+        await controller.stop()
+
+        assert result == CancellationResult.RUNNING_CANCELLING
+        assert job.status == JobStatus.CANCELLED
 
     @pytest.mark.asyncio
     async def test_supervise_loop_handles_exceptions(self, fxt_job_controller, fxt_job_queue):
