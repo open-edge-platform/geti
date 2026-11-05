@@ -3,5 +3,4 @@
 
 export const FEATURE_FLAGS = {
     SSIM_TOOL: true,
-    SOURCES_SINKS_REFACTOR: false,
 };

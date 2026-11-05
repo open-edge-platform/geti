@@ -1,15 +1,15 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
 import { screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import type { SupportedSinkConfig } from '../../types';
 import { SettingsList } from './settings-list.component';
 
 describe('SettingsList', () => {
     it('shows folder path, rate limit and output formats for a folder sink', () => {
-        const sink: SupportedSinkConfig = {
+        const sink: SinkConfig = {
             id: '1',
             name: 'Folder',
             sink_type: 'folder',
@@ -27,7 +27,7 @@ describe('SettingsList', () => {
     });
 
     it('shows request settings, headers and output formats for a webhook sink', () => {
-        const sink: SupportedSinkConfig = {
+        const sink: SinkConfig = {
             id: '2',
             name: 'Webhook',
             sink_type: 'webhook',
@@ -53,7 +53,7 @@ describe('SettingsList', () => {
         [true, 'Auth required: Yes'],
         [false, 'Auth required: No'],
     ])('shows broker settings for an mqtt sink (auth_required=%s)', (authRequired, authText) => {
-        const sink: SupportedSinkConfig = {
+        const sink: SinkConfig = {
             id: '3',
             name: 'MQTT',
             sink_type: 'mqtt',

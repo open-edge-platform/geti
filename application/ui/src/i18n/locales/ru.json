@@ -409,8 +409,7 @@
             "types": {
                 "usbCamera": "USB-камера",
                 "ipCamera": "IP-камера",
-                "videoFile": "видеофайл",
-                "disconnected": "отключено"
+                "videoFile": "видеофайл"
             },
             "options": {
                 "usbCamera": "USB-камера",
@@ -463,8 +462,7 @@
             "types": {
                 "folder": "папка",
                 "mqtt": "MQTT",
-                "webhook": "webhook",
-                "ros": "ROS"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Папка",

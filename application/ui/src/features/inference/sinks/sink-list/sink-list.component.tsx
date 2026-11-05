@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
 import { ConnectionStatusBadge } from '@/components/connection-status-badge/connection-status-badge.component';
 import { useTranslation } from '@/i18n';
 import { Button, dimensionValue, Flex, Text } from '@geti-ui/ui';
@@ -11,7 +12,6 @@ import { isEqual } from 'lodash-es';
 import { usePipeline } from '../../../../hooks/api/pipeline.hook';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useTestSink } from '../api/use-test-sink';
-import type { SupportedSinkConfig } from '../types';
 import { SettingsList } from './settings-list/settings-list.component';
 import { SinkIcon } from './sink-icon/sink-icon.component';
 import { SinkMenu } from './sink-menu/sink-menu.component';
@@ -22,18 +22,18 @@ const SINK_TYPE_LABEL_KEYS = {
     folder: 'inference.sinks.types.folder',
     mqtt: 'inference.sinks.types.mqtt',
     webhook: 'inference.sinks.types.webhook',
-} as const satisfies Record<SupportedSinkConfig['sink_type'], string>;
+} as const satisfies Record<SinkConfig['sink_type'], string>;
 
 interface SinksListProps {
-    sinks: SupportedSinkConfig[];
+    sinks: SinkConfig[];
     onAddSink: () => void;
-    onEditSink: (config: SupportedSinkConfig) => void;
+    onEditSink: (config: SinkConfig) => void;
 }
 
 interface SinksListItemProps {
-    sink: SupportedSinkConfig;
+    sink: SinkConfig;
     isConnected: boolean;
-    onEditSink: (config: SupportedSinkConfig) => void;
+    onEditSink: (config: SinkConfig) => void;
 }
 
 const SinkListItem = ({ sink, isConnected, onEditSink }: SinksListItemProps) => {
