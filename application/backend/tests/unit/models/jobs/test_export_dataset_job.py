@@ -20,6 +20,7 @@ class TestExportDatasetJobParams:
             (TaskType.DETECTION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.GETI),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.COCO),
+            (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO_SEG),
         ],
     )
     def test_validate_format_valid(self, task_type: TaskType, export_format: DatasetFormat):
@@ -53,6 +54,15 @@ class TestExportDatasetJobParams:
                 export_format=DatasetFormat.YOLO_CLS,
             )
 
+    def test_validate_format_yolo_seg_valid_for_instance_segmentation(self):
+        """Test that the YOLO segmentation format is accepted for instance segmentation projects."""
+        params = ExportDatasetJobParams(
+            project_id=uuid4(),
+            task=Task(task_type=TaskType.INSTANCE_SEGMENTATION),
+            export_format=DatasetFormat.YOLO_SEG,
+        )
+        assert params.export_format is DatasetFormat.YOLO_SEG
+
     @pytest.mark.parametrize(
         ("task_type", "export_format"),
         [
@@ -60,6 +70,7 @@ class TestExportDatasetJobParams:
             (TaskType.CLASSIFICATION, DatasetFormat.YOLO),
             (TaskType.DETECTION, DatasetFormat.VOC),
             (TaskType.DETECTION, DatasetFormat.YOLO_CLS),
+            (TaskType.DETECTION, DatasetFormat.YOLO_SEG),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.VOC),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO_CLS),

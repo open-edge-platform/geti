@@ -21,9 +21,11 @@ class DatasetFormat(StrEnum):
     COCO = "coco"
     GETI = "geti"
     VOC = "voc"
-    # YOLO_CLS is defined before YOLO because _infer_format_from_filename matches format values as
-    # substrings of the archive file name, and "yolo" is a substring of "yolo_cls".
+    # YOLO_CLS and YOLO_SEG are defined before YOLO because _infer_format_from_filename matches format
+    # values as substrings of the archive file name, and "yolo" is a substring of both "yolo_cls" and
+    # "yolo_seg".
     YOLO_CLS = "yolo_cls"
+    YOLO_SEG = "yolo_seg"
     YOLO = "yolo"
     UNKNOWN = "unknown"
 

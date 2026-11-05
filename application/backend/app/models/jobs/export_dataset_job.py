@@ -12,7 +12,7 @@ from app.models.task import TaskType
 VALID_FORMATS_PER_TASK = {
     TaskType.CLASSIFICATION: [DatasetFormat.GETI, DatasetFormat.VOC, DatasetFormat.YOLO_CLS],
     TaskType.DETECTION: [DatasetFormat.GETI, DatasetFormat.COCO, DatasetFormat.YOLO],
-    TaskType.INSTANCE_SEGMENTATION: [DatasetFormat.GETI, DatasetFormat.COCO],
+    TaskType.INSTANCE_SEGMENTATION: [DatasetFormat.GETI, DatasetFormat.COCO, DatasetFormat.YOLO_SEG],
 }
 
 

@@ -169,6 +169,7 @@ class TestDatasetExporter:
             (DatasetFormat.COCO, DataFormat.COCO),
             (DatasetFormat.YOLO, DataFormat.YOLO),
             (DatasetFormat.YOLO_CLS, DataFormat.YOLO_ULTRALYTICS_CLS),
+            (DatasetFormat.YOLO_SEG, DataFormat.YOLO_ULTRALYTICS_SEG),
         ],
     )
     def test_export_dataset(

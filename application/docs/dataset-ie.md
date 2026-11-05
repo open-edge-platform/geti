@@ -49,7 +49,8 @@ Two important design choices follow from these observations:
 
 1. All datasets that are uploaded or downloaded by the user (directly or via API), must be zip archives in a standard
    dataset format (Geti, COCO, YOLO or VOC). For classification projects, the Ultralytics YOLO classification format
-   (ImageNet-style folder layout) is also supported. Legacy Datumaro v1 archives are not supported.
+   (ImageNet-style folder layout) is also supported, and for instance segmentation projects the Ultralytics YOLO
+   segmentation format (polygon label rows). Legacy Datumaro v1 archives are not supported.
 2. Internally, all processing steps must operate on a common representation of the dataset. In practice, this means
    `getidata.Dataset` objects from getidata.
 
@@ -176,6 +177,13 @@ Conversions not listed in the table are not supported and will cause the import 
 > represent single-label (multiclass) classification datasets. Exporting to this format is therefore only offered
 > for classification projects with exclusive labels; multi-label classification projects can use the Geti and VOC
 > formats instead.
+
+> [!NOTE]
+> The Ultralytics YOLO segmentation format stores each instance as a single polygon with normalized coordinates,
+> so it cannot represent holes inside objects. Exporting to this format is only offered for instance segmentation
+> projects; object detection projects can use the Geti, COCO and YOLO (detection) formats instead. On import, the
+> format is told apart from YOLO detection by the label file content: segmentation rows hold a class index followed
+> by at least three normalized (x, y) coordinate pairs, while detection rows always have exactly five fields.
 
 ### Concurrency
 
