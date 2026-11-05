@@ -274,7 +274,11 @@ class OmeImageDB(Base):
     pixel_type: Mapped[str] = mapped_column(String(20), nullable=False)
     series_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_big_tiff: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    # [{"index": 0, "name": "DAPI", "color": "#0000ff", "emission_wavelength": 461}, ...]
+    # OME-XML format doesn't have a notion of window per channel like OME-Zarr, so window min/max is calculated from the
+    # significant bits of the pixel type and stored in `channels[].window` for convenience.
+    # [{"index": 0, "name": "DAPI", "color": "#0000ff", "emission_wavelength": 461,
+    #   "window": { "min": 0, "max": 65535, "start": 0, "end": 40000 }
+    #  }, ...]
     channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     # Fixed, deterministic channel->RGB projection used for training (see §3.6.1). Computed once at ingest
     # time and never mutated; independent of OmeChannelView, which is mutable and display-only.
@@ -404,7 +408,9 @@ PUT /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 
 ```http
 GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&c=0|120:2400$3B6CFF,1|300:9800$27C46A,2|40:1500$E8503A
-200 -> image/png, Cache-Control: private, max-age=…, ETag: {settings_hash}
+200 -> image/png, ETag: {settings_hash}
+     -> `c` omitted:  Cache-Control: private, no-cache
+     -> `c` present:  Cache-Control: private, max-age=31536000, immutable
 304 -> If-None-Match matched
 400 -> malformed `c` (bad index, min >= max, invalid hex color)
 422 -> level out of range for this image's pyramid_levels
@@ -437,8 +443,15 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
   (stored or override), plus the source version.
 - Identical `c` values therefore hit the same cache entry. Clients should avoid sending sub-integer min/max values so
   the cache is reused.
-- A `PUT .../channel-view` changes the effective settings only for requests that omit `c`. Their `ETag` changes
-  automatically, so no explicit invalidation is needed.
+- **`Cache-Control` differs by whether `c` is present:**
+  - **`c` omitted** (stored, mutable channel view): `private, no-cache` - always revalidate via `ETag` before use, so
+    a `PUT .../channel-view` is picked up on the very next load instead of being masked for up to `max-age`.
+    Revalidation is cheap: an unchanged `ETag` just gets a `304`.
+  - **`c` present** (fully specified in the URL): `private, max-age=31536000, immutable` - the URL can never resolve
+    to different bytes, so it's safe to cache indefinitely and skip revalidation entirely (useful during slider
+    scrubbing).
+- A `PUT .../channel-view` only affects requests that omit `c`; their `ETag` changes automatically and is caught by
+  the next revalidation.
 - Server-side, cache raw decoded tiles keyed by `(media_id, level, z, t, channel, tile)`. A new `c` then only reapplies
   the intensity mapping and color, with no storage read.
 
