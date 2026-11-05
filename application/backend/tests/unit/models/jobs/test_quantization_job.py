@@ -104,3 +104,17 @@ class TestQuantizationJob:
 
         # Should not raise
         fxt_quantization_job.on_complete()
+
+    def test_cancel_after_start_cleans_up_without_keeping_log(self, fxt_quantization_job):
+        """A cancelled job that ran must remove its workspace without creating a variant directory for the log."""
+        workspace_dir = (
+            fxt_quantization_job.data_dir / f"getitune-quantize-workspace-{fxt_quantization_job.params.model_id}"
+        )
+        workspace_dir.mkdir(parents=True)
+        (fxt_quantization_job.log_dir / fxt_quantization_job.log_file).write_text("Quantization log content")
+
+        fxt_quantization_job.start()
+        fxt_quantization_job.cancel()
+
+        assert not workspace_dir.exists()
+        assert not (fxt_quantization_job.data_dir / "projects").exists()

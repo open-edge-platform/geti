@@ -61,7 +61,7 @@ class Job(BaseIDModel, Generic[JobParamsT]):
         return f"{self.job_type.lower()}-{self.id}.log"
 
     def on_complete(self) -> None:
-        """Hook called when the job is finished successfully or failed."""
+        """Hook called when a job that has started finishes, fails or is cancelled."""
 
     def start(self) -> None:
         self.status = JobStatus.RUNNING
@@ -99,6 +99,9 @@ class Job(BaseIDModel, Generic[JobParamsT]):
         self.status = JobStatus.CANCELLED
         self.updated_at = now_utc_ts()
         self.message = "Job was cancelled"
+        # A job cancelled before it started has nothing to clean up.
+        if self.started_at is not None:
+            self.on_complete()
 
 
 class ProjectJob(Job, Generic[JobParamsT]):
