@@ -22,6 +22,7 @@ export const getFormatOptions = (task: Task) => {
         instance_segmentation: [
             { label: 'Geti', value: 'geti' },
             { label: 'COCO', value: 'coco' },
+            { label: 'YOLO', value: 'yolo_seg' },
         ],
         detection: [
             { label: 'Geti', value: 'geti' },
