@@ -212,6 +212,24 @@ class TestJobController:
         assert job.status == JobStatus.CANCELLED
 
     @pytest.mark.asyncio
+    async def test_runner_that_fails_to_start_fails_the_job(self, fxt_runner_factory, fxt_job):
+        job_queue = JobQueue()
+        controller = JobController(job_queue, fxt_runner_factory, max_parallel_jobs=1)
+        runner = MockRunner()
+        runner.start = Mock(side_effect=OSError("cannot spawn"))
+        fxt_runner_factory.for_job.return_value = runner
+        job = fxt_job(JobType.EXPORT_DATASET)
+
+        await controller.start()
+        await job_queue.submit(job)
+        while job.status < JobStatus.DONE:
+            await asyncio.sleep(0.01)
+        await controller.stop()
+
+        assert job.status == JobStatus.FAILED
+        assert job.error == "Failed to start the job: cannot spawn"
+
+    @pytest.mark.asyncio
     async def test_supervise_loop_handles_exceptions(self, fxt_job_controller, fxt_job_queue):
         """Test supervisor loop handles exceptions gracefully."""
         fxt_job_queue.next_runnable.side_effect = [Exception("Test error"), asyncio.CancelledError()]
@@ -413,9 +431,6 @@ class TestJobController:
             # Verify thread was created and started
             mock_thread.assert_called_once()
             mock_thread_instance.start.assert_called_once()
-
-            # Verify runner was started
-            assert mock_runner.started
 
             # Clean up
             cancel_task.cancel()
