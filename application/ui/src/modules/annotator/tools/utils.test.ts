@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { canRasteriseAtFullSize, getImageData, loadImageData, projectPointOnLine } from './utils';
+import { canRasteriseAtFullSize, clampPointToRoi, getImageData, loadImageData, projectPointOnLine } from './utils';
 
 const createImage = (width: number, height: number): ImageBitmap => ({ width, height, close: rs.fn() }) as ImageBitmap;
 
@@ -63,6 +63,15 @@ describe('canRasteriseAtFullSize', () => {
     it('rejects dimensions one pixel over the boundary', () => {
         expect(canRasteriseAtFullSize(16385, 16384)).toBe(false);
         expect(canRasteriseAtFullSize(16384, 16385)).toBe(false);
+    });
+});
+
+describe('clampPointToRoi', () => {
+    it('keeps points inside the region of interest', () => {
+        const clampPoint = clampPointToRoi({ x: 0, y: 0, width: 100, height: 50 });
+
+        expect(clampPoint({ x: -5, y: 70 })).toEqual({ x: 0, y: 50 });
+        expect(clampPoint({ x: 30, y: 20 })).toEqual({ x: 30, y: 20 });
     });
 });
 

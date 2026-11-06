@@ -49,7 +49,7 @@ export const SSIMTool = () => {
         <>
             <svg
                 aria-label='ssim preview'
-                viewBox={`0 0 ${image.width} ${image.height}`}
+                viewBox={`0 0 ${roi.width} ${roi.height}`}
                 style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}
             >
                 {toolState.shapes.map((shape, index) => {
@@ -92,7 +92,6 @@ export const SSIMTool = () => {
 
             <DrawingBox
                 roi={roi}
-                image={image}
                 zoom={zoom}
                 selectedLabel={selectedLabel}
                 // A second run would overwrite the in-flight one's results before they are added.

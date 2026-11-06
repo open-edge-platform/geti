@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { PointerEvent, useRef, useState, useTransition } from 'react';
@@ -32,7 +32,7 @@ import classes from './polygon-tool.module.scss';
 export const PolygonTool = () => {
     const { scale: zoom } = useZoom();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
-    const { image } = useSelectedMediaItem();
+    const { image, roi } = useSelectedMediaItem();
     const { selectedLabel } = useAnnotatorLabels();
 
     const ref = useRef<SVGRectElement>({} as SVGRectElement);
@@ -51,7 +51,7 @@ export const PolygonTool = () => {
         optimizePolygonOrSegments,
         resetTool,
         setPointFromEvent,
-    } = usePolygonConfig({ image, zoom, canvasRef: ref });
+    } = usePolygonConfig({ image, roi, zoom, canvasRef: ref });
 
     const toolIcon = getToolIcon(mode);
 
@@ -144,7 +144,7 @@ export const PolygonTool = () => {
 
     return (
         <SvgToolCanvas
-            image={image}
+            roi={roi}
             canvasRef={ref}
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}
