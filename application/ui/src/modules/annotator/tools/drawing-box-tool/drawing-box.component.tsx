@@ -105,7 +105,6 @@ export const DrawingBox = ({ roi, zoom, selectedLabel, onComplete, isDisabled = 
 
     return (
         <SvgToolCanvas
-            roi={roi}
             canvasRef={ref}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}

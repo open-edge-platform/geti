@@ -218,7 +218,6 @@ export const MagneticLasso = () => {
 
     return (
         <SvgToolCanvas
-            roi={roi}
             canvasRef={canvasRef}
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}

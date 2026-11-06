@@ -10,7 +10,7 @@ import { useTranslation } from '@/i18n';
 import { useGetDatasetMediaItems } from 'hooks/use-get-dataset-media-items.hook';
 
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
-import type { Annotation, Point, RegionOfInterest } from '../../../../shared/types';
+import type { Annotation, Point } from '../../../../shared/types';
 import { AnnotationShape } from '../../annotations/annotation-shape/annotation-shape.component';
 import { MaskAnnotations } from '../../annotations/mask-annotations.component';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
@@ -29,18 +29,18 @@ import classes from './segment-anything.module.scss';
 
 interface PreviewAnnotationsProps {
     previewAnnotations: Annotation[];
-    roi: RegionOfInterest;
+    size: { width: number; height: number };
 }
 
 const CURSOR_OFFSET = '7 8';
 // In screen pixels, so placed points are equally easy to hit at any zoom level.
 const PROMPT_POINT_HIT_RADIUS = 8;
 
-const PreviewAnnotations = ({ previewAnnotations, roi }: PreviewAnnotationsProps) => {
+const PreviewAnnotations = ({ previewAnnotations, size }: PreviewAnnotationsProps) => {
     if (previewAnnotations.length === 0) return null;
 
     return (
-        <MaskAnnotations isEnabled annotations={previewAnnotations} width={roi.width} height={roi.height}>
+        <MaskAnnotations isEnabled annotations={previewAnnotations} width={size.width} height={size.height}>
             {previewAnnotations.map((annotation) => (
                 <g
                     key={annotation.id}
@@ -149,7 +149,6 @@ export const SegmentAnythingTool = () => {
     return (
         <SvgToolCanvas
             ref={ref}
-            roi={roi}
             canvasRef={canvasRef}
             aria-label='SAM tool canvas'
             onPointerMove={handlePointerMove}
@@ -159,7 +158,7 @@ export const SegmentAnythingTool = () => {
                 cursor: prompt.isDecoding ? 'progress' : `url(${selectionCursor}) ${CURSOR_OFFSET}, auto`,
             }}
         >
-            <PreviewAnnotations previewAnnotations={previewAnnotations} roi={roi} />
+            <PreviewAnnotations previewAnnotations={previewAnnotations} size={mediaItem} />
             <PromptPoints points={prompt.points} />
         </SvgToolCanvas>
     );
