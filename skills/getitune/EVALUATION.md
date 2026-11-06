@@ -7,8 +7,9 @@ from the repo root with no extra hints beyond the prompt.
 Expected rubric per scenario:
 
 - **Activates the right skill** — the loaded `SKILL.md` matches the topic.
-- **Uses real paths and commands** — references `libraries/getitune/src/getitune/...`,
-  `getitune ...`, `just ...` as documented.
+- **Uses the right runtime boundary** — the six user-facing `getitune-*` skills
+  use the installed `getitune==0.4.0` package and its `getitune ...` or Python
+  API commands; `geti-library-dev` uses the contributor checkout and `just ...`.
 - **Follows the workflow checklist** — does not skip required checks or verify
   steps.
 - **Produces a checkable artifact** — a command run, a file written, or a result.
@@ -161,6 +162,9 @@ Expected behavior:
 
 - Loads the `.xml` IR (or `.onnx`) through the OpenVINO/ONNX backend.
 - Does not mix up the PyTorch and OpenVINO load paths.
+
+The per-skill prompts used for baseline versus with-skill comparisons live in
+each skill's `evals/evals.json`.
 
 ## Running the evaluations
 

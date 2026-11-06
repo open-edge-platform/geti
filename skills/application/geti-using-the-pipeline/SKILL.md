@@ -1,29 +1,22 @@
 ---
 name: geti-using-the-pipeline
-description: Use the Geti application end to end through its REST API — the project → dataset → annotate → train → deploy pipeline served by the FastAPI backend in `application/backend/`. Use when a user (not a contributor) wants to create a project, upload media, add annotations, launch a training or quantization job, track job status, configure a source → model → sink inference pipeline, and enable live inference. Covers the `/api/...` endpoints and the async job model, not backend code changes.
+description: Use a running Geti instance through its REST API to create a project, prepare a dataset, annotate media, train or quantize a model, configure an inference pipeline, and enable live inference. Use this skill for operating Geti as a user; it is not for changing the application source code.
 ---
 
 # Using the Geti pipeline (application)
 
-The Geti application is a FastAPI server (`application/backend/`, the `geti`
-package) that exposes a REST API for the full computer-vision workflow: create a
-**project**, upload and **annotate** media, **train** a model as an async job,
-then configure and **enable** a live inference **pipeline** (source → model →
-sink). This skill is about _using_ that API; to change backend code use the
-`geti-backend-dev` skill instead.
+Geti lets you create a **project**, upload and **annotate** media, **train** a
+model as an async job, then configure and **enable** a live inference **pipeline**
+(source → model → sink). This skill is about using a running instance through
+its REST API.
 
 These endpoints are served by a **running Geti instance**; how it was launched
-does not matter (Docker container, Windows MSIX app, install script, or
-`just run-server` from `application/backend/` for development). Ask the user for
-their base URL rather than assuming one — `https://localhost:7860` is only the
-default for a local deployment, the port is configurable and remote instances
-use a different host. See `application/docs/install.md` for the deployment
-modes. The authoritative API reference is the spec the instance serves; fetch it
-as JSON from `/api/openapi.json` (the `/api/docs` page is only an HTML viewer
-for humans). Read endpoint paths and payloads from there rather than from any
-checked-in Markdown, which may be out of date. If no instance is running and you
-have the sources, generate the spec with `just gen-api-spec --output-path
-openapi.json` from `application/backend/`.
+does not matter. Ask the user for their base URL rather than assuming one —
+`https://localhost:7860` is only the default for a local deployment, the port is
+configurable and remote instances use a different host. The authoritative API
+reference is the spec the instance serves; fetch it as JSON from
+`/api/openapi.json` (`/api/docs` is only an HTML viewer for humans). Read endpoint
+paths and payloads from that live spec rather than guessing from old examples.
 
 ## End-to-end pipeline
 
@@ -86,12 +79,10 @@ To bring in an existing dataset rather than annotating from scratch:
 
 ## Notes
 
-- Training and quantization jobs run out-of-process and call into the `getitune`
-  library; the underlying capabilities map to the `getitune-training-a-model`
-  and `getitune-optimizing-a-model` skills.
+- Training and quantization jobs run asynchronously; the underlying capabilities
+  map to the `getitune-training-a-model` and `getitune-optimizing-a-model` skills.
 - This skill covers API usage; the contract for endpoint paths and payloads is
-  the spec at `/api/openapi.json`. To add or change endpoints, use
-  `geti-backend-dev` and `geti-openapi-sync`.
+  the spec at `/api/openapi.json`.
 
 ## Related skills
 

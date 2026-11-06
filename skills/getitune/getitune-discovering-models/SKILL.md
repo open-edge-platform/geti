@@ -1,15 +1,18 @@
 ---
 name: getitune-discovering-models
-description: Discover which models, recipes, and tasks the getitune library (the Geti training library) supports before training. Use when a user asks what models are available, how to list recipes, how to filter by task or name pattern, how `list_models(...)` and `getitune find` behave, or how to resolve the "model name matches multiple tasks" error. Covers classification, detection, instance/semantic segmentation, and keypoint detection recipes.
+description: Discover which models, recipes, and tasks the getitune package supports before training. Use when a user asks what models are available, how to list recipes, how to filter by task or name pattern, how `list_models(...)` and `getitune find` behave, or how to resolve the "model name matches multiple tasks" error. This skill is not for changing getitune source code or adding recipes.
 ---
 
 # Discovering models and recipes in getitune
 
-Every trainable model in `getitune` is backed by a **recipe** YAML under
-`libraries/getitune/src/getitune/recipe/<task>/`. Recipes are self-discovering, so listing
-them is how you learn what you can train and what to pass to `create_engine`.
+Every trainable model in `getitune` is backed by a **recipe** included in the
+installed package. Recipes are self-discovering, so listing them is how you
+learn what you can train and what to pass to `create_engine`.
 
-Run everything from `libraries/getitune/`.
+Before running a workflow, confirm the installed version with
+`python -c "from importlib.metadata import version; print(version('getitune'))"`.
+If the import or version check fails, reinstall `getitune==0.4.0` in the active
+environment.
 
 ## List models from Python
 
@@ -17,7 +20,7 @@ Run everything from `libraries/getitune/`.
 from getitune.utils import list_models
 
 list_models()                                # all model names
-list_models(return_recipes=True)             # full recipe YAML paths
+list_models(return_recipes=True)             # full recipe paths in the package
 list_models(task="DETECTION")                # filter by task
 list_models(pattern="*efficient*")           # filter by name pattern
 list_models(task="DETECTION", return_recipes=True)  # recipe paths for one task
@@ -29,7 +32,6 @@ Pass any returned name (or recipe path) to
 ## List models from the CLI
 
 ```bash
-# from libraries/getitune/
 getitune find                # lists available model recipes
 ```
 
@@ -68,4 +70,3 @@ pre-exported OpenVINO IR models.
 
 - `getitune-training-a-model` — train the model you selected.
 - `getitune-preparing-datasets` — match the model's task to your data.
-- `geti-library-dev` — when adding a new model/recipe to the library itself.

@@ -1,0 +1,26 @@
+{
+  "skill_name": "getitune-running-inference",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run inference on a folder of images with my trained getitune checkpoint and produce a checkable output. I have not provided the checkpoint, model recipe, image folder, or any paths; no task assets are available in this environment.",
+      "expected_output": "The agent asks for the checkpoint, matching model or recipe, and input images before execution. It may explain the workflow, but does not invent paths, predictions, or a successful run.",
+      "assertions": [
+        "Requests the checkpoint, matching model or recipe, and input image location.",
+        "Does not claim to have run inference or produced predictions."
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Compare inference from my exported OpenVINO model with my trained checkpoint. This is a new session with no previous results. I have not provided the XML/BIN files, checkpoint, matching model recipe, or evaluation data; no task assets are available in this environment.",
+      "expected_output": "The agent requests the XML/BIN pair, checkpoint and matching model or recipe, and common evaluation inputs. It explains that both models must be evaluated on the same data and does not fabricate a comparison.",
+      "assertions": [
+        "Requests the XML/BIN pair, checkpoint and model or recipe, and common evaluation data.",
+        "Explains that comparison requires running both models on the same inputs.",
+        "Does not assume earlier results or claim measured parity."
+      ],
+      "files": []
+    }
+  ]
+}

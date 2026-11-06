@@ -1,0 +1,22 @@
+{
+  "skill_name": "getitune-training-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a short Python smoke script that trains a classification model with getitune 0.4.0 for one epoch on my dataset.",
+      "expected_output": "The agent provides a script using create_engine and engine.train(max_epochs=1), an explicit device and clearly marked dataset placeholder, plus installation instructions with the matching PyTorch index. It explains checkpoint and metric verification without claiming to have executed the script.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Fine-tune a getitune model from an existing checkpoint and verify the result. I have not provided the checkpoint, model or task, dataset, or target device; no task assets are available in this environment.",
+      "expected_output": "The agent requests the checkpoint, matching model or task, dataset with training and evaluation subsets, and target device. It proposes a bounded smoke run after those inputs are supplied, without claiming training or evaluation has occurred.",
+      "assertions": [
+        "Requests the checkpoint, model or task, dataset, and target device.",
+        "Proposes a bounded smoke run and subsequent checkpoint and task-metric verification.",
+        "Does not invent training results, checkpoint paths, or measured metrics."
+      ],
+      "files": []
+    }
+  ]
+}
