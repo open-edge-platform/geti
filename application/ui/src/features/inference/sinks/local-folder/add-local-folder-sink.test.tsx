@@ -80,6 +80,8 @@ describe('AddLocalFolderSink', () => {
     });
 
     it('disables "Add & Use" until Folder Path and an output format are provided', async () => {
+        const { createSink } = setupHandlers();
+
         render(<AddLocalFolderSink onSaved={rs.fn()} />);
 
         const button = () => screen.getByRole('button', { name: 'Add & Use' });
@@ -94,26 +96,75 @@ describe('AddLocalFolderSink', () => {
 
         await userEvent.click(screen.getByRole('checkbox', { name: 'Predictions' }));
         expect(button()).toBeDisabled();
+
+        await userEvent.click(button());
+        expect(createSink).not.toHaveBeenCalled();
     });
 
     it('keeps the entered values and does not connect when saving fails', async () => {
         const onSaved = rs.fn();
+        const failedCreate = rs.fn();
         const { connectSink } = setupHandlers();
         server.use(
-            http.post('/api/sinks', () =>
-                HttpResponse.json({ detail: 'Folder is not writable' } as never, { status: 400 })
+            http.post('/api/sinks', async ({ request }) => {
+                failedCreate(await request.json());
+
+                return HttpResponse.json({ detail: 'Folder is not writable' } as never, { status: 400 });
+            })
+        );
+
+        render(<AddLocalFolderSink onSaved={onSaved} />);
+
+        await userEvent.type(screen.getByRole('textbox', { name: /Samples/i }), '3');
+        await userEvent.type(screen.getByRole('textbox', { name: /Seconds/i }), '1');
+        await fillRequiredFields('/root');
+        await userEvent.click(screen.getByRole('button', { name: 'Add & Use' }));
+
+        expect(await screen.findByLabelText('toast')).toHaveTextContent(
+            'Failed to save sink configuration, Folder is not writable'
+        );
+        expect(failedCreate).toHaveBeenCalledWith({
+            name: 'Local folder sink',
+            sink_type: 'folder',
+            folder_path: '/root',
+            rate_limit: 3,
+            output_formats: ['predictions'],
+        });
+        expect(screen.getByRole('textbox', { name: /Folder Path/i })).toHaveValue('/root');
+        expect(screen.getByRole('checkbox', { name: 'Predictions' })).toBeChecked();
+        expect(screen.getByRole('textbox', { name: /Samples/i })).toHaveValue('3');
+        expect(screen.getByRole('textbox', { name: /Seconds/i })).toHaveValue('1');
+        expect(connectSink).not.toHaveBeenCalled();
+        expect(onSaved).not.toHaveBeenCalled();
+    });
+
+    it('keeps the form open and does not call onSaved when the created sink cannot be connected', async () => {
+        const onSaved = rs.fn();
+        const { createSink } = setupHandlers();
+        server.use(
+            http.patch('/api/projects/{project_id}/pipeline', () =>
+                HttpResponse.json({ detail: 'Pipeline is busy' } as never, { status: 409 })
             )
         );
 
         render(<AddLocalFolderSink onSaved={onSaved} />);
 
-        await fillRequiredFields('/root');
+        await fillRequiredFields('/data/snapshots');
         await userEvent.click(screen.getByRole('button', { name: 'Add & Use' }));
 
-        expect(await screen.findByText(/Folder is not writable/)).toBeInTheDocument();
-        expect(screen.getByRole('textbox', { name: /Folder Path/i })).toHaveValue('/root');
-        expect(screen.getByRole('checkbox', { name: 'Predictions' })).toBeChecked();
-        expect(connectSink).not.toHaveBeenCalled();
+        expect(await screen.findByText('Sink configuration created successfully.')).toBeVisible();
+        expect(await screen.findByText(/Pipeline is busy/)).toBeVisible();
+        expect(createSink).toHaveBeenCalledTimes(1);
+        expect(createSink).toHaveBeenCalledWith({
+            name: 'Local folder sink',
+            sink_type: 'folder',
+            folder_path: '/data/snapshots',
+            rate_limit: null,
+            output_formats: ['predictions'],
+        });
         expect(onSaved).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: 'Add & Use' })).toBeVisible();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Local folder sink');
+        expect(screen.getByRole('textbox', { name: /Folder Path/i })).toHaveValue('/data/snapshots');
     });
 });

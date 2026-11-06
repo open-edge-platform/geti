@@ -46,10 +46,10 @@ const setupHandlers = () => {
     return { updateSink, connectSink };
 };
 
-const renderEdit = (isConnected = false) => {
+const renderEdit = (isConnected = false, editedSink: WebhookSinkConfig = sink) => {
     const onSaved = rs.fn();
 
-    render(<EditWebhookSink sink={sink} isConnected={isConnected} onSaved={onSaved} onBackToList={rs.fn()} />);
+    render(<EditWebhookSink sink={editedSink} isConnected={isConnected} onSaved={onSaved} onBackToList={rs.fn()} />);
 
     return { onSaved };
 };
@@ -89,6 +89,69 @@ describe('EditWebhookSink', () => {
         expect(body).not.toHaveProperty('id');
         expect(body).not.toHaveProperty('sink_type');
         expect(connectSink).not.toHaveBeenCalled();
+    });
+
+    it('patches a changed webhook URL', async () => {
+        const { updateSink } = setupHandlers();
+        const { onSaved } = renderEdit();
+
+        const url = screen.getByRole('textbox', { name: /Webhook URL/ });
+        await userEvent.clear(url);
+        await userEvent.type(url, 'https://hooks.local/v2');
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateSink).toHaveBeenCalledWith({
+            name: 'My webhook',
+            webhook_url: 'https://hooks.local/v2',
+            http_method: 'PUT',
+            timeout: 5,
+            headers: { 'X-Key': 'first', 'X-Other': 'second' },
+            rate_limit: null,
+            output_formats: ['predictions'],
+        });
+    });
+
+    it('patches a changed HTTP method and a header added next to the existing ones', async () => {
+        const { updateSink } = setupHandlers();
+        const { onSaved } = renderEdit();
+
+        await userEvent.click(screen.getByRole('button', { name: /HTTP Method/ }));
+        await userEvent.click(screen.getByRole('option', { name: 'PATCH' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Add header' }));
+        await userEvent.type(screen.getAllByRole('textbox', { name: 'headers-keys' })[2], 'X-Trace');
+        await userEvent.type(screen.getAllByRole('textbox', { name: 'headers-values' })[2], 'on');
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateSink).toHaveBeenCalledWith({
+            name: 'My webhook',
+            webhook_url: 'https://hooks.local/geti',
+            http_method: 'PATCH',
+            timeout: 5,
+            headers: { 'X-Key': 'first', 'X-Other': 'second', 'X-Trace': 'on' },
+            rate_limit: null,
+            output_formats: ['predictions'],
+        });
+    });
+
+    it('patches empty headers after the only header is removed', async () => {
+        const { updateSink } = setupHandlers();
+        const { onSaved } = renderEdit(false, { ...sink, headers: { Authorization: 'Bearer token' } });
+
+        await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateSink).toHaveBeenCalledWith({
+            name: 'My webhook',
+            webhook_url: 'https://hooks.local/geti',
+            http_method: 'PUT',
+            timeout: 5,
+            headers: {},
+            rate_limit: null,
+            output_formats: ['predictions'],
+        });
     });
 
     it('connects to the pipeline on "Save & Connect"', async () => {

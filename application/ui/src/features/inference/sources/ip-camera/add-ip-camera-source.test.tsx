@@ -50,6 +50,7 @@ describe('AddIpCameraSource', () => {
         );
 
         render(<AddIpCameraSource existingNames={[]} onSaved={onSaved} />);
+        expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('IP camera source');
         const user = await fillAndSubmit('Door camera', 'rtsp://door/stream');
         await user.click(screen.getByRole('switch', { name: 'Require Authentication' }));
         await user.click(screen.getByRole('button', { name: /Add & Use/i }));
@@ -88,12 +89,46 @@ describe('AddIpCameraSource', () => {
 
         render(<AddIpCameraSource existingNames={[]} onSaved={onSaved} />);
         const user = await fillAndSubmit('Door camera', 'not-a-url');
+        await user.click(screen.getByRole('switch', { name: 'Require Authentication' }));
         await user.click(screen.getByRole('button', { name: /Add & Use/i }));
 
-        expect(await screen.findByText(/boom/)).toBeVisible();
+        expect(await screen.findByText('Failed to save source configuration, boom')).toBeVisible();
         expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('Door camera');
         expect(screen.getByRole('textbox', { name: /Stream Url/i })).toHaveValue('not-a-url');
+        expect(screen.getByRole('switch', { name: 'Require Authentication' })).toBeChecked();
         expect(pipelineSpy).not.toHaveBeenCalled();
         expect(onSaved).not.toHaveBeenCalled();
+    });
+
+    it('keeps the form open and does not call onSaved when the created source cannot be connected', async () => {
+        const createBody = rs.fn();
+        server.use(
+            http.post('/api/sources', async ({ request }) => {
+                const body = await request.json();
+                createBody(body);
+
+                return HttpResponse.json({ ...body, id: 'new-id' });
+            }),
+            http.patch('/api/projects/{project_id}/pipeline', () =>
+                HttpResponse.json({ detail: 'Pipeline is busy' } as never, { status: 409 })
+            )
+        );
+
+        render(<AddIpCameraSource existingNames={[]} onSaved={onSaved} />);
+        const user = await fillAndSubmit('Door camera', 'rtsp://door/stream');
+        await user.click(screen.getByRole('button', { name: /Add & Use/i }));
+
+        expect(await screen.findByText('Source configuration created successfully.')).toBeVisible();
+        expect(await screen.findByText(/Pipeline is busy/)).toBeVisible();
+        expect(createBody).toHaveBeenCalledWith({
+            name: 'Door camera',
+            source_type: 'ip_camera',
+            stream_url: 'rtsp://door/stream',
+            auth_required: false,
+        });
+        expect(onSaved).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: /Add & Use/i })).toBeVisible();
+        expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('Door camera');
+        expect(screen.getByRole('textbox', { name: /Stream Url/i })).toHaveValue('rtsp://door/stream');
     });
 });

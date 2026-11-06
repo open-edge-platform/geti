@@ -77,12 +77,15 @@ describe('SinkMenu', () => {
             expect(pipelinePatchSpy).not.toHaveBeenCalled();
         });
 
-        it('disabled when sink is connected', async () => {
+        it('disables removing and testing and offers no Connect when the sink is connected', async () => {
             renderApp({ name, isConnected: true });
 
             await userEvent.click(screen.getByRole('button', { name: /sink menu/i }));
 
             expect(screen.getByRole('menuitem', { name: /Remove/i })).toHaveAttribute('aria-disabled', 'true');
+            expect(screen.getByRole('menuitem', { name: /Test connection/i })).toHaveAttribute('aria-disabled', 'true');
+            expect(screen.queryByRole('menuitem', { name: /^Connect$/i })).not.toBeInTheDocument();
+            expect(screen.getByRole('menuitem', { name: /Disconnect/i })).toBeVisible();
         });
     });
 
@@ -126,14 +129,6 @@ describe('SinkMenu', () => {
                 'An unexpected error occurred. Please try again.'
             );
         });
-
-        it('shows connect when sink is disconnected', async () => {
-            renderApp({ name, isConnected: false });
-
-            await userEvent.click(screen.getByRole('button', { name: /sink menu/i }));
-
-            expect(screen.getByRole('menuitem', { name: /^Connect$/i })).toBeVisible();
-        });
     });
 
     describe('disconnect', () => {
@@ -169,14 +164,6 @@ describe('SinkMenu', () => {
             expect(pipelinePatchSpy).toHaveBeenCalledWith({
                 sink_id: null,
             });
-        });
-
-        it('shows disconnect when sink is connected', async () => {
-            renderApp({ name: 'test-name', isConnected: true });
-
-            await userEvent.click(screen.getByRole('button', { name: /sink menu/i }));
-
-            expect(screen.getByRole('menuitem', { name: /Disconnect/i })).toBeVisible();
         });
     });
 });

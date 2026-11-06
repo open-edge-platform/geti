@@ -15,7 +15,7 @@ import { EditSourceForm } from './edit-source-form.component';
 import { SourcesList } from './source-list/source-list.component';
 import { SourceOptions } from './source-options';
 
-export const SourceActions = () => {
+export const Sources = () => {
     const { t } = useTranslation();
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');
     const [currentSource, setCurrentSource] = useState<SourceConfigPayload | null>(null);

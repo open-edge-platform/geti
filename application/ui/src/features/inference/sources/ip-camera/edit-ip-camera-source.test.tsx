@@ -77,9 +77,15 @@ describe('EditIpCameraSource', () => {
         renderEdit();
 
         await editStreamUrl(user, 'rtsp://new/stream');
+        await user.click(screen.getByRole('switch', { name: 'Require Authentication' }));
         await user.click(screen.getByRole('button', { name: /Save & Connect/i }));
 
         await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateBody).toHaveBeenCalledWith({
+            name: 'Gate camera',
+            stream_url: 'rtsp://new/stream',
+            auth_required: true,
+        });
         expect(pipelineSpy).toHaveBeenCalledWith({ source_id: 'source-id' });
     });
 
@@ -118,7 +124,8 @@ describe('EditIpCameraSource', () => {
         await editStreamUrl(user, 'not-a-url');
         await user.click(screen.getByRole('button', { name: /Save & Connect/i }));
 
-        expect(await screen.findByText(/boom/)).toBeVisible();
+        expect(await screen.findByText('Failed to save source configuration, boom')).toBeVisible();
+        expect(screen.getByText('Edit input source')).toBeVisible();
         expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('Renamed');
         expect(screen.getByRole('textbox', { name: /Stream Url/i })).toHaveValue('not-a-url');
         expect(pipelineSpy).not.toHaveBeenCalled();

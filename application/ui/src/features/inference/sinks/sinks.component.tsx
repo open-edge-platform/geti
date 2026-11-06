@@ -21,7 +21,7 @@ type SinksQueryItem = ReturnType<typeof useSinksQuery>['data'][number];
 const isSupportedSink = (sink: SinksQueryItem): sink is SinkConfig =>
     sink.sink_type !== 'disconnected' && sink.sink_type !== 'ros';
 
-export const SinkActions = () => {
+export const Sinks = () => {
     const { t } = useTranslation();
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');
     const [currentSink, setCurrentSink] = useState<SinkConfig | null>(null);
