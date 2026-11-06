@@ -1,6 +1,6 @@
 ---
 name: getitune-exporting-a-model
-description: Export a trained getitune model (the Geti training library) to a deployable format. Use when a user wants to run `engine.export(...)` or `getitune export`, choose between OpenVINO IR and ONNX, set FP32 vs FP16 precision with `ExportFormat` / `Precision`, or understand where exported artifacts are written and how they load back for inference. Covers the export/load contract between training and OpenVINO/ONNX inference.
+description: Export a trained getitune model to a deployable format. Use when a user wants to run `engine.export(...)` or `getitune export`, choose between OpenVINO IR and ONNX, set FP32 vs FP16 precision with `ExportFormat` / `Precision`, or validate that exported artifacts load back for inference. This skill is not for training from scratch or post-training quantization.
 ---
 
 # Exporting a model with getitune
@@ -11,7 +11,17 @@ After training, export a model to a deployable format with `engine.export(...)`
 artifacts load back for inference via the OpenVINO/ONNX path (see the
 `getitune-running-inference` skill).
 
-Run everything from `libraries/getitune/`.
+Install the package before starting:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
+`[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
+Confirm the installed version and device before exporting. If export fails at
+model loading, first rerun `engine.test()` on the trained model; if that fails,
+fix the model or checkpoint before diagnosing the export format.
 
 ## Python API workflow
 
@@ -54,17 +64,15 @@ onnx_fp16 = engine.export(export_format=ExportFormat.ONNX, export_precision=Prec
 ## CLI workflow
 
 ```bash
-# from libraries/getitune/
 getitune export --data_root /path/to/dataset --model efficientnet_b0
 # use --help -v for export-format / precision flags
 ```
 
 ## Export/load contract
 
-- Each model implements `forward_for_tracing(...)` under
-  `libraries/getitune/src/getitune/backend/lightning/models/<task>/`; that is what defines
-  the exported graph. If you change model I/O, keep this method in sync or export
-  parity breaks.
+- Each model provides a tracing path that defines the exported graph. If you
+   provide a custom model, keep its input/output contract consistent so export
+   parity does not break.
 - Exported OpenVINO IR / ONNX models are loaded for inference through the
   OpenVINO backend (`OVEngine`) using
   [ModelAPI](https://github.com/open-edge-platform/model_api).
@@ -73,11 +81,8 @@ getitune export --data_root /path/to/dataset --model efficientnet_b0
 
 ## Verify
 
-```bash
-# from libraries/getitune/
-just lint
-just test-unit -- -k export        # when you touched export/tracing code
-```
+After export, load the returned artifact with `getitune test` or
+`create_engine(...)` and compare its metrics with the trained model.
 
 ## Related skills
 

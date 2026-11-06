@@ -1,0 +1,17 @@
+{
+  "skill_name": "getitune-preparing-datasets",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a COCO detection dataset. Show me how to pass it to create_engine with getitune 0.4.0.",
+      "expected_output": "The agent identifies the COCO root markers, points data at the dataset root, and uses a compatible detection model.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want to train an Ultralytics YOLO model from a data.yaml file. How do I install and pass the dataset?",
+      "expected_output": "The agent explains installation of getitune 0.4.0 with the ultralytics and chosen hardware extras and the matching PyTorch index. It shows a clearly marked data.yaml placeholder passed through data or --data_root, without claiming installation or training was performed.",
+      "files": []
+    }
+  ]
+}

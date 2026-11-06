@@ -1,6 +1,6 @@
 ---
 name: getitune-running-inference
-description: Run inference and evaluation with a getitune model (the Geti training library). Use when a user wants to call `engine.predict()` / `engine.test()` or `getitune predict` / `getitune test`, run inference with a PyTorch checkpoint versus an exported OpenVINO IR (`.xml`) or ONNX (`.onnx`) model, or understand how `OVEngine` loads deployed models via ModelAPI. Covers PyTorch, OpenVINO, and ONNX inference backends.
+description: Run inference and evaluation with a getitune model. Use when a user wants to call `engine.predict()` / `engine.test()` or `getitune predict` / `getitune test`, run inference with a PyTorch checkpoint versus an exported OpenVINO IR (`.xml`) or ONNX (`.onnx`) model, or compare backend results. This skill is not for training, exporting, or changing getitune source code.
 ---
 
 # Running inference with getitune
@@ -10,7 +10,17 @@ description: Run inference and evaluation with a getitune model (the Geti traini
 engine holds a **PyTorch** model or an **exported** OpenVINO/ONNX model — the
 backend is selected from what you pass to `model=`.
 
-Run everything from `libraries/getitune/`.
+Install the package before starting:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
+`[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
+Confirm the installed version and device before inference. If the exported
+model cannot load, check the matching `.bin` file for OpenVINO XML or use the
+original checkpoint to distinguish an artifact problem from a dataset problem.
 
 ## PyTorch inference (trained model)
 
@@ -61,7 +71,6 @@ Passing an `.xml` or `.onnx` path builds an `OVEngine`, which loads the model vi
 ## CLI
 
 ```bash
-# from libraries/getitune/
 getitune predict --data_root /path/to/dataset --model efficientnet_b0
 getitune test    --data_root /path/to/dataset --model /path/to/exported_model.xml
 ```

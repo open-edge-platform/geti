@@ -1,0 +1,22 @@
+{
+  "skill_name": "getitune-optimizing-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quantize my exported OpenVINO model to INT8 with getitune and verify accuracy and inference. I have not provided the XML/BIN files, calibration or evaluation data, baseline metrics, or an acceptable accuracy drop; no task assets are available in this environment.",
+      "expected_output": "The agent requests the model files, representative training/calibration data, evaluation data, and acceptable accuracy drop. It plans to measure a baseline before optimization and compare on the same evaluation data, without reporting an executed quantization or invented metrics.",
+      "assertions": [
+        "Requests XML/BIN files, calibration and evaluation data, and an accuracy tolerance.",
+        "Plans baseline measurement and post-quantization evaluation on the same data.",
+        "Does not claim to have produced an INT8 artifact or measured accuracy."
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Can I quantize my ONNX export directly with getitune?",
+      "expected_output": "The agent explains that optimization requires OpenVINO IR and directs the user to export or convert to XML first.",
+      "files": []
+    }
+  ]
+}

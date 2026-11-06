@@ -1,6 +1,6 @@
 ---
 name: getitune-optimizing-a-model
-description: Optimize an exported getitune model (the Geti training library) with post-training quantization. Use when a user wants to run `OVEngine.optimize()` / `engine.optimize()` to produce an INT8 model via NNCF, understands calibration-set requirements, or needs to re-validate and run inference with a quantized model versus the original FP32/FP16 model. Covers OpenVINO NNCF post-training quantization and the accuracy/size trade-off.
+description: Optimize an exported getitune model with post-training quantization. Use when a user wants to run `OVEngine.optimize()` / `engine.optimize()` to produce an INT8 model via NNCF, choose a calibration subset, or re-validate and run inference with a quantized model versus the original FP32/FP16 model. This skill is not for training or exporting a model.
 ---
 
 # Optimizing (quantizing) a model with getitune
@@ -10,7 +10,17 @@ description: Optimize an exported getitune model (the Geti training library) wit
 model and speed up inference. Quantization runs on an **OpenVINO** model (an
 exported `.xml`), producing an INT8 version.
 
-Run everything from `libraries/getitune/`.
+Install the package before starting:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
+`[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
+Confirm the installed version and device before optimization. If calibration
+fails, check that the dataset has a training subset and retry with an explicit
+`max_data_subset_size`; if the accelerator is unavailable, retry on CPU.
 
 ## Workflow
 
@@ -31,7 +41,11 @@ predictions = ov_engine.predict()    # run inference with the quantized model
    checkpoint, export it first with the `getitune-exporting-a-model` skill.
    - Done when: `create_engine(model="....xml", data=...)` builds an `OVEngine`.
 2. **Provide a calibration dataset.** Calibration images are taken automatically
-   from the training subset; 200-500 images is the recommended calibration size.
+   from the training subset; around 300 images is the recommended calibration
+   size. `max_data_subset_size=None` does not override the setting stored in the
+   model's optimization metadata. If that metadata does not specify a subset
+   size, NNCF uses its default of 300; `None` does not mean the whole dataset.
+   Pass `max_data_subset_size=300` to explicitly override the inherited setting.
    - Done when: `optimize()` runs without a "not enough calibration data" issue.
 3. **Run `optimize()`.** This replaces the engine's model in place with the INT8
    version.
@@ -52,17 +66,13 @@ FP32/FP16 model, either pass the original `.xml` path directly to `.test()` /
   not a training-time step.
 - **Only OpenVINO IR (`.xml`) is supported.** An ONNX model must be converted to
   OpenVINO IR first before it can be optimized.
-- In the Geti application this is exposed as the `quantize` job
-  (`application/backend/app/execution/quantization/`); library `optimize()` is
-  the same capability without the job/queue wrapper.
+- The library `optimize()` call is a direct operation; it does not require a
+   running application or job queue.
 
 ## Verify
 
-```bash
-# from libraries/getitune/
-just lint
-just test-unit -- -k optimize      # when you touched optimization code
-```
+Verify the quantized model by checking its output artifact, comparing its
+metrics with the original model, and running `predict()` on representative data.
 
 ## Related skills
 

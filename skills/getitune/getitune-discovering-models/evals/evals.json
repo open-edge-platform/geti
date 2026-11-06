@@ -1,0 +1,17 @@
+{
+  "skill_name": "getitune-discovering-models",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Which detection models can I train with the installed getitune package?",
+      "expected_output": "The agent uses list_models or getitune find with a detection filter instead of guessing a model list.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "getitune train says that my model name matches multiple tasks. How do I resolve it?",
+      "expected_output": "The agent explains task disambiguation and shows an explicit task filter or task argument.",
+      "files": []
+    }
+  ]
+}
