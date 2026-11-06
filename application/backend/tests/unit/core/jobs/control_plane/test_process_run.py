@@ -8,7 +8,7 @@ import pytest
 
 from app.core.jobs.exec import ProcessRun
 from app.core.jobs.models import Job, Progress
-from app.core.jobs.models.events import Done, Failed, Started
+from app.core.jobs.models.events import Done, Failed
 from app.core.run import RunnableFactory
 
 
@@ -60,7 +60,7 @@ class TestProcessRun:
     def test_events_yields_messages_from_parent_connection(self, fxt_process_run):
         """Test events method yields messages from parent connection."""
         # Mock messages from parent connection
-        messages = [Started(), Progress("training in progress", 50.0)]
+        messages = [Progress("preparing", 10.0), Progress("training in progress", 50.0)]
         fxt_process_run._parent.recv.side_effect = [*messages, EOFError()]
 
         # Mock process with successful exit
