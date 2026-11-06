@@ -186,6 +186,21 @@ describe('EditPolygonTool', () => {
 
         const hoverPoint = { clientX: 40, clientY: 50 };
 
+        it('does not show an insertion anchor between identical points', async () => {
+            await renderApp({
+                ...mockAnnotation,
+                shape: {
+                    ...mockShape,
+                    points: [mockShape.points[0], mockShape.points[0], ...mockShape.points.slice(1)],
+                },
+            });
+
+            const line = screen.getByLabelText('Line between point 0 and 1');
+            fireEvent.pointerMove(line, { clientX: 10, clientY: 10 });
+
+            expect(screen.queryByLabelText('Add a point between point 0 and 1')).not.toBeInTheDocument();
+        });
+
         it('can add a point between two lines', async () => {
             const expectedProjectedPoint = { x: 45, y: 45 };
 
