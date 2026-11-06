@@ -10,7 +10,7 @@ import pytest
 
 from app.core.jobs import CancellationResult
 from app.core.jobs.control_plane import JobController, JobQueue
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, JobType, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, JobType, Progress
 from app.core.run import RunnerFactory
 
 
@@ -18,7 +18,7 @@ class MockRunner:
     """Mock runner for testing purposes."""
 
     def __init__(self, events=None):
-        self.events_to_yield = events or [Started(), Progress("progress", 50.0), Done()]
+        self.events_to_yield = events or [Progress("progress", 50.0), Done()]
         self.started = False
         self.stopped = False
         self.stop_called = asyncio.Event()
@@ -39,7 +39,7 @@ class MockRunner:
 
 
 class SlowStartRunner(MockRunner):
-    """Runner whose Started event is delayed, like a spawned process still importing its modules."""
+    """Runner whose first event is delayed, like a spawned process still importing its modules."""
 
     def __init__(self):
         super().__init__()
@@ -47,7 +47,6 @@ class SlowStartRunner(MockRunner):
 
     def events(self) -> Iterator[ExecutionEvent]:
         self._released.wait(timeout=5)
-        yield Started()
         yield Cancelled() if self.stopped else Done()
 
     async def stop(self) -> None:
@@ -144,19 +143,19 @@ class TestJobController:
         "events,expected_status,expected_log_method,expected_log_args",
         [
             (
-                [Started(), Progress("progress", 100.0), Done()],
+                [Progress("progress", 100.0), Done()],
                 JobStatus.DONE,
                 "success",
                 ("Job completed successfully, job_id: {}", "job_id"),
             ),
             (
-                [Started(), Progress("progress", 50.0), Failed("boom")],
+                [Progress("progress", 50.0), Failed("boom")],
                 JobStatus.FAILED,
                 "warning",
                 ("Job failed, job_id: {}", "job_id"),
             ),
             (
-                [Started(), Progress("progress", 50.0), Cancelled()],
+                [Progress("progress", 50.0), Cancelled()],
                 JobStatus.CANCELLED,
                 "info",
                 ("Job cancelled, job_id: {}", "job_id"),
@@ -190,8 +189,8 @@ class TestJobController:
         getattr(mock_logger, expected_log_method).assert_any_call(*expected_call_args)
 
     @pytest.mark.asyncio
-    async def test_cancel_before_runner_reports_started_stops_the_runner(self, fxt_runner_factory, fxt_job):
-        """A cancel between dispatch and the runner's Started event must stop the runner, not be lost."""
+    async def test_cancel_before_runner_reports_any_event_stops_the_runner(self, fxt_runner_factory, fxt_job):
+        """A cancel between dispatch and the runner's first event must stop the runner, not be lost."""
         job_queue = JobQueue()
         controller = JobController(job_queue, fxt_runner_factory, max_parallel_jobs=1)
         runner = SlowStartRunner()
@@ -331,11 +330,11 @@ class TestJobController:
     @pytest.mark.parametrize(
         "events,expected_status,expected_progress",
         [
-            ([Started(), None], JobStatus.RUNNING, 0.0),
-            ([Started(), Progress("Mock", 10.0), Progress("Mock", 20.0), None], JobStatus.RUNNING, 20.0),
-            ([Started(), Progress("Mock", 50.0), Done()], JobStatus.DONE, 100.0),
-            ([Started(), Progress("Mock", 50.0), Failed("error")], JobStatus.FAILED, 50.0),
-            ([Started(), Progress("Mock", 50.0), Cancelled()], JobStatus.CANCELLED, 50.0),
+            ([None], JobStatus.RUNNING, 0.0),
+            ([Progress("Mock", 10.0), Progress("Mock", 20.0), None], JobStatus.RUNNING, 20.0),
+            ([Progress("Mock", 50.0), Done()], JobStatus.DONE, 100.0),
+            ([Progress("Mock", 50.0), Failed("error")], JobStatus.FAILED, 50.0),
+            ([Progress("Mock", 50.0), Cancelled()], JobStatus.CANCELLED, 50.0),
         ],
     )
     async def test_handle_job_events_progress_updates(
@@ -343,6 +342,7 @@ class TestJobController:
     ):
         """Test progress events update job properly."""
         job = fxt_job()
+        job.start()
         event_queue = asyncio.Queue()
 
         for event in events:

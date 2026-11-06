@@ -11,11 +11,6 @@ class ExecutionEvent:
 
 
 @dataclass(frozen=True, slots=True)
-class Started(ExecutionEvent):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
 class Progress(ExecutionEvent):
     message: str
     value: float  # percentage of completion (0.0, 100.0]

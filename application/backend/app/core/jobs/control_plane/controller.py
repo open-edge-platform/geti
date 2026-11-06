@@ -7,7 +7,7 @@ import threading
 
 from loguru import logger
 
-from app.core.jobs.models import Cancelled, Done, Failed, Job, JobStatus, JobType, Progress, Started
+from app.core.jobs.models import Cancelled, Done, Failed, Job, JobStatus, JobType, Progress
 from app.core.run import Runner, RunnerFactory
 
 from .capacity import Capacity
@@ -27,7 +27,7 @@ class JobController:
         - Stale job monitor: Periodically checks for jobs that haven't updated within a threshold
           (default 1 hour) and automatically schedules their termination
         - Capacity control: Enforces maximum parallel job limits via semaphore-based permits
-        - Event-driven communication: Jobs emit domain events (Started, Progress, Done, etc.)
+        - Event-driven communication: Jobs emit domain events (Progress, Done, etc.)
           which are pumped from runner threads to the async event loop for state management
         - Cancellation support: Monitors cancellation requests and triggers graceful shutdowns
 
@@ -168,8 +168,6 @@ class JobController:
                 break
 
             match evt:
-                case Started():
-                    job.start()
                 case Progress(message=m, value=v, metadata=md):
                     job.advance(percent=v, msg=m, metadata=md)
                 case Done():

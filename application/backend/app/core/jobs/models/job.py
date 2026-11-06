@@ -64,8 +64,6 @@ class Job(BaseIDModel, Generic[JobParamsT]):
         """Hook called when a job that has started finishes, fails or is cancelled."""
 
     def start(self) -> None:
-        if self.status != JobStatus.PENDING:
-            return
         self.status = JobStatus.RUNNING
         self.started_at = now_utc_ts()
         self.updated_at = now_utc_ts()
