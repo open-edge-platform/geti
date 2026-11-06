@@ -40,6 +40,7 @@ const renderPolygonConfig = () =>
         usePolygonConfig({
             zoom: 1,
             image: { width: 1, height: 1, data: new Uint8ClampedArray(4) } as ImageData,
+            roi: { x: 0, y: 0, width: 1, height: 1 },
             canvasRef: { current: document.createElementNS('http://www.w3.org/2000/svg', 'rect') },
         })
     );
