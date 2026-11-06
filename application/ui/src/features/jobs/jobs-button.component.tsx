@@ -9,7 +9,6 @@ import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { useModelJobs } from 'hooks/api/jobs/jobs.hook';
 import { useParams } from 'react-router';
 
-import { ActiveJobsSync } from './active-jobs-sync.component';
 import { JobsDialog } from './jobs-dialog/jobs-dialog.component';
 import { ALL_PROJECTS, getStatusGroup } from './utils';
 
@@ -27,7 +26,6 @@ export const JobsButton = () => {
 
     return (
         <>
-            <ActiveJobsSync />
             <TooltipTrigger>
                 <ActionButton isQuiet onPress={() => setIsOpen(true)} aria-label='Jobs'>
                     <span className={classes.iconWrapper}>
