@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import type ClipperShape from '@doodle3d/clipper-js';
@@ -222,6 +222,13 @@ export const getClampedBoundingBox = (point: Point, boundingBox: RegionOfInteres
         y: boundingBox.y - clampedTranslate.y,
     };
 };
+
+export const clampPointToRoi =
+    ({ x, y, width, height }: RegionOfInterest) =>
+    (point: Point): Point => ({
+        x: clampBetween(x, point.x, x + width),
+        y: clampBetween(y, point.y, y + height),
+    });
 
 export function convertToolShapeToGetiShape(shape: ToolPolygon): Polygon;
 export function convertToolShapeToGetiShape(shape: ToolRect): Rect;

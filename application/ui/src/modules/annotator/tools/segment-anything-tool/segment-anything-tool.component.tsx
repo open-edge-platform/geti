@@ -7,11 +7,10 @@ import selectionCursor from '@/assets/icons/selection.svg?url';
 import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
 import { useTranslation } from '@/i18n';
-import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { useGetDatasetMediaItems } from 'hooks/use-get-dataset-media-items.hook';
 
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
-import type { Annotation, Point, RegionOfInterest } from '../../../../shared/types';
+import type { Annotation, Point } from '../../../../shared/types';
 import { AnnotationShape } from '../../annotations/annotation-shape/annotation-shape.component';
 import { MaskAnnotations } from '../../annotations/mask-annotations.component';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
@@ -21,7 +20,7 @@ import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { ToolLoading } from '../tool-loading.component';
 import { useAddAndSelectAnnotations } from '../use-add-and-select-annotations.hook';
 import { useToolResultHotkey } from '../use-tool-result-hotkey.hook';
-import { getRelativePoint } from '../utils';
+import { clampPointToRoi, getRelativePoint } from '../utils';
 import { PromptPoints } from './prompt-points.component';
 import { useSegmentAnythingPrompt } from './use-segment-anything-prompt.hook';
 import { useSegmentAnythingModel } from './use-segment-anything.hook';
@@ -30,18 +29,18 @@ import classes from './segment-anything.module.scss';
 
 interface PreviewAnnotationsProps {
     previewAnnotations: Annotation[];
-    image: Pick<RegionOfInterest, 'width' | 'height'>;
+    size: { width: number; height: number };
 }
 
 const CURSOR_OFFSET = '7 8';
 // In screen pixels, so placed points are equally easy to hit at any zoom level.
 const PROMPT_POINT_HIT_RADIUS = 8;
 
-const PreviewAnnotations = ({ previewAnnotations, image }: PreviewAnnotationsProps) => {
+const PreviewAnnotations = ({ previewAnnotations, size }: PreviewAnnotationsProps) => {
     if (previewAnnotations.length === 0) return null;
 
     return (
-        <MaskAnnotations isEnabled annotations={previewAnnotations} width={image.width} height={image.height}>
+        <MaskAnnotations isEnabled annotations={previewAnnotations} width={size.width} height={size.height}>
             {previewAnnotations.map((annotation) => (
                 <g
                     key={annotation.id}
@@ -65,7 +64,7 @@ export const SegmentAnythingTool = () => {
 
     const { t } = useTranslation();
     const zoom = useZoom();
-    const { roi, image, mediaItem } = useSelectedMediaItem();
+    const { roi, mediaItem } = useSelectedMediaItem();
     const { items } = useGetDatasetMediaItems();
     const nextMediaItem = useNextMediaItem(mediaItem, items);
     const { selectedLabel } = useAnnotatorLabels();
@@ -73,7 +72,7 @@ export const SegmentAnythingTool = () => {
     const { isLoading, isError, error, decodingQueryFn } = useSegmentAnythingModel({ nextMediaItem });
     const prompt = useSegmentAnythingPrompt({ decodingQueryFn, roi, mediaItem });
 
-    const clampPoint = clampPointBetweenImage(image);
+    const clampPoint = clampPointToRoi(roi);
 
     const getImagePoint = (event: PointerEvent<SVGSVGElement>): Point | undefined => {
         if (!canvasRef.current) {
@@ -150,7 +149,6 @@ export const SegmentAnythingTool = () => {
     return (
         <SvgToolCanvas
             ref={ref}
-            image={image}
             canvasRef={canvasRef}
             aria-label='SAM tool canvas'
             onPointerMove={handlePointerMove}
@@ -160,7 +158,7 @@ export const SegmentAnythingTool = () => {
                 cursor: prompt.isDecoding ? 'progress' : `url(${selectionCursor}) ${CURSOR_OFFSET}, auto`,
             }}
         >
-            <PreviewAnnotations previewAnnotations={previewAnnotations} image={image} />
+            <PreviewAnnotations previewAnnotations={previewAnnotations} size={mediaItem} />
             <PromptPoints points={prompt.points} />
         </SvgToolCanvas>
     );

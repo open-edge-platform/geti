@@ -3,21 +3,22 @@
 
 import { PointerEvent, RefObject, useEffect, useMemo, useRef } from 'react';
 
-import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
-import { Point, Polygon } from '../../../../shared/types';
+import { Point, Polygon, RegionOfInterest } from '../../../../shared/types';
 import { useIntelligentScissorsWorker } from '../../smart-tools/use-intelligent-scissors-worker.hook';
 import { usePolygonState } from '../polygon-tool/polygon-state-provider.component';
-import { convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
+import { clampPointToRoi, convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
 
 export const usePolygonConfig = ({
     zoom,
     image,
+    roi,
     canvasRef,
 }: {
     zoom: number;
     image: ImageData;
+    roi: RegionOfInterest;
     canvasRef: RefObject<SVGRectElement>;
 }) => {
     const isMounted = useRef(true);
@@ -65,7 +66,7 @@ export const usePolygonConfig = ({
     };
 
     const getPointerRelativePosition = (event: PointerEvent<SVGElement>): Point => {
-        const clampPoint = clampPointBetweenImage(image);
+        const clampPoint = clampPointToRoi(roi);
 
         return clampPoint(getRelativePoint(canvasRef.current, { x: event.clientX, y: event.clientY }, zoom));
     };
