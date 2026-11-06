@@ -12,9 +12,9 @@ import { isEqual } from 'lodash-es';
 import { usePipeline } from '../../../../hooks/api/pipeline.hook';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useTestSink } from '../api/use-test-sink';
-import { SettingsList } from './settings-list/settings-list.component';
 import { SinkIcon } from './sink-icon/sink-icon.component';
 import { SinkMenu } from './sink-menu/sink-menu.component';
+import { SinksDetails } from './sinks-details/sinks-details.component';
 
 import classes from './sink-list.module.scss';
 
@@ -75,7 +75,7 @@ const SinkListItem = ({ sink, isConnected, onEditSink }: SinksListItemProps) => 
             </Flex>
 
             <Flex justifyContent={'space-between'}>
-                <SettingsList sink={sink} />
+                <SinksDetails sink={sink} />
 
                 <SinkMenu
                     id={sink.id}

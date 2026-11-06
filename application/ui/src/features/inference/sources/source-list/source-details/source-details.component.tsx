@@ -8,13 +8,13 @@ import { IpCameraSummary } from '../../ip-camera/ip-camera-summary.component';
 import { UsbCameraSummary } from '../../usb-camera/usb-camera-summary.component';
 import { VideoFileSummary } from '../../video-file/video-file-summary.component';
 
-import classes from './settings-list.module.scss';
+import classes from './source-details.module.scss';
 
-interface SettingsListProps {
+interface SourceDetailsProps {
     source: SourceConfigPayload;
 }
 
-const SourceSummary = ({ source }: SettingsListProps) => {
+const SourceSummary = ({ source }: SourceDetailsProps) => {
     switch (source.source_type) {
         case 'usb_camera':
             return <UsbCameraSummary source={source} />;
@@ -27,7 +27,7 @@ const SourceSummary = ({ source }: SettingsListProps) => {
     }
 };
 
-export const SettingsList = ({ source }: SettingsListProps) => (
+export const SourceDetails = ({ source }: SourceDetailsProps) => (
     <ul className={classes.list}>
         <SourceSummary source={source} />
     </ul>

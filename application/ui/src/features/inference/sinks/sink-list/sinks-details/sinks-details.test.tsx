@@ -5,9 +5,9 @@ import type { SinkConfig } from '@/api/types';
 import { screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { SettingsList } from './settings-list.component';
+import { SinksDetails } from './sinks-details.component';
 
-describe('SettingsList', () => {
+describe('SinksDetails', () => {
     it('shows folder path, rate limit and output formats for a folder sink', () => {
         const sink: SinkConfig = {
             id: '1',
@@ -18,7 +18,7 @@ describe('SettingsList', () => {
             output_formats: ['predictions', 'image_original'],
         };
 
-        render(<SettingsList sink={sink} />);
+        render(<SinksDetails sink={sink} />);
 
         expect(screen.getByText('Folder path: /data/results')).toBeInTheDocument();
         expect(screen.getByText('Rate limit: 1 sample every 5 seconds')).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('SettingsList', () => {
             output_formats: ['image_with_predictions'],
         };
 
-        render(<SettingsList sink={sink} />);
+        render(<SinksDetails sink={sink} />);
 
         expect(screen.getByText('Rate limit: 2 samples every 1 second')).toBeInTheDocument();
         expect(screen.getByText('HTTP method: POST')).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('SettingsList', () => {
             output_formats: ['image_with_predictions'],
         };
 
-        render(<SettingsList sink={sink} />);
+        render(<SinksDetails sink={sink} />);
 
         expect(screen.getByText('Topic: geti/predictions')).toBeInTheDocument();
         expect(screen.getByText('Rate limit: Not set')).toBeInTheDocument();

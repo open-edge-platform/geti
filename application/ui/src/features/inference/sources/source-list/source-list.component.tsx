@@ -13,7 +13,7 @@ import { isEqual } from 'lodash-es';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useTestSource } from '../api/use-test-source';
 import { SourceMenu } from '../source-menu/source-menu.component';
-import { SettingsList } from './settings-list/settings-list.component';
+import { SourceDetails } from './source-details/source-details.component';
 import { SourceIcon } from './source-icon/source-icon.component';
 
 import classes from './source-list.module.scss';
@@ -74,7 +74,7 @@ const SourceListItem = ({ source, isConnected, onEditSource, isPipelineRunning }
             </Flex>
 
             <Flex justifyContent={'space-between'}>
-                <SettingsList source={source} />
+                <SourceDetails source={source} />
 
                 <SourceMenu
                     id={String(source.id)}

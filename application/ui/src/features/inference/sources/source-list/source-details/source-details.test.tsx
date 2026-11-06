@@ -8,9 +8,9 @@ import { render } from 'test-utils/render';
 
 import { http } from '../../../../../api/utils';
 import { server } from '../../../../../msw-node-setup';
-import { SettingsList } from './settings-list.component';
+import { SourceDetails } from './source-details.component';
 
-describe('SettingsList', () => {
+describe('SourceDetails', () => {
     beforeEach(() => {
         server.use(
             http.get('/api/system/devices/camera', () => HttpResponse.json([{ index: 0, name: 'Integrated Webcam' }]))
@@ -20,7 +20,7 @@ describe('SettingsList', () => {
     it('shows the device name for a known usb camera', async () => {
         const source: SourceConfigPayload = { id: '1', name: 'Cam', source_type: 'usb_camera', device_id: 0 };
 
-        render(<SettingsList source={source} />);
+        render(<SourceDetails source={source} />);
 
         expect(await screen.findByText('Device: Integrated Webcam')).toBeInTheDocument();
     });
@@ -28,7 +28,7 @@ describe('SettingsList', () => {
     it('shows the loading text, then an unknown device label for an unlisted usb camera', async () => {
         const source: SourceConfigPayload = { id: '1', name: 'Cam', source_type: 'usb_camera', device_id: 7 };
 
-        render(<SettingsList source={source} />);
+        render(<SourceDetails source={source} />);
 
         expect(screen.getByRole('listitem')).toHaveTextContent('Loading...');
         expect(await screen.findByText('Device: Unknown device (id: 7)')).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('SettingsList', () => {
             auth_required: authRequired,
         };
 
-        render(<SettingsList source={source} />);
+        render(<SourceDetails source={source} />);
 
         expect(screen.getByText('Stream url: rtsp://192.168.1.10/stream')).toBeInTheDocument();
         expect(screen.getByText(authText)).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe('SettingsList', () => {
             loop: false,
         };
 
-        render(<SettingsList source={source} />);
+        render(<SourceDetails source={source} />);
 
         expect(screen.getByText('Video path: /data/video.mp4')).toBeInTheDocument();
     });

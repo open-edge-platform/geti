@@ -11,7 +11,7 @@ import { render } from 'test-utils/render';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import * as actualWebRtc from '../stream/web-rtc-connection-provider' with { rstest: 'importActual' };
-import { SourceActions } from './source-actions.component';
+import { Sources } from './sources.component';
 
 rs.mock('../stream/web-rtc-connection-provider', () => ({
     ...actualWebRtc,
@@ -55,10 +55,10 @@ const renderActions = (sources: SourceConfig[], connected: SourceConfig | null =
         )
     );
 
-    render(<SourceActions />);
+    render(<Sources />);
 };
 
-describe('SourceActions', () => {
+describe('Sources', () => {
     it('lists every source type with its settings, connected source first, and hides disconnected placeholders', async () => {
         renderActions([usbCamera, ipCamera, disconnected, videoFile, detachedUsbCamera], videoFile);
 

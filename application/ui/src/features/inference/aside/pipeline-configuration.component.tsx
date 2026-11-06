@@ -6,8 +6,8 @@ import { ReactNode, Suspense } from 'react';
 import { useTranslation } from '@/i18n';
 import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
-import { SinkActions } from '../sinks/sink-actions.component';
-import { SourceActions } from '../sources/source-actions.component';
+import { Sinks } from '../sinks/sinks.component';
+import { Sources } from '../sources/sources.component';
 import { PipelineConfidenceThreshold } from './pipeline-confidence-threshold.component';
 import { StreamInferenceDevices } from './stream-inference-devices.component';
 
@@ -49,12 +49,12 @@ export const PipelineConfiguration = () => {
                 <TabPanels flex={1} minHeight={0} UNSAFE_style={{ overflowY: 'auto' }}>
                     <Item key='sources'>
                         <ConfigurationItem>
-                            <SourceActions />
+                            <Sources />
                         </ConfigurationItem>
                     </Item>
                     <Item key='sinks'>
                         <ConfigurationItem>
-                            <SinkActions />
+                            <Sinks />
                         </ConfigurationItem>
                     </Item>
                 </TabPanels>

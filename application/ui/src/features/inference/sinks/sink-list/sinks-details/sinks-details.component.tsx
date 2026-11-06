@@ -8,13 +8,13 @@ import { LocalFolderSummary } from '../../local-folder/local-folder-summary.comp
 import { MqttSummary } from '../../mqtt/mqtt-summary.component';
 import { WebhookSummary } from '../../webhook/webhook-summary.component';
 
-import classes from './settings-list.module.scss';
+import classes from './sinks-details.module.scss';
 
-interface SettingsListProps {
+interface SinksDetailsProps {
     sink: SinkConfig;
 }
 
-const SinkSummary = ({ sink }: SettingsListProps) => {
+const SinkSummary = ({ sink }: SinksDetailsProps) => {
     switch (sink.sink_type) {
         case 'folder':
             return <LocalFolderSummary sink={sink} />;
@@ -27,7 +27,7 @@ const SinkSummary = ({ sink }: SettingsListProps) => {
     }
 };
 
-export const SettingsList = ({ sink }: SettingsListProps) => (
+export const SinksDetails = ({ sink }: SinksDetailsProps) => (
     <ul className={classes.list}>
         <SinkSummary sink={sink} />
     </ul>

@@ -11,7 +11,7 @@ import { render } from 'test-utils/render';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { createQueryClient } from '../../../query-client/query-client';
-import { SinkActions } from './sink-actions.component';
+import { Sinks } from './sinks.component';
 
 const folderSink: LocalFolderSinkConfig = {
     id: 'folder-sink-id',
@@ -99,11 +99,11 @@ const addFolderSink = async (folderPath: string) => {
     await userEvent.click(screen.getByRole('button', { name: 'Add & Use' }));
 };
 
-describe('SinkActions', () => {
+describe('Sinks', () => {
     it('lists the supported sinks with the connected one first and hides unsupported ones', async () => {
         setupHandlers({ sinks: [folderSink, rosSink, webhookSink, mqttSink], connectedSinkId: mqttSink.id });
 
-        render(<SinkActions />);
+        render(<Sinks />);
 
         const mqttCard = await getCard(mqttSink.name);
         const cards = screen.getAllByTestId(/^sink-card-/);
@@ -145,7 +145,7 @@ describe('SinkActions', () => {
     it('shows a created sink without a rate limit as "Rate limit: Not set" and in use', async () => {
         const state = setupHandlers({ sinks: [] });
 
-        render(<SinkActions />);
+        render(<Sinks />);
 
         await addFolderSink('/data/snapshots');
 
@@ -167,14 +167,14 @@ describe('SinkActions', () => {
         const queryClient = createQueryClient();
         setupHandlers({ sinks: [], connectFails: true });
 
-        const { unmount } = render(<SinkActions />, { queryClient });
+        const { unmount } = render(<Sinks />, { queryClient });
 
         await addFolderSink('/data/snapshots');
         expect(await screen.findByText(/Pipeline is busy/)).toBeVisible();
         expect(screen.getByRole('button', { name: 'Add & Use' })).toBeVisible();
 
         unmount();
-        render(<SinkActions />, { queryClient });
+        render(<Sinks />, { queryClient });
 
         const card = await getCard('Local folder sink');
         await waitFor(() => expect(within(card).queryByText('In use')).not.toBeInTheDocument());

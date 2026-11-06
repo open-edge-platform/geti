@@ -4,7 +4,7 @@
 import type { MqttSinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 
-import { OutputFormatsList } from '../sink-list/settings-list/output-formats-list.component';
+import { OutputFormatsList } from '../sink-list/sinks-details/output-formats-list.component';
 import { formatRateLimit } from '../utils';
 
 interface MqttSummaryProps {
