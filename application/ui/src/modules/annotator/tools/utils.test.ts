@@ -58,6 +58,14 @@ describe('clampPointToRoi', () => {
         expect(clampPoint({ x: -5, y: 70 })).toEqual({ x: 0, y: 50 });
         expect(clampPoint({ x: 30, y: 20 })).toEqual({ x: 30, y: 20 });
     });
+
+    it('clamps media-space points to a region of interest away from the origin', () => {
+        const clampPoint = clampPointToRoi({ x: 20, y: 10, width: 100, height: 50 });
+
+        expect(clampPoint({ x: 5, y: 5 })).toEqual({ x: 20, y: 10 });
+        expect(clampPoint({ x: 200, y: 100 })).toEqual({ x: 120, y: 60 });
+        expect(clampPoint({ x: 30, y: 20 })).toEqual({ x: 30, y: 20 });
+    });
 });
 
 describe('getImageData', () => {

@@ -144,7 +144,6 @@ export const PolygonTool = () => {
 
     return (
         <SvgToolCanvas
-            roi={roi}
             canvasRef={ref}
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}
