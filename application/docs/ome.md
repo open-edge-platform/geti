@@ -80,7 +80,9 @@ OmePlane        - media row (leaf),      type="ome_plane", parent_id -> OmeImage
 OmeImageInfo    - 1:1 with OmeImage; OME-XML-derived structure (new table)
 OmeChannelView  - 1:1 with OmeImage; user display settings (new table)
 MediaStorage    - value object, not persisted; abstracts "where the bytes are"
-OmeReader       - service protocol, one implementation per container format
+Region          - value object; a pixel rectangle in coordinates of a pyramid level
+OmeReader       - format-specific opener/prober; one implementation per container format
+OmeImageHandle  - scoped, open-image interface for metadata and pixel-region reads; not persisted
 ```
 
 ### 3.3 Storage abstraction (the cloud-scalability hinge)
@@ -107,21 +109,45 @@ dataclass and its factory, not to twenty call sites.
 ### 3.4 Reader abstraction
 
 ```python
+class OmeImageHandle(Protocol):
+    """An open image. Metadata is parsed once; reads are lazy."""
+
+    info: OmeImageInfo
+
+    def read_region(
+        self,
+        *,
+        level: int = 0,
+        region: Region | None = None,  # None means the full image at this level
+        z: int = 0,
+        t: int = 0,
+        channels: Sequence[int] | None = None,  # None means all channels
+    ) -> np.ndarray: ...
+
+    def close(self) -> None: ...
+    def __enter__(self) -> "OmeImageHandle": ...
+    def __exit__(self, *exc) -> None: ...
+
+
 class OmeReader(Protocol):
     """One implementation per container format: OmeTiffReader now, OmeZarrReader later."""
 
-    def parse(self, storage: MediaStorage) -> OmeImageInfo: ...
-    def read_plane(
-        self, storage: MediaStorage, z: int, t: int, channels: list[int], level: int
-    ) -> np.ndarray: ...
-    def read_tile(
-        self, storage: MediaStorage, z: int, t: int, level: int, x: int, y: int
-    ) -> np.ndarray: ...
+    def probe(self, storage: MediaStorage) -> bool: ...
+    def open(self, storage: MediaStorage, series: int = 0) -> OmeImageHandle: ...
 ```
 
-`OmeTiffReader` is backed by `tifffile` (the only library that handles OME-XML, pyramids and BigTIFF). Reader selection
-is on `media.format`. Windowing, RGB mapping, caching, thumbnailing and training-set materialization all live _above_
-this protocol and are written once.
+The handle is the core pixel-access abstraction: it returns a `(C, H, W)` array in the requested channel order and
+normalizes on-disk axis order. A full plane is `read_region(region=None, z=..., t=...)`; a crop is a `Region` at the
+requested pyramid level. Regions use level-local pixel coordinates; implementations may use native tiles/chunks
+internally. The API exposes full-plane rendering in v1; if partial rendering is later needed, it should extend the
+existing render endpoint. Handles own any open file/store resources and must be closed (preferably with a context
+manager).
+
+The reader only identifies and opens a format. `open()` parses metadata once and exposes it as `handle.info`; ingest
+persists that metadata before closing the handle. Reader selection uses `probe(storage)` rather than trusting
+`media.format`, which may only describe the filename extension. `OmeTiffReader` is backed by `tifffile` (with lazy
+region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB mapping, caching,
+thumbnailing and training-set materialization all live _above_ this protocol and are written once.
 
 ### 3.5 Rendering
 
@@ -148,10 +174,10 @@ This is exactly how annotated video frames are already handled, which is why req
 
 #### 3.6.1 Fixed training channel mapping
 
-Computed once, at ingest time (`OmeTiffReader.parse`), from `size_c` and the OME-XML channel metadata, and stored
-immutably on `OmeImageDB.channel_mapping` (§4.2) - **not** the `OmeChannelView` row, which only affects rendering for
-the annotator and can change at any time. Because it's derived solely from already-immutable OME metadata and
-persisted once, it's as reproducible as the pixel data itself.
+Computed once, at ingest time, from `handle.info` (`OmeTiffReader.open` parses the OME metadata), `size_c` and the
+channel metadata, and stored immutably on `OmeImageDB.channel_mapping` (§4.2) - **not** the `OmeChannelView` row, which
+only affects rendering for the annotator and can change at any time. Because it's derived solely from already-immutable
+OME metadata and persisted once, it's as reproducible as the pixel data itself.
 
 Strategy, in priority order:
 
@@ -450,8 +476,8 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
     scrubbing).
 - A `PUT .../channel-view` only affects requests that omit `c`; their `ETag` changes automatically and is caught by
   the next revalidation.
-- Server-side, cache raw decoded tiles keyed by `(media_id, level, z, t, channel, tile)`. A new `c` then only reapplies
-  the intensity mapping and color, with no storage read.
+- Server-side, decoded pixel data may be cached using format-native tiles/chunks as internal cache units. A new `c`
+  then only reapplies the intensity mapping and color, with no storage read.
 
 **Live preview (client guidance, non-normative)**
 
@@ -461,12 +487,10 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
 - On commit (pointer release, about 500 ms idle, or an explicit save), send `PUT .../channel-view` in the background
   with optimistic UI. Rendering never waits on it.
 
-Optional, added only if profiling demands it (and the natural fit for Zarr chunks):
-
-```http
-GET /api/projects/{project_id}/dataset/media/{media_id}/tiles/{level}/{x}/{y}?z=12&t=0&channel=1
-200 -> application/octet-stream (raw uint16 tile) or image/png (single-channel, unmapped)
-```
+**Deferred beyond v1:** If profiling or UI needs justify partial rendering or access to non-default series, extend
+`/render` with optional `series` and level-local region parameters (`x`, `y`, `w`, `h`). Require all region
+coordinates together, validate them against the selected series and pyramid level, and include the resolved series
+and region in the ETag/cache key. Preserve the existing channel-view/compositing behavior.
 
 ### 5.5 Plane listing and thumbnails
 
@@ -575,23 +599,26 @@ regression test** that uploads a video, creates a video frame, and asserts the `
 serializes `video_id` (not `parent_id`) with the correct value - this is the gate for the "no breaking API changes"
 decision driver and would not be caught by the existing suite if it only checks ORM-level behaviour.
 
-### Step 2 - `MediaStorage` and `OmeReader` skeleton
+### Step 2 - `MediaStorage` and reader/handle skeleton
 
 Introduce `MediaStorage` and `MediaService.get_media_storage()`; make directory-backed media work for sizing, moving
-and deletion. Define the `OmeReader` protocol with no implementations.
+and deletion. Define the `OmeReader` and `OmeImageHandle` protocols and reader registry, with no format
+implementations.
 
 _Testing._ Unit tests for `MediaStorage` over single-file and directory layouts: recursive size, move,
 discard-on-failure, delete. Assert existing image/video media still resolve to the identical paths.
 
 ### Step 3 - `OmeTiffReader`
 
-`tifffile`-backed `parse` / `read_plane` / `read_tile`. Validate X/Y/C present, default Z/T to 1, ignore unknown axes,
-select series 0.
+Implement `probe` / `open` and the handle's `read_region` using `tifffile`. Validate X/Y/C present, default Z/T to 1,
+ignore unknown axes, and use series 0 in v1. Region reads must support full planes and crops at any available pyramid
+level without exposing format-specific tile/chunk mechanics.
 
 _Testing._ `tests/unit/services/ome/test_ome_tiff_reader.py` against small fixtures committed under `tests/assets/`:
 XYC only, XYCZ, XYCZT, pyramidal, BigTIFF (a minimal one), and a non-OME TIFF that must be rejected cleanly.
-Parametrize plane selection over `(z, t)` and assert shape, dtype and a known pixel value. Malformed OME-XML must raise
-`InvalidImageError`, not propagate a `tifffile` exception.
+Parametrize region selection over `(z, t)`, channels and pyramid levels; assert the `(C, H, W)` shape, dtype and a
+known pixel value. Verify handle context-manager cleanup. Malformed OME-XML must raise `InvalidImageError`, not
+propagate a `tifffile` exception.
 
 ### Step 4 - Ingest
 
@@ -668,7 +695,7 @@ migration, no API break.
 | New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                                                |
 | `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                                                       |
 | `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1.                            |
-| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If it fails, promote `/tiles` from optional to required; the endpoint shape is already specified.                                                                              |
+| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If partial rendering is needed, extend `/render` with region parameters.                                                                                                       |
 | Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                                                |
 | RGB projection loses information needed for accuracy                       | Accepted for v1. The projection is a fixed, deterministic mapping (§3.6.1), decoupled from the mutable `OmeChannelView`, and recorded per-image and per-revision so it can be compared fairly against future N-channel training. |
 | Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                                                      |
@@ -679,7 +706,7 @@ migration, no API break.
 
 - N-channel (C > 3) model input in `getitune`.
 - Remote/lazy store reading and chunk-level caching.
-- Multiple OME series per file (series 0 only).
+- Selecting a non-default OME series in v1; series 0 is used.
 - Non-XYCZT axes.
 - UI implementation (separate workstream; this document fixes the contract it consumes).
 - Full-fidelity dataset export/import of OME media — export/import carries materialized PNGs and annotations only.
