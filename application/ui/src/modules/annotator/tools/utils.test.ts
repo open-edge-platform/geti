@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { canRasteriseAtFullSize, getImageData, loadImageData } from './utils';
+import { canRasteriseAtFullSize, getImageData, loadImageData, projectPointOnLine } from './utils';
 
 const createImage = (width: number, height: number): ImageBitmap => ({ width, height, close: rs.fn() }) as ImageBitmap;
 
@@ -38,6 +38,21 @@ const mockCanvasCreation = (contexts: Array<CanvasRenderingContext2D | null>) =>
 
 afterEach(() => {
     rs.restoreAllMocks();
+});
+
+describe('projectPointOnLine', () => {
+    it('returns undefined when the segment endpoints coincide', () => {
+        const point = { x: 10, y: 10 };
+
+        expect(projectPointOnLine([point, { ...point }], point)).toBeUndefined();
+    });
+
+    it('projects onto a non-zero-length segment', () => {
+        const start = { x: 0, y: 0 };
+        const end = { x: 10, y: 10 };
+
+        expect(projectPointOnLine([start, end], { x: 10, y: 0 })).toEqual({ x: 5, y: 5 });
+    });
 });
 
 describe('canRasteriseAtFullSize', () => {
