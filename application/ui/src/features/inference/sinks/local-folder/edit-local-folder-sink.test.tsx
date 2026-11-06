@@ -41,8 +41,10 @@ const setupHandlers = () => {
     return { updateSink, connectSink };
 };
 
-const renderEdit = ({ isConnected = false, onSaved = rs.fn() } = {}) =>
-    render(<EditLocalFolderSink sink={sink} isConnected={isConnected} onSaved={onSaved} onBackToList={rs.fn()} />);
+const renderEdit = ({ isConnected = false, onSaved = rs.fn(), editedSink = sink } = {}) =>
+    render(
+        <EditLocalFolderSink sink={editedSink} isConnected={isConnected} onSaved={onSaved} onBackToList={rs.fn()} />
+    );
 
 const changeFolderPath = async (path: string) => {
     const input = screen.getByRole('textbox', { name: /Folder Path/i });
@@ -77,6 +79,41 @@ describe('EditLocalFolderSink', () => {
             folder_path: '/data/new',
             rate_limit: null,
             output_formats: ['predictions'],
+        });
+    });
+
+    it('prefills the rate limit and output formats, and patches the changed ones', async () => {
+        const onSaved = rs.fn();
+        const { updateSink } = setupHandlers();
+
+        renderEdit({
+            onSaved,
+            editedSink: { ...sink, rate_limit: 0.2, output_formats: ['predictions', 'image_original'] },
+        });
+
+        expect(screen.getByRole('textbox', { name: /Samples/i })).toHaveValue('0.2');
+        expect(screen.getByRole('textbox', { name: /Seconds/i })).toHaveValue('1');
+        expect(screen.getByRole('checkbox', { name: 'Predictions' })).toBeChecked();
+        expect(screen.getByRole('checkbox', { name: 'Image Original' })).toBeChecked();
+        expect(screen.getByRole('checkbox', { name: 'Image with Predictions' })).not.toBeChecked();
+
+        const samples = screen.getByRole('textbox', { name: /Samples/i });
+        const seconds = screen.getByRole('textbox', { name: /Seconds/i });
+        await userEvent.clear(samples);
+        await userEvent.type(samples, '3');
+        await userEvent.clear(seconds);
+        await userEvent.type(seconds, '1');
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Image Original' }));
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Image with Predictions' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateSink).toHaveBeenCalledTimes(1);
+        expect(updateSink).toHaveBeenCalledWith({
+            name: 'Folder sink',
+            folder_path: '/data/old',
+            rate_limit: 3,
+            output_formats: ['predictions', 'image_with_predictions'],
         });
     });
 
@@ -116,7 +153,10 @@ describe('EditLocalFolderSink', () => {
         await userEvent.click(screen.getByRole('checkbox', { name: 'Image Original' }));
         await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-        expect(await screen.findByText(/Folder is not writable/)).toBeInTheDocument();
+        expect(await screen.findByLabelText('toast')).toHaveTextContent(
+            'Failed to save sink configuration, Folder is not writable'
+        );
+        expect(screen.getByText('Edit sink')).toBeVisible();
         expect(screen.getByRole('textbox', { name: /Folder Path/i })).toHaveValue('/root');
         expect(screen.getByRole('checkbox', { name: 'Predictions' })).toBeChecked();
         expect(screen.getByRole('checkbox', { name: 'Image Original' })).toBeChecked();

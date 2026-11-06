@@ -33,21 +33,14 @@ describe('SourceOptions', () => {
     });
 
     it.each([
-        ['USB Camera', 'button', /Camera list/i],
-        ['IP Camera', 'textbox', /Stream Url/i],
-    ] as const)('expanding "%s" shows its fields', async (label, role, name) => {
+        ['USB Camera', () => screen.findByRole('button', { name: /Camera list/i })],
+        ['IP Camera', () => screen.findByRole('textbox', { name: /Stream Url/i })],
+        ['Video file', () => screen.findByTestId('upload-video-file')],
+    ])('expanding "%s" shows its fields', async (label, findField) => {
         renderOptions();
 
         await userEvent.click(screen.getByRole('button', { name: label }));
 
-        expect(await screen.findByRole(role, { name })).toBeInTheDocument();
-    });
-
-    it('expanding "Video file" shows the file input', async () => {
-        renderOptions();
-
-        await userEvent.click(screen.getByRole('button', { name: 'Video file' }));
-
-        expect(await screen.findByTestId('upload-video-file')).toBeInTheDocument();
+        expect(await findField()).toBeInTheDocument();
     });
 });

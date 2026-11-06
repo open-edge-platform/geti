@@ -72,6 +72,10 @@ describe('AddMqttSink', () => {
 
         expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('MQTT sink');
         await fillForm(user);
+        const port = screen.getByRole('textbox', { name: 'Broker Port' });
+        await user.clear(port);
+        await user.type(port, '8883');
+        await user.tab();
         await user.click(screen.getByRole('button', { name: 'Add & Use' }));
 
         await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
@@ -79,7 +83,7 @@ describe('AddMqttSink', () => {
             name: 'My broker',
             sink_type: 'mqtt',
             broker_host: 'localhost',
-            broker_port: 0,
+            broker_port: 8883,
             topic: 'predictions',
             auth_required: true,
             rate_limit: null,

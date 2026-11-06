@@ -15,20 +15,12 @@ export class SourcesPage {
         return this.page.getByRole('tab').filter({ hasText: 'Source' });
     }
 
-    private getSinkTab() {
-        return this.page.getByRole('tab').filter({ hasText: 'Sink' });
-    }
-
     getAddSourceButton() {
         return this.page.getByRole('button', { name: 'Add new source' });
     }
 
     getSourceCard(name: string) {
         return this.page.getByTestId(`source-card-${name}`);
-    }
-
-    getSourceCards() {
-        return this.page.getByTestId(/^source-card-/);
     }
 
     getNameField() {
@@ -53,12 +45,6 @@ export class SourcesPage {
 
     getMenuItem(action: SourceMenuAction) {
         return this.page.getByRole('menuitem', { name: action, exact: true });
-    }
-
-    async openSourceList() {
-        await this.getSinkTab().click();
-        await this.getSourceTab().click();
-        await expect(this.getAddSourceButton()).toBeVisible();
     }
 
     async openAddSourceForm(type: SourceTypeLabel) {

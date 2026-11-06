@@ -42,20 +42,10 @@ describe('useUploadVideoFile', () => {
         expect(result.current.progress).toBeNull();
     });
 
-    it('resolves with the video path and the media id parsed from it', async () => {
-        rs.mocked(uploadSourceVideo).mockResolvedValue({ video_path: `/data/source_media/${mediaId}/sample.mp4` });
-        const { result } = renderHook(() => useUploadVideoFile());
-
-        await act(async () => {
-            await expect(result.current.mutateAsync(file)).resolves.toEqual({
-                videoPath: `/data/source_media/${mediaId}/sample.mp4`,
-                mediaId,
-            });
-        });
-    });
-
-    it('parses the media id from a Windows path', async () => {
-        const videoPath = `C:\\data\\source_media\\${mediaId}\\sample.mp4`;
+    it.each([
+        ['posix path', `/data/source_media/${mediaId}/sample.mp4`],
+        ['Windows path', `C:\\data\\source_media\\${mediaId}\\sample.mp4`],
+    ])('resolves with the video path and the media id parsed from a %s', async (_label, videoPath) => {
         rs.mocked(uploadSourceVideo).mockResolvedValue({ video_path: videoPath });
         const { result } = renderHook(() => useUploadVideoFile());
 

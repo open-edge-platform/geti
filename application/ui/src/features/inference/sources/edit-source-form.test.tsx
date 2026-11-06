@@ -20,30 +20,39 @@ describe('EditSourceForm', () => {
     const renderForm = (config: SourceConfigPayload) =>
         render(<EditSourceForm config={config} isConnected={false} onSaved={rs.fn()} onBackToList={rs.fn()} />);
 
-    it('renders the usb camera form with the saved name', async () => {
-        renderForm({ id: '1', name: 'My USB', source_type: 'usb_camera', device_id: 0 });
-
-        expect(await screen.findByRole('textbox', { name: /Name/i })).toHaveValue('My USB');
-        expect(screen.getByRole('button', { name: /Camera list/i })).toBeInTheDocument();
-    });
-
-    it('renders the ip camera form with the saved values', () => {
-        renderForm({
-            id: '2',
+    it.each([
+        {
+            label: 'usb camera',
+            config: { id: '1', name: 'My USB', source_type: 'usb_camera', device_id: 0 },
+            name: 'My USB',
+            assertFields: () => expect(screen.getByRole('button', { name: /Camera list/i })).toBeInTheDocument(),
+        },
+        {
+            label: 'ip camera',
+            config: {
+                id: '2',
+                name: 'My IP',
+                source_type: 'ip_camera',
+                stream_url: 'rtsp://host/stream',
+                auth_required: false,
+            },
             name: 'My IP',
-            source_type: 'ip_camera',
-            stream_url: 'rtsp://host/stream',
-            auth_required: false,
-        });
+            assertFields: () =>
+                expect(screen.getByRole('textbox', { name: /Stream Url/i })).toHaveValue('rtsp://host/stream'),
+        },
+        {
+            label: 'video file',
+            config: { id: '3', name: 'My Video', source_type: 'video_file', video_path: '/data/v.mp4', loop: false },
+            name: 'My Video',
+            assertFields: () => {
+                expect(screen.getByRole('textbox', { name: /Video file path/i })).toHaveValue('/data/v.mp4');
+                expect(screen.getByTestId('upload-video-file')).toBeInTheDocument();
+            },
+        },
+    ] as const)('renders the $label form with the saved values', async ({ config, name, assertFields }) => {
+        renderForm(config);
 
-        expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('My IP');
-        expect(screen.getByRole('textbox', { name: /Stream Url/i })).toHaveValue('rtsp://host/stream');
-    });
-
-    it('renders the video file form with the saved path', () => {
-        renderForm({ id: '3', name: 'My Video', source_type: 'video_file', video_path: '/data/v.mp4', loop: false });
-
-        expect(screen.getByRole('textbox', { name: /Name/i })).toHaveValue('My Video');
-        expect(screen.getByTestId('upload-video-file')).toBeInTheDocument();
+        expect(await screen.findByRole('textbox', { name: /Name/i })).toHaveValue(name);
+        assertFields();
     });
 });

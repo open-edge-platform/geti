@@ -62,7 +62,7 @@ describe('SettingsList', () => {
             topic: 'geti/predictions',
             auth_required: authRequired,
             rate_limit: null,
-            output_formats: ['predictions'],
+            output_formats: ['image_with_predictions'],
         };
 
         render(<SettingsList sink={sink} />);
@@ -72,5 +72,6 @@ describe('SettingsList', () => {
         expect(screen.getByText(authText)).toBeInTheDocument();
         expect(screen.getByText('Broker host: broker.local')).toBeInTheDocument();
         expect(screen.getByText('Broker port: 1883')).toBeInTheDocument();
+        expect(screen.getByText('image with predictions')).toBeInTheDocument();
     });
 });

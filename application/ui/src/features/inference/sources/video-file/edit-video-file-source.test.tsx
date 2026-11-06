@@ -95,6 +95,21 @@ describe('EditVideoFileSource', () => {
         expect(pipelineSpy).not.toHaveBeenCalled();
     });
 
+    it('patches with the typed path without uploading', async () => {
+        const { uploadSpy, updateSpy, pipelineSpy, onSaved } = setup();
+
+        const path = screen.getByRole('textbox', { name: /Video file path/ });
+        expect(path).toHaveValue('/old/path.mp4');
+        await userEvent.clear(path);
+        await userEvent.type(path, '/new/path.mp4');
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+        expect(updateSpy).toHaveBeenCalledWith({ name: 'My video', video_path: '/new/path.mp4', loop: false });
+        expect(uploadSpy).not.toHaveBeenCalled();
+        expect(pipelineSpy).not.toHaveBeenCalled();
+    });
+
     it('uploads the selected file and patches with the new path', async () => {
         const { uploadSpy, updateSpy, onSaved } = setup();
 
@@ -119,12 +134,13 @@ describe('EditVideoFileSource', () => {
     });
 
     it('connects the source to the pipeline only on "Save & Connect"', async () => {
-        const { pipelineSpy, onSaved } = setup();
+        const { updateSpy, pipelineSpy, onSaved } = setup();
 
         await userEvent.type(screen.getByRole('textbox', { name: 'Name' }), '!');
         await userEvent.click(screen.getByRole('button', { name: 'Save & Connect' }));
 
         await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+        expect(updateSpy).toHaveBeenCalledWith({ name: 'My video!', video_path: '/old/path.mp4', loop: false });
         expect(pipelineSpy).toHaveBeenCalledWith({ source_id: 'video-id' });
     });
 

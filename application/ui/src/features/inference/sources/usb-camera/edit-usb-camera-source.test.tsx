@@ -65,6 +65,21 @@ describe('EditUsbCameraSource', () => {
         expect(pipelineSpy).not.toHaveBeenCalled();
     });
 
+    it('switches the camera and patches with the new device id', async () => {
+        const { updateSpy, onSaved } = setup();
+
+        const cameraPicker = await screen.findByRole('button', { name: /Camera list/i });
+        await waitFor(() => expect(cameraPicker).toHaveTextContent('Integrated Webcam'));
+
+        await userEvent.click(cameraPicker);
+        await userEvent.click(await screen.findByRole('option', { name: 'Logitech C920' }));
+        expect(cameraPicker).toHaveTextContent('Logitech C920');
+        await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateSpy).toHaveBeenCalledWith({ name: 'My USB', device_id: 1, codec: 'YUY2' });
+    });
+
     it('connects the source to the pipeline after Save & Connect', async () => {
         const { updateSpy, pipelineSpy, onSaved } = setup();
 
@@ -75,6 +90,7 @@ describe('EditUsbCameraSource', () => {
 
         await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
         expect(updateSpy).toHaveBeenCalledTimes(1);
+        expect(updateSpy).toHaveBeenCalledWith({ name: 'Renamed', device_id: 0, codec: 'YUY2' });
         expect(pipelineSpy).toHaveBeenCalledWith({ source_id: 'usb-id' });
     });
 

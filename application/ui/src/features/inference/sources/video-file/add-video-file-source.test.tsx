@@ -21,6 +21,7 @@ const mediaId = '712750b2-5a82-47ee-8fba-f3dc96cb615d';
 const uploadedPath = `/data/source_media/${mediaId}/sample.mp4`;
 
 const setup = ({ createStatus = 200 } = {}) => {
+    let currentCreateStatus = createStatus;
     const uploadSpy = rs.fn();
     const createSpy = rs.fn();
     const deleteSpy = rs.fn();
@@ -44,9 +45,9 @@ const setup = ({ createStatus = 200 } = {}) => {
             const body = await request.json();
             createSpy(body);
 
-            return createStatus === 200
+            return currentCreateStatus === 200
                 ? HttpResponse.json({ ...body, id: 'new-id' } as never)
-                : HttpResponse.json({ detail: 'boom' } as never, { status: createStatus as 500 });
+                : HttpResponse.json({ detail: 'boom' } as never, { status: currentCreateStatus as 500 });
         }),
         http.post('/api/sources/{source_id}:test', () => HttpResponse.json({ reachable: true })),
         http.patch('/api/projects/{project_id}/pipeline', async ({ request }) => {
@@ -58,7 +59,14 @@ const setup = ({ createStatus = 200 } = {}) => {
 
     render(<AddVideoFileSource existingNames={[]} onSaved={onSaved} />);
 
-    return { uploadSpy, createSpy, deleteSpy, pipelineSpy, onSaved };
+    return {
+        uploadSpy,
+        createSpy,
+        deleteSpy,
+        pipelineSpy,
+        onSaved,
+        setCreateStatus: (status: number) => (currentCreateStatus = status),
+    };
 };
 
 const selectFile = async () => {
@@ -127,12 +135,14 @@ describe('AddVideoFileSource', () => {
 
         await waitFor(() => expect(deleteSpy).toHaveBeenCalledWith(mediaId));
         expect(await screen.findByText('Failed to save source configuration, boom')).toBeVisible();
+        expect(deleteSpy).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('button', { name: 'Add & Use' })).toBeVisible();
         expect(pipelineSpy).not.toHaveBeenCalled();
         expect(onSaved).not.toHaveBeenCalled();
     });
 
     it('keeps the selected file after a failed save and uploads it again on retry', async () => {
-        const { uploadSpy, createSpy } = setup({ createStatus: 500 });
+        const { uploadSpy, createSpy, pipelineSpy, onSaved, setCreateStatus } = setup({ createStatus: 500 });
 
         await selectFile();
         await submit();
@@ -140,12 +150,21 @@ describe('AddVideoFileSource', () => {
         await waitFor(() => expect(createSpy).toHaveBeenCalledTimes(1));
         expect(await screen.findByText('Failed to save source configuration, boom')).toBeVisible();
         expect(screen.getByText('Selected: sample.mp4')).toBeVisible();
+        expect(onSaved).not.toHaveBeenCalled();
 
+        setCreateStatus(200);
         await submit();
 
-        await waitFor(() => expect(createSpy).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
         expect(uploadSpy).toHaveBeenCalledTimes(2);
-        expect(createSpy).toHaveBeenLastCalledWith(expect.objectContaining({ video_path: uploadedPath }));
+        expect(createSpy).toHaveBeenCalledTimes(2);
+        expect(createSpy).toHaveBeenLastCalledWith({
+            name: 'Video file source',
+            source_type: 'video_file',
+            video_path: uploadedPath,
+            loop: false,
+        });
+        expect(pipelineSpy).toHaveBeenCalledWith({ source_id: 'new-id' });
     });
 
     it('creates no source and shows no error toast when the upload is cancelled', async () => {

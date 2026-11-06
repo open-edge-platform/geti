@@ -84,6 +84,42 @@ describe('AddWebhookSink', () => {
         expect(connectSink).toHaveBeenCalledWith({ sink_id: 'new-sink-id' });
     });
 
+    it('sends the chosen method, timeout and rate limit, and leaves removed header rows out', async () => {
+        const { createSink, connectSink } = setupHandlers();
+        const onSaved = rs.fn();
+
+        render(<AddWebhookSink onSaved={onSaved} />);
+
+        await userEvent.type(screen.getByRole('textbox', { name: /Samples/i }), '2');
+        await userEvent.type(screen.getByRole('textbox', { name: /Seconds/i }), '1');
+        await userEvent.click(screen.getByRole('button', { name: /HTTP Method/ }));
+        await userEvent.click(screen.getByRole('option', { name: 'PUT' }));
+        const timeout = screen.getByRole('textbox', { name: 'Timeout' });
+        await userEvent.clear(timeout);
+        await userEvent.type(timeout, '20');
+        await userEvent.type(screen.getByRole('textbox', { name: /Webhook URL/ }), 'https://hooks.local/geti');
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Image with Predictions' }));
+        await addHeader('X-Removed', 'gone');
+        await addHeader('X-Api-Key', 'secret');
+        await userEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0]);
+        await userEvent.click(screen.getByRole('button', { name: 'Add & Use' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+
+        expect(createSink).toHaveBeenCalledTimes(1);
+        expect(createSink).toHaveBeenCalledWith({
+            name: 'Webhook sink',
+            sink_type: 'webhook',
+            webhook_url: 'https://hooks.local/geti',
+            timeout: 20,
+            http_method: 'PUT',
+            headers: { 'X-Api-Key': 'secret' },
+            rate_limit: 2,
+            output_formats: ['image_with_predictions'],
+        });
+        expect(connectSink).toHaveBeenCalledWith({ sink_id: 'new-sink-id' });
+    });
+
     it('rejects duplicate header keys and sends no request', async () => {
         const { createSink, connectSink } = setupHandlers();
         const onSaved = rs.fn();
@@ -117,7 +153,10 @@ describe('AddWebhookSink', () => {
 
         expect(button()).toBeDisabled();
 
-        await fillRequiredFields();
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Predictions' }));
+        expect(button()).toBeDisabled();
+
+        await userEvent.type(screen.getByRole('textbox', { name: /Webhook URL/ }), 'https://hooks.local/geti');
         expect(button()).toBeEnabled();
 
         await userEvent.click(screen.getByRole('button', { name: 'Add header' }));
@@ -126,9 +165,11 @@ describe('AddWebhookSink', () => {
         await userEvent.type(screen.getByRole('textbox', { name: 'headers-keys' }), 'X-Key');
         expect(button()).toBeDisabled();
 
+        await userEvent.click(button());
+        expect(createSink).not.toHaveBeenCalled();
+
         await userEvent.type(screen.getByRole('textbox', { name: 'headers-values' }), 'v');
         expect(button()).toBeEnabled();
-        expect(createSink).not.toHaveBeenCalled();
     });
 
     it('keeps every row and field after a failed save', async () => {

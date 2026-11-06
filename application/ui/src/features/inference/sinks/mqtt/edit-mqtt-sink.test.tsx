@@ -83,6 +83,29 @@ describe('EditMqttSink', () => {
         expect(pipelineBody).not.toHaveBeenCalled();
     });
 
+    it('"Save" patches a changed broker host', async () => {
+        const onSaved = rs.fn();
+        const user = userEvent.setup();
+
+        renderEdit({ onSaved });
+
+        const host = screen.getByRole('textbox', { name: /Broker Host/i });
+        await user.clear(host);
+        await user.type(host, 'broker-2.local');
+        await user.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(updateBody).toHaveBeenCalledWith({
+            name: 'Local broker',
+            broker_host: 'broker-2.local',
+            broker_port: 1883,
+            topic: 'predictions',
+            auth_required: false,
+            rate_limit: null,
+            output_formats: ['predictions'],
+        });
+    });
+
     it('"Save & Connect" connects the sink to the pipeline before onSaved', async () => {
         const onSaved = rs.fn();
         const user = userEvent.setup();

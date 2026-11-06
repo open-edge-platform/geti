@@ -81,6 +81,35 @@ describe('AddUsbCameraSource', () => {
         expect(onSaved).not.toHaveBeenCalled();
     });
 
+    it('lists a camera attached after refreshing the camera list and creates the source with it', async () => {
+        const createSpy = rs.fn();
+        server.use(
+            http.post('/api/sources', async ({ request }) => {
+                const body = await request.json();
+                createSpy(body);
+
+                return HttpResponse.json({ ...(body as object), id: 'new-id' } as never);
+            })
+        );
+        const { onSaved } = setup([devices[0]]);
+        const getOptionNames = () => screen.getAllByRole('option').map((option) => option.textContent);
+
+        await userEvent.click(await screen.findByRole('button', { name: /Camera list/i }));
+        await waitFor(() => expect(getOptionNames()).toEqual(['Integrated Webcam']));
+        await userEvent.keyboard('{Escape}');
+
+        server.use(http.get('/api/system/devices/camera', () => HttpResponse.json(devices)));
+        await userEvent.click(screen.getByRole('button', { name: 'Refresh Cameras' }));
+
+        await userEvent.click(screen.getByRole('button', { name: /Camera list/i }));
+        await waitFor(() => expect(getOptionNames()).toEqual(['Integrated Webcam', 'Logitech C920']));
+        await userEvent.click(screen.getByRole('option', { name: 'Logitech C920' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Add & Use' }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+        expect(createSpy).toHaveBeenCalledWith({ name: 'USB camera source', source_type: 'usb_camera', device_id: 1 });
+    });
+
     it('keeps the entered values when saving fails', async () => {
         server.use(http.post('/api/sources', () => HttpResponse.json({ detail: 'boom' } as never, { status: 500 })));
         const { pipelineSpy, onSaved } = setup();
