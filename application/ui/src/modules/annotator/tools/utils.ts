@@ -469,6 +469,11 @@ export const projectPointOnLine = ([startPoint, endPoint]: ProjectLine, point: P
     // Project a onto b
     const aDotB = a.x * b.x + a.y * b.y;
     const bDotB = b.x * b.x + b.y * b.y;
+
+    if (bDotB === 0) {
+        return undefined;
+    }
+
     const scale = aDotB / bDotB;
 
     // Return undefined if the projected point would lie outside of the given line
