@@ -1191,6 +1191,11 @@ class LightningEngine(Engine):
             logging.debug("DataAugSwitch not found in AugmentationSchedulerCallback")
             return
 
+        # The datamodule input size is the source of truth (it may be overridden
+        # after the recipe was resolved), so keep the scheduled policies in sync.
+        if self.datamodule.input_size is not None:
+            data_aug_switch.set_input_size(self.datamodule.input_size)
+
         def set_data_aug_switch_if_supported(dataset: VisionDataset) -> bool:
             """Set data_aug_switch on a dataset if it supports it."""
             from getitune.data.dataset.mixins import DataAugSwitchMixin
