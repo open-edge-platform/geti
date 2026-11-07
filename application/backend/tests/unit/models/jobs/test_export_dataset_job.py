@@ -20,6 +20,7 @@ class TestExportDatasetJobParams:
             (TaskType.DETECTION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.GETI),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.COCO),
+            (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO_SEG),
         ],
     )
     def test_validate_format_valid(self, task_type: TaskType, export_format: DatasetFormat):
@@ -33,14 +34,46 @@ class TestExportDatasetJobParams:
         except ValidationError:
             pytest.fail("Validation failed for a valid combination.")
 
+    def test_validate_format_yolo_cls_valid_for_multiclass(self):
+        """Test that the YOLO classification format is accepted for single-label classification."""
+        params = ExportDatasetJobParams(
+            project_id=uuid4(),
+            task=Task(task_type=TaskType.CLASSIFICATION, exclusive_labels=True),
+            export_format=DatasetFormat.YOLO_CLS,
+        )
+        assert params.export_format is DatasetFormat.YOLO_CLS
+
+    def test_validate_format_yolo_cls_invalid_for_multilabel(self):
+        """Test that the YOLO classification format is rejected for multi-label classification."""
+        with pytest.raises(
+            ValidationError, match="Export format 'yolo_cls' is only supported for single-label"
+        ):
+            ExportDatasetJobParams(
+                project_id=uuid4(),
+                task=Task(task_type=TaskType.CLASSIFICATION, exclusive_labels=False),
+                export_format=DatasetFormat.YOLO_CLS,
+            )
+
+    def test_validate_format_yolo_seg_valid_for_instance_segmentation(self):
+        """Test that the YOLO segmentation format is accepted for instance segmentation projects."""
+        params = ExportDatasetJobParams(
+            project_id=uuid4(),
+            task=Task(task_type=TaskType.INSTANCE_SEGMENTATION),
+            export_format=DatasetFormat.YOLO_SEG,
+        )
+        assert params.export_format is DatasetFormat.YOLO_SEG
+
     @pytest.mark.parametrize(
         ("task_type", "export_format"),
         [
             (TaskType.CLASSIFICATION, DatasetFormat.COCO),
             (TaskType.CLASSIFICATION, DatasetFormat.YOLO),
             (TaskType.DETECTION, DatasetFormat.VOC),
+            (TaskType.DETECTION, DatasetFormat.YOLO_CLS),
+            (TaskType.DETECTION, DatasetFormat.YOLO_SEG),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.VOC),
+            (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO_CLS),
         ],
     )
     def test_validate_format_invalid(self, task_type: TaskType, export_format: DatasetFormat):
