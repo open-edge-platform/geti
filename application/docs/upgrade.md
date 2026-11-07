@@ -89,6 +89,12 @@ previous package can be reinstalled and backup is available, the app remains
 usable — simply reinstall the previous `.msix` version (see
 [Downgrading](#downgrading)) and restore the database from backup.
 
+> **Upgrading from Geti 3.3 or older:** logs are now written to the `logs`
+> subfolder (`%LOCALAPPDATA%\Intel\Geti\logs`). Logs from older versions are left
+> at the top level of the data directory (`app.log`, rotated `app.*.log` files,
+> and the `jobs` and `workers` folders) and are no longer used. You can delete
+> them once the upgrade has succeeded.
+
 ### Requirements for in-place upgrade to work
 
 Windows performs an **in-place upgrade** (keeping the per-user data directory)
@@ -196,7 +202,7 @@ fail identically — so the backend:
 - **Where are the logs?**
   - Source install/upgrade: `<work-dir>/.build/.install.log`.
   - Docker: the container logs (`docker logs geti-cpu`) / the `geti-logs` volume.
-  - Desktop: the per-user log directory (e.g. `%LOCALAPPDATA%\Intel\Geti`).
+  - Desktop: the per-user log directory (e.g. `%LOCALAPPDATA%\Intel\Geti\logs`).
 - **The new version won't start after an upgrade.** Check the logs for a
   `Fatal application upgrade error` message. Restore the database from the backup; start
   the previous version to continue, and open an issue at
