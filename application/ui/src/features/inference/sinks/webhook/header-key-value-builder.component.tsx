@@ -1,54 +1,42 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 
 import { RequiredTextField } from '@/components/required-text-field/required-text-field.component';
 import { useTranslation } from '@/i18n';
-import { ActionButton, Content, ContextualHelp, dimensionValue, Flex, Grid, Text } from '@geti-ui/ui';
+import { ActionButton, Content, ContextualHelp, Flex, Grid, Text, TextField } from '@geti-ui/ui';
 import { Add, Delete } from '@geti-ui/ui/icons';
-import { isEmpty } from 'lodash-es';
 
-import { Fields, getPairsFromObject, Pair } from './utils';
+import { getDuplicateKeyIndexes, type HeaderRow } from './utils';
+
+import classes from './header-key-value-builder.module.scss';
 
 type HeaderKeyValueBuilderProps = {
-    title: string;
-    keysName: string;
-    valuesName: string;
-    config?: Record<string, string>;
+    value: HeaderRow[];
+    onChange: (value: HeaderRow[]) => void;
 };
 
-const updatePairAtIndex = (indexToUpdate: number, field: Fields, value: string) => (pair: Pair, index: number) =>
-    index === indexToUpdate ? { ...pair, [field]: value } : pair;
+const KEYS_LABEL = 'headers-keys';
+const VALUES_LABEL = 'headers-values';
 
-export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {} }: HeaderKeyValueBuilderProps) => {
+export const HeaderKeyValueBuilder = ({ value, onChange }: HeaderKeyValueBuilderProps) => {
     const { t } = useTranslation();
-    const [pairs, setPairs] = useState<Pair[]>(getPairsFromObject(config));
+    const title = t('inference.sinks.fields.headers');
+    const duplicateKeyIndexes = getDuplicateKeyIndexes(value);
 
-    const addPair = () => {
-        setPairs([...pairs, { key: '', value: '' }]);
-    };
+    const addRow = () => onChange([...value, { key: '', value: '' }]);
 
-    const updatePair = (indexToUpdate: number, field: Fields, value: string) => {
-        setPairs((prevValues) => prevValues.map(updatePairAtIndex(indexToUpdate, field, value)));
-    };
+    const updateRow = (indexToUpdate: number, patch: Partial<HeaderRow>) =>
+        onChange(value.map((row, index) => (index === indexToUpdate ? { ...row, ...patch } : row)));
 
-    const removePair = (indexToRemove: number) => {
-        setPairs((prevValues) => prevValues.filter((_, index) => index !== indexToRemove));
-    };
+    const removeRow = (indexToRemove: number) => onChange(value.filter((_, index) => index !== indexToRemove));
 
     return (
         <Flex direction='column' gap='size-100'>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex gap={'size-100'}>
-                    <Text
-                        UNSAFE_style={{
-                            fontSize: dimensionValue('size-150'),
-                            color: 'var(--spectrum-alias-label-text-color)',
-                        }}
-                    >
-                        {title}
-                    </Text>
+                    <Text UNSAFE_className={classes.title}>{title}</Text>
 
                     <ContextualHelp variant='info'>
                         <Content>
@@ -56,40 +44,48 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                         </Content>
                     </ContextualHelp>
                 </Flex>
-                <ActionButton isQuiet onPress={addPair}>
+                <ActionButton isQuiet aria-label='Add header' onPress={addRow}>
                     <Add />
                 </ActionButton>
             </Flex>
 
             <Grid columns={['1fr', '1fr', '50px']} gap={'size-100'}>
-                {pairs.map((pair, index) => (
-                    <Fragment key={`${keysName}-${index}`}>
-                        <RequiredTextField
-                            isQuiet
-                            width={'100%'}
-                            name={keysName}
-                            value={pair.key}
-                            aria-label={keysName}
-                            placeholder={t('inference.sinks.webhook.keyPlaceholder')}
-                            errorMessage={t('inference.validation.keyEmpty')}
-                            onChange={(val) => updatePair(index, Fields.KEY, val)}
-                        />
-                        <RequiredTextField
-                            isQuiet
-                            width={'100%'}
-                            name={valuesName}
-                            value={pair.value}
-                            aria-label={valuesName}
-                            placeholder={t('inference.sinks.webhook.valuePlaceholder')}
-                            errorMessage={t('inference.validation.valueEmpty')}
-                            isDisabled={isEmpty(pair.key)}
-                            onChange={(val) => updatePair(index, Fields.VALUE, val)}
-                        />
-                        <ActionButton aria-label='Remove' onPress={() => removePair(index)}>
-                            <Delete />
-                        </ActionButton>
-                    </Fragment>
-                ))}
+                {value.map((row, index) => {
+                    const isDuplicate = duplicateKeyIndexes.has(index);
+
+                    return (
+                        <Fragment key={index}>
+                            <TextField
+                                isQuiet
+                                isRequired
+                                width={'100%'}
+                                value={row.key}
+                                aria-label={KEYS_LABEL}
+                                placeholder={t('inference.sinks.webhook.keyPlaceholder')}
+                                validationState={isDuplicate ? 'invalid' : undefined}
+                                errorMessage={
+                                    isDuplicate
+                                        ? t('inference.validation.keyDuplicate')
+                                        : t('inference.validation.keyEmpty')
+                                }
+                                onChange={(key) => updateRow(index, { key })}
+                            />
+                            <RequiredTextField
+                                isQuiet
+                                width={'100%'}
+                                value={row.value}
+                                aria-label={VALUES_LABEL}
+                                placeholder={t('inference.sinks.webhook.valuePlaceholder')}
+                                errorMessage={t('inference.validation.valueEmpty')}
+                                isDisabled={row.key === ''}
+                                onChange={(next) => updateRow(index, { value: next })}
+                            />
+                            <ActionButton isQuiet aria-label='Remove' onPress={() => removeRow(index)}>
+                                <Delete />
+                            </ActionButton>
+                        </Fragment>
+                    );
+                })}
             </Grid>
         </Flex>
     );

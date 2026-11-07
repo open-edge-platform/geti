@@ -35,11 +35,11 @@ from typing import TYPE_CHECKING, Callable
 import numpy as np
 import polars as pl
 import pyarrow.parquet as pq
-from datumaro.experimental import Dataset, LazyImage, register_sample
-from datumaro.experimental.categories import MaskCategories
-from datumaro.experimental.dataset import Sample
-from datumaro.experimental.export_import import export_dataset
-from datumaro.experimental.fields import (
+from getidata import Dataset, LazyImage, register_sample
+from getidata.categories import MaskCategories
+from getidata.dataset import Sample
+from getidata.export_import import export_dataset
+from getidata.fields import (
     ImageInfo,
     Subset,
     image_info_field,

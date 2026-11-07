@@ -7,21 +7,21 @@ import { CheckCircleOutlined, Search } from '@geti-ui/ui/icons';
 import classes from './annotation-state-icon.module.scss';
 
 type AnnotationStatusIconProps = {
-    isReviewed: boolean;
+    isAnnotated: boolean;
 };
 
-export const AnnotationStatusIcon = ({ isReviewed }: AnnotationStatusIconProps) => {
-    if (isReviewed) {
+export const AnnotationStatusIcon = ({ isAnnotated }: AnnotationStatusIconProps) => {
+    if (isAnnotated) {
         return (
-            <View UNSAFE_className={classes.reviewed}>
-                <CheckCircleOutlined />
+            <View UNSAFE_className={classes.annotated}>
+                <CheckCircleOutlined role='img' aria-label='Annotated' />
             </View>
         );
     }
 
     return (
-        <View UNSAFE_className={classes.toReview}>
-            <Search />
+        <View UNSAFE_className={classes.notAnnotated}>
+            <Search role='img' aria-label='Not annotated' />
         </View>
     );
 };

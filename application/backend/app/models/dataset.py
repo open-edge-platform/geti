@@ -19,7 +19,6 @@ class AnnotationType(StrEnum):
 
 class DatasetFormat(StrEnum):
     COCO = "coco"
-    DATUMARO_V1 = "datumaro_v1"
     GETI = "geti"
     VOC = "voc"
     YOLO = "yolo"

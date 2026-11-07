@@ -30,7 +30,6 @@ type GalleryProps = {
     hasActiveFilter: boolean;
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
-    isMediaItemReviewedById: (mediaItemId: string) => boolean;
 };
 
 const VIEW_MODE_SETTINGS: Record<GalleryViewMode, GridLayoutOptions> = {
@@ -45,7 +44,6 @@ type GalleryListProps = {
     isPending: boolean;
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
-    isMediaItemReviewedById: (mediaItemId: string) => boolean;
     onSelectedMediaItemChange: (item: Media) => void;
 };
 
@@ -56,7 +54,6 @@ const GalleryList = ({
     isFetchingNextPage,
     fetchNextPage,
     onSelectedMediaItemChange,
-    isMediaItemReviewedById,
 }: GalleryListProps) => {
     const projectId = useProjectIdentifier();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
@@ -137,7 +134,7 @@ const GalleryList = ({
                             </Flex>
                         )}
                         bottomRightElement={() => (
-                            <AnnotationStatusIcon isReviewed={isMediaItemReviewedById(item.id)} />
+                            <AnnotationStatusIcon isAnnotated={item.annotation_status.has_annotations} />
                         )}
                     />
                 );
@@ -153,7 +150,6 @@ export const Gallery = ({
     hasActiveFilter,
     isFetchingNextPage,
     fetchNextPage,
-    isMediaItemReviewedById,
 }: GalleryProps) => {
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
 
@@ -168,7 +164,6 @@ export const Gallery = ({
                 viewMode={viewMode}
                 isPending={isPending}
                 fetchNextPage={fetchNextPage}
-                isMediaItemReviewedById={isMediaItemReviewedById}
                 onSelectedMediaItemChange={onSelectedMediaItemChange}
                 isFetchingNextPage={isFetchingNextPage}
             />

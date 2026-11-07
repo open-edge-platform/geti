@@ -82,6 +82,21 @@ describe('createI18nInstance', () => {
         expect(instance.t('common.labels.images')).toBe('Afbeeldingen');
     });
 
+    it.each(['id', 'id-ID'])('renders Indonesian for browser language %s', (language) => {
+        setNavigatorLanguage(language);
+        const instance = createI18nInstance();
+
+        expect(instance.resolvedLanguage).toBe('id');
+        expect(instance.t('common.labels.images')).toBe('Gambar');
+        expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('id');
+    });
+
+    it.each([0, 1, 2, 1_000_000])('uses the Indonesian plural form for %i', (count) => {
+        const instance = createI18nInstance({ lng: 'id' });
+
+        expect(instance.t('project.list.count', { count })).toBe(`${count} proyek`);
+    });
+
     it.each(['zh', 'zh-CN', 'zh-Hant-HK'])('renders Simplified Chinese for browser language %s', (language) => {
         setNavigatorLanguage(language);
         const instance = createI18nInstance();

@@ -30,7 +30,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -42,7 +42,7 @@ jobs:
       - name: Validate configuration
         run: |
           # renovate: datasource=docker
-          export RENOVATE_IMAGE=ghcr.io/renovatebot/renovate:44.161.0@sha256:92b6100431d51547319638f996d8bed626d96e0d144176eb1a4e89c06ad5c6de
+          export RENOVATE_IMAGE=ghcr.io/renovatebot/renovate:44.198.3@sha256:bf344aa39d5b592ec728e1db5c3e1d940a5093a89a4598073efcb18d592d121c
           docker run --rm --entrypoint "renovate-config-validator" \
           -v "${{ github.workspace }}/.github/renovate.json5":"/renovate.json5" \
           ${RENOVATE_IMAGE} "/renovate.json5"

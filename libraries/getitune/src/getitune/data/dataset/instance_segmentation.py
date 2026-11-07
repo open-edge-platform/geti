@@ -14,7 +14,7 @@ from getitune.data.entity.utils import with_image_dtype
 from getitune.types import TaskType
 
 if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
+    from getidata import Dataset
 
 
 class InstanceSegDataset(VisionDataset):

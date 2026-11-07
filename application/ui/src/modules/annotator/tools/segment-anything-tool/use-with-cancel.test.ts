@@ -109,9 +109,7 @@ describe('useWithCancel', () => {
 
         await expect(firstCallPromise).rejects.toMatchObject({ name: 'AbortError', message: 'Request aborted' });
 
-        // The second call should resolve normally.
-        const secondResult = await secondCallPromise;
-        expect(secondResult).toEqual(secondCallShapes);
+        await expect(secondCallPromise).resolves.toEqual(secondCallShapes);
     });
 
     it('does not throw when cancel() is called before any call', () => {

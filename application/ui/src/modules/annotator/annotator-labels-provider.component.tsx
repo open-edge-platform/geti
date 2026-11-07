@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 import type { Label } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
@@ -36,11 +36,12 @@ export const AnnotatorLabelsProvider = ({ children }: AnnotatorLabelsProviderPro
 
     const selectedLabel: Label | null = labels.find(({ id }) => id === selectedLabelId) ?? null;
 
-    return (
-        <AnnotatorLabelsContext value={{ labels, selectedLabel, selectedLabelId, setSelectedLabelId }}>
-            {children}
-        </AnnotatorLabelsContext>
+    const value = useMemo(
+        () => ({ labels, selectedLabel, selectedLabelId, setSelectedLabelId }),
+        [labels, selectedLabel, selectedLabelId]
     );
+
+    return <AnnotatorLabelsContext value={value}>{children}</AnnotatorLabelsContext>;
 };
 
 export const useAnnotatorLabels = (): AnnotatorLabelsContextProps => {

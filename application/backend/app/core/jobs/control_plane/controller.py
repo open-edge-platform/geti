@@ -7,7 +7,7 @@ import threading
 
 from loguru import logger
 
-from app.core.jobs.models import Cancelled, Done, Failed, Job, JobStatus, JobType, Progress, Started
+from app.core.jobs.models import Cancelled, Done, Failed, Job, JobStatus, JobType, Progress
 from app.core.run import Runner, RunnerFactory
 
 from .capacity import Capacity
@@ -27,7 +27,7 @@ class JobController:
         - Stale job monitor: Periodically checks for jobs that haven't updated within a threshold
           (default 1 hour) and automatically schedules their termination
         - Capacity control: Enforces maximum parallel job limits via semaphore-based permits
-        - Event-driven communication: Jobs emit domain events (Started, Progress, Done, etc.)
+        - Event-driven communication: Runners emit execution events (Progress, Done, Failed, Cancelled)
           which are pumped from runner threads to the async event loop for state management
         - Cancellation support: Monitors cancellation requests and triggers graceful shutdowns
 
@@ -112,6 +112,14 @@ class JobController:
             job_run = self._runner_factory.for_job(job)
             event_q: asyncio.Queue = asyncio.Queue()
 
+            # Mark it running before the runner starts, so a cancel from now on stops the runner.
+            job.start()
+            try:
+                job_run.start()
+            except Exception as exc:
+                logger.exception("Failed to start the runner for job {}", job.id)
+                job.fail(msg=f"Failed to start the job: {exc}")
+                return
             # Set up event pumping and cancellation monitoring
             cancel_task = self._setup_job_execution(job, job_run, event_q)
 
@@ -152,10 +160,7 @@ class JobController:
             await job_run.stop()
 
         threading.Thread(target=_pump, daemon=True).start()
-        cancel_task = asyncio.create_task(_cancel())
-        job_run.start()
-
-        return cancel_task
+        return asyncio.create_task(_cancel())
 
     @staticmethod
     async def _handle_job_events(job: Job, event_q: asyncio.Queue) -> None:
@@ -166,8 +171,6 @@ class JobController:
                 break
 
             match evt:
-                case Started():
-                    job.start()
                 case Progress(message=m, value=v, metadata=md):
                     job.advance(percent=v, msg=m, metadata=md)
                 case Done():

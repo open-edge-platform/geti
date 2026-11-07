@@ -19,9 +19,9 @@ import sys
 from pathlib import Path
 
 import pytest
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.categories import LabelCategories
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 
 from getitune.data.entity.sample import DetectionSample
 

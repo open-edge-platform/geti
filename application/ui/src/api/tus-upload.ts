@@ -137,7 +137,8 @@ export const transferFile = (file: File, { onProgress, signal }: TransferOptions
                 }
 
                 upload.start();
-            });
+            })
+            .catch((error: unknown) => settle(() => reject(error instanceof Error ? toTransferError(error) : error)));
     });
 
 /** Discards an upload on the server (TUS termination). Failures are ignored: the upload expires anyway. */

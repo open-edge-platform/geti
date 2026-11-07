@@ -3,8 +3,8 @@
 
 from collections.abc import Callable
 
-from datumaro.experimental import Dataset
-from datumaro.experimental.categories import LabelCategories
+from getidata import Dataset
+from getidata.categories import LabelCategories
 from loguru import logger
 
 from app.datumaro_converter.factories import SampleFactory

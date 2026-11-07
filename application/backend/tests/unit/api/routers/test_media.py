@@ -23,7 +23,15 @@ from app.api.dependencies import (
     get_media_service,
     get_project_service,
 )
-from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
+from app.api.schemas.media import (
+    ImageView,
+    MediaAnnotationStatusView,
+    MediaViewAdapter,
+    SetMediaAnnotations,
+    VideoAnnotationStatusView,
+    VideoFrameView,
+    VideoView,
+)
 from app.models import (
     BatchInferenceMedia,
     BatchInferencePrediction,
@@ -41,10 +49,12 @@ from app.models import (
 )
 from app.models.media import (
     ImageFormat,
+    MediaAnnotationStatus,
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaSortBy,
     SortDirection,
+    VideoAnnotationStatus,
     VideoFormat,
     VideoRange,
 )
@@ -94,7 +104,7 @@ def fxt_video_media():
         size=2048,
         fps=25,
         frame_count=1000,
-        annotated_frame_count=100,
+        annotation_status=VideoAnnotationStatus(annotated_video_frames=100),
         source_id=uuid4(),
     )
 
@@ -113,6 +123,7 @@ def fxt_video_frame_media():
         frame_index=3,
         video_id=uuid4(),
         source_id=uuid4(),
+        annotation_status=MediaAnnotationStatus(has_annotations=True),
     )
 
 
@@ -177,6 +188,7 @@ def test_convert_image_to_view(fxt_image_media) -> None:
         height=fxt_image_media.height,
         size=fxt_image_media.size,
         source_id=fxt_image_media.source_id,
+        annotation_status=MediaAnnotationStatusView(has_annotations=False),
     )
 
 
@@ -192,9 +204,10 @@ def test_convert_video_to_view(fxt_video_media) -> None:
         size=fxt_video_media.size,
         fps=fxt_video_media.fps,
         frame_count=fxt_video_media.frame_count,
-        annotated_frame_count=fxt_video_media.annotated_frame_count,
+        annotated_frame_count=100,
         source_id=fxt_video_media.source_id,
         duration=fxt_video_media.duration,
+        annotation_status=VideoAnnotationStatusView(has_annotations=True, annotated_video_frames=100),
     )
 
 
@@ -211,6 +224,7 @@ def test_convert_video_frame_to_view(fxt_video_frame_media) -> None:
         frame_index=fxt_video_frame_media.frame_index,
         video_id=fxt_video_frame_media.video_id,
         source_id=fxt_video_frame_media.source_id,
+        annotation_status=MediaAnnotationStatusView(has_annotations=True),
     )
 
 
@@ -252,6 +266,7 @@ class TestMediaEndpoints:
             "size": 2048,
             "source_id": str(fxt_image_media.source_id),
             "width": 1024,
+            "annotation_status": {"has_annotations": False},
         }
         fxt_media_service.create_image.assert_called_once()
         metadata: ImageMetadata = fxt_media_service.create_image.call_args.args[0]
@@ -307,6 +322,7 @@ class TestMediaEndpoints:
             "frame_count": 1000,
             "annotated_frame_count": 100,
             "duration": 40,
+            "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
         fxt_media_service.create_video.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -459,6 +475,10 @@ class TestMediaEndpoints:
         response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media")
 
         assert response.status_code == status.HTTP_200_OK
+        assert [item["annotation_status"] for item in response.json()["items"]] == [
+            {"has_annotations": False},
+            {"has_annotations": True, "annotated_video_frames": 100},
+        ]
         fxt_media_service.count_media.assert_called_once_with(
             project=fxt_get_project,
             start_date=None,
@@ -942,8 +962,11 @@ class TestMediaEndpoints:
         assert response.status_code == status.HTTP_404_NOT_FOUND
         fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
 
-    def test_get_image_success(self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_client):
-        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+    @pytest.mark.parametrize("has_annotations", [True, False])
+    def test_get_image_success(self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_client, has_annotations):
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media.model_copy(
+            update={"annotation_status": MediaAnnotationStatus(has_annotations=has_annotations)}
+        )
 
         response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}")
 
@@ -957,6 +980,7 @@ class TestMediaEndpoints:
             "size": fxt_image_media.size,
             "source_id": str(fxt_image_media.source_id),
             "width": fxt_image_media.width,
+            "annotation_status": {"has_annotations": has_annotations},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_image_media.id
@@ -979,8 +1003,9 @@ class TestMediaEndpoints:
             "width": fxt_video_media.width,
             "fps": fxt_video_media.fps,
             "frame_count": fxt_video_media.frame_count,
-            "annotated_frame_count": fxt_video_media.annotated_frame_count,
+            "annotated_frame_count": 100,
             "duration": fxt_video_media.duration,
+            "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_video_media.id
@@ -1003,6 +1028,7 @@ class TestMediaEndpoints:
             "width": fxt_video_frame_media.width,
             "video_id": str(fxt_video_frame_media.video_id),
             "frame_index": fxt_video_frame_media.frame_index,
+            "annotation_status": {"has_annotations": True},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_video_frame_media.id
@@ -1037,9 +1063,9 @@ class TestMediaEndpoints:
             with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
                 temp_file_path = Path(tmp_file.name)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
-                # needs_display_normalization is tested separately; mock it out so that
+                # needs_display_conversion is tested separately; mock it out so that
                 # arbitrary (possibly non-image) temp files don't cause PIL errors here.
-                with patch("app.api.routers.media.needs_display_normalization", return_value=False):
+                with patch("app.api.routers.media.needs_display_conversion", return_value=False):
                     response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
 
         finally:
@@ -1073,7 +1099,7 @@ class TestMediaEndpoints:
         try:
             with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
                 temp_file_path = Path(tmp_file.name)
-                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000, mode="I;16")
+                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000)
                 img.save(temp_file_path)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
                 response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
@@ -1083,6 +1109,35 @@ class TestMediaEndpoints:
 
         assert response.status_code == status.HTTP_200_OK
         assert "image/png" in response.headers.get("content-type", "")
+
+    def test_get_media_binary_converts_8bit_tiff_to_png(self, fxt_get_project, fxt_media_service, fxt_client):
+        """Browsers cannot display TIFF, so even 8-bit TIFFs are served as PNG with the same pixels."""
+        import numpy as np
+
+        media = MagicMock(spec=Image, id=uuid4(), format=ImageFormat.TIFF, type=MediaType.IMAGE)
+        type(media).name = PropertyMock(return_value="test_8bit")
+        fxt_media_service.get_media_by_id.return_value = media
+        pixels = np.arange(10 * 12 * 3, dtype=np.uint8).reshape(10, 12, 3)
+
+        temp_file_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as tmp_file:
+                temp_file_path = Path(tmp_file.name)
+                PILImage.fromarray(pixels).save(temp_file_path)
+                fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
+                response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
+                raw_response = fxt_client.get(
+                    f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary?raw=true"
+                )
+        finally:
+            if temp_file_path and os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "image/png" in response.headers.get("content-type", "")
+        np.testing.assert_array_equal(np.array(PILImage.open(BytesIO(response.content))), pixels)
+        assert raw_response.status_code == status.HTTP_200_OK
+        assert "image/tiff" in raw_response.headers.get("content-type", "")
 
     @pytest.mark.parametrize(
         "image_format, suffix",
@@ -1105,10 +1160,10 @@ class TestMediaEndpoints:
         try:
             with (
                 tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file,
-                patch("app.api.routers.media.normalize_image_to_png_bytes") as mock_normalize_image,
+                patch("app.api.routers.media.convert_image_to_display_png_bytes") as mock_convert_image,
             ):
                 temp_file_path = Path(tmp_file.name)
-                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000, mode="I;16")
+                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000)
                 img.save(temp_file_path)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
                 response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary?raw=true")
@@ -1117,7 +1172,7 @@ class TestMediaEndpoints:
                 os.unlink(temp_file_path)
 
         assert response.status_code == status.HTTP_200_OK
-        mock_normalize_image.assert_not_called()
+        mock_convert_image.assert_not_called()
 
     def test_get_video_frame_binary_on_the_fly_annotated(self, fxt_get_project, fxt_media_service, fxt_client):
         video_id = uuid4()
@@ -1134,7 +1189,7 @@ class TestMediaEndpoints:
         try:
             with (
                 tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp_file,
-                patch("app.api.routers.media.needs_display_normalization", return_value=False),
+                patch("app.api.routers.media.needs_display_conversion", return_value=False),
             ):
                 temp_file_path = Path(tmp_file.name)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path

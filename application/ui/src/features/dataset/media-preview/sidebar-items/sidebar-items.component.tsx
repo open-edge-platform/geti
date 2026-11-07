@@ -27,7 +27,6 @@ type SidebarItemsProps = {
     isFetchingNextPage: boolean;
     mediaItem: Media;
     fetchNextPage: () => void;
-    isUserReviewed: (mediaItemId: string) => boolean;
     onSelectedMediaItem: (item: Media) => void;
 };
 
@@ -36,7 +35,6 @@ export const SidebarItems = ({
     items,
     isFetchingNextPage,
     fetchNextPage,
-    isUserReviewed,
     onSelectedMediaItem,
 }: SidebarItemsProps) => {
     const ref = useRef(null);
@@ -67,11 +65,7 @@ export const SidebarItems = ({
                             scrollToIndex={selectedIndex}
                             onLoadMore={fetchNextPage}
                             contentItem={(item) => (
-                                <SidebarMediaItem
-                                    item={item}
-                                    isUserReviewed={isUserReviewed(item.id)}
-                                    onSelectedMediaItem={onSelectedMediaItem}
-                                />
+                                <SidebarMediaItem item={item} onSelectedMediaItem={onSelectedMediaItem} />
                             )}
                         />
                     </View>

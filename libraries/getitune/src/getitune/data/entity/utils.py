@@ -13,15 +13,15 @@ from typing import TYPE_CHECKING, Any
 import polars as pl
 import torch
 import torch.utils._pytree as pytree
-from datumaro.experimental.dataset import Sample  # noqa: TC002
-from datumaro.experimental.fields import image_field
-from datumaro.experimental.fields.images import ImageField, ImagePathField
-from datumaro.experimental.fields.videos import MediaPathField
+from getidata.dataset import Sample  # noqa: TC002
+from getidata.fields import image_field
+from getidata.fields.images import ImageField, ImagePathField
+from getidata.fields.videos import MediaPathField
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from datumaro.experimental.dataset import Dataset
+    from getidata.dataset import Dataset
 
     from getitune.data.entity.base import ImageInfo
 
@@ -53,7 +53,7 @@ def detect_storage_dtype(dataset: Dataset) -> tuple[str, int]:
     Must be called on a raw dataset (before ``convert_to_schema``).
 
     Args:
-        dataset: A ``datumaro.experimental.Dataset`` instance.
+        dataset: A ``getidata.Dataset`` instance.
 
     Returns:
         A ``(storage_dtype, num_channels)`` tuple where

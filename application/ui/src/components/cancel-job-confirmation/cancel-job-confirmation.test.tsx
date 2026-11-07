@@ -47,8 +47,7 @@ describe('CancelJobConfirmation', () => {
 
         server.use(
             http.post('/api/jobs/{job_id}:cancel', () =>
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                 HttpResponse.json({ detail: 'Job not found' }, { status: 404 })
             )
         );

@@ -360,6 +360,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "La clé ne peut pas être vide",
+            "keyDuplicate": "La clé doit être unique",
             "valueEmpty": "La valeur ne peut pas être vide"
         },
         "connection": {
@@ -377,6 +378,7 @@
             "label": "Périphérique d’inférence"
         },
         "sources": {
+            "title": "Source",
             "uploadError": "Échec du téléversement du fichier vidéo.",
             "deleteVideoError": "Échec de la suppression du fichier vidéo téléversé.",
             "list": {
@@ -385,9 +387,7 @@
             "types": {
                 "usbCamera": "caméra usb",
                 "ipCamera": "caméra ip",
-                "videoFile": "fichier vidéo",
-                "imagesFolder": "dossier d’images",
-                "disconnected": "déconnecté"
+                "videoFile": "fichier vidéo"
             },
             "options": {
                 "usbCamera": "Caméra USB",
@@ -418,13 +418,10 @@
                 "loading": "Chargement...",
                 "device": "Périphérique : {{name}}",
                 "unknownDevice": "Périphérique inconnu (id : {{deviceId}})",
-                "ignoreExistingImages": "Ignorer les images existantes : {{value}}",
                 "streamUrl": "URL du flux : {{url}}",
                 "videoPath": "Chemin de la vidéo : {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Chemin du dossier d’images",
-                "ignoreExistingImages": "Ignorer les images existantes",
                 "streamUrl": "URL du flux :",
                 "requireAuthentication": "Exiger une authentification",
                 "camera": "Caméra",
@@ -439,11 +436,11 @@
             }
         },
         "sinks": {
+            "title": "Destination",
             "types": {
                 "folder": "dossier",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Dossier",
@@ -527,9 +524,7 @@
                 "disabledSuccess": "Pipeline désactivé avec succès"
             },
             "configuration": {
-                "sidebarLabel": "Configuration du pipeline",
-                "sourcesTab": "Entrée",
-                "sinksTab": "Sortie"
+                "sidebarLabel": "Configuration du pipeline"
             }
         },
         "collection": {
@@ -573,10 +568,6 @@
                 "healthy": "Opérationnel",
                 "finished": "Terminé",
                 "unavailable": "Indisponible"
-            },
-            "componentLabels": {
-                "source": "Source",
-                "sink": "Destination"
             }
         },
         "stream": {
@@ -910,7 +901,6 @@
                 "dialogTitle": "Journaux d’entraînement",
                 "loadError": "Échec du chargement des journaux : {{message}}",
                 "noJobOrModel": "Aucune tâche ni aucun modèle spécifié",
-                "fetchError": "Échec de la récupération des journaux du modèle : {{status}} {{statusText}}",
                 "downloadStarted": "Le téléchargement des journaux d’entraînement a commencé"
             },
             "parameters": {

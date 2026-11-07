@@ -4,7 +4,7 @@
 """Test Factory classes for dataset and transforms."""
 
 import pytest
-from datumaro.experimental import Dataset
+from getidata import Dataset
 
 from getitune.config.data import IntensityConfig, SubsetConfig
 from getitune.data.dataset.classification import (

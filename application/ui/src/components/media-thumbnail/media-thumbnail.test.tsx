@@ -48,14 +48,8 @@ describe('MediaThumbnail', () => {
         expect(mockedDblClick).toHaveBeenCalled();
     });
 
-    it('displays frames count when item is a video', () => {
-        render(
-            <MediaThumbnail
-                url='test-video.mp4'
-                alt='Test Image'
-                item={{ type: 'video', frame_count: 3600, annotated_frame_count: 10, duration: 60 }}
-            />
-        );
+    it('displays the duration when item is a video', () => {
+        render(<MediaThumbnail url='test-video.mp4' alt='Test Image' item={{ type: 'video', duration: 60 }} />);
 
         expect(screen.getByText('01:00')).toBeInTheDocument();
     });

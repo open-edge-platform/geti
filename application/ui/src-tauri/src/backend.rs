@@ -131,11 +131,15 @@ fn apply_default_env(command: &mut Command, app: &AppHandle) {
     // identifier in `tauri.conf.json`). These live outside the install prefix
     // so they survive reinstalls — same convention as Chrome/VSCode.
     //   macOS  : ~/Library/{Application Support, Logs, Caches}/com.intel.geti
-    //   Windows: %APPDATA%\com.intel.geti\{,logs}, %LOCALAPPDATA%\com.intel.geti
     //   Linux  : ~/.local/share, ~/.local/state, ~/.cache (each /com.intel.geti)
+    // On Windows the frozen backend's `uwp.py` hook pins DATA_DIR and LOG_DIR to
+    // %LOCALAPPDATA%\Intel\Geti and ignores the environment, so nothing is passed.
     let resolver = app.path();
-    set_env_from_dir(command, "DATA_DIR", resolver.app_local_data_dir().ok());
-    set_env_from_dir(command, "LOG_DIR", resolver.app_log_dir().ok());
+    #[cfg(not(windows))]
+    {
+        set_env_from_dir(command, "DATA_DIR", resolver.app_local_data_dir().ok());
+        set_env_from_dir(command, "LOG_DIR", resolver.app_log_dir().ok());
+    }
     // Pin matplotlib's font/style cache to a stable per-user dir so it's built
     // once and reused across launches. Without this, matplotlib falls back to
     // a path inside the frozen `_internal/` (re-extracted on every launch),

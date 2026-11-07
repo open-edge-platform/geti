@@ -8,7 +8,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import polars as pl
-from datumaro.experimental import Dataset
+from getidata import Dataset
 from loguru import logger
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy.exc import IntegrityError
@@ -57,7 +57,7 @@ class DatasetRevisionService(BaseSessionManagedService):
         Returns:
             UUID: The UUID of the newly created dataset revision.
         """
-        from datumaro.experimental.export_import import export_dataset
+        from getidata.export_import import export_dataset
 
         item_counts = self._count_dataset_revision_items(dataset=dataset)
         if not (item_counts.training and item_counts.validation and item_counts.testing):

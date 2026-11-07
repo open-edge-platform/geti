@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING, Any, Sequence, cast
 
 import polars as pl
 import torch
-from datumaro.experimental import register_sample
-from datumaro.experimental.dataset import Sample as _DatumSample
-from datumaro.experimental.fields import ImageInfo as DmImageInfo
-from datumaro.experimental.fields import (
+from getidata import register_sample
+from getidata.dataset import Sample as _DatumSample
+from getidata.fields import ImageInfo as DmImageInfo
+from getidata.fields import (
     Subset,
     bbox_field,
     image_field,

@@ -1,7 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+    createContext,
+    ReactNode,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react';
 
 import { clampBetween } from '@geti-ui/smart-tools/utils';
 
@@ -54,16 +63,16 @@ export const ZoomProvider = ({ children }: { children: ReactNode }) => {
         initialCoordinates: { scale: 1.0, x: 0, y: 0 },
     });
 
-    const fitToScreen = () => {
+    const fitToScreen = useCallback(() => {
         setZoom((prev) => ({
             ...prev,
             hasAnimation: true,
             scale: prev.initialCoordinates.scale,
             translate: { x: prev.initialCoordinates.x, y: prev.initialCoordinates.y },
         }));
-    };
+    }, []);
 
-    const onZoomChange = (factor: number, hasAnimation = true) => {
+    const onZoomChange = useCallback((factor: number, hasAnimation = true) => {
         setZoom((prev) => {
             const step = (prev.maxZoomIn - prev.initialCoordinates.scale) / ZOOM_STEP_DIVISOR;
 
@@ -76,19 +85,13 @@ export const ZoomProvider = ({ children }: { children: ReactNode }) => {
 
             return { ...newState, hasAnimation };
         });
-    };
+    }, []);
+
+    const setZoomValue = useMemo(() => ({ setZoom, fitToScreen, onZoomChange }), [fitToScreen, onZoomChange]);
 
     return (
-        <Zoom.Provider value={zoom}>
-            <SetZoom.Provider
-                value={{
-                    setZoom,
-                    fitToScreen,
-                    onZoomChange,
-                }}
-            >
-                {children}
-            </SetZoom.Provider>
-        </Zoom.Provider>
+        <Zoom value={zoom}>
+            <SetZoom value={setZoomValue}>{children}</SetZoom>
+        </Zoom>
     );
 };

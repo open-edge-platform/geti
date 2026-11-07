@@ -13,8 +13,8 @@ from uuid import UUID
 
 import polars as pl
 import yaml
-from datumaro.experimental import Dataset
-from datumaro.experimental.fields import Subset
+from getidata import Dataset
+from getidata.fields import Subset
 from jsonargparse import ArgumentParser, Namespace
 from loguru import logger
 from sqlalchemy.orm import Session

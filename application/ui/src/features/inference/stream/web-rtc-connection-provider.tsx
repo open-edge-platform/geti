@@ -43,7 +43,7 @@ const useWebRTCConnectionState = () => {
 
         return () => {
             unsubscribe();
-            webRTCConnection.stop(); // Ensure connection is closed on unmount
+            void webRTCConnection.stop(); // Ensure connection is closed on unmount
             webRTCConnectionRef.current = null;
         };
     }, []);

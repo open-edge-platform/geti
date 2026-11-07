@@ -100,7 +100,7 @@ def _build_training_job(
         status.HTTP_404_NOT_FOUND: {"description": "Project, dataset or dataset view not found"},
         status.HTTP_409_CONFLICT: {"description": "Dataset is locked by another job"},
         status.HTTP_422_UNPROCESSABLE_CONTENT: {
-            "description": "Dataset already in datumaro format and ready for import, "
+            "description": "Dataset already in Geti format and ready for import, "
             "or mutually exclusive parameters were provided"
         },
     },

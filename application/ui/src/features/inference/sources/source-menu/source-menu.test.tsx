@@ -78,7 +78,7 @@ describe('SourceMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     );
@@ -108,6 +108,8 @@ describe('SourceMenu', () => {
 
             expect(screen.getByRole('menuitem', { name: /Remove/i })).toHaveAttribute('aria-disabled', 'true');
             expect(screen.getByRole('menuitem', { name: /Test connection/i })).toHaveAttribute('aria-disabled', 'true');
+            expect(screen.getByRole('menuitem', { name: /Disconnect/i })).toBeVisible();
+            expect(screen.queryByRole('menuitem', { name: /^Connect$/i })).not.toBeInTheDocument();
         });
     });
 
@@ -120,7 +122,7 @@ describe('SourceMenu', () => {
                         {
                             project_id: '',
                             status: 'idle',
-                            device: 'images_folder',
+                            device: 'cpu',
                         },
                         { status }
                     )
@@ -151,13 +153,6 @@ describe('SourceMenu', () => {
                 'An unexpected error occurred. Please try again.'
             );
         });
-
-        it('shows connected when is disconnected', async () => {
-            renderApp({ name, isConnected: false });
-
-            await userEvent.click(screen.getByRole('button', { name: /source menu/i }));
-            expect(screen.getByRole('menuitem', { name: /^Connect$/i })).toBeVisible();
-        });
     });
 
     describe('disconnect', () => {
@@ -176,7 +171,7 @@ describe('SourceMenu', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.post('/api/projects/{project_id}/pipeline:disable', async () => {
@@ -192,6 +187,7 @@ describe('SourceMenu', () => {
             await userEvent.click(screen.getByRole('menuitem', { name: /Disconnect/i }));
 
             expect(await screen.findByLabelText('toast')).toHaveTextContent(`Successfully disconnected from "${name}"`);
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
             expect(disablePipeline).not.toHaveBeenCalled();
             expect(pipelinePatchSpy).toHaveBeenCalledWith({ source_id: null });
@@ -210,7 +206,7 @@ describe('SourceMenu', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.post('/api/projects/{project_id}/pipeline:disable', async () => {
@@ -240,13 +236,6 @@ describe('SourceMenu', () => {
             );
 
             expect(mockStopStream).toHaveBeenCalled();
-        });
-
-        it('shows disconnect when is connected', async () => {
-            renderApp({ name, isConnected: true });
-
-            await userEvent.click(screen.getByRole('button', { name: /source menu/i }));
-            expect(screen.getByRole('menuitem', { name: /Disconnect/i })).toBeVisible();
         });
     });
 });

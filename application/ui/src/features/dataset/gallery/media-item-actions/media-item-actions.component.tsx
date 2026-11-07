@@ -43,8 +43,8 @@ export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnn
         }
     };
 
-    const handleDeleteMedia = async () => {
-        await deleteMedia([id], onDeleted);
+    const handleDeleteMedia = () => {
+        deleteMedia([id], onDeleted);
     };
 
     return (

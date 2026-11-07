@@ -4,6 +4,7 @@
 import os
 import os.path
 import shutil
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from io import BytesIO
@@ -18,7 +19,15 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import MediaDB
 from app.models import DatasetItem, DatasetItemAnnotationStatus, Media, MediaType, Project, Video, VideoFrame
-from app.models.media import ImageFormat, MediaAdapter, MediaSortBy, SortDirection, VideoFormat
+from app.models.media import (
+    ImageFormat,
+    MediaAdapter,
+    MediaAnnotationStatus,
+    MediaSortBy,
+    SortDirection,
+    VideoAnnotationStatus,
+    VideoFormat,
+)
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
@@ -69,6 +78,32 @@ class ImageMetadata:
                 raise ValueError("video_id must be provided when media_type is VIDEO_FRAME")
             if self.frame_idx is None:
                 raise ValueError("frame_idx must be provided when media_type is VIDEO_FRAME")
+
+
+def to_media_with_annotation_status(repo: MediaRepository, media_dbs: Sequence[MediaDB]) -> list[Media]:
+    """Convert media rows to domain media, including their annotation status (in two batched queries at most).
+
+    Args:
+        repo: Media repository of the project the media belong to.
+        media_dbs: Media rows to convert.
+
+    Returns:
+        The domain media, in the same order as ``media_dbs``.
+    """
+    annotated_media_ids = repo.list_annotated_media_ids([m.id for m in media_dbs if m.type != MediaType.VIDEO])
+    annotated_frame_counts = repo.count_annotated_video_frames_by_video_ids(
+        [m.id for m in media_dbs if m.type == MediaType.VIDEO]
+    )
+    media_list: list[Media] = []
+    for media_db in media_dbs:
+        media = MediaAdapter.validate_python(media_db)
+        annotation_status = (
+            VideoAnnotationStatus(annotated_video_frames=annotated_frame_counts.get(media_db.id, 0))
+            if isinstance(media, Video)
+            else MediaAnnotationStatus(has_annotations=media_db.id in annotated_media_ids)
+        )
+        media_list.append(media.model_copy(update={"annotation_status": annotation_status}))
+    return media_list
 
 
 class MediaService(BaseSessionManagedService):
@@ -312,14 +347,7 @@ class MediaService(BaseSessionManagedService):
             sort_by=filters.sort_by,
             sort_direction=filters.sort_direction,
         )
-        return [
-            Video.model_validate(media_db).model_copy(
-                update={"annotated_frame_count": repo.count_annotated_video_frames_by_video_id(media_db.id)}
-            )
-            if media_db.type == MediaType.VIDEO
-            else MediaAdapter.validate_python(media_db)
-            for media_db in media_dbs
-        ]
+        return to_media_with_annotation_status(repo, media_dbs)
 
     def list_media_ids(
         self,
@@ -348,13 +376,7 @@ class MediaService(BaseSessionManagedService):
         db_media = repo.get_by_id(str(media_id))
         if not db_media:
             raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
-        return (
-            Video.model_validate(db_media).model_copy(
-                update={"annotated_frame_count": repo.count_annotated_video_frames_by_video_id(db_media.id)}
-            )
-            if db_media.type == MediaType.VIDEO
-            else MediaAdapter.validate_python(db_media)
-        )
+        return to_media_with_annotation_status(repo, [db_media])[0]
 
     def get_media_by_ids(self, project_id: UUID, media_ids: list[UUID]) -> list[Media]:
         """Get a media list by its IDs"""

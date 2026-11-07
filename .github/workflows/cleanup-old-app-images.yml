@@ -15,6 +15,10 @@ name: Cleanup Old Application Container Images
 # - Among the remaining versions (dev/daily builds and untagged versions) the
 #   most recent `min_versions_to_keep` are kept; older ones are deleted.
 #
+# RC images for a specific released version are instead removed automatically
+# once that version is promoted, see remove-rc-app-images.yml (invoked from
+# promote-rc-app-release.yml).
+#
 # Supports a dry-run mode (default) that previews deletions without removing
 # anything.
 
@@ -45,7 +49,7 @@ jobs:
       packages: write
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 

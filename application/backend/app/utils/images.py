@@ -1,11 +1,14 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+from io import BytesIO
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 _HIGH_BIT_DEPTH_MODES = ("I;16", "I;16B", "I;16L", "I;16S", "I;16BS", "I", "F")
+# 8-bit modes that PNG can store and browsers can display
+_PNG_DISPLAY_MODES = ("1", "L", "LA", "P", "RGB", "RGBA")
 
 
 def crop_to_thumbnail(image: Image.Image, target_height: int, target_width: int) -> Image.Image:
@@ -162,41 +165,45 @@ def convert_to_jpeg_compatible(image: Image.Image) -> Image.Image:
     return image.convert("RGB")
 
 
-def needs_display_normalization(image_path: Path) -> bool:
-    """Return True if the image at the given path requires normalization for display.
+def needs_display_conversion(image_path: Path) -> bool:
+    """Return True if browsers cannot display the image at the given path as-is.
 
-    Opens the image with deferred decoding (no pixel data read) and checks the mode.
-    This is cheap enough to call on every request for candidate formats (TIF, PNG).
-
-    Args:
-        image_path: Path to the image file on disk.
-
-    Returns:
-        True if the image is high bit depth and should be normalized before display.
-    """
-    with Image.open(image_path) as img:
-        return is_high_bit_depth_image(img)
-
-
-def normalize_image_to_png_bytes(image_path: Path) -> bytes:
-    """Normalize a high bit depth image to 8-bit PNG bytes on the fly.
-
-    Opens the image at the given path, applies min-max normalization to map the
-    full pixel value range to [0, 255], and returns the result encoded as PNG bytes.
-
-    This function always performs normalization. Call :func:`needs_display_normalization`
-    first to guard against unnecessary work for standard 8-bit images.
+    Browsers cannot decode TIFF, and high bit depth images must be normalized to 8-bit.
+    Opens the image with deferred decoding (no pixel data read), so this is cheap
+    enough to call on every request.
 
     Args:
         image_path: Path to the image file on disk.
 
     Returns:
-        PNG-encoded bytes of the normalized 8-bit image.
+        True if the image is a TIFF or high bit depth and should be converted before display.
     """
-    from io import BytesIO
-
     with Image.open(image_path) as img:
-        normalized_img = normalize_high_bit_depth_image(img)
+        return img.format == "TIFF" or is_high_bit_depth_image(img)
+
+
+def convert_image_to_display_png_bytes(image_path: Path) -> bytes:
+    """Convert an image to 8-bit PNG bytes that any browser can display.
+
+    High bit depth images are min-max normalized to [0, 255]; modes that PNG cannot
+    store (e.g. CMYK) are converted to RGB; all other images keep their pixels as-is.
+
+    Call :func:`needs_display_conversion` first to avoid re-encoding images that
+    browsers can already display.
+
+    Args:
+        image_path: Path to the image file on disk.
+
+    Returns:
+        PNG-encoded bytes of the 8-bit image.
+    """
+    with Image.open(image_path) as img:
+        if is_high_bit_depth_image(img):
+            display_img = normalize_high_bit_depth_image(img)
+        elif img.mode in _PNG_DISPLAY_MODES:
+            display_img = img
+        else:
+            display_img = img.convert("RGB")
         buffer = BytesIO()
-        normalized_img.save(buffer, format="PNG")
+        display_img.save(buffer, format="PNG")
         return buffer.getvalue()

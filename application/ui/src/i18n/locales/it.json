@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "La chiave non può essere vuota",
+            "keyDuplicate": "La chiave deve essere univoca",
             "valueEmpty": "Il valore non può essere vuoto"
         },
         "connection": {
@@ -363,6 +364,7 @@
             "label": "Dispositivo di inferenza"
         },
         "sources": {
+            "title": "Sorgente",
             "uploadError": "Impossibile caricare il file video.",
             "deleteVideoError": "Impossibile eliminare il file video caricato.",
             "list": {
@@ -371,9 +373,7 @@
             "types": {
                 "usbCamera": "videocamera usb",
                 "ipCamera": "videocamera ip",
-                "videoFile": "file video",
-                "imagesFolder": "cartella immagini",
-                "disconnected": "disconnesso"
+                "videoFile": "file video"
             },
             "options": {
                 "usbCamera": "Videocamera USB",
@@ -404,13 +404,10 @@
                 "loading": "Caricamento in corso...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo sconosciuto (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignora immagini esistenti: {{value}}",
                 "streamUrl": "URL stream: {{url}}",
                 "videoPath": "Percorso video: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Percorso cartella immagini",
-                "ignoreExistingImages": "Ignora immagini esistenti",
                 "streamUrl": "URL Stream:",
                 "requireAuthentication": "Richiedi autenticazione",
                 "camera": "Videocamera",
@@ -425,11 +422,11 @@
             }
         },
         "sinks": {
+            "title": "Destinazione",
             "types": {
                 "folder": "cartella",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Cartella",
@@ -511,9 +508,7 @@
                 "disabledSuccess": "Pipeline disabilitata con successo"
             },
             "configuration": {
-                "sidebarLabel": "Configurazione pipeline",
-                "sourcesTab": "Input",
-                "sinksTab": "Output"
+                "sidebarLabel": "Configurazione pipeline"
             }
         },
         "collection": {
@@ -557,10 +552,6 @@
                 "healthy": "Integro",
                 "finished": "Completato",
                 "unavailable": "Non disponibile"
-            },
-            "componentLabels": {
-                "source": "Sorgente",
-                "sink": "Destinazione"
             }
         },
         "stream": {
@@ -891,7 +882,6 @@
                 "dialogTitle": "Log di addestramento",
                 "loadError": "Impossibile caricare i log: {{message}}",
                 "noJobOrModel": "Nessun processo o modello specificato",
-                "fetchError": "Impossibile recuperare i log del modello: {{status}} {{statusText}}",
                 "downloadStarted": "Download log di addestramento iniziato"
             },
             "parameters": {

@@ -1,33 +1,29 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactNode } from 'react';
 
-import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '@/api/types';
 import { Folder as FolderIcon, Mqtt as MqttIcon, Webhook as WebhookIcon } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
-import { DisclosureGroup } from '../sources/disclosure-group.component';
-import { AddSink } from './add-sink/add-sink.component';
-import { LocalFolder } from './local-folder/local-folder.component';
-import { getLocalFolderInitialConfig, localFolderBodyFormatter } from './local-folder/utils';
-import { Mqtt } from './mqtt/mqtt.component';
-import { getMqttInitialConfig, mqttBodyFormatter } from './mqtt/utils';
-import { getWebhookInitialConfig, webhookBodyFormatter } from './webhook/utils';
-import { Webhook } from './webhook/webhook.component';
+import { DisclosureGroup } from '../shared/disclosure-group/disclosure-group.component';
+import { AddLocalFolderSink } from './local-folder/add-local-folder-sink.component';
+import { AddMqttSink } from './mqtt/add-mqtt-sink.component';
+import type { AddSinkProps } from './types';
+import { AddWebhookSink } from './webhook/add-webhook-sink.component';
 
-interface SinkOptionsProps {
-    onSaved: () => void;
+interface SinkOptionsProps extends AddSinkProps {
     hasHeader: boolean;
     children: ReactNode;
 }
 
-export const SinkOptions = ({ hasHeader, onSaved, children }: SinkOptionsProps) => {
+export const SinkOptions = ({ onSaved, hasHeader, children }: SinkOptionsProps) => {
     const { t } = useTranslation();
 
     return (
         <>
             {hasHeader && children}
+
             <DisclosureGroup
                 defaultActiveInput={null}
                 items={[
@@ -35,40 +31,19 @@ export const SinkOptions = ({ hasHeader, onSaved, children }: SinkOptionsProps) 
                         label: t('inference.sinks.options.folder'),
                         value: 'folder',
                         icon: <FolderIcon width={'24px'} />,
-                        content: (
-                            <AddSink
-                                onSaved={onSaved}
-                                config={getLocalFolderInitialConfig()}
-                                componentFields={(state: LocalFolderSinkConfig) => <LocalFolder defaultState={state} />}
-                                bodyFormatter={localFolderBodyFormatter}
-                            />
-                        ),
+                        content: <AddLocalFolderSink onSaved={onSaved} />,
                     },
                     {
                         label: t('inference.sinks.options.webhook'),
                         value: 'webhook',
                         icon: <WebhookIcon width={'24px'} />,
-                        content: (
-                            <AddSink
-                                onSaved={onSaved}
-                                config={getWebhookInitialConfig()}
-                                componentFields={(state: WebhookSinkConfig) => <Webhook defaultState={state} />}
-                                bodyFormatter={webhookBodyFormatter}
-                            />
-                        ),
+                        content: <AddWebhookSink onSaved={onSaved} />,
                     },
                     {
                         label: t('inference.sinks.options.mqtt'),
                         value: 'mqtt',
                         icon: <MqttIcon width={'24px'} />,
-                        content: (
-                            <AddSink
-                                onSaved={onSaved}
-                                config={getMqttInitialConfig()}
-                                componentFields={(state: MqttSinkConfig) => <Mqtt defaultState={state} />}
-                                bodyFormatter={mqttBodyFormatter}
-                            />
-                        ),
+                        content: <AddMqttSink onSaved={onSaved} />,
                     },
                 ]}
             />

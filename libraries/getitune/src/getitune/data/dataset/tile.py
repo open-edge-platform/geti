@@ -9,10 +9,10 @@ import logging as log
 from typing import TYPE_CHECKING, Callable
 
 import torch
-from datumaro.experimental.fields import Subset
-from datumaro.experimental.fields.datasets import TileInfo
-from datumaro.experimental.filtering.filter_registry import create_filtering_transform
-from datumaro.experimental.tiling.tiler_registry import TilingConfig, create_tiling_transform
+from getidata.fields import Subset
+from getidata.fields.datasets import TileInfo
+from getidata.filtering.filter_registry import create_filtering_transform
+from getidata.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
 from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample

@@ -44,7 +44,7 @@ Each supported task ships with curated "recipes": YAML files that bundle the mod
 - **Tiling** for large images across detection and segmentation tasks.
 - **Multiple backends**: train with PyTorch Lightning, Ultralytics YOLO, export and run inference with ONNX and OpenVINO™.
 - **Hardware acceleration**: Intel GPU (XPU) and NVIDIA CUDA support.
-- [Datumaro](https://github.com/open-edge-platform/datumaro/tree/develop/src/datumaro/experimental) **data frontend** with automatic format detection (COCO, YOLO, VOC, native).
+- [getidata](../getidata/README.md) **data frontend** with automatic format detection (COCO, YOLO, VOC, native).
 - **Distributed training** across multiple GPUs.
 - **Mixed-precision training** to reduce memory and increase batch size.
 - **Class-incremental learning** to extend an existing model with new classes.
@@ -56,13 +56,13 @@ Each supported task ships with curated "recipes": YAML files that bundle the mod
 
 All recipes live under `src/getitune/recipe/<task>/`. Pass any of these YAMLs directly to the API as `model=...`. Recipes whose name ends in `_tile` enable the tiling pipeline for large images.
 
-| Task                                       | Recipe directory                                                                                                                               | Example recipes                                                                                                                                                                                                                                                                   |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Task                                       | Recipe directory                                                                                                                               | Example recipes                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Classification (multi-class / multi-label) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/) | `dino_v2`, `dinov3_{vits,vitb16,vitl16}`, `dinov3_convnext_{tiny,small,base,large}`, `convnextv2_{atto,base,large}`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`, `yolo26_{n,s,m,l,x}_cls`, `timm_generic` (any [timm](https://github.com/huggingface/pytorch-image-models) backbone by name, e.g. `resnet50.a1_in1k`, `convnext_tiny.in12k`) |
-| Object detection                           | [detection](src/getitune/recipe/detection/)                                                                                                    | `atss_mobilenetv2`, `ssd_mobilenetv2`, `yolox_{tiny,s,l,x}`, `rtdetr_50`, `rtdetrv2_{r18,r34,r50,r101}`, `dfine_x`, `deim_dfine_{l,m,x}`, `deimv2_{s,m,l}` (DINOv3 backbones), `edgecrafter_{s,m,l,x}`, `rfdetr_{nano,small,medium,large}`, `yolo11_{n,s,m,l,x}`, `yolo12_{n,s,m,l,x}`, `yolo26_{n,s,m,l,x}`                        |
-| Instance segmentation                      | [instance_segmentation](src/getitune/recipe/instance_segmentation/)                                                                            | `eomt_large_640`, `eomt_dinov3_large_640`, `mask2former_swin_{s,t,b,l}`, `maskrcnn_{r50,swint,efficientnetb2b}`, `rtmdet_inst_tiny`, `rfdetr_seg_{nano,small,medium,large,xlarge,2xlarge}`, `yolo11_{n,s,m,l,x}_seg`, `yolo26_{n,s,m,l,x}_seg` |
-| Semantic segmentation                      | [semantic_segmentation](src/getitune/recipe/semantic_segmentation/)                                                                            | `dino_v2`, `litehrnet_{s,18,x}`, `segnext_{t,s,b}`, `yolo26_{n,s,m,l,x}_sem` (with `_tile` variants)                                                                                                                                                                              |
-| Keypoint detection                         | [keypoint_detection](src/getitune/recipe/keypoint_detection/)                                                                                  | `rtmpose_tiny`                                                                                                                                                                                                                                                                    |
+| Object detection                           | [detection](src/getitune/recipe/detection/)                                                                                                    | `atss_mobilenetv2`, `ssd_mobilenetv2`, `yolox_{tiny,s,l,x}`, `rtdetr_50`, `rtdetrv2_{r18,r34,r50,r101}`, `dfine_x`, `deim_dfine_{l,m,x}`, `deimv2_{s,m,l}` (DINOv3 backbones), `edgecrafter_{s,m,l,x}`, `rfdetr_{nano,small,medium,large}`, `yolo11_{n,s,m,l,x}`, `yolo12_{n,s,m,l,x}`, `yolo26_{n,s,m,l,x}`                                                                                |
+| Instance segmentation                      | [instance_segmentation](src/getitune/recipe/instance_segmentation/)                                                                            | `eomt_large_640`, `eomt_dinov3_large_640`, `mask2former_swin_{s,t,b,l}`, `maskrcnn_{r50,swint,efficientnetb2b}`, `rtmdet_inst_tiny`, `rfdetr_seg_{nano,small,medium,large,xlarge,2xlarge}`, `yolo11_{n,s,m,l,x}_seg`, `yolo26_{n,s,m,l,x}_seg`                                                                                                                                              |
+| Semantic segmentation                      | [semantic_segmentation](src/getitune/recipe/semantic_segmentation/)                                                                            | `dino_v2`, `litehrnet_{s,18,x}`, `segnext_{t,s,b}`, `yolo26_{n,s,m,l,x}_sem` (with `_tile` variants)                                                                                                                                                                                                                                                                                        |
+| Keypoint detection                         | [keypoint_detection](src/getitune/recipe/keypoint_detection/)                                                                                  | `rtmpose_tiny`                                                                                                                                                                                                                                                                                                                                                                              |
 
 Each task directory also ships an `openvino_model.yaml` recipe for running and optimizing pre-exported OpenVINO IR models via `OVEngine`.
 
@@ -234,7 +234,7 @@ from getitune.engine import create_engine
 # Initialize and train using a recipe and dataset
 engine = create_engine(
     model="src/getitune/recipe/classification/multi_class_cls/efficientnet_b0.yaml", # any supported model name from the model catalog (see below example), recipe.yaml path or instantiated model class directly
-    data="tests/assets/classification_cifar10", # path to dataset root (any supported format, e.g., COCO, VOC, YOLO, Datumaro) or DataModule instance
+    data="tests/assets/classification_cifar10", # path to dataset root (COCO, VOC, YOLO, getidata) or DataModule instance
     work_dir="./my_workspace",  # Defaults to "./getitune-workspace"
     device="auto",              # "auto", "cpu", "gpu", "0", "xpu", etc.
 )
@@ -368,16 +368,16 @@ predictions = ov_engine.predict() # predict on test subset with optimized model
 
 ### Dataset Support
 
-When you pass a path to `data=`, getitune uses [Datumaro](https://github.com/open-edge-platform/datumaro/tree/develop/src/datumaro/experimental) to auto-detect the dataset format. Supported formats:
+When you pass a path to `data=`, getitune uses [getidata](../getidata/README.md) to auto-detect the dataset format. Supported formats:
 
 | Format                | Detection method                                        |
 | --------------------- | ------------------------------------------------------- |
 | **COCO**              | `annotations/` directory with COCO JSON files           |
 | **YOLO**              | `data.yaml` file (Ultralytics layout)                   |
 | **Pascal VOC**        | `JPEGImages/`, `Annotations/`, `ImageSets/` directories |
-| **Datumaro (native)** | `metadata.json` + `data.parquet` at root                |
+| **getidata (native)** | `metadata.json` + `data.parquet` at root                |
 
-Zip archives are also accepted, Datumaro extracts them on import.
+Zip archives are also accepted; getidata extracts them on import.
 
 ```python
 # Works the same regardless of format, just point to the dataset root

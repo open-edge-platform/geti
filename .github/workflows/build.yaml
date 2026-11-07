@@ -36,7 +36,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -54,6 +54,8 @@ jobs:
             test:
               - application/**
               - libraries/getitune/src/**
+              - libraries/getidata/src/**
+              - libraries/getidata/pyproject.toml
               - libraries/getitune/pyproject.toml
               - libraries/getitune/uv.lock
               - libraries/getitune/MANIFEST.in
@@ -92,7 +94,7 @@ jobs:
           echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

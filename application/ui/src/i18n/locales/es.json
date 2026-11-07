@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "La clave no puede estar vacía",
+            "keyDuplicate": "La clave debe ser única",
             "valueEmpty": "El valor no puede estar vacío"
         },
         "connection": {
@@ -363,6 +364,7 @@
             "label": "Dispositivo de inferencia"
         },
         "sources": {
+            "title": "Fuente",
             "uploadError": "No se pudo cargar el archivo de vídeo.",
             "deleteVideoError": "No se pudo eliminar el archivo de vídeo cargado.",
             "list": {
@@ -371,9 +373,7 @@
             "types": {
                 "usbCamera": "cámara usb",
                 "ipCamera": "cámara ip",
-                "videoFile": "archivo de vídeo",
-                "imagesFolder": "carpeta de imágenes",
-                "disconnected": "desconectado"
+                "videoFile": "archivo de vídeo"
             },
             "options": {
                 "usbCamera": "Cámara USB",
@@ -404,13 +404,10 @@
                 "loading": "Cargando...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconocido (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignorar imágenes existentes: {{value}}",
                 "streamUrl": "URL del flujo: {{url}}",
                 "videoPath": "Ruta del vídeo: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Ruta de la carpeta de imágenes",
-                "ignoreExistingImages": "Ignorar imágenes existentes",
                 "streamUrl": "URL del flujo:",
                 "requireAuthentication": "Requerir autenticación",
                 "camera": "Cámara",
@@ -425,11 +422,11 @@
             }
         },
         "sinks": {
+            "title": "Destino",
             "types": {
                 "folder": "carpeta",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Carpeta",
@@ -511,9 +508,7 @@
                 "disabledSuccess": "Pipeline desactivado correctamente"
             },
             "configuration": {
-                "sidebarLabel": "Configuración del pipeline",
-                "sourcesTab": "Entrada",
-                "sinksTab": "Salida"
+                "sidebarLabel": "Configuración del pipeline"
             }
         },
         "collection": {
@@ -557,10 +552,6 @@
                 "healthy": "Correcto",
                 "finished": "Finalizado",
                 "unavailable": "No disponible"
-            },
-            "componentLabels": {
-                "source": "Fuente",
-                "sink": "Destino"
             }
         },
         "stream": {
@@ -891,7 +882,6 @@
                 "dialogTitle": "Registros de entrenamiento",
                 "loadError": "No se pudieron cargar los registros: {{message}}",
                 "noJobOrModel": "No se ha especificado ninguna tarea o modelo",
-                "fetchError": "No se pudieron obtener los registros del modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Descarga de los registros de entrenamiento iniciada"
             },
             "parameters": {

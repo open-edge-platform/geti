@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import threading
 from collections.abc import Iterator
 from unittest.mock import AsyncMock, Mock, call, patch
 
@@ -9,7 +10,7 @@ import pytest
 
 from app.core.jobs import CancellationResult
 from app.core.jobs.control_plane import JobController, JobQueue
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, JobType, Progress
 from app.core.run import RunnerFactory
 
 
@@ -17,7 +18,7 @@ class MockRunner:
     """Mock runner for testing purposes."""
 
     def __init__(self, events=None):
-        self.events_to_yield = events or [Started(), Progress("progress", 50.0), Done()]
+        self.events_to_yield = events or [Progress("progress", 50.0), Done()]
         self.started = False
         self.stopped = False
         self.stop_called = asyncio.Event()
@@ -35,6 +36,22 @@ class MockRunner:
         """Mark runner as stopped."""
         self.stopped = True
         self.stop_called.set()
+
+
+class SlowStartRunner(MockRunner):
+    """Runner whose first event is delayed, like a spawned process still importing its modules."""
+
+    def __init__(self):
+        super().__init__()
+        self._released = threading.Event()
+
+    def events(self) -> Iterator[ExecutionEvent]:
+        self._released.wait(timeout=5)
+        yield Cancelled() if self.stopped else Done()
+
+    async def stop(self) -> None:
+        await super().stop()
+        self._released.set()
 
 
 class TestJobController:
@@ -126,19 +143,19 @@ class TestJobController:
         "events,expected_status,expected_log_method,expected_log_args",
         [
             (
-                [Started(), Progress("progress", 100.0), Done()],
+                [Progress("progress", 100.0), Done()],
                 JobStatus.DONE,
                 "success",
                 ("Job completed successfully, job_id: {}", "job_id"),
             ),
             (
-                [Started(), Progress("progress", 50.0), Failed("boom")],
+                [Progress("progress", 50.0), Failed("boom")],
                 JobStatus.FAILED,
                 "warning",
                 ("Job failed, job_id: {}", "job_id"),
             ),
             (
-                [Started(), Progress("progress", 50.0), Cancelled()],
+                [Progress("progress", 50.0), Cancelled()],
                 JobStatus.CANCELLED,
                 "info",
                 ("Job cancelled, job_id: {}", "job_id"),
@@ -170,6 +187,47 @@ class TestJobController:
         assert job.status == expected_status
         expected_call_args = tuple(job.id if arg == "job_id" else arg for arg in expected_log_args)
         getattr(mock_logger, expected_log_method).assert_any_call(*expected_call_args)
+
+    @pytest.mark.asyncio
+    async def test_cancel_before_runner_reports_any_event_stops_the_runner(self, fxt_runner_factory, fxt_job):
+        """A cancel between dispatch and the runner's first event must stop the runner, not be lost."""
+        job_queue = JobQueue()
+        controller = JobController(job_queue, fxt_runner_factory, max_parallel_jobs=1)
+        runner = SlowStartRunner()
+        fxt_runner_factory.for_job.return_value = runner
+        job = fxt_job(JobType.EXPORT_DATASET)
+
+        await controller.start()
+        await job_queue.submit(job)
+        while not runner.started:
+            await asyncio.sleep(0.01)
+
+        _, result = job_queue.cancel(job.id)
+        await asyncio.wait_for(runner.stop_called.wait(), timeout=2)
+        while job.status < JobStatus.DONE:
+            await asyncio.sleep(0.01)
+        await controller.stop()
+
+        assert result == CancellationResult.RUNNING_CANCELLING
+        assert job.status == JobStatus.CANCELLED
+
+    @pytest.mark.asyncio
+    async def test_runner_that_fails_to_start_fails_the_job(self, fxt_runner_factory, fxt_job):
+        job_queue = JobQueue()
+        controller = JobController(job_queue, fxt_runner_factory, max_parallel_jobs=1)
+        runner = MockRunner()
+        runner.start = Mock(side_effect=OSError("cannot spawn"))
+        fxt_runner_factory.for_job.return_value = runner
+        job = fxt_job(JobType.EXPORT_DATASET)
+
+        await controller.start()
+        await job_queue.submit(job)
+        while job.status < JobStatus.DONE:
+            await asyncio.sleep(0.01)
+        await controller.stop()
+
+        assert job.status == JobStatus.FAILED
+        assert job.error == "Failed to start the job: cannot spawn"
 
     @pytest.mark.asyncio
     async def test_supervise_loop_handles_exceptions(self, fxt_job_controller, fxt_job_queue):
@@ -290,11 +348,11 @@ class TestJobController:
     @pytest.mark.parametrize(
         "events,expected_status,expected_progress",
         [
-            ([Started(), None], JobStatus.RUNNING, 0.0),
-            ([Started(), Progress("Mock", 10.0), Progress("Mock", 20.0), None], JobStatus.RUNNING, 20.0),
-            ([Started(), Progress("Mock", 50.0), Done()], JobStatus.DONE, 100.0),
-            ([Started(), Progress("Mock", 50.0), Failed("error")], JobStatus.FAILED, 50.0),
-            ([Started(), Progress("Mock", 50.0), Cancelled()], JobStatus.CANCELLED, 50.0),
+            ([None], JobStatus.RUNNING, 0.0),
+            ([Progress("Mock", 10.0), Progress("Mock", 20.0), None], JobStatus.RUNNING, 20.0),
+            ([Progress("Mock", 50.0), Done()], JobStatus.DONE, 100.0),
+            ([Progress("Mock", 50.0), Failed("error")], JobStatus.FAILED, 50.0),
+            ([Progress("Mock", 50.0), Cancelled()], JobStatus.CANCELLED, 50.0),
         ],
     )
     async def test_handle_job_events_progress_updates(
@@ -302,6 +360,7 @@ class TestJobController:
     ):
         """Test progress events update job properly."""
         job = fxt_job()
+        job.start()
         event_queue = asyncio.Queue()
 
         for event in events:
@@ -372,9 +431,6 @@ class TestJobController:
             # Verify thread was created and started
             mock_thread.assert_called_once()
             mock_thread_instance.start.assert_called_once()
-
-            # Verify runner was started
-            assert mock_runner.started
 
             # Clean up
             cancel_task.cancel()

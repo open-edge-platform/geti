@@ -5,9 +5,9 @@ import { ReactNode } from 'react';
 
 import * as actualUi from '@geti-ui/ui' with { rstest: 'importActual' };
 import { ViewModes } from '@geti-ui/ui';
-import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getMockedMediaImage } from 'mocks/mock-media';
+import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
@@ -79,7 +79,6 @@ describe('Gallery drag-and-drop upload', () => {
                         hasActiveFilter={false}
                         isFetchingNextPage={false}
                         fetchNextPage={rs.fn()}
-                        isMediaItemReviewedById={() => false}
                     />
                 </SelectedDataProvider>
             </MediaUploadProvider>
@@ -106,6 +105,50 @@ describe('Gallery drag-and-drop upload', () => {
     });
 });
 
+describe('Gallery annotation status', () => {
+    it('shows whether each media is annotated, a video being annotated if any of its frames is', async () => {
+        server.use(
+            http.get('/api/projects/{project_id}', () => HttpResponse.json(getMockedProject({ id: 'project-123' })))
+        );
+
+        render(
+            <MediaUploadProvider>
+                <SelectedDataProvider>
+                    <Gallery
+                        items={[
+                            getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: true } }),
+                            getMockedMediaImage({ id: 'image-2', annotation_status: { has_annotations: false } }),
+                            getMockedVideo({
+                                id: 'video-1',
+                                annotation_status: { has_annotations: true, annotated_video_frames: 2 },
+                            }),
+                            getMockedVideo({
+                                id: 'video-2',
+                                annotation_status: { has_annotations: false, annotated_video_frames: 0 },
+                            }),
+                        ]}
+                        viewMode={ViewModes.LARGE}
+                        isPending={false}
+                        hasActiveFilter={false}
+                        isFetchingNextPage={false}
+                        fetchNextPage={rs.fn()}
+                    />
+                </SelectedDataProvider>
+            </MediaUploadProvider>
+        );
+
+        await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
+
+        const statuses = screen.getAllByRole('option').map((option) =>
+            within(option)
+                .getByRole('img', { name: /annotated/i })
+                .getAttribute('aria-label')
+        );
+
+        expect(statuses).toEqual(['Annotated', 'Not annotated', 'Annotated', 'Not annotated']);
+    });
+});
+
 describe('Gallery item deletion and selection', () => {
     const item = getMockedMediaImage({ id: 'item-1' });
 
@@ -123,7 +166,6 @@ describe('Gallery item deletion and selection', () => {
                     hasActiveFilter={false}
                     isFetchingNextPage={false}
                     fetchNextPage={rs.fn()}
-                    isMediaItemReviewedById={() => false}
                 />
             </>
         );

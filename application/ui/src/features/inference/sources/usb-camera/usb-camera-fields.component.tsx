@@ -1,59 +1,43 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Key, useRef, useState } from 'react';
+import type { Key } from 'react';
 
 import { $api } from '@/api';
-import type { USBCameraSourceConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Item, Loading, Picker, TextField } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
-import { isEmpty } from 'lodash-es';
 
-type UsbCameraProps = {
-    defaultState?: USBCameraSourceConfig;
-};
+import type { UsbCameraFormState } from './utils';
 
-export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
+interface UsbCameraFieldsProps {
+    value: UsbCameraFormState;
+    onChange: (next: UsbCameraFormState) => void;
+}
+
+export const UsbCameraFields = ({ value, onChange }: UsbCameraFieldsProps) => {
     const { t } = useTranslation();
-    const [name, setName] = useState(defaultState?.name);
-    const isSystemName = useRef(isEmpty(defaultState?.name));
 
     const {
-        data: cameraDevices,
+        data: cameraDevices = [],
         isLoading,
         isRefetching,
         refetch,
     } = $api.useQuery('get', '/api/system/devices/camera');
 
-    const devices = (cameraDevices ?? []).map((device) => ({
-        id: device.index,
-        name: device.name,
-    }));
-
-    const handleNameChange = (value: string) => {
-        setName(value);
-        isSystemName.current = false;
-    };
-
     const handleSelectionChange = (key: Key | null) => {
-        const device = devices.find(({ id }) => id === Number(key));
+        if (key === null) return;
 
-        if (device && isSystemName.current) {
-            setName(device.name);
-        }
+        onChange({ ...value, device_id: Number(key) });
     };
 
     return (
         <Flex direction='column' gap='size-200'>
-            <TextField isHidden label='id' name='id' defaultValue={defaultState?.id} />
-            <TextField isHidden label='name' name='name' value={name} />
             <TextField
                 width='100%'
                 label={t('common.labels.name')}
-                name='name_display'
-                value={name}
-                onChange={handleNameChange}
+                value={value.name}
+                onChange={(name) => onChange({ ...value, name })}
             />
 
             <Flex alignItems='end' gap='size-200'>
@@ -61,11 +45,10 @@ export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
                     flex='1'
                     isRequired
                     label={t('inference.sources.fields.camera')}
-                    name='device_id'
-                    items={devices}
+                    items={cameraDevices.map(({ index, name }) => ({ id: index, name }))}
                     isLoading={isLoading}
                     aria-label='Camera list'
-                    defaultSelectedKey={String(defaultState?.device_id)}
+                    selectedKey={value.device_id === null ? null : String(value.device_id)}
                     onSelectionChange={handleSelectionChange}
                 >
                     {(item) => <Item key={item.id}>{item.name}</Item>}

@@ -50,14 +50,14 @@ export const useStreamJobStatus = (jobId: string | undefined, projectId: string 
             }
         },
         onClose: () => {
-            queryClient.invalidateQueries({ queryKey: getQueryKey(['get', '/api/jobs']) });
+            void queryClient.invalidateQueries({ queryKey: getQueryKey(['get', '/api/jobs']) });
 
             if (!projectId) {
                 return;
             }
 
-            queryClient.invalidateQueries({ queryKey: PROJECTS_QUERY_KEY });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({ queryKey: PROJECTS_QUERY_KEY });
+            void queryClient.invalidateQueries({
                 queryKey: getQueryKey([
                     'get',
                     '/api/projects/{project_id}/models',
@@ -65,8 +65,8 @@ export const useStreamJobStatus = (jobId: string | undefined, projectId: string 
                 ]),
             });
 
-            modelIdRef.current !== null &&
-                queryClient.invalidateQueries({
+            if (modelIdRef.current !== null) {
+                void queryClient.invalidateQueries({
                     queryKey: getQueryKey([
                         'get',
                         '/api/projects/{project_id}/models/{model_id}',
@@ -80,6 +80,7 @@ export const useStreamJobStatus = (jobId: string | undefined, projectId: string 
                         },
                     ]),
                 });
+            }
             modelIdRef.current = null;
         },
     });
@@ -112,7 +113,7 @@ export const useStreamJobDetail = (jobId: string | undefined | null) => {
 
             // The stream gave up before the job settled, so whatever is cached is stale
             if (!cachedJob || !TERMINAL_STATUSES.includes(cachedJob.status)) {
-                queryClient.invalidateQueries({ queryKey: jobKey });
+                void queryClient.invalidateQueries({ queryKey: jobKey });
             }
         },
     });

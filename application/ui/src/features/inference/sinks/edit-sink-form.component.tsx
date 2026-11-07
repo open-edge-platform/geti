@@ -1,62 +1,27 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SinkConfig } from '@/api/types';
 
-import { EditSink } from './edit-sink/edit-sink.component';
-import { LocalFolder } from './local-folder/local-folder.component';
-import { localFolderBodyFormatter } from './local-folder/utils';
-import { Mqtt } from './mqtt/mqtt.component';
-import { mqttBodyFormatter } from './mqtt/utils';
-import { webhookBodyFormatter } from './webhook/utils';
-import { Webhook } from './webhook/webhook.component';
+import { assertNever } from '../../../shared/util';
+import { EditLocalFolderSink } from './local-folder/edit-local-folder-sink.component';
+import { EditMqttSink } from './mqtt/edit-mqtt-sink.component';
+import type { EditSinkProps } from './types';
+import { EditWebhookSink } from './webhook/edit-webhook-sink.component';
 
-interface EditSinkFormProps {
+interface EditSinkFormProps extends Omit<EditSinkProps<SinkConfig>, 'sink'> {
     config: SinkConfig;
-    connectedSinkId: string | undefined;
-    onSaved: () => void;
-    onBackToList: () => void;
 }
 
-export const EditSinkForm = ({ config, connectedSinkId, onSaved, onBackToList }: EditSinkFormProps) => {
-    if (config.sink_type === 'folder') {
-        return (
-            <EditSink
-                config={config}
-                onSaved={onSaved}
-                onBackToList={onBackToList}
-                componentFields={(state) => <LocalFolder defaultState={state} />}
-                bodyFormatter={localFolderBodyFormatter}
-                isConnected={connectedSinkId === config.id}
-            />
-        );
+export const EditSinkForm = ({ config, ...props }: EditSinkFormProps) => {
+    switch (config.sink_type) {
+        case 'folder':
+            return <EditLocalFolderSink sink={config} {...props} />;
+        case 'webhook':
+            return <EditWebhookSink sink={config} {...props} />;
+        case 'mqtt':
+            return <EditMqttSink sink={config} {...props} />;
+        default:
+            return assertNever(config);
     }
-
-    if (config.sink_type === 'webhook') {
-        return (
-            <EditSink
-                config={config}
-                onSaved={onSaved}
-                onBackToList={onBackToList}
-                componentFields={(state) => <Webhook defaultState={state} />}
-                bodyFormatter={webhookBodyFormatter}
-                isConnected={connectedSinkId === config.id}
-            />
-        );
-    }
-
-    if (config.sink_type === 'mqtt') {
-        return (
-            <EditSink
-                config={config}
-                onSaved={onSaved}
-                onBackToList={onBackToList}
-                componentFields={(state) => <Mqtt defaultState={state} />}
-                bodyFormatter={mqttBodyFormatter}
-                isConnected={connectedSinkId === config.id}
-            />
-        );
-    }
-
-    return <></>;
 };

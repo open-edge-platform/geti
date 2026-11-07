@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "金鑰不能為空白",
+            "keyDuplicate": "金鑰必須是唯一的",
             "valueEmpty": "值不能為空白"
         },
         "connection": {
@@ -363,6 +364,7 @@
             "label": "推論裝置"
         },
         "sources": {
+            "title": "輸入源",
             "uploadError": "影片檔案上傳失敗。",
             "deleteVideoError": "無法刪除已上傳的影片檔案。",
             "list": {
@@ -371,9 +373,7 @@
             "types": {
                 "usbCamera": "USB 攝影機",
                 "ipCamera": "IP 攝影機",
-                "videoFile": "影片檔案",
-                "imagesFolder": "圖片資料夾",
-                "disconnected": "未連線"
+                "videoFile": "影片檔案"
             },
             "options": {
                 "usbCamera": "USB 攝影機",
@@ -404,13 +404,10 @@
                 "loading": "載入中……",
                 "device": "裝置：{{name}}",
                 "unknownDevice": "未知裝置（id：{{deviceId}}）",
-                "ignoreExistingImages": "忽略已有圖片：{{value}}",
                 "streamUrl": "影片串流位址：{{url}}",
                 "videoPath": "影片路徑：{{path}}"
             },
             "fields": {
-                "imagesFolderPath": "圖片資料夾路徑",
-                "ignoreExistingImages": "忽略已有圖片",
                 "streamUrl": "影片串流位址：",
                 "requireAuthentication": "需要身分驗證",
                 "camera": "攝影機",
@@ -425,11 +422,11 @@
             }
         },
         "sinks": {
+            "title": "輸出端",
             "types": {
                 "folder": "資料夾",
                 "mqtt": "MQTT",
-                "webhook": "Webhook",
-                "ros": "ROS"
+                "webhook": "Webhook"
             },
             "options": {
                 "folder": "資料夾",
@@ -511,9 +508,7 @@
                 "disabledSuccess": "管線停用成功"
             },
             "configuration": {
-                "sidebarLabel": "管線設定",
-                "sourcesTab": "輸入",
-                "sinksTab": "輸出"
+                "sidebarLabel": "管線設定"
             }
         },
         "collection": {
@@ -557,10 +552,6 @@
                 "healthy": "健康",
                 "finished": "已完成",
                 "unavailable": "無法使用"
-            },
-            "componentLabels": {
-                "source": "輸入源",
-                "sink": "輸出端"
             }
         },
         "stream": {
@@ -891,7 +882,6 @@
                 "dialogTitle": "訓練記錄",
                 "loadError": "記錄載入失敗：{{message}}",
                 "noJobOrModel": "未指定工作或模型",
-                "fetchError": "模型記錄取得失敗：{{status}} {{statusText}}",
                 "downloadStarted": "訓練記錄下載已開始"
             },
             "parameters": {

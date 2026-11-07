@@ -1,13 +1,12 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MqttSinkConfig, SinkOutputFormats } from '@/api/types';
+import type { MqttSinkConfig } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 
-import { rateLimitFromFormData } from '../utils';
-
-export const getMqttInitialConfig = (): MqttSinkConfig => ({
+export const getMqttInitialConfig = (t: TranslateFn): MqttSinkConfig => ({
     id: '',
-    name: '',
+    name: t('inference.sinks.defaultNames.mqtt'),
     topic: '',
     sink_type: 'mqtt',
     rate_limit: null,
@@ -17,14 +16,5 @@ export const getMqttInitialConfig = (): MqttSinkConfig => ({
     output_formats: [],
 });
 
-export const mqttBodyFormatter = (formData: FormData): MqttSinkConfig => ({
-    id: String(formData.get('id')),
-    name: String(formData.get('name')),
-    topic: String(formData.get('topic')),
-    sink_type: 'mqtt',
-    rate_limit: rateLimitFromFormData(formData),
-    broker_host: String(formData.get('broker_host')),
-    broker_port: formData.get('broker_port') ? Number(formData.get('broker_port')) : 0,
-    auth_required: formData.get('auth_required') === 'on' ? true : false,
-    output_formats: formData.getAll('output_formats') as SinkOutputFormats,
-});
+export const isMqttConfigComplete = ({ broker_host, output_formats }: MqttSinkConfig): boolean =>
+    broker_host.trim().length > 0 && output_formats.length > 0;

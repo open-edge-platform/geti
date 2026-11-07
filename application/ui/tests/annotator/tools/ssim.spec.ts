@@ -5,7 +5,6 @@ import { expect } from '@playwright/test';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { FEATURE_FLAGS } from '../../../src/constants/feature-flags';
 import type { AnnotatorPage } from '../../datasets/annotator-page';
 import { http, test } from '../../fixtures';
 import { candyBinaryHandler, redLabel } from '../annotator-fixtures';
@@ -38,8 +37,6 @@ for (const { taskType, annotationLabel } of SCENARIOS) {
     });
 
     test.describe(`SSIM tool (${taskType})`, () => {
-        test.skip(!FEATURE_FLAGS.SSIM_TOOL, 'SSIM tool is behind the SSIM_TOOL feature flag');
-
         test.beforeEach(async ({ network }) => {
             network.use(
                 http.get('/api/projects/{project_id}', () => {
