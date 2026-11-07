@@ -93,7 +93,7 @@ overrides:
       augmentations_gpu: []
 
     test_subset:
-      num_workers: 4
+      num_workers: 1
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
           init_args:

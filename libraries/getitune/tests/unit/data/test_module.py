@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Callable
 from unittest.mock import MagicMock
 
 import pytest
@@ -123,34 +122,55 @@ class TestDataModule:
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
 
+    def test_tiled_test_and_predict_loaders_are_not_persistent(self, mocker) -> None:
+        """Data loaders for tiled test and predict subsets must not keep workers alive.
+
+        Tiled test/predict run once, so persistent workers only hold idle copies of the
+        dataset and interpreter state while the test stage runs. The val loader keeps
+        its current behaviour: validation runs every epoch, so healthy worker reuse
+        still saves spawn cost there.
+        """
+
+        plain_dataset = MagicMock()
+        plain_dataset.collate_fn = lambda batch: batch
+        config = MagicMock(spec=SubsetConfig)
+        config.batch_size = 1
+        config.num_workers = 2
+        config.subset_name = "test"
+
+        dm = DataModule.__new__(DataModule)
+        dm.tile_config = TileConfig(enable_tiler=True)
+        mocker.patch.object(dm, "_get_dataset", return_value=plain_dataset)
+        dm.val_subset = MagicMock(spec=SubsetConfig)
+        dm.val_subset.batch_size = 1
+        dm.val_subset.num_workers = 2
+        dm.val_subset.subset_name = "val"
+        dm.test_subset = config
+        dm.device = DeviceType.cpu  # pin_memory resolves False without a GPU runtime
+
+        assert dm.test_dataloader().persistent_workers is False
+        assert dm.predict_dataloader().persistent_workers is False
+        assert dm.val_dataloader().persistent_workers is True
+
     def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
         """Eval loaders honor the recipe-configured batch size, workers and pinned memory.
 
-        Tiled evaluation memory is bounded by the recipe (the tile recipes set a small
-        ``batch_size`` for the val/test subsets), so the DataModule no longer overrides
-        the loader settings based on the dataset type — the values come straight from
-        the subset config.
+        Without tiling the subset config is used as-is. With tiling enabled the loader
+        batch size is clamped to 1 (see ``DataModule._eval_loader_kwargs``); the config
+        itself stays untouched.
 
-        ``pin_memory`` is the exception: it pins into *accelerator* memory, so it is only
-        enabled when the datamodule is bound to an accelerator. CPU-only consumers (most
-        importantly the OpenVINO evaluation pipeline) must not depend on the GPU runtime.
+        ``pin_memory`` only applies to accelerator-bound datamodules. CPU-only consumers
+        (most importantly the OpenVINO evaluation pipeline) must not depend on the GPU runtime.
         """
-        from getitune.data.dataset.tile import TileDataset
         from getitune.types.device import DeviceType
-
-        class _FakeTiled(TileDataset):
-            def __init__(self):  # bypass heavy TileDataset construction
-                pass
-
-            @property
-            def collate_fn(self) -> Callable:
-                return lambda batch: batch
 
         dm = DataModule.__new__(DataModule)
         dm.device = DeviceType.gpu
+        dm.tile_config = TileConfig(enable_tiler=False)
         config = MagicMock(spec=SubsetConfig)
         config.batch_size = 8
         config.num_workers = 4
+        config.subset_name = "test"
 
         plain_dataset = MagicMock()
         plain_dataset.collate_fn = lambda batch: batch
@@ -159,11 +179,13 @@ class TestDataModule:
         assert plain_kwargs["num_workers"] == 4
         assert plain_kwargs["pin_memory"] is True
 
-        # Tiled datasets are treated the same way: the recipe controls the settings.
-        tiled_kwargs = dm._eval_loader_kwargs(_FakeTiled(), config)
-        assert tiled_kwargs["batch_size"] == 8
+        # Tiled evaluation: loader batch clamped to 1, regardless of the subset config.
+        dm.tile_config = TileConfig(enable_tiler=True)
+        tiled_kwargs = dm._eval_loader_kwargs(plain_dataset, config)
+        assert tiled_kwargs["batch_size"] == 1
         assert tiled_kwargs["num_workers"] == 4
         assert tiled_kwargs["pin_memory"] is True
+        assert config.batch_size == 8
 
         # A CPU-bound datamodule must not pin batches into accelerator memory.
         dm.device = DeviceType.cpu

@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader, RandomSampler
 
 from getitune.config.data import SubsetConfig, TileConfig
 from getitune.data.augmentation import CPUAugmentationPipeline
-from getitune.data.dataset.tile import TileDatasetFactory
+from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
 from getitune.data.utils import get_adaptive_num_workers, instantiate_sampler
@@ -443,6 +443,14 @@ class DataModule(LightningDataModule):
             raise KeyError(msg)
         return dataset
 
+    def device_preprocess_pipeline(self, subset: str) -> CPUAugmentationPipeline | None:
+        """Return the intensity + resize pipeline that the tile dataset of ``subset`` defers to the device.
+
+        The pipeline comes from the dataset itself, so the device side always matches the worker side.
+        """
+        dataset = self.subsets.get(subset)
+        return dataset.device_preprocess if isinstance(dataset, TileDataset) else None
+
     def train_dataloader(self) -> DataLoader:
         """Get train dataloader."""
         config = self.train_subset
@@ -493,38 +501,65 @@ class DataModule(LightningDataModule):
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+        return DataLoader(
+            **self._eval_loader_kwargs(
+                dataset, config, persistent_workers=False if self.tile_config.enable_tiler else None
+            )
+        )
 
     def predict_dataloader(self) -> DataLoader:
         """Get predict dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+        return DataLoader(
+            **self._eval_loader_kwargs(
+                dataset, config, persistent_workers=False if self.tile_config.enable_tiler else None
+            )
+        )
 
-    def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
+    def _eval_loader_kwargs(
+        self,
+        dataset: VisionDataset,
+        config: SubsetConfig,
+        persistent_workers: bool | None = None,
+    ) -> dict:
         """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
 
-        The batch size, number of workers and pinned-memory behaviour are taken
-        directly from the subset config (i.e. the recipe). This keeps evaluation
-        loading configurable per recipe rather than hardcoded here.
+        The number of workers and pinned-memory behaviour are taken directly from
+        the subset config (i.e. the recipe). This keeps evaluation loading
+        configurable per recipe rather than hardcoded here.
+        ``persistent_workers`` defaults to the recipe-driven behaviour (workers stay
+        alive while num_workers > 0); test and predict pass ``False`` when tiling is
+        enabled so their workers are shut down as soon as the loader finishes.
 
         For tiled evaluation a single original image expands into *every* grid tile
         (tiles are not filtered by annotation at inference time), so one dataset item
-        can become a large nested tile batch. Recipes therefore keep the tiled
-        val/test ``batch_size`` small (typically 1) so the collated tile batch stays
-        bounded; the model still forwards tiles in groups of
-        ``TileConfig.tile_inference_batch_size`` for GPU efficiency.
+        can become a large nested tile batch. The loader ``batch_size`` is therefore
+        clamped to 1 when tiling is enabled, regardless of what the recipe or the
+        user configuration request: a loader batch of N images collates N images'
+        worth of tiles into a single in-memory batch, which can hang or OOM on
+        large images. The model still forwards tiles in groups of
+        ``TileConfig.tile_inference_batch_size`` for GPU efficiency, so the clamp
+        does not change the GPU work.
         """
         num_workers = config.num_workers
+        batch_size = config.batch_size
+        if self.tile_config.enable_tiler and batch_size > 1:
+            logger.info(
+                "Tiling enabled: clamping %s subset batch_size %d -> 1 to keep the collated tile batch bounded",
+                config.subset_name,
+                batch_size,
+            )
+            batch_size = 1
         return {
             "dataset": dataset,
-            "batch_size": config.batch_size,
+            "batch_size": batch_size,
             "shuffle": False,
             "num_workers": num_workers,
             "pin_memory": self._pin_memory,
             "collate_fn": dataset.collate_fn,
-            "persistent_workers": num_workers > 0,
+            "persistent_workers": num_workers > 0 if persistent_workers is None else persistent_workers,
             "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
         }
 

@@ -493,11 +493,15 @@ class HyperparametersUpdater:
 
     @staticmethod
     def _update_num_workers(param_value: int | None, config: dict) -> None:
-        """Update the number of dataloader workers for all subsets."""
+        """Update the number of dataloader workers for train and val subsets.
+
+        The test subset keeps the recipe value: tiled test loaders are memory-heavy
+        and the recipe sets their worker count explicitly.
+        """
         if param_value is None:
             logger.info("Number of workers is not provided, skipping update.")
             return
-        for subset in ("train_subset", "val_subset", "test_subset"):
+        for subset in ("train_subset", "val_subset"):
             config["data"][subset]["num_workers"] = param_value
 
     @staticmethod
@@ -753,7 +757,8 @@ class GetiConfigConverter:
                         config_dict["data"][subset_name]["batch_size"] = value
 
         if (num_workers := training_parameters.get("num_workers")) is not None:
-            for subset_name in ("train_subset", "val_subset", "test_subset"):
+            # The test subset keeps the recipe worker count (see HyperparametersUpdater._update_num_workers).
+            for subset_name in ("train_subset", "val_subset"):
                 config_dict["data"][subset_name]["num_workers"] = num_workers
 
         early_stopping = training_parameters.get("early_stopping")
