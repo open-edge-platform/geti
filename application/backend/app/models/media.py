@@ -161,12 +161,6 @@ class Video(BaseMedia):
         """Return duration in seconds"""
         return self.frame_count / self.fps
 
-    # TODO: remove together with the deprecated `VideoView.annotated_frame_count` API field.
-    @property
-    def annotated_frame_count(self) -> int:
-        """Deprecated alias of ``annotation_status.annotated_video_frames``"""
-        return self.annotation_status.annotated_video_frames
-
 
 class NotAnnotatedVideoFrame(BaseModel):
     """

@@ -102,8 +102,6 @@ class VideoView(BaseRequiredIDNameModel):
     size: int
     fps: float
     frame_count: int
-    # TODO: remove in a future release, together with `Video.annotated_frame_count` in the domain model.
-    annotated_frame_count: int = Field(deprecated="Use `annotation_status.annotated_video_frames` instead.")
     source_id: UUID | None = None
     duration: float
     annotation_status: VideoAnnotationStatusView
@@ -119,7 +117,6 @@ class VideoView(BaseRequiredIDNameModel):
                 "height": 720,
                 "fps": 25.0,
                 "frame_count": 100,
-                "annotated_frame_count": 25,
                 "duration": 4.0,
                 "size": 2211840,
                 "source_id": "c1feaabc-da2b-442e-9b3e-55c11c2c2ff3",
