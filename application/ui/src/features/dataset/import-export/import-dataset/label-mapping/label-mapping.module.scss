@@ -3,3 +3,8 @@
     color: var(--spectrum-global-color-gray-700);
     font-size: var(--spectrum-global-dimension-size-150);
 }
+
+// Lets long label names without spaces wrap instead of widening the column past its cap.
+.datasetLabel {
+    overflow-wrap: anywhere;
+}
