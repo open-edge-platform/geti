@@ -16,7 +16,6 @@ from app.models.dataset_revision import DatasetRevision
 from app.models.dataset_view import DatasetView
 from app.scheduler import Scheduler
 from app.services import (
-    BaseWeightsService,
     DatasetRevisionService,
     DatasetService,
     DatasetViewService,
@@ -64,13 +63,6 @@ def get_file_name_and_extension(file: UploadFile) -> tuple[str, str]:
     if not file_ext:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File extension cannot be empty.")
     return file_name, file_ext
-
-
-def get_file_size(file: UploadFile) -> int:
-    """Return the file size in bytes"""
-    if not file.size:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File size should be defined.")
-    return file.size
 
 
 def get_db() -> Generator[Session]:
@@ -375,11 +367,6 @@ def get_source(
 ) -> Source:
     """Provides a Source instance for request scoped source."""
     return source_update_service.get_by_id(source_id)
-
-
-def get_base_weights_service(data_dir: Annotated[Path, Depends(get_data_dir)]) -> BaseWeightsService:
-    """Provides a BaseWeightsService instance for managing base weights."""
-    return BaseWeightsService(data_dir)
 
 
 def get_license_service(

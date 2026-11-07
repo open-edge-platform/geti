@@ -5,7 +5,3 @@ from pydantic import BaseModel, ConfigDict
 
 class BaseEntity(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
-
-class BaseModelNoExtra(BaseModel):
-    model_config = ConfigDict(extra="forbid")

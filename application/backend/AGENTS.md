@@ -84,7 +84,7 @@ Never return raw ORM models from a router — convert to a Pydantic schema.
 ## Services & Repositories
 
 - **Repositories** (`app/repositories/`): a generic `BaseRepository[ModelType]`
-  provides `get_by_id`, `list_all`, `save`, `update`, `delete`, `save_batch`;
+  provides `get_by_id`, `exists`, `list_all`, `save`, `update`, `delete`;
   per-resource repos subclass it (e.g. `ProjectRepository(BaseRepository[ProjectDB])`).
   Repos are CRUD only — no business rules.
 - **Services** (`app/services/`): orchestrate repositories, enforce business rules,

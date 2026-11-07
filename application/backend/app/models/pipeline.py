@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import AliasChoices, Field, model_validator
 
 from .base import BaseEntity
-from .data_collection_policy import DataCollectionConfig, DataCollectionPolicy
+from .data_collection_policy import DataCollectionConfig
 from .inference_config import InferenceConfig
 from .model_revision import ModelRevision, ModelVariant
 from .sink import Sink
@@ -70,11 +70,6 @@ class Pipeline(BaseEntity):
     data_collection: DataCollectionConfig = Field(default_factory=DataCollectionConfig)
     inference: InferenceConfig = Field(default_factory=InferenceConfig)
     device: str = Field(default="cpu", pattern=r"^(cpu|xpu|cuda)(-\d+)?$")
-
-    @property
-    def data_collection_policies(self) -> list[DataCollectionPolicy]:
-        """Backward-compatible property to access data collection policies."""
-        return self.data_collection.policies
 
     @model_validator(mode="before")
     def set_status_from_is_running(cls, data: Any) -> Any:
