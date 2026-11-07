@@ -2243,14 +2243,8 @@ class TestMediaEndpoints:
             frame_index_to=9,
         )
 
-    @pytest.mark.parametrize(
-        "predict_path_suffix",
-        ["media:predict", "media/media:predict"],
-        ids=["new_path", "deprecated_path"],
-    )
     def test_media_predict(
         self,
-        predict_path_suffix,
         fxt_get_project,
         fxt_media_prediction_service,
         fxt_inference_media_limit,
@@ -2282,7 +2276,7 @@ class TestMediaEndpoints:
         )
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/{predict_path_suffix}",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
