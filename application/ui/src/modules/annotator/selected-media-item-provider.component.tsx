@@ -49,8 +49,7 @@ const convertMediaItem = (mediaItem: Media, frameNumber: number): Media => {
         return {
             ...mediaItem,
             type: 'video_frame',
-            fps: Math.round(mediaItem.fps),
-            frame_stride: Math.round(mediaItem.fps),
+            frame_stride: Math.max(1, Math.round(mediaItem.fps)),
             frame_number: frameNumber,
         };
     }
