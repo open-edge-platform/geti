@@ -6,6 +6,7 @@ import type { TranslateFn } from '@/i18n';
 import { orderBy } from 'lodash-es';
 
 export const SortingOptions = {
+    RECOMMENDED: 'recommended',
     NAME_ASC: 'name-asc',
     NAME_DESC: 'name-desc',
     SPEED_ASC: 'speed-asc',
@@ -29,6 +30,12 @@ const getAccuracyMetricBasedOnTask = ({ stats }: ModelArchitectureWithPerformanc
 };
 
 export const SORTING_HANDLERS: Record<SortingOptions, SortingHandler> = {
+    [SortingOptions.RECOMMENDED]: (modelArchitectures) =>
+        orderBy(
+            modelArchitectures,
+            [(modelArchitecture) => modelArchitecture.performanceCategory === undefined, 'name'],
+            ['asc', 'asc']
+        ),
     [SortingOptions.ACCURACY_ASC]: (modelArchitectures) =>
         orderBy(modelArchitectures, getAccuracyMetricBasedOnTask, 'asc'),
     [SortingOptions.ACCURACY_DESC]: (modelArchitectures) =>
@@ -44,6 +51,12 @@ export const SORTING_HANDLERS: Record<SortingOptions, SortingHandler> = {
 };
 
 export const getSortOptions = (t: TranslateFn) => [
+    [
+        {
+            key: SortingOptions.RECOMMENDED,
+            name: t('models.training.architectures.sort.recommended'),
+        },
+    ],
     [
         {
             key: SortingOptions.NAME_ASC,
