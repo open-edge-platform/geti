@@ -11,8 +11,17 @@ learn what you can train and what to pass to `create_engine`.
 
 Before running a workflow, confirm the installed version with
 `python -c "from importlib.metadata import version; print(version('getitune'))"`.
-If the import or version check fails, reinstall `getitune==0.4.0` in the active
-environment.
+These examples target Python 3.11-3.14 and `getitune==0.4.0`. Check
+`python --version` too. If the package is missing, install into a dedicated
+environment; installation requires network access:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+If a different version is already installed, report the mismatch and use an
+isolated environment for the pinned examples rather than downgrading the user's
+working environment. Model discovery does not require selecting an accelerator.
 
 ## List models from Python
 
@@ -26,8 +35,24 @@ list_models(pattern="*efficient*")           # filter by name pattern
 list_models(task="DETECTION", return_recipes=True)  # recipe paths for one task
 ```
 
-Pass any returned name (or recipe path) to
-`create_engine(model="...", data="...")` — see `getitune-training-a-model`.
+To display names alongside paths, derive each name from its recipe; the
+name list is deduplicated and is not ordered to match the recipe list:
+
+```python
+from pathlib import Path
+
+for recipe in list_models(task="DETECTION", return_recipes=True):
+  print(Path(recipe).stem, recipe)
+```
+
+Pass a returned name with its task (or an unambiguous recipe path) to an engine.
+The factory is exported from `getitune.engine`, not the package root:
+
+```python
+from getitune.engine import create_engine
+
+engine = create_engine(model="dino_v2", task="MULTI_CLASS_CLS", data="./dataset")
+```
 
 ## List models from the CLI
 
@@ -40,8 +65,8 @@ getitune find                # lists available model recipes
 Task types live in `getitune.types` (`TaskType`) and organize both the model
 implementations and the recipe folders:
 
-- Classification: `MULTI_CLASS_CLS`, `MULTI_LABEL_CLS`, `H_LABEL_CLS`
-- Detection: `DETECTION`, `ROTATED_DETECTION`, `KEYPOINT_DETECTION`
+- Classification: `MULTI_CLASS_CLS`, `MULTI_LABEL_CLS`
+- Detection: `DETECTION`, `KEYPOINT_DETECTION`
 - Segmentation: `INSTANCE_SEGMENTATION`, `SEMANTIC_SEGMENTATION`
 
 Recipes whose name ends in `_tile` enable the tiling pipeline for large images.
@@ -52,7 +77,7 @@ pre-exported OpenVINO IR models.
 
 - Passing a **model name** that matches recipes under **multiple tasks** raises a
   `ValueError` listing the matches — pass `task=` to disambiguate
-  (e.g. `create_engine(model="dino_v2", task="DETECTION", ...)`).
+  (e.g. `create_engine(model="dino_v2", task="MULTI_CLASS_CLS", ...)`).
 - Passing a **recipe path** (`.yaml`/`.yml`) that does not exist raises
   `FileNotFoundError`.
 - Use `list_models(task="...", return_recipes=True)` to get unambiguous full

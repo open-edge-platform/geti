@@ -17,6 +17,18 @@
       "prompt": "Should I export my trained model to OpenVINO IR or ONNX for deployment?",
       "expected_output": "The agent explains the format trade-off, names the correct enum or CLI options, and does not claim that ONNX can be directly optimized by the OpenVINO quantization workflow.",
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write Python code only, without executing it, for installed getitune 0.4.0. Export my efficientnet_b0 checkpoint ./weights/classifier.ckpt to OpenVINO FP16 using evaluation data at ./dataset. Check the returned files and compare the exported model with the checkpoint on that same dataset. Do not train a new model.",
+      "expected_output": "Imports ExportFormat and Precision from their concrete submodules, loads the checkpoint, evaluates a baseline, exports OPENVINO with export_precision=Precision.FP16, checks XML/BIN existence, and evaluates a new engine loaded from the returned path. Does not train or claim measured parity.",
+      "assertions": [
+        "Imports ExportFormat from getitune.types.export and Precision from getitune.types.precision, not from getitune.types.",
+        "Loads ./weights/classifier.ckpt with efficientnet_b0 and task=MULTI_CLASS_CLS (or its unambiguous recipe), and does not call train().",
+        "Exports using ExportFormat.OPENVINO and export_precision=Precision.FP16.",
+        "Checks both XML and BIN and evaluates the returned exported model on ./dataset against a checkpoint baseline without fabricating metrics."
+      ],
+      "files": []
     }
   ]
 }

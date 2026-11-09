@@ -12,6 +12,18 @@
       "prompt": "getitune train says that my model name matches multiple tasks. How do I resolve it?",
       "expected_output": "The agent explains task disambiguation and shows an explicit task filter or task argument.",
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write, but do not execute, Python code for getitune 0.4.0 that lists the installed detection models and their recipe paths. Then show how to select dino_v2 for a single-label multiclass classification dataset at ./dataset without the ambiguous-model-name error. Do not hard-code a catalogue or assume a source checkout.",
+      "expected_output": "Uses list_models from getitune.utils with the DETECTION task and return_recipes=True for paths; uses create_engine with model=dino_v2, task=MULTI_CLASS_CLS and data=./dataset. Does not guess detection model names or use repository-relative recipe paths.",
+      "assertions": [
+        "Imports list_models from getitune.utils and lists models filtered to DETECTION.",
+        "Requests recipe paths using return_recipes=True instead of constructing source-tree paths; if pairing names with paths, derives names from each path rather than zipping unordered lists.",
+        "Imports create_engine from getitune.engine and selects dino_v2 with MULTI_CLASS_CLS rather than DETECTION for the classification dataset.",
+        "Provides code only and does not claim model discovery or engine creation was executed."
+      ],
+      "files": []
     }
   ]
 }

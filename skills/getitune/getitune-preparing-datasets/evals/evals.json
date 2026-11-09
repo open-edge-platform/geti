@@ -12,6 +12,18 @@
       "prompt": "I want to train an Ultralytics YOLO model from a data.yaml file. How do I install and pass the dataset?",
       "expected_output": "The agent explains installation of getitune 0.4.0 with the ultralytics and chosen hardware extras and the matching PyTorch index. It shows a clearly marked data.yaml placeholder passed through data or --data_root, without claiming installation or training was performed.",
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Give commands and Python code only; do not install or train anything. On Linux with Python 3.12 and CPU, I need getitune 0.4.0 with Ultralytics YOLO support. My dataset is described by ./dataset/data.yaml and I will supply the model name in model_name. Show installation and how to pass this dataset to the engine, without cloning Geti.",
+      "expected_output": "Installs the pinned cpu and ultralytics extras with the CPU PyTorch index and passes the data.yaml path to create_engine(model=model_name, data=...). Does not require a checkout, reformat the dataset unnecessarily, or claim a completed run.",
+      "assertions": [
+        "The installation selects getitune 0.4.0 with both cpu and ultralytics extras.",
+        "The installation supplies https://download.pytorch.org/whl/cpu as an extra index.",
+        "The engine receives ./dataset/data.yaml as data and model_name as the model.",
+        "Does not require cloning Geti, running uv sync or just, or claim installation or training occurred."
+      ],
+      "files": []
     }
   ]
 }

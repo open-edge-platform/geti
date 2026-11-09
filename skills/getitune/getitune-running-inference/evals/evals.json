@@ -21,6 +21,18 @@
         "Does not assume earlier results or claim measured parity."
       ],
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write Python code only; do not execute it. With getitune 0.4.0, compare my efficientnet_b0 checkpoint ./weights/classifier.ckpt and its already-quantized OpenVINO model ./int8/model.xml (BIN alongside it) using ./dataset, which has a test subset. Obtain metrics and predictions from both. Do not train, export, or quantize again.",
+      "expected_output": "Creates a checkpoint-backed engine and a separate XML-backed engine with the same dataset, tests and predicts with both, and stays in inference rather than optimizing an already-quantized model.",
+      "assertions": [
+        "Loads efficientnet_b0 with checkpoint=./weights/classifier.ckpt and task=MULTI_CLASS_CLS (or its unambiguous recipe), rather than just the model name.",
+        "Creates a separate engine with model=./int8/model.xml and the same ./dataset.",
+        "Calls test() and predict() for both engines.",
+        "Does not call train(), export() or optimize(), and does not claim measured results."
+      ],
+      "files": []
     }
   ]
 }

@@ -17,6 +17,18 @@
         "Does not invent training results, checkpoint paths, or measured metrics."
       ],
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write a Python script, without executing it, to fine-tune efficientnet_b0 using installed getitune 0.4.0 on CPU for one epoch. Use ./weights/classifier.ckpt, a prepared single-label classification dataset at ./dataset with train/validation/test subsets, and ./run as the output directory. Evaluate the result and explain what I must verify; do not export or quantize.",
+      "expected_output": "Uses create_engine with the specified model, checkpoint, data, CPU device and work_dir; calls train(max_epochs=1) and test(), and describes checkpoint and task-metric verification without fabricating a run.",
+      "assertions": [
+        "Uses create_engine from getitune.engine with efficientnet_b0, task=MULTI_CLASS_CLS (or its unambiguous recipe), ./dataset, device=cpu and work_dir=./run; does not invent a CLASSIFICATION task.",
+        "Loads ./weights/classifier.ckpt via the checkpoint parameter before training.",
+        "Bounds training to max_epochs=1 and evaluates with test().",
+        "Explains checking a saved checkpoint and task metrics without claiming measured results or performing export or quantization."
+      ],
+      "files": []
     }
   ]
 }

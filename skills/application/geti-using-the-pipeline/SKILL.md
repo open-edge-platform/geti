@@ -18,6 +18,12 @@ reference is the spec the instance serves; fetch it as JSON from
 `/api/openapi.json` (`/api/docs` is only an HTML viewer for humans). Read endpoint
 paths and payloads from that live spec rather than guessing from old examples.
 
+If the base URL, required inputs, or API spec are unavailable, ask for them and
+stop before mutations. Do not invent project IDs, request schemas, or successful
+jobs. For an explicit planning request, provide a conditional plan without
+claiming to have contacted the instance. Use the deployment's trusted CA or
+certificate configuration; do not disable TLS verification as a default fix.
+
 ## End-to-end pipeline
 
 ```mermaid
@@ -44,12 +50,18 @@ flowchart LR
    - `POST /api/jobs` with job type `train` → job id.
    - Track it: `GET /api/jobs/<id>`, stream `GET /api/jobs/<id>/status` and
      `GET /api/jobs/<id>/logs`; cancel with `POST /api/jobs/<id>:cancel`.
-   - Done when: the job reaches a finished state and
-     `GET /api/projects/<id>/models` lists the new model.
+   - Done when: the job reaches the successful state defined by the instance
+     schema and `GET /api/projects/<id>/models` lists the expected usable model.
+     A failed or cancelled terminal job is not success; inspect its error/logs
+     before retrying or configuring inference.
 5. **(Optional) Quantize** the trained model for faster inference.
    - `POST /api/jobs` with job type `quantize`.
    - Done when: the quantized model variant appears under the project's models.
 6. **Configure the inference pipeline** — bind a source, the model, and a sink.
+   - Before mutation, use the spec's read endpoints to verify the project and
+     every supplied source, model and sink ID exists. Confirm the model belongs
+     to the project and is deployable, the source is reachable, and the sink is
+     ready. Existing pipeline bindings alone do not prove resource readiness.
    - Sources: `POST /api/sources`; sinks: `POST /api/sinks`.
    - `PATCH /api/projects/<id>/pipeline` with the ids of source, sink, and model.
    - Done when: `GET /api/projects/<id>/pipeline` shows the wired components.
@@ -88,5 +100,3 @@ To bring in an existing dataset rather than annotating from scratch:
 
 - `getitune-training-a-model` / `getitune-optimizing-a-model` — the library
   capabilities behind the `train` and `quantize` jobs.
-- `geti-backend-dev` — change the backend/API itself.
-- `geti-ui-dev` — the web UI that drives this same API.
