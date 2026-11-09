@@ -25,14 +25,20 @@ export const useBulkAssignLabel = () => {
     // follow the request dispatched last and flicker as each batch settles.
     const [isPending, setIsPending] = useState(false);
 
-    const invalidateQueries = () => {
+    const invalidateQueries = (mediaIds: string[]) => {
         return Promise.all([
-            queryClient.invalidateQueries({
-                queryKey: getQueryKey([
-                    'get',
-                    '/api/projects/{project_id}/dataset/items',
-                    { params: { path: { project_id: projectId } } },
-                ]),
+            ...mediaIds.map((mediaId) => {
+                return queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/media/{media_id}/annotations',
+                        {
+                            params: {
+                                path: { media_id: mediaId, project_id: projectId },
+                            },
+                        },
+                    ]),
+                });
             }),
             queryClient.invalidateQueries({
                 queryKey: getQueryKey([
@@ -103,7 +109,7 @@ export const useBulkAssignLabel = () => {
                 });
             }
 
-            void invalidateQueries();
+            void invalidateQueries(mediaIds);
         } finally {
             setIsPending(false);
         }
