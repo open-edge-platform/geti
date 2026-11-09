@@ -12,6 +12,7 @@ import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
 import { isNonEmptyLabel } from '../../../../shared/labels';
+import { isVideo } from '../../../../shared/media-item-utils';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 
 import classes from './media-details.module.scss';
@@ -26,11 +27,11 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     const projectId = useProjectIdentifier();
     const number = useNumberFormatter({ maximumFractionDigits: 2 });
     const mediaFileName = `${item.name}.${item.format}`;
-    const isVideo = item.type === 'video';
+    const isVideoItem = isVideo(item);
     const hasAnnotations = item.annotation_status.has_annotations;
     const annotationsQuery = useQuery({
         ...annotationsQueryOptions(projectId, item),
-        enabled: !isVideo && hasAnnotations,
+        enabled: !isVideoItem && hasAnnotations,
     });
     const framesQuery = $api.useQuery(
         'get',
@@ -39,14 +40,16 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
             params: {
                 path: { project_id: projectId, media_id: item.id },
                 // The API defaults to a limited frame range; video totals need every frame, including the last one.
-                query: isVideo ? { frame_index_from: 0, frame_index_to: Math.max(0, item.frame_count - 1) } : undefined,
+                query: isVideoItem
+                    ? { frame_index_from: 0, frame_index_to: Math.max(0, item.frame_count - 1) }
+                    : undefined,
             },
         },
-        { enabled: isVideo && hasAnnotations, retry: false }
+        { enabled: isVideoItem && hasAnnotations, retry: false }
     );
-    const query = isVideo ? framesQuery : annotationsQuery;
+    const query = isVideoItem ? framesQuery : annotationsQuery;
     const hasError = hasAnnotations && query.isError;
-    const savedAnnotations = isVideo
+    const savedAnnotations = isVideoItem
         ? framesQuery.data?.flatMap((frame) => frame.annotation_data.annotations)
         : annotationsQuery.data?.annotations;
     const annotations = savedAnnotations?.filter((annotation) => annotation.labels.some(isNonEmptyLabel));
@@ -68,7 +71,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
         [t('dataset.mediaDetails.fileSize'), prettyBytes(item.size, { locale: i18n.language })],
         [t('dataset.mediaDetails.format'), item.format.toUpperCase()],
         [t('dataset.mediaDetails.type'), t(`dataset.mediaDetails.${item.type}`)],
-        ...(isVideo
+        ...(isVideoItem
             ? [
                   [t('dataset.mediaDetails.frameRate'), `${number.format(item.fps)} FPS`],
                   [t('dataset.mediaDetails.duration'), `${number.format(item.duration)} s`],
