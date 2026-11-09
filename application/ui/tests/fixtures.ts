@@ -16,6 +16,7 @@ import { HttpResponse } from 'msw';
 
 import { handlers, http } from '../src/api/utils';
 import { BoundingBoxToolPage } from './annotator/bounding-box-tool-page';
+import { MagneticLassoToolPage } from './annotator/magnetic-lasso-tool-page';
 import { PolygonToolPage } from './annotator/polygon-tool-page';
 import { SegmentAnythingToolPage } from './annotator/segment-anything-tool-page';
 import { SSIMToolPage } from './annotator/ssim-tool-page';
@@ -61,6 +62,7 @@ interface Fixtures {
     jobsPage: JobsPage;
     jobsDialogPage: JobsDialogPage;
     polygonTool: PolygonToolPage;
+    magneticLassoTool: MagneticLassoToolPage;
     boundingBoxTool: BoundingBoxToolPage;
     ssimTool: SSIMToolPage;
     segmentAnythingTool: SegmentAnythingToolPage;
@@ -299,6 +301,10 @@ const test = testBase.extend<Fixtures>({
     polygonTool: async ({ page }, use) => {
         const polygonTool = new PolygonToolPage(page);
         await use(polygonTool);
+    },
+    magneticLassoTool: async ({ page }, use) => {
+        const magneticLassoTool = new MagneticLassoToolPage(page);
+        await use(magneticLassoTool);
     },
     videoPage: async ({ page }, use) => {
         const videoPage = new VideoPage(page);
