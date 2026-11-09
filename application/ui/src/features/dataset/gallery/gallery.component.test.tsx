@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 import * as actualUi from '@geti-ui/ui' with { rstest: 'importActual' };
 import { ViewModes } from '@geti-ui/ui';
-import { act, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
@@ -196,28 +196,35 @@ describe('Gallery item deletion and selection', () => {
             )
         );
         const user = userEvent.setup();
-        let replaceItems = () => {};
-        const GalleryWithChangingItems = () => {
-            const [items, setItems] = useState([item]);
-            replaceItems = () => setItems([getMockedMediaImage({ id: 'another-item' })]);
-            return <GalleryWithSelectionCount items={items} />;
-        };
-        render(
+        const { rerender } = render(
             <MediaUploadProvider>
                 <SelectedDataProvider>
-                    <GalleryWithChangingItems />
+                    <GalleryWithSelectionCount items={[item]} />
                 </SelectedDataProvider>
             </MediaUploadProvider>
         );
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
+        const originalCard = screen.getByRole('option');
 
         await user.click(screen.getByRole('button', { name: 'Media actions' }));
         await user.click(await screen.findByRole('menuitem', { name: 'Details' }));
         await screen.findByRole('dialog', { name: 'Details' });
 
-        act(() => replaceItems());
+        rerender(
+            <MediaUploadProvider>
+                <SelectedDataProvider>
+                    <GalleryWithSelectionCount
+                        items={[getMockedMediaImage({ id: 'another-item', name: 'replacement' })]}
+                    />
+                </SelectedDataProvider>
+            </MediaUploadProvider>
+        );
 
-        expect(screen.getByRole('dialog', { name: 'Details' })).toBeVisible();
+        expect(originalCard).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Selection state of media item another-item')).toBeInTheDocument();
+        const dialog = screen.getByRole('dialog', { name: 'Details' });
+        expect(dialog).toBeVisible();
+        expect(within(dialog).getByRole('heading', { name: `${item.name}.${item.format}`, level: 3 })).toBeVisible();
         await user.click(screen.getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
