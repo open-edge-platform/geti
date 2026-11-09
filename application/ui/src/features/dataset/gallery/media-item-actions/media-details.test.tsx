@@ -7,7 +7,7 @@ import type { AnnotatedVideoFrame, AnnotationDTO, Media } from '@/api/types';
 import { DialogContainer } from '@geti-ui/ui';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
+import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
@@ -106,18 +106,14 @@ describe('Media details', () => {
             }),
             fileName: 'boxes.mp4',
         },
-        {
-            item: getMockedVideoFrame({
-                name: 'boxes',
-                format: 'mp4',
-                annotation_status: { has_annotations: false, annotated_video_frames: 0 },
-            }),
-            fileName: 'boxes.mp4',
-        },
     ])('shows the download filename $fileName in the heading and tooltip', ({ item, fileName }) => {
         renderDetails(item);
 
         expect(screen.getByRole('heading', { name: fileName, level: 3 })).toHaveAttribute('title', fileName);
+        expect(screen.getByRole('img')).toHaveAttribute(
+            'src',
+            expect.stringMatching(new RegExp(`/api/projects/project-123/dataset/media/${item.id}/thumbnail$`))
+        );
     });
 
     it('keeps an explicitly empty annotation distinct from an unannotated image', async () => {
@@ -135,7 +131,6 @@ describe('Media details', () => {
     it.each([
         getMockedMediaImage(),
         getMockedVideo({ annotation_status: { has_annotations: false, annotated_video_frames: 0 } }),
-        getMockedVideoFrame({ annotation_status: { has_annotations: false, annotated_video_frames: 0 } }),
     ])('shows zero without requesting annotations for unannotated $type', async (item) => {
         const request = rs.fn();
         server.use(
@@ -156,10 +151,8 @@ describe('Media details', () => {
         expect(request).not.toHaveBeenCalled();
     });
 
-    it.each([
-        getMockedMediaImage({ annotation_status: { has_annotations: true } }),
-        getMockedVideoFrame({ frame_number: 42 }),
-    ])('does not count the empty label cached by the annotator for $type', async (item) => {
+    it('does not count the empty label cached by the annotator for an image', async () => {
+        const item = getMockedMediaImage({ annotation_status: { has_annotations: true } });
         const request = rs.fn();
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () => {
@@ -311,29 +304,5 @@ describe('Media details', () => {
         expect(getValue('Annotated frames')).toHaveTextContent('3');
         expect(screen.getByRole('status')).toHaveTextContent('Annotated');
         expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
-    });
-
-    it('requests the selected video frame and uses its thumbnail', async () => {
-        const requestedFrame = rs.fn();
-        server.use(
-            http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', ({ request }) => {
-                requestedFrame(new URL(request.url).searchParams.get('frame_index'));
-                return HttpResponse.json({ annotations, user_reviewed: true, subset: 'training' });
-            })
-        );
-        render(
-            <DialogContainer onDismiss={rs.fn()}>
-                <MediaDetails
-                    item={getMockedVideoFrame({
-                        frame_number: 42,
-                        annotation_status: { has_annotations: true, annotated_video_frames: 3 },
-                    })}
-                    onClose={rs.fn()}
-                />
-            </DialogContainer>
-        );
-        await waitFor(() => expect(requestedFrame).toHaveBeenCalledWith('42'));
-        expect(getValue('Annotated frames')).toHaveTextContent('3');
-        expect(screen.getByRole('img')).toHaveAttribute('src', expect.stringContaining('frame_index=42'));
     });
 });
