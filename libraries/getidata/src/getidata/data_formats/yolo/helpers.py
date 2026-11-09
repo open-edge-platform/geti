@@ -22,6 +22,7 @@ from getidata.data_formats.yolo.constants import (
     TRADITIONAL_DIR_NAME_TO_SUBSET,
     TRADITIONAL_SUBSET_CONFIG_KEYS,
     TRADITIONAL_SUBSET_DIR_NAMES,
+    UNANNOTATED_DIR_NAME,
 )
 from getidata.data_formats.yolo.sample import YoloClsSample, YoloSample, YoloSegSample
 from getidata.fields import ImageInfo, Subset
@@ -922,7 +923,10 @@ def _load_yolo_cls(root_path: Path) -> Dataset:
     Load an Ultralytics YOLO classification dataset.
 
     The class names are taken from the per-class directory names, collected across all subsets and
-    sorted alphabetically so that the label indices are deterministic.
+    sorted alphabetically so that the label indices are deterministic. A class directory named
+    ``unannotated`` is reserved for images without annotations: its images are loaded as samples
+    without a label, and the name never becomes a class, so unannotated media exported by getidata
+    round-trips. Third-party datasets with a real class of that name are not supported.
     """
     splits = _resolve_yolo_cls_splits(root_path)
     if not splits:
@@ -932,7 +936,14 @@ def _load_yolo_cls(root_path: Path) -> Dataset:
             "subdirectory per class with the images inside it."
         )
 
-    class_names = sorted({class_dir.name for _, _, class_dirs in splits for class_dir in class_dirs})
+    class_names = sorted(
+        {
+            class_dir.name
+            for _, _, class_dirs in splits
+            for class_dir in class_dirs
+            if class_dir.name.lower() != UNANNOTATED_DIR_NAME
+        }
+    )
     categories = LabelCategories(labels=tuple(class_names))
     dataset = Dataset(YoloClsSample, categories={"label": categories})
 
@@ -943,8 +954,9 @@ def _load_yolo_cls(root_path: Path) -> Dataset:
 
         samples = []
         for class_dir in class_dirs:
-            label_idx, _ = categories.find(class_dir.name)
-            if label_idx is None:
+            is_unannotated_dir = class_dir.name.lower() == UNANNOTATED_DIR_NAME
+            label_idx = None if is_unannotated_dir else categories.find(class_dir.name)[0]
+            if label_idx is None and not is_unannotated_dir:
                 continue
             for image_path in _find_image_files(class_dir):
                 try:
@@ -1159,12 +1171,45 @@ def _group_cls_samples_by_subset(dataset: Dataset[YoloClsSample]) -> dict[Subset
     return subset_to_samples
 
 
+def _cls_destination_dir_name(
+    sample: YoloClsSample,
+    label_names: list[str],
+    skipped_class_names: set[str],
+    reserved_name_taken: bool,
+) -> str | None:
+    """
+    Resolve the name of the directory a sample belongs to in the classification layout.
+
+    Returns the class directory name for labeled samples, the reserved ``unannotated``
+    directory name for samples without a label, or None when the sample cannot be
+    represented and must be skipped.
+    """
+    if sample.label is None:
+        if reserved_name_taken:
+            return None
+        return UNANNOTATED_DIR_NAME
+    if not 0 <= int(sample.label) < len(label_names):
+        logger.warning("[YOLO-CLS] Skipping sample without a valid class label: %s", sample.image)
+        return None
+    class_name = label_names[int(sample.label)]
+    if class_name in skipped_class_names:
+        return None
+    return class_name
+
+
 def _save_yolo_cls(
     dataset: Dataset[YoloClsSample],
     root_path: Path,
     save_images: bool,
 ) -> dict[str, Path]:
-    """Save a dataset in the Ultralytics YOLO classification (ImageNet-style) layout."""
+    """
+    Save a dataset in the Ultralytics YOLO classification (ImageNet-style) layout.
+
+    Samples without a label cannot be represented as class members, so they are written into the
+    reserved ``unannotated`` directory of their subset, where the loader picks them up again as
+    samples without a label. When an actual class is named ``unannotated``, the directory cannot
+    be reserved and such samples are skipped with a warning.
+    """
     label_names = _get_cls_label_names_from_dataset(dataset)
     subset_to_samples = _group_cls_samples_by_subset(dataset)
 
@@ -1178,6 +1223,10 @@ def _save_yolo_cls(
             class_name,
         )
 
+    # The 'unannotated' directory is reserved for unlabeled samples; a class of the same name
+    # would collide with it, in which case unlabeled samples cannot be exported.
+    reserved_name_taken = any(class_name.lower() == UNANNOTATED_DIR_NAME for class_name in label_names)
+
     written: dict[str, Path] = {}
     for subset, samples in subset_to_samples.items():
         if not samples:
@@ -1188,21 +1237,26 @@ def _save_yolo_cls(
 
         logger.info("[YOLO-CLS] Saving subset '%s' with %d samples", subset_name, len(samples))
 
+        if reserved_name_taken and any(sample.label is None for sample in samples):
+            logger.warning(
+                "[YOLO-CLS] Skipping samples without a label in subset '%s': the reserved "
+                "'%s' directory is taken by a class of that name",
+                subset_name,
+                UNANNOTATED_DIR_NAME,
+            )
+
         # Destination file names only need to be unique within a single class directory.
         used_names: dict[str, dict[str, str]] = {}
         saved = 0
         for sample in samples:
-            if sample.label is None or not 0 <= int(sample.label) < len(label_names):
-                logger.warning("[YOLO-CLS] Skipping sample without a valid class label: %s", sample.image)
-                continue
-
             image_path = Path(sample.image) if sample.image else None
             if not image_path:
                 continue
 
-            class_name = label_names[int(sample.label)]
-            if class_name in skipped_class_names:
+            class_name = _cls_destination_dir_name(sample, label_names, skipped_class_names, reserved_name_taken)
+            if class_name is None:
                 continue
+
             class_dir = subset_dir / class_name
             names = used_names.setdefault(class_name, {})
             file_name = unique_destination_filename(image_path, names)

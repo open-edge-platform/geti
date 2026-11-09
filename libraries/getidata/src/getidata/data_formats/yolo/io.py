@@ -103,7 +103,8 @@ def load_yolo_cls_dataset(root_dir: str) -> Dataset:
         test/  (optional)
 
     There are no annotation files: each image is labeled by the class directory that
-    contains it, so every image carries exactly one label.
+    contains it, so every image carries exactly one label. Images inside the reserved
+    ``unannotated`` directory of a subset carry no label.
 
     Args:
         root_dir: Path to the top-level YOLO classification dataset directory.
@@ -129,7 +130,8 @@ def save_yolo_cls_dataset(
 
     Creates the ImageNet-style layout with one directory per subset, each holding one
     subdirectory per class with the images copied into it. Samples without a label are
-    skipped, as the format has no way to represent them.
+    written into the reserved ``unannotated`` directory of their subset, where the loader
+    picks them up again as samples without a label.
 
     Args:
         dataset: Dataset containing YoloClsSample samples.

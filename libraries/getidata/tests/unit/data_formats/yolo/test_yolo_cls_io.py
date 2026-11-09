@@ -5,6 +5,7 @@ Unit tests for Ultralytics YOLO classification I/O functions.
 """
 
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 
@@ -232,6 +233,34 @@ def test_import_dataset_explicit_yolo_cls_format(tmp_path: Path):
     assert len(ds) == 3
 
 
+def test_load_yolo_cls_dataset_reserved_unannotated_dir(tmp_path: Path):
+    """Test that images in the reserved 'unannotated' directory load as samples without a label."""
+    _create_test_image(tmp_path / "train" / "cat" / "img1.jpg")
+    _create_test_image(tmp_path / "train" / "unannotated" / "img2.jpg")
+
+    ds = load_yolo_cls_dataset(str(tmp_path))
+
+    assert ds.schema.attributes["label"].categories.labels == ("cat",)
+    assert len(ds) == 2
+    by_image = {Path(sample.image).name: sample for sample in ds}
+    assert by_image["img1.jpg"].label == 0
+    assert by_image["img2.jpg"].label is None
+    assert by_image["img2.jpg"].subset == Subset.TRAINING
+
+
+def test_load_yolo_cls_dataset_split_with_only_unannotated_images(tmp_path: Path):
+    """Test that a subset holding only unannotated images is still a valid split."""
+    _create_test_image(tmp_path / "train" / "cat" / "img1.jpg")
+    _create_test_image(tmp_path / "unassigned" / "unannotated" / "img2.jpg")
+
+    ds = load_yolo_cls_dataset(str(tmp_path))
+
+    assert len(ds) == 2
+    by_image = {Path(sample.image).name: sample for sample in ds}
+    assert by_image["img2.jpg"].label is None
+    assert by_image["img2.jpg"].subset == Subset.UNASSIGNED
+
+
 # ==========================
 # save_yolo_cls_dataset Tests
 # ==========================
@@ -254,8 +283,8 @@ def test_save_yolo_cls_dataset(tmp_path: Path):
     assert written == {"train": export_dir / "train"}
 
 
-def test_save_yolo_cls_dataset_skips_unlabeled_samples(tmp_path: Path):
-    """Test that samples without a label are skipped, as the format cannot represent them."""
+def test_save_yolo_cls_dataset_writes_unlabeled_samples_to_reserved_dir(tmp_path: Path):
+    """Test that samples without a label go into the reserved 'unannotated' directory."""
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     _create_test_image(src_dir / "img1.jpg")
@@ -276,7 +305,39 @@ def test_save_yolo_cls_dataset_skips_unlabeled_samples(tmp_path: Path):
     save_yolo_cls_dataset(dataset, str(export_dir))
 
     assert (export_dir / "train" / "cat" / "img1.jpg").exists()
-    assert not (export_dir / "train" / "cat" / "img2.jpg").exists()
+    assert (export_dir / "train" / "unannotated" / "img2.jpg").exists()
+
+
+def test_save_yolo_cls_dataset_skips_unlabeled_samples_when_class_takes_reserved_name(tmp_path, caplog):
+    """Test that unlabeled samples are skipped when a real class is named 'unannotated'."""
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    _create_test_image(src_dir / "img1.jpg")
+    _create_test_image(src_dir / "img2.jpg")
+    _create_test_image(src_dir / "img3.jpg")
+
+    dataset = Dataset(YoloClsSample, categories={"label": LabelCategories(labels=("cat", "unannotated"))})
+    dataset.append(_make_cls_sample(src_dir / "img1.jpg", label=0, subset=Subset.TRAINING))
+    dataset.append(_make_cls_sample(src_dir / "img2.jpg", label=1, subset=Subset.TRAINING))
+    dataset.append(
+        YoloClsSample(
+            image=str(src_dir / "img3.jpg"),
+            image_info=ImageInfo(height=480, width=640),
+            label=None,
+            subset=Subset.TRAINING,
+        )
+    )
+
+    export_dir = tmp_path / "export"
+    with caplog.at_level("WARNING", logger="getidata.data_formats.yolo.helpers"):
+        save_yolo_cls_dataset(dataset, str(export_dir))
+
+    assert (export_dir / "train" / "cat" / "img1.jpg").exists()
+    assert (export_dir / "train" / "unannotated" / "img2.jpg").exists()
+    # The reserved directory belongs to the real class, so the unlabeled image cannot be exported
+    assert not (export_dir / "train" / "unannotated" / "img3.jpg").exists()
+    reserved_warnings = [r for r in caplog.records if "reserved" in r.getMessage()]
+    assert len(reserved_warnings) == 1
 
 
 def test_save_yolo_cls_dataset_name_collision(tmp_path: Path):
@@ -434,3 +495,76 @@ def test_export_dataset_yolo_cls_format_as_zip(tmp_path: Path):
     reloaded = import_dataset(str(zip_path), extract_dir=tmp_path / "extracted")
     assert reloaded.dtype is YoloClsSample
     assert len(reloaded) == len(original)
+
+
+def test_save_and_reload_yolo_cls_with_unannotated_samples(tmp_path: Path):
+    """Test that unlabeled samples round-trip through the reserved 'unannotated' directory."""
+    src_dir = tmp_path / "src"
+    _create_test_image(src_dir / "labeled.jpg")
+    _create_test_image(src_dir / "unannotated.jpg")
+
+    dataset = Dataset(YoloClsSample, categories={"label": LabelCategories(labels=("cat", "dog"))})
+    dataset.append(_make_cls_sample(src_dir / "labeled.jpg", label=0, subset=Subset.TRAINING))
+    dataset.append(
+        YoloClsSample(
+            image=str(src_dir / "unannotated.jpg"),
+            image_info=ImageInfo(height=480, width=640),
+            label=None,
+            subset=Subset.UNASSIGNED,
+        )
+    )
+
+    export_dir = tmp_path / "export"
+    save_yolo_cls_dataset(dataset, str(export_dir))
+
+    assert (export_dir / "train" / "cat" / "labeled.jpg").exists()
+    assert (export_dir / "unassigned" / "unannotated" / "unannotated.jpg").exists()
+
+    reloaded = load_yolo_cls_dataset(str(export_dir))
+
+    assert len(reloaded) == 2
+    by_image = {Path(sample.image).name: sample for sample in reloaded}
+    assert by_image["labeled.jpg"].label == 0
+    assert by_image["labeled.jpg"].subset == Subset.TRAINING
+    assert by_image["unannotated.jpg"].label is None
+    assert by_image["unannotated.jpg"].subset == Subset.UNASSIGNED
+
+
+def test_export_dataset_yolo_cls_unannotated_round_trip_as_zip(tmp_path: Path):
+    """Test that unlabeled samples survive a zip export and auto-detected reimport.
+
+    This mirrors exporting a project with 'Include media without annotations' enabled and
+    importing the archive back: the unlabeled media must be present in the archive and load
+    as samples without a label.
+    """
+    src_dir = tmp_path / "src"
+    _create_test_image(src_dir / "labeled.jpg")
+    _create_test_image(src_dir / "unannotated.jpg")
+
+    dataset = Dataset(YoloClsSample, categories={"label": LabelCategories(labels=("cat", "dog"))})
+    dataset.append(_make_cls_sample(src_dir / "labeled.jpg", label=1, subset=Subset.TRAINING))
+    dataset.append(
+        YoloClsSample(
+            image=str(src_dir / "unannotated.jpg"),
+            image_info=ImageInfo(height=480, width=640),
+            label=None,
+            subset=Subset.UNASSIGNED,
+        )
+    )
+
+    zip_path = tmp_path / "export.zip"
+    export_dataset(dataset, output_path=str(zip_path), data_format=DataFormat.YOLO_ULTRALYTICS_CLS, as_zip=True)
+
+    with ZipFile(zip_path) as zf:
+        names = set(zf.namelist())
+    assert "train/dog/labeled.jpg" in names
+    assert "unassigned/unannotated/unannotated.jpg" in names
+
+    reloaded = import_dataset(str(zip_path), extract_dir=tmp_path / "extracted")
+
+    assert detect_dataset_format(tmp_path / "extracted") == DataFormat.YOLO_ULTRALYTICS_CLS
+    assert reloaded.dtype is YoloClsSample
+    assert len(reloaded) == 2
+    by_image = {Path(sample.image).name: sample for sample in reloaded}
+    assert by_image["labeled.jpg"].label == reloaded.schema.attributes["label"].categories.find("dog")[0]
+    assert by_image["unannotated.jpg"].label is None

@@ -7,6 +7,7 @@ Unit tests for Ultralytics YOLO segmentation I/O functions.
 """
 
 from pathlib import Path
+from zipfile import ZipFile
 
 import numpy as np
 import pytest
@@ -430,6 +431,41 @@ def test_export_dataset_yolo_seg_format_as_zip(tmp_path: Path):
     reloaded = import_dataset(str(zip_path), extract_dir=tmp_path / "extracted")
     assert reloaded.dtype is YoloSegSample
     assert len(reloaded) == len(original)
+
+
+def test_export_dataset_yolo_seg_unannotated_round_trip_as_zip(tmp_path: Path):
+    """Test that samples without polygons survive a zip export and auto-detected reimport.
+
+    This mirrors exporting a project with 'Include media without annotations' enabled: the
+    unannotated media must be present in the archive (with an empty label file) and load back
+    as samples without polygons.
+    """
+    src_dir = tmp_path / "src"
+    _create_test_image(src_dir / "labeled.jpg")
+    _create_test_image(src_dir / "unannotated.jpg")
+
+    dataset = Dataset(YoloSegSample, categories={"labels": LabelCategories(labels=("cat",))})
+    dataset.append(_make_seg_sample(src_dir / "labeled.jpg", polygons=[[[64, 96], [192, 96], [192, 192]]], labels=[0]))
+    dataset.append(_make_seg_sample(src_dir / "unannotated.jpg", polygons=[], labels=[]))
+
+    zip_path = tmp_path / "export.zip"
+    export_dataset(dataset, output_path=str(zip_path), data_format=DataFormat.YOLO_ULTRALYTICS_SEG, as_zip=True)
+
+    with ZipFile(zip_path) as zf:
+        names = set(zf.namelist())
+    assert "images/train/labeled.jpg" in names
+    assert "images/train/unannotated.jpg" in names
+    assert "labels/train/unannotated.txt" in names
+
+    reloaded = import_dataset(str(zip_path), extract_dir=tmp_path / "extracted")
+
+    assert detect_dataset_format(tmp_path / "extracted") == DataFormat.YOLO_ULTRALYTICS_SEG
+    assert reloaded.dtype is YoloSegSample
+    assert len(reloaded) == 2
+    by_image = {Path(sample.image).name: sample for sample in reloaded}
+    assert by_image["labeled.jpg"].labels.tolist() == [0]
+    assert by_image["unannotated.jpg"].polygons is None
+    assert by_image["unannotated.jpg"].labels is None
 
 
 def test_seg_dataset_not_misdetected_after_detection_export(tmp_path: Path):
