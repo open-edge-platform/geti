@@ -26,6 +26,10 @@ certificate configuration; do not disable TLS verification as a default fix.
 
 ## End-to-end pipeline
 
+The checklist below is an operation overview, not executable request templates.
+Resolve endpoints, request bodies and content types from the instance's
+`/api/openapi.json` before sending requests.
+
 ```mermaid
 flowchart LR
     A[Create project] --> B[Upload media]
@@ -36,7 +40,7 @@ flowchart LR
 ```
 
 1. **Create a project** with a task type and labels.
-   - `POST /api/projects` (name, task, labels) → project info.
+   - `POST /api/projects` → project info.
    - Done when: `GET /api/projects/<id>` returns the project with its labels.
 2. **Upload media** (images/videos) to the project dataset.
    - `POST /api/projects/<id>/dataset/media` (binary) → media info.
