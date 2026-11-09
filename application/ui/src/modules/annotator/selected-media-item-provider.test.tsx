@@ -13,9 +13,11 @@ rs.mock('./hooks/use-load-image-query.hook', () => ({
 describe('SelectedMediaItemProvider', () => {
     it.each([
         [30000 / 1001, 30],
+        [24.25, 24],
+        [24.5, 25],
         [0.4, 1],
         [25, 25],
-    ])('preserves %s fps with a frame stride of %s', (fps, frameStride) => {
+    ])('preserves %s fps and rounds the frame stride to %s', (fps, expectedFrameStride) => {
         const video = getMockedVideo({ fps });
         const { result } = renderHook(useSelectedMediaItem, {
             wrapper: ({ children }) => (
@@ -26,8 +28,8 @@ describe('SelectedMediaItemProvider', () => {
         expect(result.current.mediaItem).toMatchObject({
             type: 'video_frame',
             fps,
-            frame_stride: frameStride,
             frame_number: 0,
         });
+        expect(result.current.mediaItem).toHaveProperty('frame_stride', expectedFrameStride);
     });
 });
