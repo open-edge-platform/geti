@@ -94,6 +94,32 @@ describe('Media details', () => {
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
+    it.each([
+        { item: getMockedMediaImage({ name: 'inspection.v2', format: 'jpg' }), fileName: 'inspection.v2.jpg' },
+        { item: getMockedMediaImage({ name: 'inspection', format: 'jpeg' }), fileName: 'inspection.jpeg' },
+        { item: getMockedMediaImage({ name: 'inspection', format: 'tiff' }), fileName: 'inspection.tiff' },
+        {
+            item: getMockedVideo({
+                name: 'boxes',
+                format: 'mp4',
+                annotation_status: { has_annotations: false, annotated_video_frames: 0 },
+            }),
+            fileName: 'boxes.mp4',
+        },
+        {
+            item: getMockedVideoFrame({
+                name: 'boxes',
+                format: 'mp4',
+                annotation_status: { has_annotations: false, annotated_video_frames: 0 },
+            }),
+            fileName: 'boxes.mp4',
+        },
+    ])('shows the download filename $fileName in the heading and tooltip', ({ item, fileName }) => {
+        renderDetails(item);
+
+        expect(screen.getByRole('heading', { name: fileName, level: 3 })).toHaveAttribute('title', fileName);
+    });
+
     it('keeps an explicitly empty annotation distinct from an unannotated image', async () => {
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () =>
