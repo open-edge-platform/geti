@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import type { AnnotationDTO, Media } from '@/api/types';
+import type { AnnotatedVideoFrame, AnnotationDTO, Media } from '@/api/types';
 import { DialogContainer } from '@geti-ui/ui';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -236,21 +236,42 @@ describe('Media details', () => {
     });
 
     it('counts annotations across the video separately from annotated frames', async () => {
+        const requestedRange = rs.fn();
+        const frames: AnnotatedVideoFrame[] = [
+            {
+                media_id: 'frame-0',
+                frame_index: 0,
+                annotation_data: { annotations, user_reviewed: true, subset: 'training' },
+            },
+            {
+                media_id: 'frame-10',
+                frame_index: 10,
+                annotation_data: { annotations: [], user_reviewed: true, subset: 'training' },
+            },
+            {
+                // A distinct label on the last frame catches both truncated ranges and an off-by-one upper bound.
+                media_id: 'frame-399',
+                frame_index: 399,
+                annotation_data: {
+                    annotations: [
+                        { shape: { type: 'full_image' }, labels: [{ id: 'label-2' }] },
+                        { shape: { type: 'full_image' }, labels: [{ id: 'label-2' }] },
+                    ],
+                    user_reviewed: true,
+                    subset: 'training',
+                },
+            },
+        ];
         server.use(
-            http.get('/api/projects/{project_id}/dataset/media/{media_id}/frames', () =>
-                HttpResponse.json([
-                    {
-                        media_id: 'video-1',
-                        frame_index: 0,
-                        annotation_data: { annotations, user_reviewed: true, subset: 'training' },
-                    },
-                    {
-                        media_id: 'video-1',
-                        frame_index: 10,
-                        annotation_data: { annotations: [], user_reviewed: true, subset: 'training' },
-                    },
-                ])
-            )
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/frames', ({ request }) => {
+                const params = new URL(request.url).searchParams;
+                requestedRange(params.get('frame_index_from'), params.get('frame_index_to'));
+                const from = Number(params.get('frame_index_from') ?? 0);
+                const to = Number(params.get('frame_index_to') ?? 50);
+                return HttpResponse.json(
+                    frames.filter((frame) => frame.frame_index >= from && frame.frame_index <= to)
+                );
+            })
         );
         render(
             <DialogContainer onDismiss={rs.fn()}>
@@ -258,15 +279,18 @@ describe('Media details', () => {
                     item={getMockedVideo({
                         fps: 29.97,
                         duration: 12.5,
-                        annotation_status: { has_annotations: true, annotated_video_frames: 2 },
+                        frame_count: 400,
+                        annotation_status: { has_annotations: true, annotated_video_frames: 3 },
                     })}
                     onClose={rs.fn()}
                 />
             </DialogContainer>
         );
-        expect(getValue('Annotated frames')).toHaveTextContent('2');
+        expect(getValue('Annotated frames')).toHaveTextContent('3');
         expect(getValue('Annotations')).toHaveTextContent('Loading...');
-        await waitFor(() => expect(getValue('Annotations')).toHaveTextContent('2'));
+        await waitFor(() => expect(getValue('Annotations')).toHaveTextContent('4'));
+        expect(getValue('Unique labels')).toHaveTextContent('2');
+        expect(requestedRange).toHaveBeenCalledWith('0', '399');
         expect(getValue('Total frames')).toHaveTextContent('400');
         expect(getValue('Frame rate')).toHaveTextContent('29.97 FPS');
         expect(getValue('Duration')).toHaveTextContent('12.5 s');

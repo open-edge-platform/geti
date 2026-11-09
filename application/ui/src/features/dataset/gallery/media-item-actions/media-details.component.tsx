@@ -35,7 +35,13 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     const framesQuery = $api.useQuery(
         'get',
         '/api/projects/{project_id}/dataset/media/{media_id}/frames',
-        { params: { path: { project_id: projectId, media_id: item.id } } },
+        {
+            params: {
+                path: { project_id: projectId, media_id: item.id },
+                // The API defaults to a limited frame range; video totals need every frame, including the last one.
+                query: isVideo ? { frame_index_from: 0, frame_index_to: Math.max(0, item.frame_count - 1) } : undefined,
+            },
+        },
         { enabled: isVideo && hasAnnotations, retry: false }
     );
     const query = isVideo ? framesQuery : annotationsQuery;
