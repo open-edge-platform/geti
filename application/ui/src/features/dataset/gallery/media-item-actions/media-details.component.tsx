@@ -52,10 +52,15 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     const savedAnnotations = isVideoItem
         ? framesQuery.data?.flatMap((frame) => frame.annotation_data.annotations)
         : annotationsQuery.data?.annotations;
-    const annotations = savedAnnotations?.filter((annotation) => annotation.labels.some(isNonEmptyLabel));
-    const annotationCount = annotations?.length ?? 0;
+    const annotationCount = isVideoItem
+        ? (framesQuery.data?.reduce(
+              (total, { annotation_data }) =>
+                  total + (annotation_data.annotations.length || (annotation_data.user_reviewed ? 1 : 0)),
+              0
+          ) ?? 0)
+        : (savedAnnotations?.length ?? 0);
     const labelCount = new Set(
-        annotations?.flatMap((annotation) => annotation.labels.filter(isNonEmptyLabel).map((label) => label.id))
+        savedAnnotations?.flatMap((annotation) => annotation.labels.filter(isNonEmptyLabel).map((label) => label.id))
     ).size;
     const annotationValue = (value: number) =>
         !hasAnnotations
