@@ -120,7 +120,8 @@ def _parse_yolo_seg_annotation(anno_path: Path, image_width: int, image_height: 
     ``(x, y)`` coordinates of its polygon: ``<class-index> <x1> <y1> <x2> <y2> ... <xn> <yn>``.
     Rows must therefore hold at least seven fields (three points) with an odd field count
     so that the coordinates form ``(x, y)`` pairs. Rows that do not match -- including
-    detection-format rows with exactly five fields -- are skipped with a warning.
+    detection-format rows with exactly five fields -- are skipped, with one warning summary
+    emitted per file.
 
     Returns:
         Tuple of (polygons in absolute xy format, labels)
@@ -131,36 +132,54 @@ def _parse_yolo_seg_annotation(anno_path: Path, image_width: int, image_height: 
     if not anno_path.exists():
         return polygons, labels
 
+    # A file of a mixed dataset can hold many unparseable rows; each skip is logged at debug
+    # level and one warning summary is emitted per file to keep the logs readable.
+    skipped_lines = 0
+    total_lines = 0
+
     with open(anno_path, encoding="utf-8") as f:
         for raw_line in f:
             line = raw_line.strip()
             if not line:
                 continue
 
+            total_lines += 1
             parts = line.split()
             if len(parts) < 7:
-                logger.warning(
+                logger.debug(
                     "Skipping non-segmentation annotation line in %s: %s (expected a class index followed by at "
                     "least 3 normalized x, y coordinate pairs)",
                     anno_path,
                     line,
                 )
+                skipped_lines += 1
                 continue
             if len(parts) % 2 == 0:
-                logger.warning("Skipping annotation line with unpaired coordinates in %s: %s", anno_path, line)
+                logger.debug("Skipping annotation line with unpaired coordinates in %s: %s", anno_path, line)
+                skipped_lines += 1
                 continue
 
             try:
                 label_id = int(parts[0])
                 coords = [float(p) for p in parts[1:]]
             except ValueError as e:
-                logger.warning("Skipping malformed annotation line in %s: %s (%s)", anno_path, line, e)
+                logger.debug("Skipping malformed annotation line in %s: %s (%s)", anno_path, line, e)
+                skipped_lines += 1
                 continue
 
             # Convert normalized coordinates to absolute xy format
             polygon = [[coords[i] * image_width, coords[i + 1] * image_height] for i in range(0, len(coords), 2)]
             polygons.append(polygon)
             labels.append(label_id)
+
+    if skipped_lines:
+        logger.warning(
+            "Skipped %d of %d annotation line(s) in %s (expected a class index followed by at least "
+            "3 normalized x, y coordinate pairs)",
+            skipped_lines,
+            total_lines,
+            anno_path,
+        )
 
     return polygons, labels
 
@@ -170,9 +189,11 @@ def _has_segmentation_rows(root_path: Path) -> bool:
     Check whether any label file of an Ultralytics-layout YOLO dataset holds segmentation rows.
 
     A valid segmentation row consists of a class index plus at least three normalized ``(x, y)``
-    pairs, i.e. seven or more fields with an odd count. Detection rows always have exactly five
-    fields, so the presence of any such row marks the dataset as an instance segmentation dataset.
-    Label files that cannot be read are skipped.
+    pairs, i.e. seven or more fields with an odd count, where the class index parses as an
+    integer and every coordinate parses as a float. Detection rows always have exactly five
+    fields, so the presence of any such row marks the dataset as an instance segmentation
+    dataset. Rows that only match the field count but fail to parse -- e.g. a malformed line in
+    a detection dataset -- do not count. Label files that cannot be read are skipped.
     """
     for _, _, labels_dir in _resolve_ultralytics_subsets(root_path):
         if labels_dir is None or not labels_dir.is_dir():
@@ -182,8 +203,15 @@ def _has_segmentation_rows(root_path: Path) -> bool:
                 with open(label_file, encoding="utf-8") as f:
                     for raw_line in f:
                         parts = raw_line.split()
-                        if len(parts) >= 7 and len(parts) % 2 == 1:
-                            return True
+                        if len(parts) < 7 or len(parts) % 2 == 0:
+                            continue
+                        try:
+                            int(parts[0])
+                            for coordinate in parts[1:]:
+                                float(coordinate)
+                        except ValueError:
+                            continue
+                        return True
             except OSError as e:
                 logger.warning("Failed to read label file %s: %s", label_file, e)
     return False
@@ -662,7 +690,9 @@ def _write_sample_seg_annotation(
     Every polygon is written as one row holding the class index followed by the
     polygon coordinates normalized to [0, 1] relative to the image dimensions.
     Polygons with fewer than three points cannot be represented in the format and
-    are skipped with a warning.
+    are skipped with a warning, as are malformed polygon payloads (e.g. an odd
+    number of coordinate values); only the offending polygon is skipped, so the
+    remaining polygons of the sample are still written.
     """
     info = sample.image_info
     width = int(info.width) if info and info.width else 0
@@ -674,7 +704,11 @@ def _write_sample_seg_annotation(
         for i in range(len(sample.labels)):
             if i >= len(sample.polygons):
                 break
-            polygon = np.asarray(sample.polygons[i], dtype=np.float32).reshape(-1, 2)
+            try:
+                polygon = np.asarray(sample.polygons[i], dtype=np.float32).reshape(-1, 2)
+            except ValueError as e:
+                logger.warning("[YOLO-SEG] Skipping malformed polygon %d in %s: %s", i, sample.image, e)
+                continue
             if len(polygon) < 3:
                 logger.warning("[YOLO-SEG] Skipping polygon with fewer than 3 points in %s: %s", sample.image, polygon)
                 continue
