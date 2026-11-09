@@ -3,7 +3,7 @@
 
 .dialog {
     min-width: 0;
-    max-width: calc(100vw - 32px);
+    max-width: 100%;
 }
 
 .content {
@@ -12,9 +12,10 @@
 
 .layout {
     display: grid;
+    padding-top: 16px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 32px;
-    align-items: center;
+    align-items: start;
 }
 
 .preview {
@@ -89,6 +90,7 @@
 
 @media (max-height: 700px) {
     .layout {
+        padding-top: 8px;
         gap: 16px;
     }
 

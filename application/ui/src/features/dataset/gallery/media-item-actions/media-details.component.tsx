@@ -25,6 +25,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     const { t, i18n } = useTranslation();
     const projectId = useProjectIdentifier();
     const number = useNumberFormatter({ maximumFractionDigits: 2 });
+    const mediaFileName = `${item.name}.${item.format}`;
     const isVideo = item.type === 'video';
     const hasAnnotations = item.annotation_status.has_annotations;
     const annotationsQuery = useQuery({
@@ -92,8 +93,8 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
                         />
                     </div>
                     <div className={classes.details}>
-                        <h3 className={classes.name} title={item.name}>
-                            {item.name}
+                        <h3 className={classes.name} title={mediaFileName}>
+                            {mediaFileName}
                         </h3>
                         <span className={classes.status} role='status'>
                             {status}
