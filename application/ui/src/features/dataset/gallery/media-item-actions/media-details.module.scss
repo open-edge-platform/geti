@@ -1,20 +1,15 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-.dialog {
-    min-width: 0;
-    max-width: 100%;
-}
-
 .content {
     min-height: 0;
 }
 
 .layout {
     display: grid;
-    padding-top: 16px;
+    padding-top: var(--spectrum-global-dimension-size-200);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 32px;
+    gap: var(--spectrum-global-dimension-size-400);
     align-items: start;
 }
 
@@ -25,7 +20,7 @@
     aspect-ratio: 4 / 3;
     background: var(--spectrum-global-color-gray-50);
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: var(--spectrum-global-dimension-size-50);
 
     img {
         width: 100%;
@@ -39,8 +34,8 @@
 }
 
 .name {
-    margin: 0 0 8px;
-    font-size: 18px;
+    margin: 0 0 var(--spectrum-global-dimension-size-100);
+    font-size: var(--spectrum-global-dimension-font-size-300);
     line-height: 1.4;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -49,24 +44,24 @@
 
 .status {
     color: var(--spectrum-global-color-gray-700);
-    font-size: 13px;
+    font-size: var(--spectrum-global-dimension-font-size-100);
 }
 
 .fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px 24px;
-    margin: 24px 0 0;
+    gap: var(--spectrum-global-dimension-size-225) var(--spectrum-global-dimension-size-300);
+    margin: var(--spectrum-global-dimension-size-300) 0 0;
 
     dt {
         color: var(--spectrum-global-color-gray-700);
-        font-size: 12px;
+        font-size: var(--spectrum-global-dimension-font-size-75);
     }
 
     dd {
-        margin: 4px 0 0;
-        font-size: 14px;
-        font-weight: 600;
+        margin: var(--spectrum-global-dimension-size-50) 0 0;
+        font-size: var(--spectrum-global-dimension-font-size-100);
+        font-weight: var(--spectrum-global-font-weight-semi-bold);
         overflow-wrap: anywhere;
     }
 }
@@ -74,28 +69,28 @@
 @media (max-width: 640px) {
     .layout {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: var(--spectrum-global-dimension-size-200);
     }
 
     .preview {
         aspect-ratio: auto;
-        height: 112px;
+        height: calc(var(--spectrum-global-dimension-size-200) * 7);
     }
 
     .fields {
-        gap: 10px 16px;
-        margin-top: 12px;
+        gap: var(--spectrum-global-dimension-size-125) var(--spectrum-global-dimension-size-200);
+        margin-top: var(--spectrum-global-dimension-size-150);
     }
 }
 
 @media (max-height: 700px) {
     .layout {
-        padding-top: 8px;
-        gap: 16px;
+        padding-top: var(--spectrum-global-dimension-size-100);
+        gap: var(--spectrum-global-dimension-size-200);
     }
 
     .fields {
-        gap: 10px 16px;
-        margin-top: 12px;
+        gap: var(--spectrum-global-dimension-size-125) var(--spectrum-global-dimension-size-200);
+        margin-top: var(--spectrum-global-dimension-size-150);
     }
 }
