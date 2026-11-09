@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import * as actualUi from '@geti-ui/ui' with { rstest: 'importActual' };
 import { ViewModes } from '@geti-ui/ui';
-import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { act, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
@@ -187,6 +187,40 @@ describe('Gallery item deletion and selection', () => {
 
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
     };
+
+    it('keeps Details open when its gallery card unmounts', async () => {
+        server.use(
+            http.get('/api/projects/{project_id}', () => HttpResponse.json(getMockedProject({ id: 'project-123' }))),
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () =>
+                HttpResponse.json({ annotations: [], user_reviewed: true, subset: 'unassigned' })
+            )
+        );
+        const user = userEvent.setup();
+        let replaceItems = () => {};
+        const GalleryWithChangingItems = () => {
+            const [items, setItems] = useState([item]);
+            replaceItems = () => setItems([getMockedMediaImage({ id: 'another-item' })]);
+            return <GalleryWithSelectionCount items={items} />;
+        };
+        render(
+            <MediaUploadProvider>
+                <SelectedDataProvider>
+                    <GalleryWithChangingItems />
+                </SelectedDataProvider>
+            </MediaUploadProvider>
+        );
+        await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
+
+        await user.click(screen.getByRole('button', { name: 'Media actions' }));
+        await user.click(await screen.findByRole('menuitem', { name: 'Details' }));
+        await screen.findByRole('dialog', { name: 'Details' });
+
+        act(() => replaceItems());
+
+        expect(screen.getByRole('dialog', { name: 'Details' })).toBeVisible();
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
 
     it('does not show a selected count after deleting a non-selected item', async () => {
         const user = userEvent.setup();

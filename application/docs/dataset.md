@@ -65,6 +65,19 @@ Conversely, heavy processes like training and evaluation benefit from `datumaro`
 specifically designed for analytical workloads that consume data in batches.
 Note that Datumaro also allows to export datasets in a variety of formats, useful for interoperability with other tools.
 
+## Media details
+
+In the dataset gallery, open a media item's three-dot menu and select **Details**.
+The dialog shows a preview, filename, resolution, file size, format, media type,
+annotation status, annotation count and number of unique labels. Videos also show
+frame rate, duration in seconds, total frames and annotated frames. Video annotation
+counts include annotations across all annotated frames, not just the preview frame.
+
+A saved empty annotation counts as annotated media with zero annotations. Metadata
+remains visible while annotation details load; failed annotation requests show
+**Unavailable** and can be retried. Annotation status and the number of annotated
+video frames remain available even if annotation details cannot be loaded.
+
 ## Dataset views
 
 A dataset view in Geti is a user-defined subset of items within a dataset, designed to facilitate the organization

@@ -263,6 +263,25 @@
             "assignAllFailure_other": "Не удалось назначить классы {{count}} изображениям.",
             "assignPartialSuccess": "Классы назначены не всем изображениям ({{succeeded}} из {{total}}). Не удалось обработать {{failed}}."
         },
+        "mediaDetails": {
+            "title": "Сведения",
+            "resolution": "Разрешение",
+            "fileSize": "Размер файла",
+            "format": "Формат",
+            "type": "Тип медиа",
+            "image": "Изображение",
+            "video": "Видео",
+            "video_frame": "Видеокадр",
+            "frameRate": "Частота кадров",
+            "duration": "Длительность",
+            "frames": "Всего кадров",
+            "annotatedFrames": "Размечено кадров",
+            "annotations": "Аннотации",
+            "labels": "Уникальные классы",
+            "loading": "Загрузка...",
+            "unavailable": "Недоступно",
+            "retry": "Повторить"
+        },
         "mediaActions": {
             "downloadStarted": "Началось скачивание {{fileName}}"
         },

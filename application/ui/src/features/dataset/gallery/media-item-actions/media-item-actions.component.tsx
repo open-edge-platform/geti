@@ -15,6 +15,7 @@ const MEDIA_ACTIONS = {
     DOWNLOAD: 'download',
     DELETE: 'delete',
     ANNOTATE: 'annotate',
+    DETAILS: 'details',
 };
 
 type MediaItemActionsProps = {
@@ -23,9 +24,17 @@ type MediaItemActionsProps = {
     mediaFileName: string;
     onDeleted?: (deletedIds: string[]) => void;
     onAnnotate: () => void;
+    onDetails: () => void;
 };
 
-export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnnotate }: MediaItemActionsProps) => {
+export const MediaItemActions = ({
+    id,
+    onDeleted,
+    mediaUrl,
+    mediaFileName,
+    onAnnotate,
+    onDetails,
+}: MediaItemActionsProps) => {
     const { t } = useTranslation();
     const { closeDeleteDialog, openDeleteDialog, isDeleteDialogOpen, deleteMedia, isPending } = useDeleteMediaItem();
 
@@ -40,6 +49,8 @@ export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnn
             openDeleteDialog();
         } else if (key === MEDIA_ACTIONS.ANNOTATE) {
             onAnnotate();
+        } else if (key === MEDIA_ACTIONS.DETAILS) {
+            onDetails();
         }
     };
 
@@ -55,6 +66,7 @@ export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnn
                 </ActionButton>
                 <Menu onAction={handleAction} aria-label={'Media actions menu'}>
                     <Item key={MEDIA_ACTIONS.ANNOTATE}>{t('common.actions.annotate')}</Item>
+                    <Item key={MEDIA_ACTIONS.DETAILS}>{t('dataset.mediaDetails.title')}</Item>
                     <Item key={MEDIA_ACTIONS.DOWNLOAD}>{t('common.actions.download')}</Item>
                     <Item key={MEDIA_ACTIONS.DELETE}>{t('common.actions.delete')}</Item>
                 </Menu>
