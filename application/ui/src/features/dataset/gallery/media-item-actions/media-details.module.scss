@@ -1,0 +1,99 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+.dialog {
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+}
+
+.content {
+    min-height: 0;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: center;
+}
+
+.preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    background: var(--spectrum-global-color-gray-50);
+    overflow: hidden;
+    border-radius: 4px;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.details {
+    min-width: 0;
+}
+
+.name {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.status {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: 13px;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 24px;
+    margin: 24px 0 0;
+
+    dt {
+        color: var(--spectrum-global-color-gray-700);
+        font-size: 12px;
+    }
+
+    dd {
+        margin: 4px 0 0;
+        font-size: 14px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 640px) {
+    .layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .preview {
+        aspect-ratio: auto;
+        height: 112px;
+    }
+
+    .fields {
+        gap: 10px 16px;
+        margin-top: 12px;
+    }
+}
+
+@media (max-height: 700px) {
+    .layout {
+        gap: 16px;
+    }
+
+    .fields {
+        gap: 10px 16px;
+        margin-top: 12px;
+    }
+}

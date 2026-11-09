@@ -242,6 +242,25 @@
             "assignAllFailure": "Échec de l’attribution des étiquettes aux {{count}} image(s)",
             "assignPartialSuccess": "Étiquette(s) attribuée(s) à {{succeeded}} image(s) sur {{total}} ({{failed}} en échec)"
         },
+        "mediaDetails": {
+            "title": "Détails",
+            "resolution": "Résolution",
+            "fileSize": "Taille du fichier",
+            "format": "Format",
+            "type": "Type de média",
+            "image": "Image",
+            "video": "Vidéo",
+            "video_frame": "Image vidéo",
+            "frameRate": "Fréquence d'images",
+            "duration": "Durée",
+            "frames": "Nombre d'images",
+            "annotatedFrames": "Images annotées",
+            "annotations": "Annotations",
+            "labels": "Étiquettes uniques",
+            "loading": "Chargement...",
+            "unavailable": "Indisponible",
+            "retry": "Réessayer"
+        },
         "mediaActions": {
             "downloadStarted": "Le téléchargement de {{fileName}} a commencé"
         },

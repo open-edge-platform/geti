@@ -229,6 +229,25 @@
             "assignAllFailure": "Gagal menetapkan label ke seluruh {{count}} gambar",
             "assignPartialSuccess": "Label ditetapkan ke {{succeeded}} dari {{total}} gambar ({{failed}} gagal)"
         },
+        "mediaDetails": {
+            "title": "Detail",
+            "resolution": "Resolusi",
+            "fileSize": "Ukuran berkas",
+            "format": "Format",
+            "type": "Jenis media",
+            "image": "Gambar",
+            "video": "Video",
+            "video_frame": "Bingkai video",
+            "frameRate": "Laju bingkai",
+            "duration": "Durasi",
+            "frames": "Total bingkai",
+            "annotatedFrames": "Bingkai beranotasi",
+            "annotations": "Anotasi",
+            "labels": "Label unik",
+            "loading": "Memuat...",
+            "unavailable": "Tidak tersedia",
+            "retry": "Coba lagi"
+        },
         "mediaActions": {
             "downloadStarted": "Pengunduhan {{fileName}} telah dimulai"
         },

@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useState } from 'react';
+
 import type { Media } from '@/api/types';
 import { MediaItem } from '@/components/media-item/media-item.component';
 import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
@@ -19,6 +21,7 @@ import { BulkLabelsAssignmentDialog } from './bulk-labels-assignment/bulk-labels
 import { DatasetDropZone } from './drop-zone.component';
 import { EmptyDataset } from './empty-dataset.component';
 import { useSelectDatasetItem } from './hooks/use-select-dataset-item.hook';
+import { MediaDetails } from './media-item-actions/media-details.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
 import { MediaItemContextualHelp } from './media-item-contextual-help/media-item-contextual-help.component';
 import { useUploadFiles } from './use-upload-files';
@@ -45,6 +48,7 @@ type GalleryListProps = {
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
     onSelectedMediaItemChange: (item: Media) => void;
+    onDetails: (item: Media) => void;
 };
 
 const GalleryList = ({
@@ -54,6 +58,7 @@ const GalleryList = ({
     isFetchingNextPage,
     fetchNextPage,
     onSelectedMediaItemChange,
+    onDetails,
 }: GalleryListProps) => {
     const projectId = useProjectIdentifier();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
@@ -130,6 +135,7 @@ const GalleryList = ({
                                     mediaUrl={downloadUrl}
                                     mediaFileName={mediaFileName}
                                     onAnnotate={() => onSelectedMediaItemChange(item)}
+                                    onDetails={() => onDetails(item)}
                                 />
                             </Flex>
                         )}
@@ -152,6 +158,7 @@ export const Gallery = ({
     fetchNextPage,
 }: GalleryProps) => {
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
+    const [detailsItem, setDetailsItem] = useState<Media | null>(null);
 
     const { isClassification, uploadFiles, clearFilesForLabelAssignment, filesForLabelAssignment } = useUploadFiles();
 
@@ -166,6 +173,7 @@ export const Gallery = ({
                 fetchNextPage={fetchNextPage}
                 onSelectedMediaItemChange={onSelectedMediaItemChange}
                 isFetchingNextPage={isFetchingNextPage}
+                onDetails={setDetailsItem}
             />
         );
 
@@ -183,6 +191,10 @@ export const Gallery = ({
                     )}
                 </DialogContainer>
             </DatasetDropZone>
+
+            <DialogContainer onDismiss={() => setDetailsItem(null)}>
+                {detailsItem !== null && <MediaDetails item={detailsItem} onClose={() => setDetailsItem(null)} />}
+            </DialogContainer>
 
             {isClassification && (
                 <BulkLabelsAssignmentDialog files={filesForLabelAssignment} onClose={clearFilesForLabelAssignment} />

@@ -229,6 +229,25 @@
             "assignAllFailure": "Nie udało się przypisać etykietę(-y) do wszystkich {{count}} obrazów",
             "assignPartialSuccess": "Przypisano etykietę(-y) do {{succeeded}} z {{total}} obrazów ({{failed}} nieudanych)"
         },
+        "mediaDetails": {
+            "title": "Szczegóły",
+            "resolution": "Rozdzielczość",
+            "fileSize": "Rozmiar pliku",
+            "format": "Format",
+            "type": "Typ mediów",
+            "image": "Obraz",
+            "video": "Wideo",
+            "video_frame": "Klatka wideo",
+            "frameRate": "Liczba klatek na sekundę",
+            "duration": "Czas trwania",
+            "frames": "Wszystkie klatki",
+            "annotatedFrames": "Klatki z adnotacjami",
+            "annotations": "Adnotacje",
+            "labels": "Unikalne etykiety",
+            "loading": "Ładowanie...",
+            "unavailable": "Niedostępne",
+            "retry": "Ponów"
+        },
         "mediaActions": {
             "downloadStarted": "Rozpoczęto pobieranie {{fileName}}"
         },

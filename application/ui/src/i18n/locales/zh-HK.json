@@ -229,6 +229,25 @@
             "assignAllFailure": "為 {{count}} 張圖片分配標籤時全部失敗",
             "assignPartialSuccess": "{{total}} 張圖片中，已有 {{succeeded}} 張分配成功（{{failed}} 張失敗）"
         },
+        "mediaDetails": {
+            "title": "詳細資料",
+            "resolution": "解像度",
+            "fileSize": "檔案大小",
+            "format": "格式",
+            "type": "媒體類型",
+            "image": "圖像",
+            "video": "影片",
+            "video_frame": "影片影格",
+            "frameRate": "影格率",
+            "duration": "時長",
+            "frames": "影格總數",
+            "annotatedFrames": "已標註影格",
+            "annotations": "標註數量",
+            "labels": "不同標籤數",
+            "loading": "載入中...",
+            "unavailable": "無法取得",
+            "retry": "重試"
+        },
         "mediaActions": {
             "downloadStarted": "{{fileName}} 已開始下載"
         },
