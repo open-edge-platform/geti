@@ -22,7 +22,7 @@ import classes from './ssim-tool.module.scss';
 export const SSIMTool = () => {
     const { t } = useTranslation();
     const { scale: zoom } = useZoom();
-    const { roi, image } = useSelectedMediaItem();
+    const { roi, image, mediaItem } = useSelectedMediaItem();
     const { annotations } = useAnnotations();
     const { selectedLabel } = useAnnotatorLabels();
     const { runSSIM, toolState, isProcessing, isLoading, isError, error, autoMergeDuplicates } = useSSIMState();
@@ -49,7 +49,7 @@ export const SSIMTool = () => {
         <>
             <svg
                 aria-label='ssim preview'
-                viewBox={`0 0 ${image.width} ${image.height}`}
+                viewBox={`0 0 ${mediaItem.width} ${mediaItem.height}`}
                 style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}
             >
                 {toolState.shapes.map((shape, index) => {
@@ -92,7 +92,6 @@ export const SSIMTool = () => {
 
             <DrawingBox
                 roi={roi}
-                image={image}
                 zoom={zoom}
                 selectedLabel={selectedLabel}
                 // A second run would overwrite the in-flight one's results before they are added.

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect, useRef, useState, useTransition } from 'react';
@@ -36,7 +36,7 @@ export const MagneticLasso = () => {
     const { scale: zoom } = useZoom();
     const [mode, setMode] = useState<PolygonMode>(PolygonMode.MagneticLasso);
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
-    const { image } = useSelectedMediaItem();
+    const { image, roi } = useSelectedMediaItem();
     const { selectedLabel } = useAnnotatorLabels();
     const [isPendingPolygonOptimization, startTransition] = useTransition();
 
@@ -59,7 +59,7 @@ export const MagneticLasso = () => {
         resetTool,
         optimizePolygonOrSegments,
         setPointFromEvent,
-    } = usePolygonConfig({ image, zoom, canvasRef });
+    } = usePolygonConfig({ image, roi, zoom, canvasRef });
 
     const toolIcon = getToolIcon(mode);
 
@@ -218,7 +218,6 @@ export const MagneticLasso = () => {
 
     return (
         <SvgToolCanvas
-            image={image}
             canvasRef={canvasRef}
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}
