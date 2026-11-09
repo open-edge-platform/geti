@@ -1,7 +1,8 @@
 # Geti Agent Skills
 
-Canonical, repo-specific agent skills for Geti. Skills are grouped by the part
-of the repo they target so agents load the right paths and commands.
+Canonical agent skills for Geti. Contributor skills target this repository;
+user-facing skills target the installed `getitune` package or a running Geti
+instance and must not require a source checkout.
 
 ## Buckets
 
@@ -84,9 +85,10 @@ This is what an agent matches against to decide whether to load the skill.
 
 - **Be concise; assume the model is smart.** Keep `SKILL.md` well under 500
   lines.
-- **Ground every claim in real paths** for that bucket
-  (`libraries/getitune/src/getitune/...`, `application/backend/app/...`,
-  `application/ui/src/...`) and real commands. No invented flags.
+- **Ground every claim in the relevant runtime.** Contributor skills use real
+  repository paths and commands. User-facing skills use the supported installed
+  package or live API contract, not repository-only paths or missing hand-offs.
+  No invented flags.
 - **Numbered workflow steps, each ending in a checkable completion criterion**
   ("Done when: …") so the agent can tell done from not-done.
 - **Match freedom to fragility:** high freedom (prose) for open tasks; low

@@ -17,6 +17,18 @@
       "prompt": "Can I quantize my ONNX export directly with getitune?",
       "expected_output": "The agent explains that optimization requires OpenVINO IR and directs the user to export or convert to XML first.",
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "For installed getitune 0.4.0, write code but do not run it: quantize ./model/model.xml (its BIN is alongside it) using ./dataset, which has training and test subsets. Measure the original model and the INT8 result on the same test data, retain the output path, and predict after quantization. Explain whether max_data_subset_size=None uses the whole training set and how to explicitly cap it at 300. No measured metrics are available.",
+      "expected_output": "Loads the XML, measures baseline before optimize, explicitly passes max_data_subset_size=300, retains the returned path and tests/predicts the optimized model. Explains that None preserves metadata or the NNCF default rather than requesting unlimited calibration.",
+      "assertions": [
+        "Calls test() before optimize() to capture an original-model baseline.",
+        "Calls optimize(max_data_subset_size=300) and retains its returned artifact path.",
+        "Tests and predicts after optimization on the same configured dataset without fabricating metrics.",
+        "Explains that None preserves model metadata or falls back to the NNCF default of 300, not the entire dataset."
+      ],
+      "files": []
     }
   ]
 }

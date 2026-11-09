@@ -17,6 +17,10 @@ Use the Python API as the default entry point:
   `engine.train()` / `engine.test()` for notebooks, scripts, and smoke tests.
   Use the CLI when the workflow must be driven entirely from shell commands.
 
+Use Python 3.11-3.14 in a dedicated environment. Before installing, check
+`python --version` and `python -m pip show getitune`; if a different version is
+present, use a separate environment instead of downgrading it in place.
+Installation and pretrained-weight downloads require network access.
 Install the pinned package with the extra that matches your hardware:
 
 ```bash
@@ -26,9 +30,15 @@ python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.
 For Intel GPUs, replace `[cpu]` with `[xpu]` and the index suffix `/cpu` with
 `/xpu`. For NVIDIA GPUs, use `[cuda]` and `/cu130`. Install only the extra for
 the selected hardware; the accelerator wheels also require compatible drivers.
-Confirm the installed version before training and verify that the selected
-device is available. If an accelerator import or availability check fails,
-retry with the CPU extra before debugging the dataset or model.
+After installation, check the selected accelerator before training:
+
+```bash
+python -c "import torch; print('CUDA:', torch.cuda.is_available(), 'XPU:', torch.xpu.is_available())"
+```
+
+If the selected accelerator is unavailable, check drivers and the installed
+wheel. Offer CPU as an explicit fallback rather than silently changing the
+user's device. Missing checkpoints or datasets require user input before a run.
 
 ## Python API workflow
 
@@ -37,6 +47,7 @@ from getitune.engine import create_engine
 
 engine = create_engine(
     model="efficientnet_b0",          # model name, recipe .yaml path, or model class
+    task="MULTI_CLASS_CLS",           # single-label classification; this model also has a multilabel recipe
     data="/path/to/dataset_root",     # dataset root (COCO/YOLO/VOC/native), auto-detected
     work_dir="./my_workspace",        # checkpoints + logs; defaults to ./getitune-workspace
     device="auto",                    # "auto", "cpu", "gpu", "xpu", "cuda", "0", ...
@@ -46,9 +57,11 @@ engine.test()
 ```
 
 1. **Pick the model/recipe.** Pass a model name (`"efficientnet_b0"`), a recipe
-  path provided by your own package or script, or a model class. If a
-   name matches recipes under several tasks, pass `task=` (e.g.
-   `task="DETECTION"`) to disambiguate. Use the `getitune-discovering-models`
+   path provided by your own package or script, or a model class. If a
+   name matches recipes under several tasks, pass the dataset's exact task:
+   `MULTI_CLASS_CLS` for single-label or `MULTI_LABEL_CLS` for multilabel
+   classification. `CLASSIFICATION` is not a valid task in 0.4.0.
+   Use the `getitune-discovering-models`
    skill to list options.
    - Done when: `create_engine(...)` returns without a `ValueError`/`FileNotFoundError`.
 2. **Point `data=` at the dataset root.** Format is auto-detected by Datumaro; see
@@ -80,7 +93,7 @@ getitune train --data_root /path/to/dataset --model yolox_s \
   --max_epochs 200 --checkpoint /path/to/weights.pt
 
 # 4. Run with a named model and inspect all available CLI options
-getitune train --data_root /path/to/dataset --model yolox_s
+getitune train --help -v
 ```
 
 `getitune test` and `getitune predict` share the same `--model` / `--data_root`
@@ -91,9 +104,9 @@ argument list.
 
 - `device="auto"` selects an available accelerator; force with `"cpu"`, `"gpu"`,
   `"xpu"`, `"cuda"`, or an index like `"0"`.
-- The device must match the installed extra — `--extra xpu` for Intel GPUs,
-  `--extra cuda` for NVIDIA. Guard nothing yourself; the library handles
-  capability checks.
+- The device must match the installed extra: `[xpu]` for Intel GPUs or `[cuda]`
+  for NVIDIA, using the matching PyTorch index above. Check availability before
+  starting a long run; a selected extra alone does not install GPU drivers.
 
 ## Debugging a run
 

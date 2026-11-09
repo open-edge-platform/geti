@@ -10,6 +10,9 @@ description: Optimize an exported getitune model with post-training quantization
 model and speed up inference. Quantization runs on an **OpenVINO** model (an
 exported `.xml`), producing an INT8 version.
 
+Use Python 3.11-3.14 in a dedicated environment. Check `python --version` and
+`python -m pip show getitune` first; use a separate environment if the installed
+version differs from 0.4.0. Installation requires network access.
 Install the package before starting:
 
 ```bash
@@ -18,9 +21,11 @@ python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.
 
 For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
 `[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
-Confirm the installed version and device before optimization. If calibration
-fails, check that the dataset has a training subset and retry with an explicit
-`max_data_subset_size`; if the accelerator is unavailable, retry on CPU.
+Check `openvino.Core().available_devices` for the intended inference device;
+PyTorch extras alone do not enable OpenVINO devices. Ask for missing XML/BIN
+files or data before optimizing. If calibration fails, verify that the training
+subset is nonempty and matches the model's task and preprocessing; changing
+`max_data_subset_size` cannot repair a missing or incompatible dataset.
 
 ## Workflow
 
@@ -32,7 +37,8 @@ ov_engine = create_engine(
     model="/path/to/exported_model.xml",
     data="/path/to/dataset",
 )
-ov_engine.optimize()                 # INT8 post-training quantization via NNCF
+baseline_metrics = ov_engine.test()
+optimized_path = ov_engine.optimize(max_data_subset_size=300)
 int8_metrics = ov_engine.test()      # validate the quantized model
 predictions = ov_engine.predict()    # run inference with the quantized model
 ```
@@ -45,7 +51,9 @@ predictions = ov_engine.predict()    # run inference with the quantized model
    size. `max_data_subset_size=None` does not override the setting stored in the
    model's optimization metadata. If that metadata does not specify a subset
    size, NNCF uses its default of 300; `None` does not mean the whole dataset.
-   Pass `max_data_subset_size=300` to explicitly override the inherited setting.
+   Pass `max_data_subset_size=300` to `optimize()` to explicitly override the
+   inherited setting. This is a per-optimization argument, not an engine
+   constructor argument.
    - Done when: `optimize()` runs without a "not enough calibration data" issue.
 3. **Run `optimize()`.** This replaces the engine's model in place with the INT8
    version.
@@ -57,8 +65,9 @@ predictions = ov_engine.predict()    # run inference with the quantized model
 ## Comparing against the original model
 
 After `optimize()` the engine holds the INT8 model. To re-check the original
-FP32/FP16 model, either pass the original `.xml` path directly to `.test()` /
-`.predict()`, or create the engine again from the original `.xml`.
+FP32/FP16 model, create a separate engine from its original `.xml` and call that
+engine's `test()` / `predict()`. `model=` belongs to `create_engine()`, not to
+`test()` or `predict()`.
 
 ## Notes
 
@@ -67,7 +76,7 @@ FP32/FP16 model, either pass the original `.xml` path directly to `.test()` /
 - **Only OpenVINO IR (`.xml`) is supported.** An ONNX model must be converted to
   OpenVINO IR first before it can be optimized.
 - The library `optimize()` call is a direct operation; it does not require a
-   running application or job queue.
+  running application or job queue.
 
 ## Verify
 

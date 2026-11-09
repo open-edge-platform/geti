@@ -1,17 +1,25 @@
 # Skill Evaluation Scenarios — Application
 
 Use these prompts to test whether an agent correctly invokes and follows each
-application skill. Each scenario checks one realistic failure mode. Run the agent
-from the repo root with no extra hints beyond the prompt.
+application skill. The Markdown scenarios are manual checks with a prepared
+checkout for contributor work or a running instance and task inputs for API use.
+User-facing API skills do not require a Geti checkout.
+
+For per-skill `evals/evals.json` runs, the case's `expected_output` and
+`assertions` take precedence over this manual rubric. Clarification cases must
+request missing inputs without claiming execution. Guidance cases require only
+the requested plan or code. Execution cases require declared fixtures, service
+access, and a verified result; do not infer them from earlier cases.
 
 Expected rubric per scenario:
 
 - **Activates the right skill** — the loaded `SKILL.md` matches the topic.
-- **Uses real paths and commands** — references `application/backend/app/...`,
-  `application/ui/src/...`, `just ...`, `npm run ...` as documented.
+- **Uses the right runtime boundary** — contributor skills use the checkout's
+  documented paths and tools; user-facing skills use the running instance's API.
 - **Follows the workflow checklist** — does not skip required checks or verify
   steps.
-- **Produces a checkable artifact** — a command run, a file written, or a result.
+- **Verifies the requested deliverable** — a plan or code for advisory prompts,
+  and actual artifacts or results for execution prompts.
 
 ## `geti-backend-dev`
 
@@ -165,6 +173,11 @@ Expected behavior:
 ## Running the evaluations
 
 1. Reset the agent context between scenarios.
-2. Give only the prompt; do not hint at which skill to use.
-3. Score against the expected-behavior rubric above.
+2. Supply the prompt and declared fixtures or instance access, without relying
+   on prior scenarios. For invocation tests, do not hint at which skill to use.
+3. Score JSON runs using their own `expected_output` and `assertions`; use the
+   rubric above only for the manual scenarios.
 4. If an agent fails a scenario, update the corresponding `SKILL.md` and rerun.
+5. Compare baseline and with-skill outputs under the same model, inputs, tools,
+   and grading. Preserve outputs and grades, and distinguish plan quality from
+   successful execution against a live instance.

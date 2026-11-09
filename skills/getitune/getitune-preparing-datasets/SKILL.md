@@ -10,7 +10,10 @@ When you pass a filesystem path to `data=` (Python API) or `--data_root` (CLI),
 **auto-detect the dataset format** — you point at the dataset root and the same
 call works regardless of the underlying format.
 
-Install the package before starting:
+Use Python 3.11-3.14 in a dedicated environment. Check `python --version` and
+`python -m pip show getitune` first; use a separate environment if the installed
+version differs from 0.4.0. Installation and weight downloads require network
+access. Install the package before starting:
 
 ```bash
 python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
@@ -18,9 +21,11 @@ python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.
 
 For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
 `[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
-Confirm the installed version before loading data; if a backend import fails,
-reinstall with the matching extra and retry on CPU to separate device issues
-from dataset-format issues.
+Inspect dataset paths and annotation types before launching training. If a
+smoke run uses an accelerator, check `torch.cuda.is_available()` or
+`torch.xpu.is_available()` first. For a backend import failure, check the active
+environment and matching extra; agree on a CPU fallback to separate device
+issues from format errors. Ask for missing data rather than inventing fixtures.
 
 ## Supported formats and how they are detected
 
@@ -64,7 +69,7 @@ engine.train()
 ## Ultralytics YOLO datasets
 
 If you train an Ultralytics YOLO model, pass the Ultralytics
-`data.yaml`](https://docs.ultralytics.com/datasets/) file directly as `data=`
+[`data.yaml`](https://docs.ultralytics.com/datasets/) file directly as `data=`
 (or `--data_root`). Install the optional backend from PyPI with
 `python -m pip install "getitune[cpu,ultralytics]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu`.
 For a GPU, replace the CPU extra and index with the matching pair above while
