@@ -66,8 +66,8 @@ export const MediaItemActions = ({
                 </ActionButton>
                 <Menu onAction={handleAction} aria-label={'Media actions menu'}>
                     <Item key={MEDIA_ACTIONS.ANNOTATE}>{t('common.actions.annotate')}</Item>
-                    <Item key={MEDIA_ACTIONS.DETAILS}>{t('dataset.mediaDetails.title')}</Item>
                     <Item key={MEDIA_ACTIONS.DOWNLOAD}>{t('common.actions.download')}</Item>
+                    <Item key={MEDIA_ACTIONS.DETAILS}>{t('dataset.mediaDetails.title')}</Item>
                     <Item key={MEDIA_ACTIONS.DELETE}>{t('common.actions.delete')}</Item>
                 </Menu>
             </MenuTrigger>

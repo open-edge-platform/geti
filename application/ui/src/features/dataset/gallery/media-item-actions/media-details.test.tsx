@@ -81,6 +81,12 @@ describe('Media details', () => {
 
         expect(request).not.toHaveBeenCalled();
         await user.click(screen.getByRole('button', { name: 'Media actions' }));
+        expect((await screen.findAllByRole('menuitem')).map((menuItem) => menuItem.textContent)).toEqual([
+            'Annotate',
+            'Download',
+            'Details',
+            'Delete',
+        ]);
         await user.click(await screen.findByRole('menuitem', { name: 'Details' }));
         await screen.findByRole('dialog', { name: 'Details' });
         expect(screen.queryByRole('region', { name: 'Details' })).not.toBeInTheDocument();
