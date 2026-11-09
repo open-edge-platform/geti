@@ -12,7 +12,7 @@ import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
 import { isNonEmptyLabel } from '../../../../shared/labels';
-import { getThumbnailUrl, getVideoFrameThumbnailUrl } from '../../../../shared/media-url.utils';
+import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 
 import classes from './media-details.module.scss';
 
@@ -68,7 +68,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
         [t('dataset.mediaDetails.fileSize'), prettyBytes(item.size, { locale: i18n.language })],
         [t('dataset.mediaDetails.format'), item.format.toUpperCase()],
         [t('dataset.mediaDetails.type'), t(`dataset.mediaDetails.${item.type}`)],
-        ...(item.type !== 'image'
+        ...(isVideo
             ? [
                   [t('dataset.mediaDetails.frameRate'), `${number.format(item.fps)} FPS`],
                   [t('dataset.mediaDetails.duration'), `${number.format(item.duration)} s`],
@@ -89,14 +89,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
             <Content UNSAFE_className={classes.content}>
                 <div className={classes.layout}>
                     <div className={classes.preview}>
-                        <img
-                            src={
-                                item.type === 'video_frame'
-                                    ? getVideoFrameThumbnailUrl(projectId, item.id, item.frame_number)
-                                    : getThumbnailUrl(projectId, item.id)
-                            }
-                            alt={item.name}
-                        />
+                        <img src={getThumbnailUrl(projectId, item.id)} alt={item.name} />
                     </div>
                     <div className={classes.details}>
                         <h3 className={classes.name} title={mediaFileName}>
