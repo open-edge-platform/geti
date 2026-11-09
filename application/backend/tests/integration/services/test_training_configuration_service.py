@@ -476,6 +476,8 @@ class TestTrainingConfigurationService:
             project_id=project_id, model_architecture_id=model_architecture_id
         )
         assert loaded.algo_level_parameters.training.allowed_values_input_size == [
+            384,
+            512,
             640,
             800,
             960,

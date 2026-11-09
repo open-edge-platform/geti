@@ -36,7 +36,13 @@ hyperparameters:
       enable: true
       max_grad_norm: 0.1
     allowed_values_input_size:
+      - 384
+      - 512
       - 640
+      - 800
+      - 960
+      - 1024
+      - 1280
     input_size_width: 640
     input_size_height: 640
   dataset_preparation:

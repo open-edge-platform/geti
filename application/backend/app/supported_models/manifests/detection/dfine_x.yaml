@@ -25,6 +25,8 @@ hyperparameters:
         enable: true
         epochs: 30
     allowed_values_input_size:
+      - 384
+      - 512
       - 640
       - 800
       - 960
