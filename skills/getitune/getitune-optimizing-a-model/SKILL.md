@@ -39,8 +39,8 @@ ov_engine = create_engine(
 )
 baseline_metrics = ov_engine.test()
 optimized_path = ov_engine.optimize(max_data_subset_size=300)
-int8_metrics = ov_engine.test()      # validate the quantized model
-predictions = ov_engine.predict()    # run inference with the quantized model
+int8_metrics = ov_engine.test(checkpoint=optimized_path)
+predictions = ov_engine.predict(checkpoint=optimized_path)
 ```
 
 1. **Start from an exported OpenVINO model** (`.xml`). If you only have a
@@ -55,19 +55,21 @@ predictions = ov_engine.predict()    # run inference with the quantized model
    inherited setting. This is a per-optimization argument, not an engine
    constructor argument.
    - Done when: `optimize()` runs without a "not enough calibration data" issue.
-3. **Run `optimize()`.** This replaces the engine's model in place with the INT8
-   version.
-   - Done when: the call completes and subsequent `test()`/`predict()` use INT8.
-4. **Re-validate accuracy** with `test()` and compare against the FP32/FP16
-   baseline; a small accuracy drop is expected in exchange for size/latency.
+3. **Run `optimize()`.** Retain the returned path to the INT8 artifact; the
+   engine's original model is not replaced.
+   - Done when: the returned XML and its companion BIN exist.
+4. **Re-validate accuracy** with `test(checkpoint=optimized_path)` and run
+   `predict(checkpoint=optimized_path)` on the same evaluation data. Compare
+   against the FP32/FP16 baseline.
    - Done when: the INT8 metric is within your acceptable tolerance of baseline.
 
 ## Comparing against the original model
 
-After `optimize()` the engine holds the INT8 model. To re-check the original
-FP32/FP16 model, create a separate engine from its original `.xml` and call that
-engine's `test()` / `predict()`. `model=` belongs to `create_engine()`, not to
-`test()` or `predict()`.
+After `optimize()` the engine still holds the original FP32/FP16 model. Calling
+`test()` or `predict()` without `checkpoint=` therefore uses that original
+model, even after a call with `checkpoint=optimized_path`. Pass the optimized
+path to both calls, or create a separate engine with
+`create_engine(model=optimized_path, data=...)` and use its `test()` / `predict()`.
 
 ## Notes
 

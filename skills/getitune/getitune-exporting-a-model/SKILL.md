@@ -25,9 +25,9 @@ For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
 Check device availability with `torch.cuda.is_available()` or
 `torch.xpu.is_available()` when exporting from an accelerator-backed engine;
 check its drivers and wheel if unavailable, or agree on a CPU fallback.
-If export fails at
-model loading, first rerun `engine.test()` on the trained model; if that fails,
-fix the model or checkpoint before diagnosing the export format.
+If export fails at model loading, first rerun `engine.test()` on the trained
+model; if that fails, fix the model or checkpoint before diagnosing the export
+format.
 
 ## Python API workflow
 
@@ -40,9 +40,9 @@ from getitune.types.precision import Precision
 
 engine = create_engine(
     model="efficientnet_b0",
-      task="MULTI_CLASS_CLS",
+    task="MULTI_CLASS_CLS",
     data="/path/to/dataset",
-      checkpoint="/path/to/trained_checkpoint.ckpt",
+    checkpoint="/path/to/trained_checkpoint.ckpt",
     work_dir="./my_workspace",
 )
 baseline_metrics = engine.test()
@@ -58,7 +58,7 @@ assert Path(ov_fp16).with_suffix(".bin").is_file()
 # FP32 ONNX
 onnx_path = engine.export(export_format=ExportFormat.ONNX)
 
-# FP16 ONNX (same pattern works for OpenVINO IR)
+# FP16 ONNX
 onnx_fp16 = engine.export(export_format=ExportFormat.ONNX, export_precision=Precision.FP16)
 
 exported_engine = create_engine(model=ov_fp16, data="/path/to/dataset")
