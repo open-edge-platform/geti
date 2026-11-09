@@ -92,7 +92,7 @@ getitune train --data_root /path/to/dataset --model yolox_s
 getitune train --data_root /path/to/dataset --model yolox_s \
   --max_epochs 200 --checkpoint /path/to/weights.pt
 
-# 4. Run with a named model and inspect all available CLI options
+# 4. Inspect all available training CLI options
 getitune train --help -v
 ```
 

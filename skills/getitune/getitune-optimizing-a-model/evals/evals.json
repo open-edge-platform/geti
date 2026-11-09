@@ -7,7 +7,7 @@
       "expected_output": "The agent requests the model files, representative training/calibration data, evaluation data, and acceptable accuracy drop. It plans to measure a baseline before optimization and compare on the same evaluation data, without reporting an executed quantization or invented metrics.",
       "assertions": [
         "Requests XML/BIN files, calibration and evaluation data, and an accuracy tolerance.",
-        "Plans baseline measurement and post-quantization evaluation on the same data.",
+        "Plans baseline measurement and evaluation of the returned optimized artifact on the same data, using checkpoint= or a separate engine.",
         "Does not claim to have produced an INT8 artifact or measured accuracy."
       ],
       "files": []
@@ -21,11 +21,11 @@
     {
       "id": 3,
       "prompt": "For installed getitune 0.4.0, write code but do not run it: quantize ./model/model.xml (its BIN is alongside it) using ./dataset, which has training and test subsets. Measure the original model and the INT8 result on the same test data, retain the output path, and predict after quantization. Explain whether max_data_subset_size=None uses the whole training set and how to explicitly cap it at 300. No measured metrics are available.",
-      "expected_output": "Loads the XML, measures baseline before optimize, explicitly passes max_data_subset_size=300, retains the returned path and tests/predicts the optimized model. Explains that None preserves metadata or the NNCF default rather than requesting unlimited calibration.",
+      "expected_output": "Loads the XML, measures baseline before optimize, explicitly passes max_data_subset_size=300, and retains the returned path. Both test and predict explicitly load that optimized path via checkpoint= or a separate engine; optimize does not replace the original engine model. Explains that None preserves metadata or the NNCF default rather than requesting unlimited calibration.",
       "assertions": [
         "Calls test() before optimize() to capture an original-model baseline.",
         "Calls optimize(max_data_subset_size=300) and retains its returned artifact path.",
-        "Tests and predicts after optimization on the same configured dataset without fabricating metrics.",
+        "Tests and predicts on the same evaluation data using the returned optimized path: pass checkpoint=optimized_path to BOTH calls, or call both on a separate engine constructed with model=optimized_path. Rejects bare test()/predict() on the original engine after optimize(), including predict() after only test(checkpoint=optimized_path). Does not fabricate metrics.",
         "Explains that None preserves model metadata or falls back to the NNCF default of 300, not the entire dataset."
       ],
       "files": []

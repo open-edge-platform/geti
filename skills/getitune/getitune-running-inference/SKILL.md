@@ -25,9 +25,9 @@ For PyTorch, check `torch.cuda.is_available()` or `torch.xpu.is_available()`
 before selecting an accelerator. For OpenVINO, inspect
 `openvino.Core().available_devices`; PyTorch extras do not determine OpenVINO
 device availability. Resolve missing drivers or agree on CPU before continuing.
-If the exported
-model cannot load, check the matching `.bin` file for OpenVINO XML or use the
-original checkpoint to distinguish an artifact problem from a dataset problem.
+If the exported model cannot load, check the matching `.bin` file for OpenVINO
+XML or use the original checkpoint to distinguish an artifact problem from a
+dataset problem.
 
 ## PyTorch inference (trained model)
 
@@ -36,9 +36,9 @@ from getitune.engine import create_engine
 
 engine = create_engine(
     model="efficientnet_b0",
-      task="MULTI_CLASS_CLS",
+    task="MULTI_CLASS_CLS",
     data="/path/to/dataset",
-      checkpoint="/path/to/trained_checkpoint.ckpt",
+    checkpoint="/path/to/trained_checkpoint.ckpt",
 )
 test_metrics = engine.test()      # metrics on the test subset
 predictions = engine.predict()    # predictions on the test subset

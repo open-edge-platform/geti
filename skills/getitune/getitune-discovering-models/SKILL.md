@@ -42,7 +42,7 @@ name list is deduplicated and is not ordered to match the recipe list:
 from pathlib import Path
 
 for recipe in list_models(task="DETECTION", return_recipes=True):
-  print(Path(recipe).stem, recipe)
+    print(Path(recipe).stem, recipe)
 ```
 
 Pass a returned name with its task (or an unambiguous recipe path) to an engine.
