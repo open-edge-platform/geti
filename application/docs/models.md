@@ -210,14 +210,15 @@ compared to the ground truth annotations to compute the metrics.
 ### Tiling
 
 Models that support tiling (detection and instance segmentation) can be trained on tiles of large images, enabled in
-automatic or custom mode in the advanced training settings. **Minimum visible object fraction** sets how much of an
-annotation's bounding box or polygon area must lie inside a tile for the annotation to be kept on that tile:
+automatic or custom mode in the advanced training settings. **Object visibility threshold in tile** sets how much of an
+object's bounding box or polygon area must be visible inside a tile for the object to be included, in its visible
+(cut) extent, on that tile:
 
-- `0.5` (default): keep an annotation only if at least half of it is visible;
-- `0`: keep every annotation that intersects the tile;
-- `1`: keep only annotations that are fully inside the tile.
+- `0.5` (default): include an object only if at least half of it is visible;
+- `0`: include every object that intersects the tile, however little is visible;
+- `1`: include only objects that are fully inside the tile.
 
-The setting applies to the annotations of training and validation tiles. Objects that are large compared to the tile
+The setting applies to the objects of training and validation tiles. Objects that are large compared to the tile
 size can be left out of every tile when no tile contains the required fraction, so choose the tile size and the
 threshold according to the size of the objects in the dataset.
 

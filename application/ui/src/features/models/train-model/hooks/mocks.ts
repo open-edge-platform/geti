@@ -567,8 +567,8 @@ export const mockedTrainingConfiguration: TrainingConfiguration = {
                                 },
                                 {
                                     type: 'parameter',
-                                    key: 'drop_annotation_threshold',
-                                    name: 'Minimum visible object fraction',
+                                    key: 'min_object_ratio_thr',
+                                    name: 'Object visibility threshold in tile',
                                     description:
                                         "Minimum fraction of an annotation's bounding box or polygon area that must be visible in a tile.",
                                     depends_on: null,

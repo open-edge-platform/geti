@@ -34,7 +34,7 @@ export const getTilingAutomaticDescription = (t: TranslateFn): string =>
 
 const ADAPTIVE_TILING_PARAMETER = 'enable_adaptive_tiling';
 const ENABLE_TILING_PARAMETER = 'enable';
-const DROP_ANNOTATION_THRESHOLD_PARAMETER = 'drop_annotation_threshold';
+const MIN_OBJECT_RATIO_THRESHOLD_PARAMETER = 'min_object_ratio_thr';
 
 const getBoolParameter = (tilingParameters: ConfigurableParameter[], key: string) => {
     const parameter = tilingParameters.find((tilingParameter) => key === tilingParameter.key);
@@ -55,7 +55,7 @@ export const getEnableTilingParameter = (tilingParameters: ConfigurableParameter
 };
 
 export const getObjectThresholdParameter = (tilingParameters: ConfigurableParameter[]) => {
-    return tilingParameters.find((parameter) => parameter.key === DROP_ANNOTATION_THRESHOLD_PARAMETER);
+    return tilingParameters.find((parameter) => parameter.key === MIN_OBJECT_RATIO_THRESHOLD_PARAMETER);
 };
 
 export const TILING_MODES = {

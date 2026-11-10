@@ -27,11 +27,11 @@ import {
 
 describe('getObjectThresholdParameter', () => {
     const threshold = getMockedConfigurationParameter({
-        key: 'drop_annotation_threshold',
+        key: 'min_object_ratio_thr',
         value_type: 'float',
-        name: 'Minimum visible object fraction',
+        name: 'Object visibility threshold in tile',
         value: 0.5,
-        description: 'Minimum visible fraction of an annotation',
+        description: "Fraction of an object's bounding box or polygon area that must be visible in a tile",
         default_value: 0.5,
         min_value: 0,
         max_value: 1,
@@ -151,11 +151,11 @@ describe('Tiling', () => {
             min_value: 0,
         }),
         getMockedConfigurationParameter({
-            key: 'drop_annotation_threshold',
+            key: 'min_object_ratio_thr',
             value_type: 'float',
-            name: 'Minimum visible object fraction',
+            name: 'Object visibility threshold in tile',
             value: 0.5,
-            description: 'Minimum visible fraction of an annotation',
+            description: "Fraction of an object's bounding box or polygon area that must be visible in a tile",
             default_value: 0.5,
             min_value: 0,
             max_value: 1,
@@ -221,7 +221,7 @@ describe('Tiling', () => {
         expect(getTilingModeButton(TILING_MODES.CUSTOM)).toHaveAttribute('aria-pressed', 'false');
         expect(screen.getByText(getTilingOffDescription(t))).toBeInTheDocument();
         expect(
-            screen.queryByRole('textbox', { name: 'Change Minimum visible object fraction' })
+            screen.queryByRole('textbox', { name: 'Change Object visibility threshold in tile' })
         ).not.toBeInTheDocument();
 
         fireEvent.click(getTilingModeButton(TILING_MODES.AUTOMATIC));
@@ -231,8 +231,8 @@ describe('Tiling', () => {
         expect(getTilingModeButton(TILING_MODES.CUSTOM)).toHaveAttribute('aria-pressed', 'false');
         expect(screen.getByText(getTilingAutomaticDescription(t))).toBeInTheDocument();
         expect(screen.queryByRole('textbox', { name: 'Change Tile size' })).not.toBeInTheDocument();
-        const threshold = screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' });
-        const slider = screen.getByRole('slider', { name: 'Change Minimum visible object fraction slider' });
+        const threshold = screen.getByRole('textbox', { name: 'Change Object visibility threshold in tile' });
+        const slider = screen.getByRole('slider', { name: 'Change Object visibility threshold in tile slider' });
         expect(slider).toHaveAttribute('min', '0');
         expect(slider).toHaveAttribute('max', '1');
         expect(threshold).toHaveValue('0.5');
@@ -240,13 +240,13 @@ describe('Tiling', () => {
         await userEvent.type(threshold, '0.8');
         await userEvent.tab();
         await userEvent.click(getTilingModeButton(TILING_MODES.CUSTOM));
-        expect(screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' })).toHaveValue('0.8');
+        expect(screen.getByRole('textbox', { name: 'Change Object visibility threshold in tile' })).toHaveValue('0.8');
         fireEvent.click(getTilingModeButton(TILING_MODES.OFF));
         expect(
-            screen.queryByRole('textbox', { name: 'Change Minimum visible object fraction' })
+            screen.queryByRole('textbox', { name: 'Change Object visibility threshold in tile' })
         ).not.toBeInTheDocument();
         fireEvent.click(getTilingModeButton(TILING_MODES.AUTOMATIC));
-        expect(screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' })).toHaveValue('0.8');
+        expect(screen.getByRole('textbox', { name: 'Change Object visibility threshold in tile' })).toHaveValue('0.8');
     });
 
     it('tiling tag updates properly when tiling mode changes', () => {
@@ -277,7 +277,7 @@ describe('Tiling', () => {
         for (const parameter of customParameters) {
             const parameterInput = screen.getByRole('textbox', { name: `Change ${parameter.name}` });
             const nextValue =
-                parameter.key === 'drop_annotation_threshold' ? '0.8' : (Number(parameter.value) + 1).toString();
+                parameter.key === 'min_object_ratio_thr' ? '0.8' : (Number(parameter.value) + 1).toString();
 
             expect(parameterInput).toHaveValue(parameter.value.toString());
 

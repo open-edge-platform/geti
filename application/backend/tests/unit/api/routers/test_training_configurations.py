@@ -102,7 +102,7 @@ class TestTrainingConfigurationEndpoints:
         response = fxt_client.patch(
             f"/api/projects/{uuid4()}/training_configuration",
             params={"model_architecture_id": "object-detection-yolox-x"},
-            json={"dataset_preparation.augmentation.tiling.drop_annotation_threshold": threshold},
+            json={"dataset_preparation.augmentation.tiling.min_object_ratio_thr": threshold},
         )
         assert response.status_code == 400
         fxt_training_configuration_service.update.assert_not_called()

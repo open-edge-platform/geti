@@ -332,7 +332,7 @@ class GaussianNoise(BaseAugmentationParameter):
 
 class Tiling(BaseAugmentationParameter):
     # ``TrainingConfiguration.apply_updates`` assigns values with ``setattr``, so validate on assignment to
-    # reject out-of-range updates such as ``drop_annotation_threshold``.
+    # reject out-of-range updates such as ``min_object_ratio_thr``.
     model_config = ConfigDict(validate_assignment=True)
 
     enable_adaptive_tiling: bool = Field(
@@ -357,11 +357,11 @@ class Tiling(BaseAugmentationParameter):
         title="Tile overlap",
         description="Overlap between adjacent tiles as a fraction of tile size",
     )
-    drop_annotation_threshold: float = Field(
+    min_object_ratio_thr: float = Field(
         default=0.5,
         ge=0.0,
         le=1.0,
-        title="Minimum visible object fraction",
+        title="Object visibility threshold in tile",
         description=(
             "Minimum fraction of an annotation's bounding box or polygon area that must be visible in a tile. "
             "Annotations below this threshold are excluded from the tile. "

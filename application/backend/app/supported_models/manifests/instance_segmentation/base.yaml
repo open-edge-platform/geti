@@ -10,7 +10,7 @@ hyperparameters:
         enable_adaptive_tiling: true
         tile_size: 400
         tile_overlap: 0.2
-        drop_annotation_threshold: 0.5
+        min_object_ratio_thr: 0.5
       random_horizontal_flip:
         enable: true
         probability: 0.5

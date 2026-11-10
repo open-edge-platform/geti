@@ -133,23 +133,23 @@ class TestTrainingConfigurationService:
         config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
         tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
         assert tiling is not None
-        assert tiling.drop_annotation_threshold == 0.5
+        assert tiling.min_object_ratio_thr == 0.5
         config.apply_updates(
             {
                 "dataset_preparation.augmentation.tiling.enable": True,
-                "dataset_preparation.augmentation.tiling.drop_annotation_threshold": 0.25,
+                "dataset_preparation.augmentation.tiling.min_object_ratio_thr": 0.25,
             }
         )
         fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
         loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
         loaded_tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
         assert loaded_tiling is not None
-        assert loaded_tiling.drop_annotation_threshold == 0.25
+        assert loaded_tiling.min_object_ratio_thr == 0.25
         view = TrainingConfigurationView.from_training_configuration(loaded, default).model_dump()
 
         def find_parameter(nodes):
             for node in nodes:
-                if node["key"] == "drop_annotation_threshold":
+                if node["key"] == "min_object_ratio_thr":
                     return node
                 if "parameters" in node:
                     result = find_parameter(node["parameters"])
@@ -169,18 +169,18 @@ class TestTrainingConfigurationService:
         serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
         serialized.update(model_manifest_id=architecture, sub_task_type=None)
         converted = GetiConfigConverter.convert(serialized)
-        assert converted["data"]["tile_config"]["drop_annotation_threshold"] == 0.25
+        assert converted["data"]["tile_config"]["min_object_ratio_thr"] == 0.25
 
         for invalid in (-0.01, 1.01):
             with pytest.raises(ValidationError):
-                loaded.apply_updates({"dataset_preparation.augmentation.tiling.drop_annotation_threshold": invalid})
+                loaded.apply_updates({"dataset_preparation.augmentation.tiling.min_object_ratio_thr": invalid})
 
     @pytest.mark.parametrize("architecture", ["object-detection-yolox-s", "instance-segmentation-mask-rcnn-resnet50"])
     def test_object_threshold_default_for_tiling_architectures(self, architecture: str):
         config = TrainingConfigurationService.get_default_by_model_architecture(architecture)
         tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
         assert tiling is not None
-        assert tiling.drop_annotation_threshold == 0.5
+        assert tiling.min_object_ratio_thr == 0.5
 
     def test_existing_tiling_configuration_uses_threshold_default(
         self,
@@ -191,7 +191,7 @@ class TestTrainingConfigurationService:
         architecture = "object-detection-yolox-s"
         default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
         legacy = default.algo_level_parameters.model_dump()
-        legacy["dataset_preparation"]["augmentation"]["tiling"].pop("drop_annotation_threshold")
+        legacy["dataset_preparation"]["augmentation"]["tiling"].pop("min_object_ratio_thr")
         db_session.add(
             TrainingConfigurationDB(
                 id=str(uuid4()),
@@ -204,7 +204,7 @@ class TestTrainingConfigurationService:
         loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
         tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
         assert tiling is not None
-        assert tiling.drop_annotation_threshold == 0.5
+        assert tiling.min_object_ratio_thr == 0.5
 
     def test_get_by_model_revision(
         self,

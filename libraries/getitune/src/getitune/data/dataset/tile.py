@@ -76,7 +76,7 @@ class TileDatasetFactory:
                         overlap_x=tile_config.overlap,
                         overlap_y=tile_config.overlap,
                     ),
-                    threshold_drop_ann=tile_config.drop_annotation_threshold,
+                    threshold_drop_ann=tile_config.min_object_ratio_thr,
                 ),
                 dtype=dm_dataset.dtype,  # type: ignore[attr-defined]
             )
@@ -124,7 +124,7 @@ class TileDataset(VisionDataset):
             overlap_y=tile_config.overlap,
         )
         self._tiling_transform = create_tiling_transform(
-            self._tiling_config, threshold_drop_ann=tile_config.drop_annotation_threshold
+            self._tiling_config, threshold_drop_ann=tile_config.min_object_ratio_thr
         )
         self._filtering_transform = create_filtering_transform()
 

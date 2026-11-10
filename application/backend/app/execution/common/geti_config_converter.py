@@ -409,7 +409,7 @@ class TransformsUpdater:
         """Update tiling parameters in the config.
 
         Args:
-            tiling_dict: Tiling settings, including the minimum visible annotation fraction.
+            tiling_dict: Tiling settings, including the object visibility threshold in tile.
             config: The full getitune config dictionary.
         """
         if tiling_dict is None:
@@ -425,8 +425,8 @@ class TransformsUpdater:
                 tiling_dict["tile_size"],
             )
             tile_config["overlap"] = tiling_dict["tile_overlap"]
-            if "drop_annotation_threshold" in tiling_dict:
-                tile_config["drop_annotation_threshold"] = tiling_dict["drop_annotation_threshold"]
+            if "min_object_ratio_thr" in tiling_dict:
+                tile_config["min_object_ratio_thr"] = tiling_dict["min_object_ratio_thr"]
 
 
 class HyperparametersUpdater:

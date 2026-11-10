@@ -30,8 +30,8 @@ if TYPE_CHECKING:
 
 @pytest.mark.parametrize("threshold", [-0.01, 1.01, float("nan"), float("inf")])
 def test_invalid_threshold_is_rejected(threshold: float) -> None:
-    with pytest.raises(ValueError, match="drop_annotation_threshold"):
-        TileConfig(drop_annotation_threshold=threshold)
+    with pytest.raises(ValueError, match="min_object_ratio_thr"):
+        TileConfig(min_object_ratio_thr=threshold)
 
 
 @pytest.fixture
@@ -64,7 +64,7 @@ def fxt_detection_dataset(tmp_path: Path):
 
 def _tiles(ds, threshold: float) -> list:
     tile_ds = TileDatasetFactory.create(
-        ds, TileConfig(enable_tiler=True, tile_size=(300, 300), drop_annotation_threshold=threshold)
+        ds, TileConfig(enable_tiler=True, tile_size=(300, 300), min_object_ratio_thr=threshold)
     )
     assert isinstance(tile_ds, TileDataset)
     return tile_ds.get_tiles(0)
@@ -117,7 +117,7 @@ def test_instance_segmentation_threshold_keeps_masks_aligned(threshold, expected
     )
     dataset = InstanceSegDataset(dm_subset=source, transforms=[])
     tiled = TileDatasetFactory.create(
-        dataset, TileConfig(enable_tiler=True, tile_size=(100, 100), overlap=0.0, drop_annotation_threshold=threshold)
+        dataset, TileConfig(enable_tiler=True, tile_size=(100, 100), overlap=0.0, min_object_ratio_thr=threshold)
     )
     first = next(item for item in tiled.dm_subset if item.tile.x == 0 and item.tile.y == 0)
     assert first.label.tolist() == expected_labels
