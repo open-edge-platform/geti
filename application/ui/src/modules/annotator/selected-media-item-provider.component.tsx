@@ -8,7 +8,7 @@ import { isEqual } from 'lodash-es';
 import { useParams } from 'react-router';
 
 import { isOmeImage, isVideo, isVideoFrame } from '../../shared/media-item-utils';
-import { getOmeDemoDefaultChannels } from '../../shared/ome-demo';
+import { getOmeDemoChannelView } from '../../shared/ome-demo';
 import type { RegionOfInterest } from '../../shared/types';
 import { useLoadImageQuery } from './hooks/use-load-image-query.hook';
 
@@ -62,7 +62,8 @@ const convertMediaItem = (mediaItem: Media, frameNumber: number): Media => {
             type: 'ome_plane',
             z_index: 0,
             t_index: 0,
-            channels: getOmeDemoDefaultChannels(mediaItem.id),
+            // TODO(#7810): use `GET .../channel-view` once the OME backend is merged, and drop the ome-demo import
+            channels: getOmeDemoChannelView(mediaItem.id),
         };
     }
 

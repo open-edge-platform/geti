@@ -3,6 +3,7 @@
 
 export const FEATURE_FLAGS = {
     SSIM_TOOL: true,
-    // Adds fake OME images to the gallery, rendered in the browser
+    // Serves fake OME images from a mock service worker (web only, not Tauri)
+    // TODO(#7810): delete once the OME backend is merged, together with `startOmeDemo` in index.tsx
     OME_DEMO: true,
 };

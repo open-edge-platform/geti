@@ -112,5 +112,10 @@
     },
     "overrides": {
         "@faker-js/faker": "~10.6.0"
+    },
+    "msw": {
+        "workerDirectory": [
+            "public"
+        ]
     }
 }

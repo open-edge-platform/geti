@@ -11,7 +11,7 @@ import type {
     PredictionVideoRangePayload,
 } from '@/api/types';
 
-import { getMediaBinaryUrl } from './media-url.utils';
+import { getMediaBinaryUrl, getOmeRenderUrl } from './media-url.utils';
 
 export const isVideo = (media: Pick<Media, 'type'> | undefined): media is MediaVideo => media?.type === 'video';
 
@@ -33,9 +33,8 @@ export const isOmePlane = (media: Pick<Media, 'type'> | undefined): media is Med
 export const isAnnotatableMedia = (media: Pick<Media, 'type'> | undefined): media is MediaImage | MediaVideoFrame =>
     isImage(media) || isVideoFrame(media);
 
-// The helpers below translate a media item (an image or a single video frame) into the shapes the API expects, so
-// callers never branch on how each media type is addressed.
-// TODO(#7810): extend with the Z/C/T coordinates of OME-TIFF / OME-Zarr images.
+// The helpers below translate a media item (an image, a video frame or an OME plane) into the shapes the API expects,
+// so callers never branch on how each media type is addressed.
 
 // Frames of the same video and planes of the same OME image share their parent's id.
 export const getMediaItemKey = (media: Media): string => {
@@ -51,10 +50,25 @@ export const getMediaItemKey = (media: Media): string => {
 };
 
 // Query params for the endpoints that act on a single media item: binary, thumbnail, annotations and embeddings.
-export const getMediaItemQueryParams = (media: Media): { frame_index: number } | undefined =>
-    isVideoFrame(media) ? { frame_index: media.frame_number } : undefined;
+// TODO(#7810): drop the optional `z`/`t` once the regenerated OpenAPI types include them.
+export const getMediaItemQueryParams = (media: Media): { frame_index?: number; z?: number; t?: number } | undefined => {
+    if (isVideoFrame(media)) {
+        return { frame_index: media.frame_number };
+    }
 
-export const getMediaItemBinaryUrl = (projectId: string, media: Media): string => {
+    if (isOmePlane(media)) {
+        return { z: media.z_index, t: media.t_index };
+    }
+
+    return undefined;
+};
+
+// The picture the annotator shows: the stored file, or for an OME plane a render of its channel view.
+export const getMediaItemImageUrl = (projectId: string, media: Media): string => {
+    if (isOmePlane(media)) {
+        return getOmeRenderUrl(projectId, media);
+    }
+
     const url = getMediaBinaryUrl(projectId, media.id);
     const queryParams = getMediaItemQueryParams(media);
 

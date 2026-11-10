@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import type { Media } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { getMediaItemBinaryUrl, isVideo, isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemImageUrl, isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { VideoFrame } from '../video-player/video-frame.component';
 import { drawImageDataOnCanvas } from './draw-image-data-on-canvas';
 
@@ -34,7 +34,7 @@ const StaticImage = ({ mediaItem }: { mediaItem: Media }) => {
 
     return (
         <img
-            src={getMediaItemBinaryUrl(projectId, mediaItem)}
+            src={getMediaItemImageUrl(projectId, mediaItem)}
             width={mediaItem.width}
             height={mediaItem.height}
             crossOrigin='anonymous'

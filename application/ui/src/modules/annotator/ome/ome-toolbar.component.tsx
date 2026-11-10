@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import type { MediaOmePlane, OmeChannelSetting } from '@/api/types';
+import type { MediaOmePlane, OmeChannelInfo, OmeChannelSetting } from '@/api/types';
 import {
     ActionButton,
     ColorSwatch,
@@ -20,9 +20,9 @@ import {
     Text,
     type RangeValue,
 } from '@geti-ui/ui';
-import { uniq } from 'lodash-es';
+import { throttle, uniq } from 'lodash-es';
 
-import { getOmeDemoChannelNames, OME_DEMO_INTENSITY_MAX } from '../../../shared/ome-demo';
+import { getOmeDemoChannels, saveOmeDemoChannelView } from '../../../shared/ome-demo';
 import { useSelectedMediaItem } from '../selected-media-item-provider.component';
 import { Toolbar } from '../shell/toolbar-container/toolbar-container.component';
 
@@ -62,12 +62,24 @@ const PlaneSlider = ({ label, index, size, onChange }: PlaneSliderProps) => {
 
 type ChannelProps = {
     name: string;
+    intensityRange: OmeChannelInfo['window'] | undefined;
     setting: OmeChannelSetting;
+    onPreview: (setting: OmeChannelSetting) => void;
     onChange: (setting: OmeChannelSetting) => void;
 };
 
-const Channel = ({ name, setting, onChange }: ChannelProps) => {
+const PREVIEW_INTERVAL_MS = 100;
+
+const Channel = ({ name, intensityRange, setting, onPreview, onChange }: ChannelProps) => {
     const [range, setRange] = useState<RangeValue<number>>({ start: setting.window_min, end: setting.window_max });
+    // Called with a callback so the trailing call uses the latest props
+    const [throttledPreview] = useState(() => throttle((preview: () => void) => preview(), PREVIEW_INTERVAL_MS));
+
+    const withWindow = ({ start, end }: RangeValue<number>): OmeChannelSetting => ({
+        ...setting,
+        window_min: start,
+        window_max: Math.max(end, start + 1),
+    });
 
     return (
         <Flex direction={'column'} gap={'size-50'}>
@@ -99,13 +111,17 @@ const Channel = ({ name, setting, onChange }: ChannelProps) => {
 
             <RangeSlider
                 label={'Display range'}
-                minValue={0}
-                maxValue={OME_DEMO_INTENSITY_MAX}
+                minValue={intensityRange?.min ?? 0}
+                maxValue={intensityRange?.max ?? 65535}
                 value={range}
-                onChange={setRange}
-                onChangeEnd={({ start, end }) =>
-                    onChange({ ...setting, window_min: start, window_max: Math.max(end, start + 1) })
-                }
+                onChange={(value) => {
+                    setRange(value);
+                    throttledPreview(() => onPreview(withWindow(value)));
+                }}
+                onChangeEnd={(value) => {
+                    throttledPreview.cancel();
+                    onChange(withWindow(value));
+                }}
                 isDisabled={!setting.enabled}
                 width={'100%'}
             />
@@ -115,14 +131,19 @@ const Channel = ({ name, setting, onChange }: ChannelProps) => {
 
 const Channels = ({ plane }: { plane: MediaOmePlane }) => {
     const { setMediaItem } = useSelectedMediaItem();
-    const names = getOmeDemoChannelNames(plane.id);
+    // TODO(#7810): use `GET .../media/{media_id}/ome` once the OME backend is merged, and drop the ome-demo import
+    const channelsInfo = getOmeDemoChannels(plane.id);
 
-    const changeChannel = (setting: OmeChannelSetting) => {
-        setMediaItem({
-            ...plane,
-            channels: plane.channels.map((channel) => (channel.channel === setting.channel ? setting : channel)),
-        });
+    const updateChannel = (setting: OmeChannelSetting) => {
+        const channels = plane.channels.map((channel) => (channel.channel === setting.channel ? setting : channel));
+
+        setMediaItem({ ...plane, channels });
+
+        return channels;
     };
+
+    // TODO(#7810): use `PUT .../channel-view` once the OME backend is merged
+    const saveChannel = (setting: OmeChannelSetting) => saveOmeDemoChannelView(plane.id, updateChannel(setting));
 
     return (
         <DialogTrigger type={'popover'} placement={'top'}>
@@ -145,9 +166,11 @@ const Channels = ({ plane }: { plane: MediaOmePlane }) => {
                         {plane.channels.map((setting) => (
                             <Channel
                                 key={setting.channel}
-                                name={names[setting.channel] ?? `Channel ${setting.channel}`}
+                                name={channelsInfo[setting.channel]?.name ?? `Channel ${setting.channel}`}
+                                intensityRange={channelsInfo[setting.channel]?.window}
                                 setting={setting}
-                                onChange={changeChannel}
+                                onPreview={updateChannel}
+                                onChange={saveChannel}
                             />
                         ))}
                         <Text>Display only. Training uses a fixed channel mapping.</Text>

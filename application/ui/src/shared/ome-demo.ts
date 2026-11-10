@@ -1,15 +1,28 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MediaOmeImage, MediaOmePlane, OmeChannelSetting } from '@/api/types';
+import type { MediaOmeImage, OmeChannelInfo, OmeChannelSetting } from '@/api/types';
 
-// TODO(#7810): demo-only. Fake OME images rendered in the browser until the backend serves real ones.
+// TODO(#7810): delete once the OME backend is merged. Fake OME images, served by `ome-demo-worker.ts`.
 
 type ChannelKind = 'nuclei' | 'cytoplasm' | 'puncta';
 
-type DemoChannel = { name: string; color: string; kind: ChannelKind };
+type DemoChannel = OmeChannelInfo & { kind: ChannelKind };
 
-export const OME_DEMO_INTENSITY_MAX = 4095;
+// 12-bit camera stored as uint16
+const OME_DEMO_INTENSITY_MAX = 4095;
+
+const createDemoChannels = (channels: Pick<DemoChannel, 'name' | 'color' | 'kind'>[]): DemoChannel[] =>
+    channels.map((channel, index) => ({
+        ...channel,
+        index,
+        window: {
+            min: 0,
+            max: OME_DEMO_INTENSITY_MAX,
+            start: Math.round(OME_DEMO_INTENSITY_MAX * 0.05),
+            end: Math.round(OME_DEMO_INTENSITY_MAX * 0.75),
+        },
+    }));
 
 const createDemoImage = (
     props: Pick<MediaOmeImage, 'id' | 'name' | 'width' | 'height' | 'size_z' | 'size_c' | 'size_t'>
@@ -17,19 +30,20 @@ const createDemoImage = (
     type: 'ome_image',
     format: 'tiff',
     size: 0,
+    annotation_status: { has_annotations: false },
     ...props,
 });
 
 const DEMO_CHANNELS: Record<string, DemoChannel[]> = {
-    '0e0e0e0e-0000-4000-8000-000000000001': [
+    '0e0e0e0e-0000-4000-8000-000000000001': createDemoChannels([
         { name: 'DAPI', color: '#3B6CFF', kind: 'nuclei' },
         { name: 'GFP', color: '#27C46A', kind: 'cytoplasm' },
         { name: 'Cy5', color: '#E8503A', kind: 'puncta' },
-    ],
-    '0e0e0e0e-0000-4000-8000-000000000002': [
+    ]),
+    '0e0e0e0e-0000-4000-8000-000000000002': createDemoChannels([
         { name: 'H2B-mCherry', color: '#FF00FF', kind: 'nuclei' },
         { name: 'Tubulin-GFP', color: '#00FF00', kind: 'cytoplasm' },
-    ],
+    ]),
 };
 
 export const OME_DEMO_IMAGES: MediaOmeImage[] = [
@@ -53,17 +67,27 @@ export const OME_DEMO_IMAGES: MediaOmeImage[] = [
     }),
 ];
 
-export const getOmeDemoChannelNames = (mediaId: string): string[] =>
-    (DEMO_CHANNELS[mediaId] ?? []).map(({ name }) => name);
+export const getOmeDemoChannels = (mediaId: string): OmeChannelInfo[] => DEMO_CHANNELS[mediaId] ?? [];
 
-export const getOmeDemoDefaultChannels = (mediaId: string): OmeChannelSetting[] =>
-    (DEMO_CHANNELS[mediaId] ?? []).map(({ color }, channel) => ({
-        channel,
+// Stands in for the server-computed default of `GET .../channel-view`
+const getOmeDemoDefaultChannels = (mediaId: string): OmeChannelSetting[] =>
+    getOmeDemoChannels(mediaId).map(({ index, color, window }) => ({
+        channel: index,
         enabled: true,
         color,
-        window_min: Math.round(OME_DEMO_INTENSITY_MAX * 0.05),
-        window_max: Math.round(OME_DEMO_INTENSITY_MAX * 0.75),
+        window_min: window.start,
+        window_max: window.end,
     }));
+
+// In-memory stand-in for `GET/PUT .../channel-view`, lost on reload
+const channelViews = new Map<string, OmeChannelSetting[]>();
+
+export const getOmeDemoChannelView = (mediaId: string): OmeChannelSetting[] =>
+    channelViews.get(mediaId) ?? getOmeDemoDefaultChannels(mediaId);
+
+export const saveOmeDemoChannelView = (mediaId: string, settings: OmeChannelSetting[]) => {
+    channelViews.set(mediaId, settings);
+};
 
 // Cells are ellipsoids, so each Z slice cuts them at a different radius, and they drift between time points.
 type Cell = {
@@ -160,14 +184,18 @@ const renderChannelIntensity = (cells: Cell[], seed: number, z: number, t: numbe
 };
 
 // Window/level each enabled channel, then add them up, like the backend renderer will.
-const renderPlane = (
-    mediaId: string,
-    sizeZ: number,
-    channels: OmeChannelSetting[],
-    { z, t, width, height }: { z: number; t: number; width: number; height: number }
+export const renderOmeDemoPlane = (
+    { id, size_z }: Pick<MediaOmeImage, 'id' | 'size_z'>,
+    {
+        z,
+        t,
+        channels,
+        width,
+        height,
+    }: { z: number; t: number; channels: OmeChannelSetting[]; width: number; height: number }
 ): ImageData => {
     const rgb = new Float32Array(width * height * 3);
-    const kinds = DEMO_CHANNELS[mediaId] ?? [];
+    const kinds = DEMO_CHANNELS[id] ?? [];
 
     channels
         .filter(({ enabled }) => enabled)
@@ -179,7 +207,7 @@ const renderPlane = (
             }
 
             const intensity = renderChannelIntensity(
-                getChannelCells(mediaId, sizeZ, kind),
+                getChannelCells(id, size_z, kind),
                 channel + 1,
                 z,
                 t,
@@ -208,43 +236,4 @@ const renderPlane = (
     }
 
     return imageData;
-};
-
-export const renderOmeDemoPlane = (plane: MediaOmePlane): ImageData =>
-    renderPlane(plane.id, plane.size_z, plane.channels, {
-        z: plane.z_index,
-        t: plane.t_index,
-        width: plane.width,
-        height: plane.height,
-    });
-
-const thumbnails = new Map<string, string>();
-
-export const getOmeDemoThumbnailUrl = (image: MediaOmeImage): string => {
-    const cached = thumbnails.get(image.id);
-
-    if (cached !== undefined) {
-        return cached;
-    }
-
-    const width = 320;
-    const height = Math.round((width * image.height) / image.width);
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext('2d')?.putImageData(
-        renderPlane(image.id, image.size_z, getOmeDemoDefaultChannels(image.id), {
-            z: Math.floor(image.size_z / 2),
-            t: 0,
-            width,
-            height,
-        }),
-        0,
-        0
-    );
-
-    const url = canvas.toDataURL('image/png');
-    thumbnails.set(image.id, url);
-
-    return url;
 };

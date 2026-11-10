@@ -5,6 +5,7 @@ import {
     getDatasetRevisionThumbnailUrl,
     getMediaBinaryUrl,
     getMediaDownloadUrl,
+    getOmeRenderUrl,
     getProjectThumbnailUrl,
     getThumbnailUrl,
     getVideoFrameThumbnailUrl,
@@ -38,5 +39,41 @@ describe.each([
         expect(getVideoFrameThumbnailUrl('p1', 'm1', 7)).toBe(
             `${prefix}/api/projects/p1/dataset/media/m1/thumbnail?frame_index=7`
         );
+    });
+});
+
+describe('getOmeRenderUrl', () => {
+    const plane = { id: 'm1', z_index: 12, t_index: 3 };
+
+    it('lists the shown channels in `c`, rounded, as uppercase hex without #', () => {
+        const url = getOmeRenderUrl('p1', {
+            ...plane,
+            channels: [
+                { channel: 0, enabled: true, color: '#3b6cff', window_min: 120.4, window_max: 2400.6 },
+                { channel: 1, enabled: false, color: '#27C46A', window_min: 300, window_max: 9800 },
+                { channel: 2, enabled: true, color: '#E8503A', window_min: 40, window_max: 1500 },
+            ],
+        });
+        const { pathname, searchParams } = new URL(url, 'http://localhost');
+
+        expect(pathname).toBe('/api/projects/p1/dataset/media/m1/render');
+        expect(searchParams.get('z')).toBe('12');
+        expect(searchParams.get('t')).toBe('3');
+        expect(searchParams.get('c')).toBe('0|120:2401$3B6CFF,2|40:1500$E8503A');
+    });
+
+    it('sends an empty `c` when every channel is hidden', () => {
+        const url = getOmeRenderUrl('p1', {
+            ...plane,
+            channels: [{ channel: 0, enabled: false, color: '#3B6CFF', window_min: 0, window_max: 1 }],
+        });
+
+        expect(new URL(url, 'http://localhost').searchParams.get('c')).toBe('');
+    });
+
+    it('omits `c` without a channel view, so the stored one is used', () => {
+        const url = getOmeRenderUrl('p1', { ...plane, channels: [] });
+
+        expect(new URL(url, 'http://localhost').searchParams.has('c')).toBe(false);
     });
 });

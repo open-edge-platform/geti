@@ -78,6 +78,7 @@ describe('Toolbar', () => {
                 return HttpResponse.json({
                     items: allMedia.map(({ id, type }) => ({
                         id,
+                        // TODO(#7810): drop the cast once the OME backend is merged and the OpenAPI types are regenerated
                         type: type as Exclude<Media['type'], 'ome_image' | 'ome_plane'>,
                     })),
                 });

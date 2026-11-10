@@ -52,13 +52,22 @@ export type MediaVideoFrame = Omit<MediaVideo, 'type'> & {
     type: 'video_frame';
 };
 
-// TODO(#7810): demo-only OME types; replace with the generated schemas once the backend serves OME images.
+// TODO(#7810): replace with the generated schemas once the OME backend is merged and the OpenAPI types regenerated.
 export type MediaOmeImage = Omit<MediaImage, 'type'> & {
     type: 'ome_image';
     size_z: number;
     size_c: number;
     size_t: number;
 };
+// A channel from `GET .../media/{media_id}/ome`. `window.min`/`max` is the range the pixel type actually uses.
+export type OmeChannelInfo = {
+    index: number;
+    name: string;
+    color: string;
+    emission_wavelength?: number;
+    window: { min: number; max: number; start: number; end: number };
+};
+// One entry of `GET/PUT .../media/{media_id}/channel-view`.
 export type OmeChannelSetting = {
     channel: number;
     enabled: boolean;
@@ -75,7 +84,7 @@ export type MediaOmePlane = Omit<MediaOmeImage, 'type'> & {
     channels: OmeChannelSetting[];
 };
 
-export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO | MediaOmeImage;
+export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO;
 
 export type Media = MediaImage | MediaVideo | MediaVideoFrame | MediaOmeImage | MediaOmePlane;
 
