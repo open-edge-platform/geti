@@ -28,7 +28,7 @@
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
 
-use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WebviewWindowBuilder, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindow, WindowEvent};
 use webview2_com::Microsoft::Web::WebView2::Win32::{
     GetAvailableCoreWebView2BrowserVersionString, ICoreWebView2,
     ICoreWebView2ProcessFailedEventArgs, COREWEBVIEW2_PROCESS_FAILED_KIND,
@@ -268,7 +268,7 @@ fn recover(app: &AppHandle, recovery: Recovery) {
 /// window reports `Destroyed`.
 fn recreate_main_window(app: &AppHandle) {
     let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) else {
-        build_main_window(app);
+        rebuild_main_window(app);
         return;
     };
 
@@ -297,32 +297,14 @@ pub fn on_run_event(app: &AppHandle, event: &RunEvent) {
     } = event
     {
         if label == MAIN_WINDOW_LABEL && RECREATE_PENDING.swap(false, Ordering::SeqCst) {
-            build_main_window(app);
+            rebuild_main_window(app);
         }
     }
 }
 
-/// Build the main window from its `tauri.conf.json` definition and watch it for
-/// WebView2 process failures.
-fn build_main_window(app: &AppHandle) {
-    let config = app
-        .config()
-        .app
-        .windows
-        .iter()
-        .find(|w| w.label == MAIN_WINDOW_LABEL)
-        .cloned();
-
-    let Some(config) = config else {
-        log::error!("No '{MAIN_WINDOW_LABEL}' window in the config; cannot recover");
-        return;
-    };
-
-    match WebviewWindowBuilder::from_config(app, &config).and_then(|b| b.build()) {
-        Ok(window) => {
-            log::info!("✔ Main window recreated after WebView2 failure");
-            attach_process_failed_handler(&window);
-        }
+fn rebuild_main_window(app: &AppHandle) {
+    match crate::build_main_window(app) {
+        Ok(()) => log::info!("✔ Main window recreated after WebView2 failure"),
         Err(e) => log::error!("Failed to recreate the main window: {e}"),
     }
 }

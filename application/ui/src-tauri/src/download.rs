@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use reqwest::{Certificate, Client, ClientBuilder, Response, Url};
 use serde::Deserialize;
 use tauri::ipc::Channel;
-use tauri::{AppHandle, Manager, WebviewWindow};
+use tauri::{Manager, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
 
 /// Where the backend side-car serves its API (see `PUBLIC_API_BASE_URL` in
@@ -35,7 +35,8 @@ pub async fn download_file(
     on_started: Channel<()>,
 ) -> Result<(), String> {
     let url = backend_url(&url)?;
-    let cert = backend_certificate(window.app_handle())?;
+    let pem = crate::certificate::read_pem(window.app_handle())?;
+    let cert = Certificate::from_pem(&pem).map_err(|e| e.to_string())?;
     let extensions: Vec<&str> = filter.extensions.iter().map(String::as_str).collect();
     // Blocking is fine here: async commands do not run on the main thread.
     let Some(path) = window
@@ -67,17 +68,6 @@ fn backend_url(url: &str) -> Result<Url, String> {
         return Err(format!("not a backend URL: {url}"));
     }
     Ok(url)
-}
-
-/// The backend's self-signed certificate, which it serves from
-/// `<data dir>/certs/localhost.pem` (see `application/backend/app/main.py`).
-fn backend_certificate(app: &AppHandle) -> Result<Certificate, String> {
-    let path = crate::resolve_data_dir(app)
-        .ok_or("unknown data directory")?
-        .join("certs")
-        .join("localhost.pem");
-    let pem = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-    Certificate::from_pem(&pem).map_err(|e| e.to_string())
 }
 
 fn client_builder() -> ClientBuilder {

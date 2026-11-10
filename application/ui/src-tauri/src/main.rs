@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod backend;
+mod certificate;
 mod download;
 #[cfg(windows)]
 mod job;
@@ -11,11 +12,11 @@ mod webview;
 use std::path::PathBuf;
 use std::process::Child;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::sync::{Arc, Mutex, OnceLock};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::Deserialize;
-use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_log::{RotationStrategy, Target, TargetKind, TimezoneStrategy};
 use tauri_plugin_opener::OpenerExt;
@@ -129,6 +130,90 @@ fn shell_log_target() -> Target {
         Some(path) => Target::new(TargetKind::Folder { path, file_name }),
         None => Target::new(TargetKind::LogDir { file_name }),
     }
+}
+
+/// Browser arguments of the main window, fixed for the whole run: WebView2 cannot add a
+/// window with different ones to a running browser process (see `webview.rs`).
+static BROWSER_ARGS: OnceLock<String> = OnceLock::new();
+
+/// Build the main window from its `tauri.conf.json` definition, which has `create: false` so
+/// the backend certificate can be pinned (see [`browser_args`]).
+pub fn build_main_window(app: &AppHandle) -> tauri::Result<()> {
+    let config = app
+        .config()
+        .app
+        .windows
+        .iter()
+        .find(|w| w.label == MAIN_WINDOW_LABEL)
+        .ok_or(tauri::Error::WindowNotFound)?;
+    let args = BROWSER_ARGS.get_or_init(|| {
+        browser_args(
+            app,
+            config
+                .additional_browser_args
+                .as_deref()
+                .unwrap_or_default(),
+        )
+    });
+    #[cfg_attr(not(windows), allow(unused_variables))]
+    let window = WebviewWindowBuilder::from_config(app, config)?
+        .additional_browser_args(args)
+        .build()?;
+
+    // Recover from WebView2 renderer/browser-process failures instead of letting them take
+    // the whole application down.
+    #[cfg(windows)]
+    webview::attach_process_failed_handler(&window);
+    Ok(())
+}
+
+/// Append a pin for the backend's public key to `base`, so WebView2 treats the self-signed
+/// certificate as valid and, unlike with `--ignore-certificate-errors`, caches responses.
+/// That flag stays in `base` as the fallback for when the pin does not apply: before the
+/// backend's first launch has created the certificate, or after its key changed.
+fn browser_args(app: &AppHandle, base: &str) -> String {
+    let spki = match certificate::read_pem(app).map(|pem| certificate::spki_sha256(&pem)) {
+        Ok(Some(spki)) => spki,
+        Ok(None) => {
+            log::warn!("Backend certificate is malformed; HTTP caching is disabled");
+            return base.to_string();
+        }
+        Err(e) => {
+            log::info!("Backend certificate not created yet ({e}); HTTP caching is disabled");
+            return base.to_string();
+        }
+    };
+    // Any server can match the pin by sending the (public) backend certificate in its chain, so
+    // a process squatting the backend port could poison the cache: never reuse it across runs.
+    let Some(cache_dir) = fresh_cache_dir(app) else {
+        log::warn!("No cache directory available; HTTP caching is disabled");
+        return base.to_string();
+    };
+    log::info!("▶ Pinning the backend certificate in WebView2");
+    format!(
+        "{base} --ignore-certificate-errors-spki-list={spki} --disk-cache-dir=\"{}\"",
+        cache_dir.display()
+    )
+}
+
+/// A WebView2 disk cache directory unique to this run. Earlier runs' ones are removed in the
+/// background, best effort: a lingering browser process may still hold their files.
+fn fresh_cache_dir(app: &AppHandle) -> Option<PathBuf> {
+    let root = app.path().app_cache_dir().ok()?.join("webview-cache");
+    let run = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()?
+        .as_nanos();
+    let current = root.join(run.to_string());
+    let keep = current.clone();
+    std::thread::spawn(move || {
+        for entry in std::fs::read_dir(&root).into_iter().flatten().flatten() {
+            if entry.path() != keep {
+                let _ = std::fs::remove_dir_all(entry.path());
+            }
+        }
+    });
+    Some(current)
 }
 
 /// Structured description of a fatal backend startup failure, deserialized from
@@ -513,6 +598,8 @@ fn main() {
                 #[cfg(windows)]
                 webview::log_runtime_version();
 
+                build_main_window(app.handle())?;
+
                 let sidecar = match spawn_backend(app.handle()) {
                     Ok(sidecar) => sidecar,
                     Err(e) => {
@@ -535,13 +622,6 @@ fn main() {
                     *control.job.lock().unwrap() = sidecar.job;
                 }
                 *control.child.lock().unwrap() = Some(sidecar.child);
-
-                // Recover from WebView2 renderer/browser-process failures
-                // instead of letting them take the whole application down.
-                #[cfg(windows)]
-                if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
-                    webview::attach_process_failed_handler(&window);
-                }
 
                 let app_handle = app.handle().clone();
                 let monitor_control = control.clone();

@@ -1242,10 +1242,12 @@ dependencies = [
 name = "geti_ui"
 version = "3.4.0"
 dependencies = [
+ "base64 0.23.1",
  "log",
  "reqwest",
  "serde",
  "serde_json",
+ "sha2",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
