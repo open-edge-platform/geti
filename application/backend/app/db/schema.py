@@ -162,8 +162,8 @@ class DatasetViewItemDB(Base):
 class MediaDB(BaseID):
     __tablename__ = "media"
     __table_args__ = (
-        Index("idx_media_video_id", "video_id"),
-        UniqueConstraint("video_id", "frame_index", name="uq_video_id_frame_index"),
+        Index("idx_media_parent_id", "parent_id"),
+        UniqueConstraint("parent_id", "frame_index", name="uq_parent_id_frame_index"),
     )
 
     project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
@@ -174,12 +174,43 @@ class MediaDB(BaseID):
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     fps: Mapped[float | None] = mapped_column(Float, nullable=True, default=None)
     frame_count: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
-    video_id: Mapped[str | None] = mapped_column(
+    parent_id: Mapped[str | None] = mapped_column(
         Text, ForeignKey("media.id", ondelete="CASCADE"), nullable=True, default=None
     )
     frame_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    z_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    t_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
     size: Mapped[int] = mapped_column(Integer, nullable=False)
     source_id: Mapped[str | None] = mapped_column(Text, ForeignKey("sources.id", ondelete="SET NULL"), nullable=True)
+
+
+class OmeImageDB(Base):
+    __tablename__ = "ome_images"
+
+    media_id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True)
+    container_format: Mapped[str] = mapped_column(String(20), nullable=False)
+    size_x: Mapped[int] = mapped_column(Integer, nullable=False)
+    size_y: Mapped[int] = mapped_column(Integer, nullable=False)
+    size_z: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    size_c: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    size_t: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    dimension_order: Mapped[str] = mapped_column(String(16), nullable=False)
+    pixel_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    series_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_big_tiff: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    channel_mapping: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    pyramid_levels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    entrypoint: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    files: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    raw_metadata: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class OmeChannelViewDB(Base):
+    __tablename__ = "ome_channel_views"
+
+    media_id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True)
+    settings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
 
 class LabelDB(BaseID):
