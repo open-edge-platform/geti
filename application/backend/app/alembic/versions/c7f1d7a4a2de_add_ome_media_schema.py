@@ -26,6 +26,7 @@ def upgrade() -> None:
     op.drop_index("idx_media_video_id", table_name="media")
 
     with op.batch_alter_table("media") as batch_op:
+        batch_op.drop_constraint("uq_video_id_frame_index", type_="unique")
         batch_op.alter_column("video_id", new_column_name="parent_id", existing_type=sa.Text())
         batch_op.add_column(sa.Column("z_index", sa.Integer(), nullable=True))
         batch_op.add_column(sa.Column("t_index", sa.Integer(), nullable=True))
@@ -84,6 +85,7 @@ def downgrade() -> None:
     op.drop_index("idx_media_parent_id", table_name="media")
 
     with op.batch_alter_table("media") as batch_op:
+        batch_op.drop_constraint("uq_parent_id_frame_index", type_="unique")
         batch_op.drop_column("t_index")
         batch_op.drop_column("z_index")
         batch_op.alter_column("parent_id", new_column_name="video_id", existing_type=sa.Text())
