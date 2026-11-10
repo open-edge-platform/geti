@@ -71,6 +71,58 @@ def fxt_training_configuration_service(db_session: Session) -> TrainingConfigura
 class TestTrainingConfigurationService:
     """Tests for TrainingConfigurationService."""
 
+    @pytest.mark.parametrize(
+        ("architecture", "task", "tiling"),
+        [
+            ("image-classification-efficientnet-b0", "MULTI_CLASS_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_CLASS_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_CLASS_CLS", False),
+            ("image-classification-efficientnet-b0", "MULTI_LABEL_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_LABEL_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_LABEL_CLS", False),
+            ("object-detection-dfine-x", "DETECTION", False),
+            ("object-detection-dfine-x", "DETECTION", True),
+            ("object-detection-rtdetrv2-r18", "DETECTION", False),
+            ("object-detection-yolo26-n", "DETECTION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", True),
+            ("instance-segmentation-mask2former-swin-s", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-yolo26-n", "INSTANCE_SEGMENTATION", False),
+        ],
+    )
+    @pytest.mark.parametrize("workers", [0, 2, 6])
+    def test_worker_settings_follow_application_and_recipe(
+        self, architecture: str, task: str, tiling: bool, workers: int
+    ) -> None:
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture).model_copy(deep=True)
+        assert config.algo_level_parameters.training.num_workers == 2
+        config.apply_updates({"training.num_workers": workers})
+        if tiling:
+            config.apply_updates({"dataset_preparation.augmentation.tiling.enable": True})
+        serialized = config.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=task)
+        resolved = GetiConfigConverter.convert(serialized)["data"]
+        assert [resolved[f"{subset}_subset"]["num_workers"] for subset in ("train", "val", "test")] == [
+            workers,
+            workers,
+            1,
+        ]
+
+    @pytest.mark.parametrize("workers", [0, 4, 6])
+    def test_existing_worker_setting_is_preserved(
+        self,
+        workers: int,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ) -> None:
+        architecture = "object-detection-yolox-s"
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        config.apply_updates({"training.num_workers": workers})
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        assert loaded.algo_level_parameters.training.num_workers == workers
+
     def test_object_threshold_round_trip(
         self,
         fxt_training_configuration_service: TrainingConfigurationService,

@@ -495,16 +495,18 @@ class TestGetiConfigConverterConvert:
             assert result["data"][subset]["num_workers"] == 0
         assert result["data"]["test_subset"]["num_workers"] == baseline["data"]["test_subset"]["num_workers"]
 
-    def test_convert_ultralytics_applies_num_workers(self) -> None:
+    @pytest.mark.parametrize("num_workers", [0, 2, 6])
+    def test_convert_ultralytics_applies_num_workers(self, num_workers: int) -> None:
         geti_cfg = _make_geti_config(
             model_manifest_id="object-detection-yolo26-n",
-            hyper_parameters={"training": {"num_workers": 0}},
+            hyper_parameters={"training": {"num_workers": num_workers}},
         )
 
         result = GetiConfigConverter.convert(geti_cfg)
 
-        for subset in ("train_subset", "val_subset", "test_subset"):
-            assert result["data"][subset]["num_workers"] == 0
+        for subset in ("train_subset", "val_subset"):
+            assert result["data"][subset]["num_workers"] == num_workers
+        assert result["data"]["test_subset"]["num_workers"] == 1
 
     def test_convert_applies_max_epochs(self) -> None:
         getitune_cfg = _make_getitune_config()

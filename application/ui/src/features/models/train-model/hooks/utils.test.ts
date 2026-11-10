@@ -57,6 +57,7 @@ describe('getTrainingConfigurationUpdatePayload', () => {
             'dataset_preparation.augmentation.tiling.drop_annotation_threshold': 0.5,
             'training.max_epochs': 200,
             'training.batch_size': 4,
+            'training.num_workers': 2,
             'training.early_stopping.enable': true,
             'training.early_stopping.patience': 10,
             'training.learning_rate': 0.007,

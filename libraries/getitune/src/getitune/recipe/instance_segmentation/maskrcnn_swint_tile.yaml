@@ -60,7 +60,6 @@ overrides:
 
     train_subset:
       batch_size: 4
-      num_workers: 4
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
           init_args:
@@ -76,7 +75,6 @@ overrides:
       augmentations_gpu: []
 
     val_subset:
-      num_workers: 4
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
           init_args:

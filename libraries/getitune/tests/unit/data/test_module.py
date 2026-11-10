@@ -191,6 +191,18 @@ class TestDataModule:
         dm.device = DeviceType.cpu
         assert dm._eval_loader_kwargs(plain_dataset, config)["pin_memory"] is False
 
+    @pytest.mark.parametrize("num_workers", [0, 1, 5])
+    def test_test_loader_preserves_explicit_worker_count(self, num_workers: int) -> None:
+        dm = DataModule.__new__(DataModule)
+        dm.device = DeviceType.cpu
+        dm.tile_config = TileConfig(enable_tiler=True)
+        dm.test_subset = SubsetConfig(subset_name="test", num_workers=num_workers)
+        dataset = MagicMock()
+        dataset.collate_fn = lambda batch: batch
+        dm.subsets = {"test": dataset}
+
+        assert dm.test_dataloader().num_workers == num_workers
+
     def test_init_input_size(
         self,
         mock_dm_dataset,

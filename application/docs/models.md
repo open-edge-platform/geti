@@ -176,6 +176,10 @@ The data used for training can be scoped in three ways:
 The last two parameters are mutually exclusive. In the first two cases, the job creates a new dataset revision unless
 an up-to-date one already exists for the same scope.
 
+In advanced training settings, **Number of workers** controls data-loading subprocesses for training and validation.
+It defaults to `2`; set it to `0` to load data in the main process. Testing uses `1` worker from the model recipe and
+is not changed by this setting. Existing saved training configurations keep their configured worker count.
+
 The actual training loop is controlled by the OTX `Engine`, configured with an `OTXDataModule` that is initialized
 from the previously created `Dataset`. Just before the loop starts, the hyperparameters are serialized to a YAML file
 in OTX-compatible format, and any necessary base weights are downloaded if not already cached locally.

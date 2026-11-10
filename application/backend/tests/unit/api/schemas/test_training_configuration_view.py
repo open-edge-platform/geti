@@ -1277,12 +1277,12 @@ def fxt_training_configuration_view_json() -> dict:
                         "key": "num_workers",
                         "name": "Number of workers",
                         "description": (
-                            "Number of subprocesses used for data loading. 0 means that the data will be loaded in "
+                            "Number of subprocesses used for training and validation data loading. 0 loads data in "
                             "the main process. More workers can speed up data loading and augmentation, at the cost "
-                            "of higher CPU and memory usage."
+                            "of higher CPU and memory usage. Testing uses the model recipe's worker count."
                         ),
-                        "value": 4,
-                        "default_value": 4,
+                        "value": 2,
+                        "default_value": 2,
                         "value_type": "int",
                         "min_value": 0,
                         "max_value": 64,

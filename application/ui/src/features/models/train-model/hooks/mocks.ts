@@ -620,6 +620,20 @@ export const mockedTrainingConfiguration: TrainingConfiguration = {
                     allowed_values: null,
                 },
                 {
+                    type: 'parameter',
+                    key: 'num_workers',
+                    name: 'Number of workers',
+                    description:
+                        "Number of subprocesses used for training and validation data loading. 0 loads data in the main process. More workers can speed up data loading and augmentation, at the cost of higher CPU and memory usage. Testing uses the model recipe's worker count.",
+                    depends_on: null,
+                    value_type: 'int',
+                    value: 2,
+                    default_value: 2,
+                    min_value: 0,
+                    max_value: 64,
+                    allowed_values: null,
+                },
+                {
                     type: 'parameter_group',
                     key: 'early_stopping',
                     name: 'Early stopping',
