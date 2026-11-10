@@ -13,9 +13,10 @@ import { getQueryKey } from '../../../../query-client/query-client';
 import { getMediaItemQueryParams, isAnnotatableMedia } from '../../../../shared/media-item-utils';
 import { isDetectionTask } from '../../../../shared/task-type-guards';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
-import { executeWithTimeout } from '../../smart-tools/execute-with-timeout';
+import { executeWithTimeout, OperationTimeoutError } from '../../smart-tools/execute-with-timeout';
 import { SAM_DECODER_TIMEOUT_MS, SAM_ENCODING_GC_TIME_MS } from '../../smart-tools/sam-timeouts';
 import {
+    useRestartSegmentAnythingWorker,
     useSegmentAnythingWorker,
     type SegmentAnythingRemoteInstance,
 } from '../../smart-tools/use-segment-anything-worker.hook';
@@ -128,6 +129,7 @@ const useDecoderOutputType = () => {
 
 const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encoding: EncodingOutput | undefined) => {
     const decoderOutput = useDecoderOutputType();
+    const restartWorker = useRestartSegmentAnythingWorker();
 
     // TODO: look into returning a new "decoder model" instance that already has the encoding data
     // stored in memory, to reduce  memory usage
@@ -139,22 +141,31 @@ const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encodin
             return { shapes: [] };
         }
 
-        const { shapes, lowResMask } = await executeWithTimeout(
-            model.processDecoder(encoding, {
-                points,
-                boxes: [],
-                // Decoding runs against the already-computed `encoding`; no image is needed.
-                image: undefined,
-                outputConfig: {
-                    type: decoderOutput,
-                },
-                previousMask,
-            }),
-            i18n.t('annotator.tools.autoSegmentation.operations.decoder'),
-            SAM_DECODER_TIMEOUT_MS
-        );
+        try {
+            const { shapes, lowResMask } = await executeWithTimeout(
+                model.processDecoder(encoding, {
+                    points,
+                    boxes: [],
+                    // Decoding runs against the already-computed `encoding`; no image is needed.
+                    image: undefined,
+                    outputConfig: {
+                        type: decoderOutput,
+                    },
+                    previousMask,
+                }),
+                i18n.t('annotator.tools.autoSegmentation.operations.decoder'),
+                SAM_DECODER_TIMEOUT_MS
+            );
 
-        return { shapes: shapes.map(convertToolShapeToGetiShape), lowResMask };
+            return { shapes: shapes.map(convertToolShapeToGetiShape), lowResMask };
+        } catch (error) {
+            // A decode that never finishes leaves the worker unusable, so replace it.
+            if (error instanceof OperationTimeoutError) {
+                restartWorker(model);
+            }
+
+            throw error;
+        }
     };
 };
 

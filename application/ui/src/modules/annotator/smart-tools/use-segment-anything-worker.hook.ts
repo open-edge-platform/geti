@@ -2,11 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { i18n } from '@/i18n';
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 
 import { executeWithTimeout } from './execute-with-timeout';
-import { SAM_WORKER_BUILD_TIMEOUT_MS, SAM_WORKER_INIT_TIMEOUT_MS } from './sam-timeouts';
+import {
+    SAM_ASSET_DOWNLOAD_STALL_TIMEOUT_MS,
+    SAM_WORKER_BUILD_TIMEOUT_MS,
+    SAM_WORKER_INIT_TIMEOUT_MS,
+} from './sam-timeouts';
 import type {
     SegmentAnythingWorkerApi,
     SegmentAnythingWorkerInstance,
@@ -45,6 +49,9 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
 
             try {
                 const samWorker = wrap<SegmentAnythingWorkerApi>(worker);
+
+                await samWorker.prefetchAssets(SAM_ASSET_DOWNLOAD_STALL_TIMEOUT_MS);
+
                 const instance = await executeWithTimeout(
                     samWorker.build(),
                     i18n.t('annotator.tools.autoSegmentation.operations.workerBuild'),
@@ -71,6 +78,7 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
         },
         staleTime: Infinity,
         gcTime: Infinity,
+        retry: 2,
         enabled,
     });
 
@@ -79,4 +87,20 @@ export const useSegmentAnythingWorker = (enabled = true) => {
         ...segmentAnythingWorkerQueryOptions(enabled),
         select: (data) => data.instance,
     });
+};
+
+export const useRestartSegmentAnythingWorker = () => {
+    const queryClient = useQueryClient();
+
+    return (stuckInstance: SegmentAnythingRemoteInstance) => {
+        const { queryKey } = segmentAnythingWorkerQueryOptions();
+        const current = queryClient.getQueryData(queryKey);
+
+        if (current?.instance !== stuckInstance) {
+            return;
+        }
+
+        current.worker.terminate();
+        void queryClient.resetQueries({ queryKey, exact: true });
+    };
 };
