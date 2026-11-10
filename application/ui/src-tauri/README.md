@@ -67,7 +67,7 @@ is the source of truth for the release build.
 | [WebView2 runtime](https://developer.microsoft.com/microsoft-edge/webview2/)                | Preinstalled on Windows 11. **Absent on Windows Server** — install it manually.             |
 | [Git for Windows](https://git-scm.com/download/win)                                         | Needed for `bash.exe` **and** `cygpath.exe` (see below).                                    |
 | [Node.js](https://nodejs.org) ≥ 24.2, npm ≥ 11.14.0                                         | Pinned in [`../.nvmrc`](../.nvmrc) and `engines` in [`../package.json`](../package.json).   |
-| [Rust](https://rustup.rs) stable ≥ 1.77.2                                                   | Install via `rustup-init.exe`, then `rustup default stable`.                                |
+| [Rust](https://rustup.rs) stable ≥ 1.90                                                     | Install via `rustup-init.exe`, then `rustup default stable`.                                |
 | [`just`](https://just.systems)                                                              | See _Package managers_ below.                                                               |
 | [`uv`](https://docs.astral.sh/uv/)                                                          | Installed automatically by the backend `Justfile` (see step 3).                             |
 
@@ -172,7 +172,14 @@ Copy-Item -Recurse -Force ..\..\backend\dist\geti-backend\_internal .\_internal
 
 ### 5. Run the dev shell
 
-From `application\ui`:
+The UI's API typings are generated from an OpenAPI spec that is not committed.
+Create it from `application\backend`:
+
+```powershell
+just gen-api-spec -o ../ui/src/api/openapi-spec.json
+```
+
+Then, from `application\ui`:
 
 ```powershell
 npm ci
@@ -196,7 +203,7 @@ from the Windows SDK.
 
 ```powershell
 cd application\ui
-cargo tauri build                       # add --debug for a debug build
+npx tauri build                         # add --debug for a debug build
 
 $build = "src-tauri\target\release"
 $msix  = "$build\bundle\msix"
@@ -339,7 +346,13 @@ certificates valid for 365 days; after regenerating you must re-run
 
 ### 5. Run the dev shell
 
-From `application/ui`:
+Generate the (uncommitted) OpenAPI spec from `application/backend`:
+
+```sh
+just gen-api-spec -o ../ui/src/api/openapi-spec.json
+```
+
+Then, from `application/ui`:
 
 ```sh
 npm ci
@@ -417,7 +430,13 @@ and run `sudo update-ca-certificates`.
 
 ### 4. Run the dev shell
 
-From `application/ui`:
+Generate the (uncommitted) OpenAPI spec from `application/backend`:
+
+```sh
+just gen-api-spec -o ../ui/src/api/openapi-spec.json
+```
+
+Then, from `application/ui`:
 
 ```sh
 npm ci
@@ -589,7 +608,7 @@ Windows:
 ```powershell
 Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Intel\Geti", "$env:LOCALAPPDATA\com.intel.geti"
 Remove-Item -Recurse -Force application\backend\dist, application\backend\build
-Remove-Item -Recurse -Force application\ui\src-tauri\target, application\ui\dist
+Remove-Item -Recurse -Force application\ui\src-tauri\target, application\ui\dist, application\ui\dist-tauri
 ```
 
 macOS:
@@ -597,7 +616,7 @@ macOS:
 ```sh
 rm -rf ~/Library/{Application\ Support,Logs,Caches}/com.intel.geti
 rm -rf application/backend/dist application/backend/build
-rm -rf application/ui/src-tauri/target application/ui/dist
+rm -rf application/ui/src-tauri/target application/ui/dist application/ui/dist-tauri
 ```
 
 Linux:
@@ -605,5 +624,5 @@ Linux:
 ```sh
 rm -rf ~/.local/share/com.intel.geti ~/.local/state/com.intel.geti ~/.cache/com.intel.geti
 rm -rf application/backend/dist application/backend/build
-rm -rf application/ui/src-tauri/target application/ui/dist
+rm -rf application/ui/src-tauri/target application/ui/dist application/ui/dist-tauri
 ```
