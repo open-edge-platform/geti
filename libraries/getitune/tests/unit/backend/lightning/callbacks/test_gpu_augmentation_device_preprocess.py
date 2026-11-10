@@ -1,3 +1,5 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Tests for the GPU callback that converts deferred evaluation tiles to float on the device."""
 
 from __future__ import annotations

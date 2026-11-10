@@ -1,3 +1,5 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Tests for deferring evaluation tile intensity mapping and resize to the device (dataset side)."""
 
 from __future__ import annotations

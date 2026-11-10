@@ -1,3 +1,5 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Tiled item building decodes the source image once and yields the same tiles as per-tile lazy evaluation."""
 
 from __future__ import annotations

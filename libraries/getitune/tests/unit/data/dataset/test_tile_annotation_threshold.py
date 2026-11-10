@@ -1,3 +1,5 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """The tile annotation threshold keeps an annotation in a tile only while enough of it stays visible.
 
 A tile that only sees a sliver of a box keeps that box at threshold 0 (any intersection) and drops it at 0.5.
