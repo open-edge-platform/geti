@@ -54,6 +54,7 @@ describe('getTrainingConfigurationUpdatePayload', () => {
             'dataset_preparation.augmentation.tiling.enable_adaptive_tiling': true,
             'dataset_preparation.augmentation.tiling.tile_size': 400,
             'dataset_preparation.augmentation.tiling.tile_overlap': 0.2,
+            'dataset_preparation.augmentation.tiling.drop_annotation_threshold': 0.5,
             'training.max_epochs': 200,
             'training.batch_size': 4,
             'training.early_stopping.enable': true,

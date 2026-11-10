@@ -18,6 +18,7 @@ hyperparameters:
         enable_adaptive_tiling: true
         tile_size: 400
         tile_overlap: 0.2
+        drop_annotation_threshold: 0.5
       iou_random_crop:
         enable: true
         probability: 1.0

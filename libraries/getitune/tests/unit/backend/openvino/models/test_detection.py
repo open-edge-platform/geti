@@ -453,6 +453,42 @@ class TestOVDetectionModelTiling:
         detection_model.model = existing
         assert detection_model._get_tiler() is existing
 
+    def test_get_tiler_merges_with_tile_config_not_ir_settings(self, detection_model):
+        """Cross-tile merge settings come from tile_config, not from the IR the tiler was built from."""
+        from model_api.tilers import DetectionTiler
+
+        existing = MagicMock(spec=DetectionTiler, iou_threshold=0.8, max_pred_number=100)
+        detection_model.model = existing
+        detection_model.tile_config = TileConfig(enable_tiler=True, iou_threshold=0.37, max_num_instances=37)
+
+        assert detection_model._get_tiler() is existing
+        assert existing.iou_threshold == 0.37
+        assert existing.max_pred_number == 37
+
+    def test_get_tiler_updates_cached_fallback_tiler(self, detection_model):
+        """A fallback tiler cached under an earlier tile_config follows later tile_config changes."""
+        from model_api.tilers import DetectionTiler
+
+        fallback = MagicMock(spec=DetectionTiler, iou_threshold=0.45, max_pred_number=1500)
+        detection_model._fallback_tiler = fallback
+        detection_model.tile_config = TileConfig(enable_tiler=True, iou_threshold=0.4, max_num_instances=500)
+
+        assert detection_model._get_tiler() is fallback
+        assert fallback.iou_threshold == 0.4
+        assert fallback.max_pred_number == 500
+
+    def test_get_tiler_keeps_ir_settings_when_tiling_is_disabled(self, detection_model):
+        from model_api.tilers import DetectionTiler
+
+        existing = MagicMock(spec=DetectionTiler, iou_threshold=0.8, max_pred_number=100)
+        detection_model.model = existing
+        detection_model.tile_config = TileConfig(enable_tiler=False, iou_threshold=0.37)
+
+        detection_model._get_tiler()
+
+        assert existing.iou_threshold == 0.8
+        assert existing.max_pred_number == 100
+
     def test_forward_untiled_bypasses_model_api_tiler(self, detection_model):
         """_forward_untiled must infer on the raw model, never the model_api Tiler wrapper.
 

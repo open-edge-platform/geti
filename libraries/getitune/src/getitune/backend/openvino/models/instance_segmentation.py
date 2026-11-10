@@ -333,21 +333,25 @@ class OVInstanceSegmentationModel(OVModel):
 
         When the IR was exported with tiling metadata, :meth:`_setup_tiler` has already
         wrapped ``self.model`` in a :class:`~model_api.tilers.InstanceSegmentationTiler`;
-        that instance (configured from the IR metadata) is reused. Otherwise a tiler is
-        created on demand and cached, configured from the datamodule ``tile_config``.
+        that instance is reused. Otherwise a tiler is created on demand and cached. Either
+        way, the cross-tile merge settings come from the datamodule ``tile_config`` (see
+        :meth:`_apply_tile_config_to_tiler`).
         """
         if isinstance(self.model, InstanceSegmentationTiler):
-            return self.model
-        if getattr(self, "_fallback_tiler", None) is None:
-            self._fallback_tiler = InstanceSegmentationTiler(
-                self.model,
-                configuration={
-                    "iou_threshold": self.tile_config.iou_threshold,
-                    "max_pred_number": self.tile_config.max_num_instances,
-                },
-                execution_mode="sync",
-            )
-        return self._fallback_tiler
+            tiler = self.model
+        else:
+            if getattr(self, "_fallback_tiler", None) is None:
+                self._fallback_tiler = InstanceSegmentationTiler(
+                    self.model,
+                    configuration={
+                        "iou_threshold": self.tile_config.iou_threshold,
+                        "max_pred_number": self.tile_config.max_num_instances,
+                    },
+                    execution_mode="sync",
+                )
+            tiler = self._fallback_tiler
+        self._apply_tile_config_to_tiler(tiler)
+        return tiler
 
     def predict_step(self, data_batch: SampleBatch) -> PredictionBatch:
         """Run instance segmentation inference and filter by confidence threshold."""

@@ -5,8 +5,11 @@
 from pathlib import Path
 
 import pytest
+import torch
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
+from getitune.config.data import TileConfig
+from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.module import DataModule
 from getitune.tools.auto_configurator import (
     DEFAULT_CONFIG_PER_TASK,
@@ -238,6 +241,46 @@ class TestAutoConfigurator:
         # Verify subsets are preserved
         assert "train" in updated_datamodule.subsets
         assert "val" in updated_datamodule.subsets
+
+    @pytest.mark.parametrize(
+        ("task", "data_root"),
+        [
+            (TaskType.DETECTION, "tests/assets/detection_coco"),
+            (TaskType.INSTANCE_SEGMENTATION, "tests/assets/instance_segmentation_coco"),
+        ],
+    )
+    def test_preconstructed_tiled_ov_pipeline_normalizes_native_tiles(self, task, data_root) -> None:
+        """Rebuilt OpenVINO loaders must not reuse deferred Lightning preprocessing."""
+        auto_configurator = AutoConfigurator(data_root=data_root, task=task)
+        source = auto_configurator.get_datamodule()
+        # This unit test checks tile preprocessing, not multiprocessing. Avoid spawning
+        # four recipe-default workers just to inspect one batch.
+        source.test_subset.num_workers = 0
+        config = TileConfig(enable_tiler=True, tile_size=(200, 200), iou_threshold=0.37)
+        original_dataset = TileDatasetFactory.create(source.subsets["test"], config)
+        assert isinstance(original_dataset, TileDataset)
+        assert original_dataset.device_preprocess is not None
+        raw_tile = original_dataset.get_tiles(0)[0].image
+        assert raw_tile.dtype == torch.uint8
+        original_transforms = original_dataset.transforms
+        prebuilt = DataModule.from_vision_datasets(
+            train_dataset=source.subsets["train"],
+            val_dataset=source.subsets["val"],
+            test_dataset=original_dataset,
+            train_subset=source.train_subset,
+            val_subset=source.val_subset,
+            test_subset=source.test_subset,
+        )
+        prebuilt.tile_config = config
+
+        updated = auto_configurator.update_ov_subset_pipeline(prebuilt, subset="test")
+        tile = next(iter(updated.test_dataloader())).batch_tiles[0][0]
+        assert tile.dtype == torch.float32
+        torch.testing.assert_close(tile, raw_tile.float() / 255)
+        assert updated.tile_config == config
+        assert updated.test_dataloader().batch_size == 1
+        assert original_dataset.transforms is original_transforms
+        assert original_dataset.device_preprocess is not None
 
     @pytest.mark.parametrize("training_device", [DeviceType.xpu, DeviceType.gpu, DeviceType.auto])
     def test_update_ov_subset_pipeline_resets_device_to_cpu(self, training_device: DeviceType) -> None:

@@ -501,7 +501,9 @@ def test_last_image_cache_reuses_and_evicts():
     assert calls == ["img0-a", "img1", "img0-c"]
 
 
-def test_instance_mask_tiling_stays_aligned_with_bboxes_and_labels():
+@pytest.mark.parametrize("threshold", [0.0, 0.5])
+@pytest.mark.parametrize("mask_dtype", [pl.Boolean(), pl.UInt8()])
+def test_instance_mask_tiling_stays_aligned_with_bboxes_and_labels(threshold, mask_dtype):
     """Instance masks must be filtered in sync with bboxes and labels.
 
     Regression test: previously ``InstanceMaskTiler`` kept an entry for every
@@ -513,7 +515,7 @@ def test_instance_mask_tiling_stays_aligned_with_bboxes_and_labels():
             "image_info": AttributeInfo(type=dict, field=image_info_field()),
             "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
             "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
-            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+            "instances": AttributeInfo(type=list, field=instance_mask_field(dtype=mask_dtype)),
         }
     )
 
@@ -543,13 +545,13 @@ def test_instance_mask_tiling_stays_aligned_with_bboxes_and_labels():
         schema={
             **polars_schema,
             "labels": pl.List(pl.Utf8()),
-            "instances": pl.List(pl.Boolean()),
+            "instances": pl.List(mask_dtype),
             "instances_shape": pl.List(pl.Int32()),
         },
     )
 
     config = TilingConfig(tile_width=100, tile_height=100)
-    plan = _create_tiling_plan(schema, config, threshold_drop_ann=0.0)
+    plan = _create_tiling_plan(schema, config, threshold_drop_ann=threshold)
     result_df, _ = _apply_tiling(df, None, plan, ["bboxes", "labels", "instances"])
 
     assert len(result_df) == 4
@@ -558,3 +560,249 @@ def test_instance_mask_tiling_stays_aligned_with_bboxes_and_labels():
         n_labels = len(result_df[i, "labels"])
         n_masks = result_df[i, "instances_shape"][0]
         assert n_boxes == n_labels == n_masks, f"tile {i}: boxes={n_boxes} labels={n_labels} masks={n_masks}"
+        tile = result_df[i, "tile"]
+        x, y, width, height = (tile[k] for k in ("x", "y", "width", "height"))
+        expected = []
+        for j, (x1, y1, x2, y2) in enumerate(specs):
+            intersection = max(0, min(x2, x + width) - max(x1, x)) * max(0, min(y2, y + height) - max(y1, y))
+            if intersection > 0 and intersection >= threshold * (x2 - x1) * (y2 - y1):
+                expected.append(instances[j, y : y + height, x : x + width])
+        actual = np.asarray(result_df[i, "instances"]).reshape(n_masks, height, width)
+        np.testing.assert_array_equal(actual, np.asarray(expected).reshape(n_masks, height, width))
+
+
+@pytest.mark.parametrize(("threshold", "expected"), [(0.0, 1), (0.5, 1), (0.5001, 0), (1.0, 0)])
+def test_box_threshold_includes_annotations_at_the_boundary(threshold, expected):
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+        }
+    )
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 20, "height": 10}],
+            "bboxes": [[[8.0, 1.0, 12.0, 5.0]]],
+            "labels": [["object"]],
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            **schema.attributes["bboxes"].field.to_polars_schema("bboxes"),
+            "labels": pl.List(pl.Utf8()),
+        },
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=10, tile_height=10), threshold_drop_ann=threshold)
+    result, _ = _apply_tiling(df, None, plan, {"bboxes", "labels"})
+    assert len(result[0, "bboxes"]) == len(result[0, "labels"]) == expected
+
+
+def test_instance_masks_without_boxes_keep_labels_aligned():
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+        }
+    )
+    masks = np.zeros((2, 20, 20), dtype=bool)
+    masks[0, 0:5, 0:5] = True
+    masks[1, 15:20, 15:20] = True
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 20, "height": 20}],
+            "labels": [["first", "second"]],
+            "instances": [masks.reshape(-1)],
+            "instances_shape": [list(masks.shape)],
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            "labels": pl.List(pl.Utf8()),
+            "instances": pl.List(pl.Boolean()),
+            "instances_shape": pl.List(pl.Int32()),
+        },
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=10, tile_height=10), threshold_drop_ann=0.5)
+    result, _ = _apply_tiling(df, None, plan, {"labels", "instances"})
+    assert [row.to_list() for row in result["labels"]] == [["first"], [], [], ["second"]]
+    assert [shape[0] for shape in result["instances_shape"]] == [1, 0, 0, 1]
+
+
+def test_empty_instance_masks_and_boxes_are_tiled():
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+        }
+    )
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 20, "height": 20}],
+            "bboxes": [[]],
+            "labels": [[]],
+            "instances": [[]],
+            "instances_shape": [[0, 20, 20]],
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            **schema.attributes["bboxes"].field.to_polars_schema("bboxes"),
+            "labels": pl.List(pl.Utf8()),
+            "instances": pl.List(pl.Boolean()),
+            "instances_shape": pl.List(pl.Int32()),
+        },
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=10, tile_height=10), threshold_drop_ann=0.5)
+    result, _ = _apply_tiling(df, None, plan, {"bboxes", "labels", "instances"})
+    assert len(result) == 4
+    assert all(len(row) == 0 for row in result["bboxes"])
+    assert all(len(row) == 0 for row in result["labels"])
+    assert all(shape[0] == 0 for shape in result["instances_shape"])
+
+
+def test_instance_masks_follow_combined_box_and_polygon_keep_flags():
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
+            "polygons": AttributeInfo(type=list, field=polygon_field(dtype=pl.Float64())),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+        }
+    )
+    masks = np.zeros((2, 20, 20), dtype=bool)
+    masks[0, 1:5, 1:5] = True
+    masks[1, 0:2, 8:10] = True
+    masks[1, 0:10, 10:12] = True
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 20, "height": 20}],
+            "bboxes": [[[1.0, 1.0, 5.0, 5.0], [8.0, 0.0, 12.0, 10.0]]],
+            "polygons": [
+                [
+                    [[1.0, 1.0], [5.0, 1.0], [5.0, 5.0], [1.0, 5.0], [1.0, 1.0]],
+                    [[8.0, 0.0], [12.0, 0.0], [12.0, 10.0], [10.0, 10.0], [10.0, 2.0], [8.0, 2.0], [8.0, 0.0]],
+                ]
+            ],
+            "labels": [["first", "second"]],
+            "instances": [masks.reshape(-1)],
+            "instances_shape": [list(masks.shape)],
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            **schema.attributes["bboxes"].field.to_polars_schema("bboxes"),
+            **schema.attributes["polygons"].field.to_polars_schema("polygons"),
+            "labels": pl.List(pl.Utf8()),
+            "instances": pl.List(pl.Boolean()),
+            "instances_shape": pl.List(pl.Int32()),
+        },
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=10, tile_height=10), threshold_drop_ann=0.5)
+    result, _ = _apply_tiling(df, None, plan, {"bboxes", "polygons", "labels", "instances"})
+    assert result[0, "labels"].to_list() == ["first"]
+    assert len(result[0, "bboxes"]) == len(result[0, "polygons"]) == result[0, "instances_shape"][0] == 1
+    np.testing.assert_array_equal(np.asarray(result[0, "instances"]).reshape(1, 10, 10), masks[:1, :10, :10])
+
+
+@pytest.mark.parametrize("eager_boxes", [False, True])
+def test_tiling_requests_related_lazy_fields_before_filtering(eager_boxes):
+    from getidata.transform import IdentityTransform
+
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+        }
+    )
+    mask = np.ones((1, 10, 10), dtype=bool)
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 10, "height": 10}],
+            "bboxes": [[[0.0, 0.0, 10.0, 10.0]]],
+            "labels": [["object"]],
+            "instances": [mask.reshape(-1)],
+            "instances_shape": [list(mask.shape)],
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            **schema.attributes["bboxes"].field.to_polars_schema("bboxes"),
+            "labels": pl.List(pl.Utf8()),
+            "instances": pl.List(pl.Boolean()),
+            "instances_shape": pl.List(pl.Int32()),
+        },
+    )
+
+    class SelectiveParent(IdentityTransform):
+        def __init__(self, data, data_schema):
+            super().__init__(data, data_schema)
+            self.requested = set()
+
+        def get_lazy_attributes(self):
+            return {"instances"} if eager_boxes else {"bboxes", "labels", "instances"}
+
+        def apply(self, _):
+            fields = _
+            self.requested.update(fields)
+            columns = set().union(*(self.schema.get_required_columns(field) for field in fields))
+            return self._df.select(sorted(columns))
+
+    parent = SelectiveParent(df, schema)
+    transform = create_tiling_transform(TilingConfig(tile_width=10, tile_height=10), 0.5)(parent)
+    assert "instances" not in parent.requested
+    if not eager_boxes:
+        transform.apply(["bboxes"])
+        assert "instances" not in parent.requested
+    result = transform.apply(["instances"])
+    assert len(result[0, "bboxes"]) == len(result[0, "labels"]) == result[0, "instances_shape"][0] == 1
+
+
+def test_sliced_lazy_instance_masks_follow_filtered_boxes():
+    from getidata.transform import IdentityTransform
+
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float64())),
+            "labels": AttributeInfo(type=list, field=label_field(is_list=True)),
+            "instances": AttributeInfo(type=list, field=instance_mask_field()),
+        }
+    )
+    masks = np.zeros((2, 20, 20), dtype=bool)
+    masks[0, 1:5, 1:5] = True
+    masks[1, 8:12, 8:12] = True
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 20, "height": 20}] * 2,
+            "bboxes": [[[1.0, 1.0, 5.0, 5.0], [8.0, 8.0, 12.0, 12.0]]] * 2,
+            "labels": [["first", "second"]] * 2,
+            "instances": [masks.reshape(-1)] * 2,
+            "instances_shape": [list(masks.shape)] * 2,
+        },
+        schema={
+            **schema.attributes["image_info"].field.to_polars_schema("image_info"),
+            **schema.attributes["bboxes"].field.to_polars_schema("bboxes"),
+            "labels": pl.List(pl.Utf8()),
+            "instances": pl.List(pl.Boolean()),
+            "instances_shape": pl.List(pl.Int32()),
+        },
+    )
+
+    class SelectiveParent(IdentityTransform):
+        def get_lazy_attributes(self):
+            return {"instances"}
+
+        def apply(self, _):
+            columns = set().union(*(self.schema.get_required_columns(field) for field in _))
+            return self._df.select(sorted(columns))
+
+        def slice(self, offset, length=None):
+            return SelectiveParent(self._df.slice(offset, length), self.schema)
+
+    transform = create_tiling_transform(TilingConfig(tile_width=10, tile_height=10), 0.5)(SelectiveParent(df, schema))
+    tile = transform.slice(4, 1).apply(["instances"])
+    assert tile[0, "labels"].to_list() == ["first"]
+    assert len(tile[0, "bboxes"]) == tile[0, "instances_shape"][0] == 1
+    np.testing.assert_array_equal(np.asarray(tile[0, "instances"]).reshape(1, 10, 10), masks[:1, :10, :10])

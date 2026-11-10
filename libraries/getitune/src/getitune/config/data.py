@@ -142,6 +142,8 @@ class TileConfig:
             (the number of original images per batch): a single image expands into many
             tiles, and this value controls how many of those tiles are grouped into a
             single model forward pass for GPU efficiency. Configurable from the recipe.
+        drop_annotation_threshold: Minimum fraction of an annotation's original area that must remain visible in a
+            tile, from 0 to 1. A value of 0 keeps every annotation intersecting the tile.
     """
 
     enable_tiler: bool = False
@@ -153,6 +155,13 @@ class TileConfig:
     object_tile_ratio: float = 0.03
     sampling_ratio: float = 1.0
     tile_inference_batch_size: int = 8
+    drop_annotation_threshold: float = 0.5
+
+    def __post_init__(self) -> None:
+        """Validate the annotation visibility threshold."""
+        if not 0.0 <= self.drop_annotation_threshold <= 1.0:
+            msg = "drop_annotation_threshold must be between 0 and 1"
+            raise ValueError(msg)
 
     def __repr__(self):
         """Return a string representation of the TileConfig instance."""
@@ -165,7 +174,8 @@ class TileConfig:
             f"max_num_instances={self.max_num_instances}, "
             f"object_tile_ratio={self.object_tile_ratio}, "
             f"sampling_ratio={self.sampling_ratio}, "
-            f"tile_inference_batch_size={self.tile_inference_batch_size})"
+            f"tile_inference_batch_size={self.tile_inference_batch_size}, "
+            f"drop_annotation_threshold={self.drop_annotation_threshold})"
         )
 
     def clone(self) -> TileConfig:

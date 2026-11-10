@@ -1235,6 +1235,23 @@ class TrainingConfigurationView(BaseModel):
                                                 "max_value": 1.0,
                                                 "allowed_values": None,
                                             },
+                                            {
+                                                "type": "parameter",
+                                                "key": "drop_annotation_threshold",
+                                                "name": "Minimum visible object fraction",
+                                                "description": (
+                                                    "Minimum fraction of an annotation's bounding box or polygon "
+                                                    "area that must be visible in a tile. Annotations below this "
+                                                    "threshold are excluded from the tile. A value of 0 keeps "
+                                                    "every intersecting annotation."
+                                                ),
+                                                "value": 0.5,
+                                                "default_value": 0.5,
+                                                "value_type": "float",
+                                                "min_value": 0.0,
+                                                "max_value": 1.0,
+                                                "allowed_values": None,
+                                            },
                                         ],
                                     },
                                 ],

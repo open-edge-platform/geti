@@ -15,6 +15,7 @@ import { render } from 'test-utils/render';
 
 import { Tiling } from './tiling.component';
 import {
+    getObjectThresholdParameter,
     getTilingAutomaticDescription,
     getTilingMode,
     getTilingOffDescription,
@@ -23,6 +24,36 @@ import {
     TilingConfigurableParameterGroup,
     TilingMode,
 } from './utils';
+
+describe('getObjectThresholdParameter', () => {
+    const threshold = getMockedConfigurationParameter({
+        key: 'drop_annotation_threshold',
+        value_type: 'float',
+        name: 'Minimum visible object fraction',
+        value: 0.5,
+        description: 'Minimum visible fraction of an annotation',
+        default_value: 0.5,
+        min_value: 0,
+        max_value: 1,
+    });
+
+    it('returns the parameter when present', () => {
+        const tileSize = getMockedConfigurationParameter({
+            key: 'tile_size',
+            value_type: 'int',
+            name: 'Tile size',
+            value: 400,
+            description: 'Size of one tile',
+            default_value: 400,
+        });
+
+        expect(getObjectThresholdParameter([tileSize, threshold])).toBe(threshold);
+    });
+
+    it('returns undefined when the backend does not provide it', () => {
+        expect(getObjectThresholdParameter([])).toBeUndefined();
+    });
+});
 
 describe('getTilingMode', () => {
     it('tiling is off when enable tiling parameter is absent', () => {
@@ -119,6 +150,16 @@ describe('Tiling', () => {
             max_value: null,
             min_value: 0,
         }),
+        getMockedConfigurationParameter({
+            key: 'drop_annotation_threshold',
+            value_type: 'float',
+            name: 'Minimum visible object fraction',
+            value: 0.5,
+            description: 'Minimum visible fraction of an annotation',
+            default_value: 0.5,
+            min_value: 0,
+            max_value: 1,
+        }),
     ];
 
     const tilingParameters = getMockedConfigurationParameterGroup({
@@ -170,7 +211,7 @@ describe('Tiling', () => {
         );
     };
 
-    it('tiling off and automatic displays only description and no parameters', () => {
+    it('shows the object threshold in automatic mode but not when tiling is off', async () => {
         render(<App tilingParameters={tilingParameters} />);
 
         fireEvent.click(getTilingModeButton(TILING_MODES.OFF));
@@ -179,6 +220,9 @@ describe('Tiling', () => {
         expect(getTilingModeButton(TILING_MODES.AUTOMATIC)).toHaveAttribute('aria-pressed', 'false');
         expect(getTilingModeButton(TILING_MODES.CUSTOM)).toHaveAttribute('aria-pressed', 'false');
         expect(screen.getByText(getTilingOffDescription(t))).toBeInTheDocument();
+        expect(
+            screen.queryByRole('textbox', { name: 'Change Minimum visible object fraction' })
+        ).not.toBeInTheDocument();
 
         fireEvent.click(getTilingModeButton(TILING_MODES.AUTOMATIC));
 
@@ -186,6 +230,23 @@ describe('Tiling', () => {
         expect(getTilingModeButton(TILING_MODES.OFF)).toHaveAttribute('aria-pressed', 'false');
         expect(getTilingModeButton(TILING_MODES.CUSTOM)).toHaveAttribute('aria-pressed', 'false');
         expect(screen.getByText(getTilingAutomaticDescription(t))).toBeInTheDocument();
+        expect(screen.queryByRole('textbox', { name: 'Change Tile size' })).not.toBeInTheDocument();
+        const threshold = screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' });
+        const slider = screen.getByRole('slider', { name: 'Change Minimum visible object fraction slider' });
+        expect(slider).toHaveAttribute('min', '0');
+        expect(slider).toHaveAttribute('max', '1');
+        expect(threshold).toHaveValue('0.5');
+        await userEvent.clear(threshold);
+        await userEvent.type(threshold, '0.8');
+        await userEvent.tab();
+        await userEvent.click(getTilingModeButton(TILING_MODES.CUSTOM));
+        expect(screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' })).toHaveValue('0.8');
+        fireEvent.click(getTilingModeButton(TILING_MODES.OFF));
+        expect(
+            screen.queryByRole('textbox', { name: 'Change Minimum visible object fraction' })
+        ).not.toBeInTheDocument();
+        fireEvent.click(getTilingModeButton(TILING_MODES.AUTOMATIC));
+        expect(screen.getByRole('textbox', { name: 'Change Minimum visible object fraction' })).toHaveValue('0.8');
     });
 
     it('tiling tag updates properly when tiling mode changes', () => {
@@ -215,12 +276,14 @@ describe('Tiling', () => {
 
         for (const parameter of customParameters) {
             const parameterInput = screen.getByRole('textbox', { name: `Change ${parameter.name}` });
+            const nextValue =
+                parameter.key === 'drop_annotation_threshold' ? '0.8' : (Number(parameter.value) + 1).toString();
 
             expect(parameterInput).toHaveValue(parameter.value.toString());
 
             await userEvent.clear(parameterInput);
-            await userEvent.type(parameterInput, (Number(parameter.value) + 1).toString());
-            expect(parameterInput).toHaveValue((Number(parameter.value) + 1).toString());
+            await userEvent.type(parameterInput, nextValue);
+            expect(parameterInput).toHaveValue(nextValue);
 
             await userEvent.click(screen.getByRole('button', { name: `Reset ${parameter.name}` }));
             expect(parameterInput).toHaveValue(parameter.default_value.toString());

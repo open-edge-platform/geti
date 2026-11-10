@@ -409,7 +409,7 @@ class TransformsUpdater:
         """Update tiling parameters in the config.
 
         Args:
-            tiling_dict: Dict with keys: enable, enable_adaptive_tiling, tile_size, tile_overlap.
+            tiling_dict: Tiling settings, including the minimum visible annotation fraction.
             config: The full getitune config dictionary.
         """
         if tiling_dict is None:
@@ -425,6 +425,8 @@ class TransformsUpdater:
                 tiling_dict["tile_size"],
             )
             tile_config["overlap"] = tiling_dict["tile_overlap"]
+            if "drop_annotation_threshold" in tiling_dict:
+                tile_config["drop_annotation_threshold"] = tiling_dict["drop_annotation_threshold"]
 
 
 class HyperparametersUpdater:
@@ -532,19 +534,6 @@ class HyperparametersUpdater:
 
         if patience is not None:
             config["callbacks"][idx]["init_args"]["patience"] = patience
-
-    @staticmethod
-    def update_tiling(tiling_dict: dict | None, config: dict) -> None:
-        """Update tiling parameters in the config."""
-        if tiling_dict is None:
-            logger.info("Tiling parameters are not provided, skipping update.")
-            return
-
-        config["data"]["tile_config"]["enable_tiler"] = tiling_dict["enable"]
-        if tiling_dict["enable"]:
-            config["data"]["tile_config"]["enable_adaptive_tiling"] = tiling_dict["enable_adaptive_tiling"]
-            config["data"]["tile_config"]["tile_size"] = (tiling_dict["tile_size"], tiling_dict["tile_size"])
-            config["data"]["tile_config"]["overlap"] = tiling_dict["tile_overlap"]
 
     @staticmethod
     def _update_input_size(size_value: tuple[int, int] | None, config: dict) -> None:

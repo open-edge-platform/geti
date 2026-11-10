@@ -203,6 +203,23 @@ compared to the ground truth annotations to compute the metrics.
 > on the same dataset revision, or to simply inspect the dataset contents. For this reason, it is recommended to
 > store the dataset in a format like Parquet that allows efficient loading and querying, with or without Datumaro.
 
+### Tiling
+
+Models that support tiling (detection and instance segmentation) can be trained on tiles of large images, enabled in
+automatic or custom mode in the advanced training settings. **Minimum visible object fraction** sets how much of an
+annotation's bounding box or polygon area must lie inside a tile for the annotation to be kept on that tile:
+
+- `0.5` (default): keep an annotation only if at least half of it is visible;
+- `0`: keep every annotation that intersects the tile;
+- `1`: keep only annotations that are fully inside the tile.
+
+The setting applies to the annotations of training and validation tiles. Objects that are large compared to the tile
+size can be left out of every tile when no tile contains the required fraction, so choose the tile size and the
+threshold according to the size of the objects in the dataset.
+
+Before this setting existed, bounding boxes were kept on any intersection while polygons already used `0.5`. Training
+configurations saved earlier use the `0.5` default; models that were already trained are not affected.
+
 ### Evaluation metrics
 
 The following table lists the evaluation metrics supported by Geti for each task type.

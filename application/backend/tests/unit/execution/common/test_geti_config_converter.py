@@ -428,6 +428,7 @@ class TestGetiConfigConverterConvert:
                             "enable_adaptive_tiling": True,
                             "tile_size": 512,
                             "tile_overlap": 0.3,
+                            "drop_annotation_threshold": 0.25,
                         }
                     }
                 }
@@ -442,6 +443,7 @@ class TestGetiConfigConverterConvert:
         assert tc["enable_adaptive_tiling"] is True
         assert tc["tile_size"] == (512, 512)
         assert tc["overlap"] == 0.3
+        assert tc["drop_annotation_threshold"] == 0.25
 
     def test_convert_applies_batch_size(self) -> None:
         getitune_cfg = _make_getitune_config()
@@ -770,6 +772,7 @@ class TestGetiConfigConverterConvert:
                             "enable_adaptive_tiling": True,
                             "tile_size": 512,
                             "tile_overlap": 0.3,
+                            "drop_annotation_threshold": 0.25,
                         }
                     }
                 }
@@ -784,6 +787,7 @@ class TestGetiConfigConverterConvert:
         assert result["data"]["tile_config"]["enable_adaptive_tiling"] is True
         assert result["data"]["tile_config"]["tile_size"] == (512, 512)
         assert result["data"]["tile_config"]["overlap"] == 0.3
+        assert result["data"]["tile_config"]["drop_annotation_threshold"] == 0.25
 
 
 class TestHyperparametersUpdater:
@@ -929,6 +933,30 @@ class TestTransformsUpdater:
         assert tc["enable_adaptive_tiling"] is True
         assert tc["tile_size"] == (256, 256)
         assert tc["overlap"] == 0.5
+
+    @pytest.mark.parametrize("adaptive", [False, True])
+    @pytest.mark.parametrize("threshold", [0.0, 0.5, 1.0])
+    def test_tiling_update_passes_object_threshold(self, adaptive: bool, threshold: float) -> None:
+        config = _make_getitune_config()
+        TransformsUpdater.update_tiling(
+            {
+                "enable": True,
+                "enable_adaptive_tiling": adaptive,
+                "tile_size": 400,
+                "tile_overlap": 0.2,
+                "drop_annotation_threshold": threshold,
+            },
+            config,
+        )
+        assert config["data"]["tile_config"]["drop_annotation_threshold"] == threshold
+
+    def test_tiling_update_without_threshold_leaves_library_default(self) -> None:
+        """A tiling dict without the threshold must not set it, so the getitune TileConfig default applies."""
+        config = _make_getitune_config()
+        TransformsUpdater.update_tiling(
+            {"enable": True, "enable_adaptive_tiling": True, "tile_size": 400, "tile_overlap": 0.2}, config
+        )
+        assert "drop_annotation_threshold" not in config["data"]["tile_config"]
 
     def test_tiling_update_disabled(self) -> None:
         config = _make_getitune_config()

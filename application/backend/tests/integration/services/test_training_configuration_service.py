@@ -4,9 +4,12 @@
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from app.api.schemas import TrainingConfigurationView
 from app.db.schema import ModelRevisionDB, ProjectDB, TrainingConfigurationDB
+from app.execution.common.geti_config_converter import GetiConfigConverter
 from app.models import TaskType
 from app.models.training_configuration.configuration import (
     AlgoLevelParameters,
@@ -67,6 +70,89 @@ def fxt_training_configuration_service(db_session: Session) -> TrainingConfigura
 
 class TestTrainingConfigurationService:
     """Tests for TrainingConfigurationService."""
+
+    def test_object_threshold_round_trip(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.drop_annotation_threshold == 0.5
+        config.apply_updates(
+            {
+                "dataset_preparation.augmentation.tiling.enable": True,
+                "dataset_preparation.augmentation.tiling.drop_annotation_threshold": 0.25,
+            }
+        )
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        loaded_tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert loaded_tiling is not None
+        assert loaded_tiling.drop_annotation_threshold == 0.25
+        view = TrainingConfigurationView.from_training_configuration(loaded, default).model_dump()
+
+        def find_parameter(nodes):
+            for node in nodes:
+                if node["key"] == "drop_annotation_threshold":
+                    return node
+                if "parameters" in node:
+                    result = find_parameter(node["parameters"])
+                    if result is not None:
+                        return result
+            return None
+
+        parameter = find_parameter(view["parameters"])
+        assert parameter is not None
+        assert (parameter["value"], parameter["default_value"], parameter["min_value"], parameter["max_value"]) == (
+            0.25,
+            0.5,
+            0.0,
+            1.0,
+        )
+        serialized = loaded.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=None)
+        converted = GetiConfigConverter.convert(serialized)
+        assert converted["data"]["tile_config"]["drop_annotation_threshold"] == 0.25
+
+        for invalid in (-0.01, 1.01):
+            with pytest.raises(ValidationError):
+                loaded.apply_updates({"dataset_preparation.augmentation.tiling.drop_annotation_threshold": invalid})
+
+    @pytest.mark.parametrize("architecture", ["object-detection-yolox-s", "instance-segmentation-mask-rcnn-resnet50"])
+    def test_object_threshold_default_for_tiling_architectures(self, architecture: str):
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.drop_annotation_threshold == 0.5
+
+    def test_existing_tiling_configuration_uses_threshold_default(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+        db_session: Session,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        legacy = default.algo_level_parameters.model_dump()
+        legacy["dataset_preparation"]["augmentation"]["tiling"].pop("drop_annotation_threshold")
+        db_session.add(
+            TrainingConfigurationDB(
+                id=str(uuid4()),
+                project_id=fxt_project.id,
+                model_architecture_id=architecture,
+                configuration_data=legacy,
+            )
+        )
+        db_session.flush()
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.drop_annotation_threshold == 0.5
 
     def test_get_by_model_revision(
         self,

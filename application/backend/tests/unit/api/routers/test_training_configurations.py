@@ -13,7 +13,7 @@ from app.models.training_configuration import (
     AlgoLevelTrainingParameters,
     TaskLevelDatasetPreparationParameters,
 )
-from app.models.training_configuration.augmentation import AugmentationParameters, ColorJitter
+from app.models.training_configuration.augmentation import AugmentationParameters, ColorJitter, Tiling
 from app.models.training_configuration.configuration import TaskLevelParameters, TrainingConfiguration
 from app.models.training_configuration.dataset_preparation import (
     Filtering,
@@ -93,6 +93,20 @@ def fxt_training_configuration_service(fxt_app) -> MagicMock:
 
 
 class TestTrainingConfigurationEndpoints:
+    @pytest.mark.parametrize("threshold", [-0.01, 1.01])
+    def test_invalid_tiling_object_threshold_is_rejected(
+        self, fxt_client, fxt_training_configuration, fxt_training_configuration_service, threshold
+    ):
+        fxt_training_configuration.algo_level_parameters.dataset_preparation.augmentation.tiling = Tiling()
+        fxt_training_configuration_service.get_by_model_architecture.return_value = fxt_training_configuration
+        response = fxt_client.patch(
+            f"/api/projects/{uuid4()}/training_configuration",
+            params={"model_architecture_id": "object-detection-yolox-x"},
+            json={"dataset_preparation.augmentation.tiling.drop_annotation_threshold": threshold},
+        )
+        assert response.status_code == 400
+        fxt_training_configuration_service.update.assert_not_called()
+
     def test_get_training_configuration_by_model_architecture(
         self,
         fxt_client,
