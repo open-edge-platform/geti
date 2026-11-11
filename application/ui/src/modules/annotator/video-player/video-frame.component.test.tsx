@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { render } from '@testing-library/react';
-import { getMockedVideoFrame } from 'mocks/mock-media';
+import { MOCKED_VIDEO_PLAYER_CONTEXT } from 'mocks/mock-video-player-context';
 
 import { VideoFrame } from './video-frame.component';
 import { useVideoPlayer } from './video-player-provider.component';
@@ -13,13 +13,14 @@ rs.mock('./video-player-provider.component', () => ({
 
 describe('VideoFrame', () => {
     it.each([
-        { fps: 30, playbackTime: 0.086, mediaTime: 0.066, expectedIndex: 2 },
-        { fps: 7.5, playbackTime: 0.134, mediaTime: 0.134, expectedIndex: 1 },
-        { fps: 30, playbackTime: 0, mediaTime: 0, expectedIndex: 0 },
-    ])('tracks frame $expectedIndex at $fps fps', ({ fps, playbackTime, mediaTime, expectedIndex }) => {
+        // The playback clock rounds to frame 3. The callback timestamp rounds to frame 2.
+        { fps: 30, currentTime: 0.086, mediaTime: 0.066, expectedIndex: 2 },
+        { fps: 7.5, currentTime: 0.134, mediaTime: 0.134, expectedIndex: 1 },
+        { fps: 30, currentTime: 0, mediaTime: 0, expectedIndex: 0 },
+    ])('tracks presented frame $expectedIndex at $fps fps', ({ fps, currentTime, mediaTime, expectedIndex }) => {
         const requestVideoFrameCallback = rs.fn((_callback: VideoFrameRequestCallback) => 1);
         const video = Object.assign(document.createElement('video'), {
-            currentTime: playbackTime,
+            currentTime,
             requestVideoFrameCallback,
             cancelVideoFrameCallback: rs.fn(),
         });
@@ -28,26 +29,14 @@ describe('VideoFrame', () => {
         const changeCurrentFrameIndex = rs.fn();
 
         rs.mocked(useVideoPlayer).mockReturnValue({
+            ...MOCKED_VIDEO_PLAYER_CONTEXT,
             videoRef: { current: video },
-            videoFrame: getMockedVideoFrame({ fps }),
+            videoFrame: { ...MOCKED_VIDEO_PLAYER_CONTEXT.videoFrame, fps },
             videoControls: {
+                ...MOCKED_VIDEO_PLAYER_CONTEXT.videoControls,
                 isPlaying: true,
-                canSelectPreviousFrame: false,
-                canSelectNextFrame: true,
-                previousFrame: rs.fn(),
-                nextFrame: rs.fn(),
-                play: rs.fn(() => Promise.resolve()),
-                pause: rs.fn(),
-                goto: rs.fn(),
             },
             changeCurrentFrameIndex,
-            isMuted: false,
-            toggleMute: rs.fn(),
-            playbackRate: 1,
-            changePlaybackRate: rs.fn(),
-            step: 1,
-            changeStep: rs.fn(),
-            videoError: null,
         });
 
         render(<VideoFrame canvasRef={{ current: canvas }} />);
