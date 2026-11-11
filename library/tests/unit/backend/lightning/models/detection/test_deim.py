@@ -125,6 +125,32 @@ class TestDEIMDFine:
         output = fxt_model.forward_for_tracing(torch.randn(1, 3, 640, 640))
         assert len(output) == 5  # Should return boxes, scores, labels, saliency_map, feature_vector
 
+    def test_load_state_dict_from_different_input_size(self) -> None:
+        """Regression test: a checkpoint trained at 640x640 must strict-load into a model built at
+        another input size. The size-dependent decoder buffers (anchors, valid_mask) are dropped
+        from the checkpoint; freshly regenerated buffers at the new size are kept.
+        """
+        donor = DEIMDFine(
+            model_name="deim_dfine_hgnetv2_n",
+            label_info=3,
+            data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
+        )
+        target = DEIMDFine(
+            model_name="deim_dfine_hgnetv2_n",
+            label_info=3,
+            data_input_params=DataInputParams((1024, 1024), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
+        )
+        ckpt = donor.state_dict()
+        anchors_size_before = target.state_dict()["model.decoder.anchors"].shape[1]
+        assert ckpt["model.decoder.anchors"].shape[1] != anchors_size_before
+
+        target.load_state_dict(ckpt)  # must not raise
+
+        # the target keeps its own, new-size regenerated buffers
+        assert target.state_dict()["model.decoder.anchors"].shape[1] == anchors_size_before
+
     def test_multi_scale_training(self) -> None:
         """Test DEIM DFine with multi-scale training enabled."""
         model = DEIMDFine(
