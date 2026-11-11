@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Largue ficheiros multimédia aqui",
                 "description": "As imagens e vídeos serão carregados para este dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Número de fotogramas anotados: {{count}}",
-                "totalFrames": "Total de fotogramas: {{count}}"
             }
         },
         "import": {

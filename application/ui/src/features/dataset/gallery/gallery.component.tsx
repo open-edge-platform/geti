@@ -7,7 +7,20 @@ import type { Media } from '@/api/types';
 import { MediaItem } from '@/components/media-item/media-item.component';
 import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewModes } from '@geti-ui/ui';
+import { useTranslation } from '@/i18n';
+import {
+    ActionButton,
+    Checkbox,
+    DialogContainer,
+    dimensionValue,
+    Flex,
+    Selection,
+    Size,
+    Tooltip,
+    TooltipTrigger,
+    ViewModes,
+} from '@geti-ui/ui';
+import { InfoOutline } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
@@ -23,7 +36,6 @@ import { EmptyDataset } from './empty-dataset.component';
 import { useSelectDatasetItem } from './hooks/use-select-dataset-item.hook';
 import { MediaDetails } from './media-item-actions/media-details.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
-import { MediaItemContextualHelp } from './media-item-contextual-help/media-item-contextual-help.component';
 import { useUploadFiles } from './use-upload-files';
 
 type GalleryProps = {
@@ -60,6 +72,7 @@ const GalleryList = ({
     onSelectedMediaItemChange,
     onDetails,
 }: GalleryListProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
 
@@ -127,7 +140,17 @@ const GalleryList = ({
                         )}
                         topRightElement={() => (
                             <Flex alignItems={'center'} gap={'size-50'}>
-                                <MediaItemContextualHelp item={item} />
+                                <TooltipTrigger>
+                                    <ActionButton
+                                        isQuiet
+                                        aria-label={t('dataset.mediaDetails.title')}
+                                        aria-haspopup='dialog'
+                                        onPress={() => onDetails(item)}
+                                    >
+                                        <InfoOutline />
+                                    </ActionButton>
+                                    <Tooltip>{t('dataset.mediaDetails.title')}</Tooltip>
+                                </TooltipTrigger>
 
                                 <MediaItemActions
                                     id={item.id}
@@ -135,7 +158,6 @@ const GalleryList = ({
                                     mediaUrl={downloadUrl}
                                     mediaFileName={mediaFileName}
                                     onAnnotate={() => onSelectedMediaItemChange(item)}
-                                    onDetails={() => onDetails(item)}
                                 />
                             </Flex>
                         )}

@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Arrastra aquí los archivos multimedia",
                 "description": "Las imágenes y vídeos se cargarán en este dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Número de fotogramas anotados: {{count}}",
-                "totalFrames": "Fotogramas totales: {{count}}"
             }
         },
         "import": {

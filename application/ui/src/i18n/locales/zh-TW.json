@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "將媒體檔案拖曳到這裡",
                 "description": "圖片和影片將上傳到此資料集。"
-            },
-            "mediaInfo": {
-                "annotatedFrames": "已標註幀數：{{count}}",
-                "totalFrames": "總幀數：{{count}}"
             }
         },
         "import": {
