@@ -6,9 +6,9 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import import_dataset
-from datumaro.experimental.fields import Subset
+from getidata.categories import LabelCategories
+from getidata.export_import import import_dataset
+from getidata.fields import Subset
 from PIL import Image
 
 from app.execution import PrepareDataset
@@ -38,7 +38,11 @@ def test_prepare_roboflow_yolo_archive(tmp_path: Path) -> None:
     assert isinstance(dataset.label_categories, LabelCategories)
     assert list(dataset.label_categories.labels) == ["License_Plate"]
     assert len(dataset) == 3
-    assert {sample.subset for sample in dataset} == {Subset.TRAINING, Subset.VALIDATION, Subset.TESTING}
+    assert {Path(sample.image.path).stem: sample.subset for sample in dataset} == {
+        "train": Subset.TRAINING,
+        "valid": Subset.VALIDATION,
+        "test": Subset.TESTING,
+    }
     for sample in dataset:
-        assert sample.label.tolist() == [0]
+        assert sample.labels.tolist() == [0]
         assert sample.bboxes.tolist() == [[50, 50, 40, 20]]
