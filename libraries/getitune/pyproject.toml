@@ -191,7 +191,7 @@ torchvision = [
     { index = "torch-cuda", extra = "cuda"},
 ]
 ultralytics = { git = "https://github.com/ultralytics/ultralytics.git", rev = "3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" }
-openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "master", subdirectory = "model_api" }
+openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", subdirectory = "model_api", rev = "0d029fbc94b99839f646e51205c3d661b00c300a" }
 
 [[tool.uv.index]]
 name = "torch-cpu"
