@@ -25,8 +25,6 @@
             "refresh": "Atualizar",
             "remove": "Remover",
             "selectAll": "Selecionar tudo",
-            "showLess": "Mostrar menos",
-            "showMore": "Mostrar mais",
             "skip": "Ignorar",
             "start": "Iniciar",
             "submit": "Submeter",
@@ -346,6 +344,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "A chave não pode estar vazia",
+            "keyDuplicate": "A chave deve ser única",
             "valueEmpty": "O valor não pode estar vazio"
         },
         "connection": {
@@ -363,6 +362,7 @@
             "label": "Dispositivo de inferência"
         },
         "sources": {
+            "title": "Fonte",
             "uploadError": "Falha ao carregar o ficheiro de vídeo.",
             "deleteVideoError": "Falha ao eliminar o ficheiro de vídeo carregado.",
             "list": {
@@ -371,9 +371,7 @@
             "types": {
                 "usbCamera": "câmara usb",
                 "ipCamera": "câmara ip",
-                "videoFile": "ficheiro de vídeo",
-                "imagesFolder": "pasta de imagens",
-                "disconnected": "desligado"
+                "videoFile": "ficheiro de vídeo"
             },
             "options": {
                 "usbCamera": "Câmara USB",
@@ -404,13 +402,10 @@
                 "loading": "A carregar...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconhecido (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignorar imagens existentes: {{value}}",
                 "streamUrl": "URL do fluxo: {{url}}",
                 "videoPath": "Caminho do vídeo: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Caminho da pasta de imagens",
-                "ignoreExistingImages": "Ignorar imagens existentes",
                 "streamUrl": "URL do fluxo:",
                 "requireAuthentication": "Requer autenticação",
                 "camera": "Câmara",
@@ -425,11 +420,11 @@
             }
         },
         "sinks": {
+            "title": "Destino",
             "types": {
                 "folder": "pasta",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Pasta",
@@ -511,9 +506,7 @@
                 "disabledSuccess": "Pipeline desativado com sucesso"
             },
             "configuration": {
-                "sidebarLabel": "Configuração do pipeline",
-                "sourcesTab": "Entrada",
-                "sinksTab": "Saída"
+                "sidebarLabel": "Configuração do pipeline"
             }
         },
         "collection": {
@@ -557,10 +550,6 @@
                 "healthy": "Operacional",
                 "finished": "Terminado",
                 "unavailable": "Indisponível"
-            },
-            "componentLabels": {
-                "source": "Fonte",
-                "sink": "Destino (sink)"
             }
         },
         "stream": {
@@ -788,6 +777,7 @@
                 "unknownError": "Erro desconhecido, tente atualizar a página.",
                 "timeoutError": "O tempo limite de {{operation}} expirou após {{timeoutMs}}ms. Tente atualizar a página.",
                 "embeddingError": "Não foi possível obter o embedding da imagem ({{status}}{{statusText}}).",
+                "hint": "Shift + clique para incluir uma área, Alt + clique para a excluir. Clique para criar a anotação, Esc para limpar os pontos.",
                 "operations": {
                     "workerBuild": "Compilação do worker SAM",
                     "workerInit": "Inicialização do worker SAM",
@@ -890,7 +880,6 @@
                 "dialogTitle": "Registos de Treino",
                 "loadError": "Falha ao carregar registos: {{message}}",
                 "noJobOrModel": "Nenhuma tarefa ou modelo especificado",
-                "fetchError": "Falha ao obter registos do modelo: {{status}} {{statusText}}",
                 "downloadStarted": "Transferência dos registos de treino iniciada"
             },
             "parameters": {
@@ -912,6 +901,7 @@
                 },
                 "sort": {
                     "label": "Ordenar por:",
+                    "recommended": "Recomendados primeiro",
                     "nameAsc": "Nome (A a Z)",
                     "nameDesc": "Nome (Z a A)",
                     "speedAsc": "Velocidade (mais rápido primeiro)",

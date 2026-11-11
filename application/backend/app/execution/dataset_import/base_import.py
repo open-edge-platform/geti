@@ -9,9 +9,8 @@ from typing import cast
 from uuid import UUID
 
 import numpy as np
-from datumaro.experimental import Dataset, LazyImage, LazyVideoFrame, Sample
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.export_import import import_dataset
+from getidata import Dataset, LazyImage, LazyVideoFrame, Sample
+from getidata.categories import LabelCategories
 from loguru import logger
 from sqlalchemy.orm import Session
 
@@ -20,6 +19,7 @@ from app.datumaro_converter import (
     InstanceSegmentationImportExportSample,
     MulticlassClassificationImportExportSample,
     MultilabelClassificationImportExportSample,
+    import_dataset,
 )
 from app.execution.base import Execution, JobParamsT
 from app.models import DatasetItemSubset, Media, MediaType, Task, TaskType

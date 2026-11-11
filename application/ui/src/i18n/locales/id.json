@@ -1,0 +1,1202 @@
+{
+    "common": {
+        "actions": {
+            "cancel": "Batal",
+            "close": "Tutup",
+            "delete": "Hapus",
+            "goBack": "Kembali",
+            "rename": "Ubah nama",
+            "save": "Simpan",
+            "assign": "Tetapkan",
+            "back": "Kembali",
+            "clear": "Bersihkan",
+            "clearAll": "Bersihkan semua",
+            "confirm": "Konfirmasi",
+            "connect": "Hubungkan",
+            "continue": "Lanjutkan",
+            "create": "Buat",
+            "disconnect": "Putuskan koneksi",
+            "dismiss": "Tutup",
+            "download": "Unduh",
+            "edit": "Edit",
+            "export": "Ekspor",
+            "hide": "Sembunyikan",
+            "next": "Berikutnya",
+            "refresh": "Muat ulang",
+            "remove": "Hapus",
+            "selectAll": "Pilih semua",
+            "skip": "Lewati",
+            "start": "Mulai",
+            "submit": "Kirim",
+            "train": "Latih",
+            "upload": "Unggah",
+            "undo": "Urungkan",
+            "redo": "Ulangi",
+            "annotate": "Beri anotasi",
+            "addAndUse": "Tambah & Gunakan",
+            "saveAndConnect": "Simpan & Hubungkan",
+            "testConnection": "Uji koneksi"
+        },
+        "labels": {
+            "allUppercase": "SEMUA",
+            "yes": "Ya",
+            "no": "Tidak",
+            "unknown": "Tidak diketahui",
+            "name": "Nama",
+            "architecture": "Arsitektur",
+            "device": "Perangkat",
+            "on": "Aktif",
+            "off": "Nonaktif",
+            "noMaximum": "Tanpa batas maksimum",
+            "active": "Aktif",
+            "dataset": "Dataset",
+            "filters": "Filter",
+            "images": "Gambar",
+            "videos": "Video",
+            "size": "Ukuran",
+            "sizeUppercase": "UKURAN",
+            "statusUppercase": "STATUS",
+            "settings": "Pengaturan",
+            "training": "Pelatihan",
+            "training_subset": "Pelatihan",
+            "validation": "Validasi",
+            "validation_subset": "Validasi",
+            "testing": "Pengujian",
+            "unassigned": "Belum ditetapkan",
+            "trainingLowercase": "pelatihan",
+            "validationLowercase": "validasi",
+            "testingLowercase": "pengujian",
+            "frames": "Bingkai",
+            "seconds": "Detik",
+            "every": "setiap",
+            "model": "Model",
+            "jobs": "Tugas",
+            "labels": "Label",
+            "bytesTransferred": "{{transferred}} dari {{total}}"
+        },
+        "viewModes": {
+            "large": "Gambar mini besar",
+            "medium": "Gambar mini sedang",
+            "small": "Gambar mini kecil"
+        },
+        "status": {
+            "pending": "Menunggu",
+            "running": "Berjalan",
+            "done": "Selesai",
+            "cancelled": "Dibatalkan",
+            "uploading": "Mengunggah",
+            "failed": "Gagal",
+            "error": "Kesalahan",
+            "disconnected": "Terputus"
+        },
+        "errors": {
+            "unknown": "Terjadi kesalahan yang tidak diketahui",
+            "unknownDetail": "Kesalahan tidak diketahui"
+        }
+    },
+    "navigation": {
+        "logoAlt": "Logo Geti",
+        "datasetDescription": "Halaman kumpulan data untuk menampilkan item media Anda",
+        "models": "Model",
+        "modelsDescription": "Halaman model untuk menampilkan model Anda",
+        "inference": "Inferensi",
+        "inferenceDescription": "Halaman inferensi yang menampilkan inferensi langsung pada proyek Anda",
+        "help": {
+            "documentation": "Dokumentasi pengguna",
+            "whatsNew": "Yang baru",
+            "reportIssue": "Laporkan masalah"
+        }
+    },
+    "dataset": {
+        "validation": {
+            "datasetViewNameExists": "Tampilan dengan nama ini sudah ada.",
+            "invalidDateRange": "Tanggal akhir harus setelah tanggal mulai"
+        },
+        "views": {
+            "deleted": "Tampilan dihapus",
+            "title": "Tampilan",
+            "entireDataset": "Seluruh dataset",
+            "assignToExistingView": "Tetapkan ke tampilan yang ada",
+            "assignTo": "Tetapkan ke",
+            "selectView": "Pilih tampilan",
+            "assignmentNote": "Operasi ini tidak akan memengaruhi media lain yang sudah ditetapkan ke tampilan ini.",
+            "mediaAssigned_one": "{{count}} item media berhasil ditetapkan.",
+            "mediaAssigned_other": "{{count}} item media berhasil ditetapkan.",
+            "openView": "Buka {{viewName}}",
+            "saveView": "Simpan tampilan",
+            "viewNameLabel": "Nama tampilan",
+            "renameTitle": "Ubah nama tampilan dataset",
+            "deleteTitle": "Konfirmasi penghapusan",
+            "deleteConfirmation": "Yakin ingin menghapus tampilan dataset \"{{viewName}}\"?",
+            "deleteSuccess": "Tampilan dataset \"{{viewName}}\" berhasil dihapus.",
+            "unassignFromView": "Hapus dari tampilan ini",
+            "selectedMediaCount_one": "{{count}} item media dipilih",
+            "selectedMediaCount_other": "{{count}} item media dipilih"
+        },
+        "filters": {
+            "allMedia": "Semua media",
+            "withAnnotations": "Media dengan anotasi",
+            "missingAnnotations": "Media tanpa anotasi",
+            "subset": "Filter berdasarkan subset",
+            "searchLabels": "Cari label",
+            "labelsSelected_one": "{{count}} label dipilih",
+            "labelsSelected_other": "{{count}} label dipilih",
+            "toggleAll": "Ubah pilihan semua",
+            "more": "Filter lainnya",
+            "dateRange": {
+                "heading": "Filter berdasarkan tanggal unggah",
+                "startDateLabel": "Tanggal mulai",
+                "endDateLabel": "Tanggal akhir",
+                "from": "Dari {{date}}",
+                "to": "Hingga {{date}}"
+            }
+        },
+        "upload": {
+            "queued": "Dalam antrean",
+            "processing": "Memproses",
+            "uploaded": "Diunggah",
+            "errorTitle": "Kesalahan unggah",
+            "details": "Detail unggahan",
+            "filename": "NAMA BERKAS",
+            "uploadingSummary_one": "Mengunggah {{total}} item - {{uploaded}} diunggah",
+            "uploadingSummary_other": "Mengunggah {{total}} item - {{uploaded}} diunggah",
+            "uploadingFailedSummary_one": "Mengunggah {{total}} item - {{uploaded}} diunggah, {{failed}} gagal",
+            "uploadingFailedSummary_other": "Mengunggah {{total}} item - {{uploaded}} diunggah, {{failed}} gagal",
+            "uploadedSummary_one": "{{count}} item diunggah",
+            "uploadedSummary_other": "{{count}} item diunggah",
+            "failedSummary_one": "Gagal mengunggah {{count}} item",
+            "failedSummary_other": "Gagal mengunggah {{count}} item",
+            "mixedSummary_one": "{{uploaded}} item diunggah, {{failed}} gagal",
+            "mixedSummary_other": "{{uploaded}} item diunggah, {{failed}} gagal",
+            "mixedCancelledSummary_one": "{{uploaded}} item diunggah, {{failed}} gagal, {{cancelled}} dibatalkan",
+            "mixedCancelledSummary_other": "{{uploaded}} item diunggah, {{failed}} gagal, {{cancelled}} dibatalkan",
+            "genericError": "Gagal mengunggah media.",
+            "uploadMedia": "Unggah media",
+            "showDetails": "Tampilkan detail",
+            "inProgressToast_one": "Mengunggah {{count}} item...",
+            "inProgressToast_other": "Mengunggah {{count}} item...",
+            "inProgressSucceededPart": "{{count}} berhasil",
+            "inProgressFailedPart": "{{count}} gagal",
+            "cancelAll": "Batalkan semua",
+            "cancelledSummary_one": "{{count}} unggahan dibatalkan",
+            "cancelledSummary_other": "{{count}} unggahan dibatalkan"
+        },
+        "empty": {
+            "noMatches": "Tidak ada item media yang cocok dengan filter Anda.",
+            "changeFilter": "Hapus atau pilih filter baru.",
+            "viewEmpty": "Tampilan ini tidak memiliki item media.",
+            "assignOrBack": "Tetapkan item media ke tampilan ini, atau kembali ke seluruh dataset.",
+            "goToEntireDataset": "Buka {{datasetName}}",
+            "datasetEmpty": "Dataset Anda kosong.",
+            "uploadToStart": "Unggah item media pertama Anda untuk memulai."
+        },
+        "review": {
+            "reviewed": "Ditinjau",
+            "forReview": "Perlu Ditinjau",
+            "selectSubsetPlaceholder": "Pilih subset"
+        },
+        "statistics": {
+            "label": "Statistik dataset",
+            "title": "Statistik Dataset",
+            "numberOfMedia": "Jumlah media",
+            "annotatedImages": "Gambar beranotasi",
+            "annotatedVideosFrames": "Video / bingkai beranotasi",
+            "numberOfObjectsPerLabel": "Jumlah objek per label",
+            "unannotated": "Tanpa anotasi",
+            "annotated": "Beranotasi",
+            "annotationsChartTooltip": "Anotasi"
+        },
+        "delete": {
+            "title": "Hapus Item",
+            "mediaItem": "Hapus item media",
+            "confirmation_one": "Yakin ingin menghapus {{count}} item?",
+            "confirmation_other": "Yakin ingin menghapus {{count}} item?",
+            "deletingItems": "Menghapus item...",
+            "deleteError": "Gagal menghapus, {{detail}}",
+            "deletedSuccess_one": "{{count}} item berhasil dihapus",
+            "deletedSuccess_other": "{{count}} item berhasil dihapus"
+        },
+        "bulkLabels": {
+            "title": "Penetapan label",
+            "uploadInstructions": "Pilih label yang akan ditetapkan ke gambar yang diunggah, lalu klik 'Lanjutkan'. Jika Anda ingin memberi anotasi pada gambar nanti, pilih 'Lewati'.",
+            "selectedInstructions": "Pilih label yang akan ditetapkan ke gambar yang dipilih, lalu klik 'Tetapkan'.",
+            "imageOnlyNote": "Label yang dipilih hanya berlaku untuk gambar. Video (jika ada) akan diunggah tanpa anotasi.",
+            "selectedImagesNote": "Label yang dipilih hanya berlaku untuk gambar. Video (jika ada) tidak berubah.",
+            "noResults": "Tidak ada hasil. Coba cari dengan kata lain.",
+            "cancelUpload": "Batalkan unggahan",
+            "assignLabelTooltip": "Tetapkan label",
+            "assignAllSuccess": "Label berhasil ditetapkan ke seluruh {{count}} gambar",
+            "assignAllFailure": "Gagal menetapkan label ke seluruh {{count}} gambar",
+            "assignPartialSuccess": "Label ditetapkan ke {{succeeded}} dari {{total}} gambar ({{failed}} gagal)"
+        },
+        "mediaActions": {
+            "downloadStarted": "Pengunduhan {{fileName}} telah dimulai"
+        },
+        "gallery": {
+            "sort": {
+                "label": "Urutkan Media berdasarkan:",
+                "uploadDateDescending": "Tanggal unggah (terbaru)",
+                "uploadDateAscending": "Tanggal unggah (terlama)"
+            },
+            "selectedCount": "{{count}} dipilih",
+            "totalMediaCount_one": "{{count}} item media",
+            "totalMediaCount_other": "{{count}} item media",
+            "dropZone": {
+                "title": "Letakkan berkas media di sini",
+                "description": "Gambar dan video akan diunggah ke dataset ini."
+            },
+            "mediaInfo": {
+                "annotatedFrames": "Jumlah bingkai beranotasi: {{count}}",
+                "totalFrames": "Total bingkai: {{count}}"
+            }
+        },
+        "import": {
+            "jobTitle": "Impor dataset - {{fileName}} - {{size}}",
+            "processingMessage": "Berkas {{fileName}} sedang diproses untuk diimpor",
+            "technicalDetails": "Detail teknis",
+            "preparingJob": "Menyiapkan",
+            "stagedFileReadError": "Terjadi kesalahan saat membaca berkas sementara",
+            "prepareError": "Terjadi kesalahan saat menyiapkan impor.",
+            "genericError": "Terjadi kesalahan saat mengimpor.",
+            "importedSuccess": "Dataset {{fileName}} {{size}} berhasil diimpor.",
+            "multipleFilesError": "Menambahkan folder atau beberapa berkas tidak diizinkan. Harap muat satu berkas saja.",
+            "unsupportedFormatError": "Format berkas tidak didukung. Harap unggah berkas .zip yang valid.",
+            "datasetBeingUploaded": "Dataset sedang diunggah",
+            "dropZipHere": "Letakkan berkas .zip dataset di sini",
+            "learnMoreFormats": "Pelajari lebih lanjut tentang berbagai format",
+            "dialogHeading": "Impor dataset",
+            "scanningMessage": "Memindai dan menganalisis arsip dataset yang akan diimpor...",
+            "mapLabelsMessage": "Petakan label untuk dataset yang diunggah",
+            "deleteStagedFile": {
+                "title": "Hapus Berkas Sementara",
+                "confirmation": "Yakin ingin menghapus berkas dataset \"{{stagedDatasetId}}\"?"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "Dataset yang diimpor menggunakan anotasi kotak pembatas, tetapi dataset proyek Anda menggunakan poligon. Anotasi akan dikonversi menjadi poligon secara otomatis agar tetap kompatibel.",
+                "polygonToBoundingBox": "Dataset yang diimpor menggunakan anotasi poligon, tetapi dataset proyek Anda menggunakan kotak pembatas. Anotasi akan dikonversi menjadi kotak pembatas secara otomatis agar tetap kompatibel."
+            },
+            "labelMapping": {
+                "statisticsHeading": "Statistik dataset yang diimpor",
+                "heading": "Pemetaan label - opsional",
+                "unmappedNote": "Item yang tidak dipetakan akan diimpor tanpa label",
+                "datasetLabelsColumn": "Label dataset",
+                "projectLabelsColumn": "Label proyek",
+                "selectLabelPlaceholder": "Pilih label",
+                "imagesLabel": "gambar",
+                "framesLabel": "bingkai"
+            }
+        },
+        "export": {
+            "heading": "Ekspor {{name}}",
+            "headingDatasetView": "Ekspor tampilan dataset",
+            "datasetView": "Tampilan: {{name}}",
+            "statisticsHeading": "Statistik dataset yang diekspor",
+            "settingsHeading": "Pengaturan ekspor",
+            "filterByLabel": "Filter anotasi berdasarkan label",
+            "selectFormat": "Pilih format ekspor dataset",
+            "learnMoreFormats": "Pelajari lebih lanjut tentang format ekspor",
+            "processing": "Memproses dataset untuk diekspor",
+            "readyForDownload": "Dataset siap diunduh",
+            "downloadStarted": "Pengunduhan dataset dimulai",
+            "error": "Kesalahan: {{error}}",
+            "itemsLabel": "item",
+            "details": {
+                "defaultName": "dataset",
+                "format": "Format:",
+                "media": "Media:",
+                "onlyAnnotated": "Hanya media dengan anotasi",
+                "labels": "Label:"
+            },
+            "warnings": {
+                "videos": "Ekspor video tidak didukung oleh format dataset ini. Semua bingkai beranotasi dari video akan diekspor sebagai gambar.",
+                "emptyLabel": "Format yang dipilih tidak mendukung label kosong (misalnya \"{{emptyLabelName}}\"). Gambar dan bingkai yang memuat label tersebut akan diekspor tanpa anotasi.",
+                "unsupportedItemsEmptyLabels": "label kosong",
+                "unsupportedItemsVideos": "video",
+                "unsupportedItems": "Untuk mempertahankan {{items}}, gunakan format ekspor Geti.",
+                "subsetNotIncluded": "Dataset yang diekspor tidak akan menyertakan informasi tentang subset yang ditetapkan ke setiap media."
+            }
+        },
+        "importExport": {
+            "trigger": "Impor/ekspor dataset",
+            "exportItem": "Ekspor dataset"
+        },
+        "revisions": {
+            "createdOn": "Dibuat {{date}}",
+            "unnamedName": "Dataset #{{id}}",
+            "notFoundForModel": "Tidak ditemukan revisi dataset untuk model ini",
+            "filesDeleted": "Berkas untuk revisi dataset ini telah dihapus.",
+            "noItemsInSubset": "Tidak ada item dalam subset ini",
+            "itemAlt": "Item {{subset}}",
+            "trainingSubsets": {
+                "test": "Pengujian"
+            },
+            "rename": {
+                "title": "Ubah nama revisi dataset",
+                "nameLabel": "Nama revisi dataset"
+            },
+            "delete": {
+                "title": "Hapus revisi dataset",
+                "description": "Yakin ingin menghapus revisi dataset \"{{name}}\"? Anda masih dapat melihat statistik model, tetapi tidak dapat mengakses berkas dataset pelatihan."
+            }
+        },
+        "includeUnannotated": "Sertakan media tanpa anotasi"
+    },
+    "inference": {
+        "validation": {
+            "keyEmpty": "Kunci tidak boleh kosong",
+            "keyDuplicate": "Kunci harus unik",
+            "valueEmpty": "Nilai tidak boleh kosong"
+        },
+        "connection": {
+            "testing": "Menguji koneksi...",
+            "inUse": "Sedang digunakan",
+            "unreachable": "Tidak dapat dijangkau",
+            "ready": "Siap",
+            "saveErrorFallback": "coba lagi",
+            "removeSuccess": "{{name}} berhasil dihapus!"
+        },
+        "confidenceThreshold": {
+            "label": "Ambang kepercayaan"
+        },
+        "devices": {
+            "label": "Perangkat inferensi"
+        },
+        "sources": {
+            "title": "Sumber",
+            "uploadError": "Gagal mengunggah berkas video.",
+            "deleteVideoError": "Gagal menghapus berkas video yang diunggah.",
+            "list": {
+                "addSource": "Tambah sumber baru"
+            },
+            "types": {
+                "usbCamera": "kamera usb",
+                "ipCamera": "kamera ip",
+                "videoFile": "berkas video"
+            },
+            "options": {
+                "usbCamera": "Kamera USB",
+                "ipCamera": "Kamera IP",
+                "videoFile": "Berkas video"
+            },
+            "add": {
+                "title": "Tambah sumber masukan baru"
+            },
+            "edit": {
+                "title": "Edit sumber masukan"
+            },
+            "form": {
+                "createSuccess": "Konfigurasi sumber berhasil dibuat.",
+                "updateSuccess": "Konfigurasi sumber berhasil diperbarui.",
+                "saveError": "Gagal menyimpan konfigurasi sumber, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Berhasil terhubung ke \"{{name}}\".",
+                "disconnectSuccess": "Berhasil memutuskan koneksi dari \"{{name}}\".",
+                "disablePipelineAndDisconnectSuccess": "Berhasil menonaktifkan pipeline dan memutuskan koneksi dari \"{{name}}\".",
+                "disconnectDialog": {
+                    "title": "Putuskan koneksi {{name}}",
+                    "message": "Memutuskan koneksi sumber ini juga akan menonaktifkan pipeline inferensi. Ingin melanjutkan?"
+                }
+            },
+            "settings": {
+                "loading": "Memuat...",
+                "device": "Perangkat: {{name}}",
+                "unknownDevice": "Perangkat tidak diketahui (id: {{deviceId}})",
+                "streamUrl": "URL stream: {{url}}",
+                "videoPath": "Lokasi video: {{path}}"
+            },
+            "fields": {
+                "streamUrl": "URL Stream:",
+                "requireAuthentication": "Wajibkan Autentikasi",
+                "camera": "Kamera",
+                "videoFilePath": "Lokasi berkas video",
+                "selectedFile": "Dipilih: {{fileName}}",
+                "loopVideo": "Putar video berulang"
+            },
+            "defaultNames": {
+                "usbCamera": "Sumber kamera USB",
+                "ipCamera": "Sumber kamera IP",
+                "videoFile": "Sumber berkas video"
+            }
+        },
+        "sinks": {
+            "title": "Tujuan",
+            "types": {
+                "folder": "folder",
+                "mqtt": "mqtt",
+                "webhook": "webhook"
+            },
+            "options": {
+                "folder": "Folder",
+                "webhook": "Webhook",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "Tambah tujuan baru"
+            },
+            "edit": {
+                "title": "Edit tujuan"
+            },
+            "form": {
+                "createSuccess": "Konfigurasi tujuan berhasil dibuat.",
+                "updateSuccess": "Konfigurasi tujuan berhasil diperbarui.",
+                "saveError": "Gagal menyimpan konfigurasi tujuan, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Berhasil terhubung ke \"{{name}}\"",
+                "disconnectSuccess": "Berhasil memutuskan koneksi dari \"{{name}}\""
+            },
+            "settings": {
+                "rateLimit": "Batas laju: {{value}}",
+                "httpMethod": "Metode HTTP: {{value}}",
+                "timeout": "Batas waktu: {{value}}",
+                "webhookUrl": "URL Webhook: {{value}}",
+                "topic": "Topik: {{value}}",
+                "brokerHost": "Host broker: {{value}}",
+                "brokerPort": "Port broker: {{value}}",
+                "outputFormats": "Format keluaran: ",
+                "outputFormatTypes": {
+                    "imageOriginal": "gambar asli",
+                    "imageWithPredictions": "gambar dengan prediksi",
+                    "predictions": "prediksi"
+                }
+            },
+            "rateLimit": {
+                "notSet": "Belum diatur",
+                "samplesPerSecond_one": "{{count}} sampel setiap 1 detik",
+                "samplesPerSecond_other": "{{count}} sampel setiap 1 detik",
+                "oneSamplePerSeconds_one": "1 sampel setiap {{count}} detik",
+                "oneSamplePerSeconds_other": "1 sampel setiap {{count}} detik"
+            },
+            "fields": {
+                "samples": "Sampel",
+                "outputFormatsLabel": "Format Keluaran",
+                "outputFormatPredictions": "Prediksi",
+                "outputFormatImageOriginal": "Gambar Asli",
+                "outputFormatImageWithPredictions": "Gambar dengan Prediksi",
+                "folderPath": "Lokasi Folder",
+                "httpMethod": "Metode HTTP",
+                "timeout": "Batas Waktu",
+                "webhookUrl": "URL Webhook",
+                "headers": "Header",
+                "topic": "Topik",
+                "brokerHost": "Host Broker",
+                "brokerPort": "Port Broker",
+                "authRequired": "Autentikasi Wajib"
+            },
+            "webhook": {
+                "headersHelp": "Tambahkan pasangan kunci-nilai sebanyak yang diperlukan. Setiap pasangan akan disertakan dalam objek '{{title}}'.",
+                "keyPlaceholder": "kunci",
+                "valuePlaceholder": "nilai"
+            },
+            "defaultNames": {
+                "localFolder": "Tujuan folder lokal",
+                "webhook": "Tujuan webhook",
+                "mqtt": "Tujuan MQTT"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "loading": "Model: ..."
+            },
+            "toggle": {
+                "enabledLabel": "Pipeline diaktifkan",
+                "disabledLabel": "Pipeline dinonaktifkan",
+                "enabledSuccess": "Pipeline berhasil diaktifkan",
+                "disabledSuccess": "Pipeline berhasil dinonaktifkan"
+            },
+            "configuration": {
+                "sidebarLabel": "Konfigurasi pipeline"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "Kebijakan pengumpulan data",
+            "maxDatasetSize": {
+                "title": "Ukuran maksimum dataset",
+                "description": "Jumlah maksimum item yang dikumpulkan"
+            },
+            "captureRate": {
+                "title": "Laju pengambilan",
+                "description": "Ambil bingkai saat stream berjalan",
+                "toggleLabel": "Aktifkan/nonaktifkan pengambilan otomatis"
+            },
+            "confidenceThreshold": {
+                "description": "Ambil bingkai saat kepercayaan berada di bawah ambang",
+                "sliderLabel": "Ambang"
+            }
+        },
+        "metrics": {
+            "time": "waktu",
+            "sidebarLabel": "Metrik pipeline",
+            "empty": {
+                "title": "Tidak ada statistik yang tersedia",
+                "description": "Metrik pipeline akan ditampilkan di sini setelah pipeline mulai berjalan dan memproses data."
+            },
+            "throughput": {
+                "title": "Throughput",
+                "axisLabel": "permintaan/detik"
+            },
+            "latency": {
+                "title": "Latensi",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "idle": "Siaga",
+                "problemsDetected": "Masalah terdeteksi"
+            },
+            "component": {
+                "healthy": "Berfungsi baik",
+                "finished": "Selesai",
+                "unavailable": "Tidak tersedia"
+            }
+        },
+        "stream": {
+            "start": "Mulai stream",
+            "enablePipelineToStart": "Aktifkan pipeline untuk memulai stream",
+            "connectError": "Gagal terhubung ke stream",
+            "captureFrame": "Ambil bingkai",
+            "captureSuccess": "Bingkai diambil dan ditambahkan ke dataset."
+        },
+        "settings": {
+            "folderPath": "Lokasi folder: {{path}}",
+            "authRequired": "Autentikasi wajib: {{value}}"
+        }
+    },
+    "project": {
+        "delete": {
+            "confirmation": "Yakin ingin menghapus proyek \"{{projectName}}\"?",
+            "success": "Proyek berhasil dihapus"
+        },
+        "rename": {
+            "title": "Edit nama proyek",
+            "success": "Proyek berhasil diperbarui"
+        },
+        "validation": {
+            "nameEmpty": "Nama proyek tidak boleh kosong",
+            "nameExists": "Nama proyek tersebut sudah ada"
+        },
+        "panel": {
+            "manageProjects": "Kelola proyek",
+            "enablePipelineBlocked": {
+                "title": "Tidak dapat mengaktifkan pipeline",
+                "message": "Pastikan Anda telah memilih model dan sumber sebelum mengaktifkan pipeline."
+            }
+        },
+        "taskTypes": {
+            "detection": "Deteksi objek",
+            "classification": "Klasifikasi",
+            "instanceSegmentation": "Segmentasi instans",
+            "multiLabelClassification": "Klasifikasi multilabel",
+            "recommended": "{{taskType}} (Direkomendasikan)"
+        },
+        "list": {
+            "count_one": "{{count}} proyek",
+            "count_other": "{{count}} proyek",
+            "countFiltered_one": "{{filtered}} dari {{count}} proyek",
+            "countFiltered_other": "{{filtered}} dari {{count}} proyek",
+            "createNewProject": "Buat proyek baru",
+            "createProjectFromDataset": "Buat dari dataset",
+            "card": {
+                "created": "Dibuat: {{date}}",
+                "models_one": "{{count}} model",
+                "models_other": "{{count}} model"
+            },
+            "menu": {
+                "enablePipeline": "Aktifkan pipeline",
+                "disablePipeline": "Nonaktifkan pipeline"
+            },
+            "sort": {
+                "label": "Urutkan Proyek berdasarkan:",
+                "nameAscending": "Nama (A-Z)",
+                "nameDescending": "Nama (Z-A)",
+                "createdAtDescending": "Tanggal pembuatan (terbaru)",
+                "createdAtAscending": "Tanggal pembuatan (terlama)"
+            },
+            "filters": {
+                "searchPlaceholder": "Cari proyek",
+                "taskType": "Filter berdasarkan jenis tugas",
+                "models": "Filter berdasarkan model",
+                "withTrainedModels": "Dengan model terlatih"
+            },
+            "noMatches": {
+                "title": "Tidak ada proyek yang cocok dengan filter Anda",
+                "description": "Coba sesuaikan pencarian atau filter jenis tugas untuk menemukan yang Anda cari."
+            },
+            "empty": {
+                "intro": "Selamat datang di <name>Geti</name>, platform AI visi yang memandu Anda melalui <highlight>seluruh siklus hidup model</highlight>, dari penyiapan dataset hingga pelatihan, optimasi, dan penerapan."
+            },
+            "workflow": {
+                "addData": "Tambah data",
+                "optimize": "Optimalkan",
+                "runInference": "Jalankan inferensi",
+                "loop": "Pantau prediksi dan kumpulkan lebih banyak data untuk menyempurnakan model Anda secara bertahap"
+            }
+        },
+        "create": {
+            "taskQuestion": "Jenis tugas apa yang ingin Anda berikan kepada model?",
+            "labelsQuestion": "Objek apa yang perlu {{verb}} oleh model?",
+            "submit": "Buat proyek",
+            "tasks": {
+                "detection": {
+                    "title": "Deteksi Objek",
+                    "description": "Identifikasi dan temukan lokasi objek dalam gambar Anda",
+                    "advice": "Cocok untuk: Penghitungan, Pelacakan",
+                    "verb": "dideteksi"
+                },
+                "instanceSegmentation": {
+                    "title": "Segmentasi Instans",
+                    "description": "Deteksi dan tandai batas area atau bentuk tertentu",
+                    "advice": "Cocok untuk: Pengukuran, Bentuk tidak beraturan",
+                    "verb": "disegmentasi"
+                },
+                "classification": {
+                    "title": "Klasifikasi Gambar",
+                    "description": "Kategorikan seluruh gambar berdasarkan isinya",
+                    "advice": "Cocok untuk: Penyaringan, Moderasi Konten",
+                    "verb": "diklasifikasikan"
+                }
+            },
+            "classificationType": {
+                "title": "Jenis klasifikasi apa yang harus digunakan model?",
+                "singleLabel": {
+                    "label": "Label tunggal",
+                    "description": "Tetapkan satu label dari pilihan label yang saling eksklusif",
+                    "warning": "Memerlukan minimal 2 label"
+                },
+                "multiLabel": {
+                    "label": "Multilabel",
+                    "description": "Tetapkan satu atau lebih label yang dapat berlaku bersamaan"
+                }
+            },
+            "labels": {
+                "atLeastOneRequired": "Minimal satu objek diperlukan"
+            },
+            "defaultName": "Proyek #{{number}}"
+        },
+        "import": {
+            "title": "Buat proyek dari dataset - Impor",
+            "labelMapping": {
+                "title": "Pemetaan label"
+            },
+            "preparingMessage": "Siapkan impor dataset sebagai proyek baru",
+            "taskSelection": {
+                "projectName": "Nama proyek",
+                "selectTaskPlaceholder": "Pilih tugas",
+                "recommendationHint": "Pilihan yang direkomendasikan didasarkan pada jenis anotasi yang terdeteksi dalam dataset. Jika Anda memilih jenis lain, anotasi akan dikonversi secara otomatis saat impor agar sesuai dengan jenis yang dipilih."
+            },
+            "jobsList": {
+                "selectTaskType": "Pilih jenis tugas",
+                "mapLabelsButton": "Petakan label"
+            }
+        },
+        "taskType": "Jenis tugas"
+    },
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "Tombol pintasan",
+            "nameExists": "Nama label tersebut sudah ada",
+            "hotkeyExists": "Tombol pintasan tersebut sudah digunakan"
+        },
+        "editor": {
+            "namePlaceholder": "Nama label",
+            "pin": "Sematkan label",
+            "unpin": "Lepas sematan label",
+            "editTrigger": "Edit label",
+            "createTrigger": "Buat label",
+            "delete": {
+                "title": "Hapus label",
+                "message": "Jika Anda menghapus label {{labelName}}, semua anotasi dalam dataset yang memiliki label ini akan dihapus. Namun, model yang telah Anda latih sebelumnya tidak akan terpengaruh."
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "Tombol pintasan: {{hotkey}}",
+            "overflowCount": "+ {{count}} lainnya"
+        },
+        "empty": {
+            "noLabel": "Tanpa label",
+            "noObject": "Tanpa objek"
+        }
+    },
+    "annotator": {
+        "canvas": {
+            "hideLabels": "Sembunyikan label",
+            "pixelView": "Tampilan piksel",
+            "annotationFillOpacity": "Opasitas isian anotasi",
+            "annotationBorderOpacity": "Opasitas garis tepi anotasi",
+            "imageBrightness": "Kecerahan gambar",
+            "imageContrast": "Kontras gambar",
+            "imageSaturation": "Saturasi gambar"
+        },
+        "actions": {
+            "zoomIn": "Perbesar",
+            "zoomOut": "Perkecil",
+            "fitToScreen": "Sesuaikan dengan layar ({{hotkey}})",
+            "undo": "Urungkan ({{hotkey}})",
+            "redo": "Ulangi ({{hotkeys}})",
+            "toggleFocus": "Aktifkan/nonaktifkan fokus",
+            "showAnnotations": "Tampilkan anotasi ({{hotkey}})",
+            "hideAnnotations": "Sembunyikan anotasi ({{hotkey}})"
+        },
+        "modes": {
+            "annotation": "Anotasi",
+            "prediction": "Prediksi"
+        },
+        "predictions": {
+            "settingsTitle": "Pengaturan prediksi",
+            "confirm": "Konfirmasi prediksi"
+        },
+        "hotkeys": {
+            "alternatives": "{{primary}} atau {{alternative}}",
+            "title": "Tombol pintasan",
+            "submitAnnotationsPredictions": "Kirim anotasi/prediksi",
+            "previousMedia": "Media sebelumnya",
+            "nextMedia": "Media berikutnya",
+            "deleteSelectedAnnotation": "Hapus anotasi yang dipilih",
+            "toggleAnnotationsVisibility": "Tampilkan atau sembunyikan semua anotasi",
+            "selectAllAnnotations": "Pilih semua anotasi",
+            "deselectAllAnnotations": "Batalkan pilihan semua anotasi",
+            "selectNextAnnotation": "Pilih anotasi berikutnya",
+            "resetZoom": "Atur ulang zoom"
+        },
+        "tools": {
+            "selection": {
+                "label": "Seleksi"
+            },
+            "boundingBox": {
+                "label": "Kotak pembatas",
+                "description": "Gambar persegi panjang atau persegi yang mengelilingi objek dalam gambar."
+            },
+            "autoSegmentation": {
+                "label": "Segmentasi otomatis",
+                "detectionDescription": "Arahkan kursor ke objek untuk melihat pratinjau kotak yang disarankan, lalu klik untuk membuat anotasi.",
+                "segmentationDescription": "Arahkan kursor ke objek untuk melihat pratinjau poligon yang disarankan, lalu klik untuk membuat anotasi.",
+                "loading": "Memproses gambar, harap tunggu...",
+                "error": "Kesalahan pada alat Segment Anything: {{message}}",
+                "unknownError": "Kesalahan tidak diketahui, coba muat ulang halaman.",
+                "timeoutError": "{{operation}} melewati batas waktu setelah {{timeoutMs}}ms. Coba muat ulang halaman.",
+                "embeddingError": "Tidak dapat mengambil embedding gambar ({{status}}{{statusText}}).",
+                "hint": "Shift + klik untuk menyertakan area, Alt + klik untuk mengecualikannya. Klik untuk membuat anotasi, Esc untuk menghapus titik.",
+                "operations": {
+                    "workerBuild": "Pembuatan worker SAM",
+                    "workerInit": "Inisialisasi worker SAM",
+                    "decoder": "Dekoder SAM"
+                }
+            },
+            "polygon": {
+                "label": "Poligon",
+                "description": "Klik untuk menempatkan titik satu per satu, atau tahan dan seret untuk menggambar bebas. Cocok untuk bentuk tidak beraturan yang memerlukan ketepatan piksel."
+            },
+            "magneticLasso": {
+                "label": "Laso Magnetis",
+                "description": "Arahkan kursor di sepanjang tepi objek dan klik secara berkala agar garis mengikuti batas objek.",
+                "error": "Gagal memilih batas bentuk, coba lagi."
+            },
+            "ssim": {
+                "label": "Asisten deteksi",
+                "description": "Gambar kotak di sekitar objek untuk menemukan dan memberi anotasi pada objek serupa dalam gambar secara otomatis.",
+                "loading": "Memuat asisten deteksi, harap tunggu...",
+                "error": "Kesalahan pada alat Asisten deteksi: {{message}}",
+                "operations": {
+                    "workerBuild": "Pembuatan worker Asisten deteksi"
+                },
+                "options": {
+                    "accept": "Terima",
+                    "reject": "Tolak",
+                    "numberOfItems": "Jumlah item",
+                    "autoMergeDuplicates": "Gabungkan duplikat secara otomatis"
+                }
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "Lebih lambat",
+                "slow": "Lambat",
+                "normal": "Normal",
+                "speed": "Kecepatan pemutaran",
+                "showAllFrames": "Tampilkan semua bingkai",
+                "showOneFramePerSecond": "Tampilkan 1 bingkai per detik"
+            },
+            "frames": {
+                "currentTotal": "Bingkai saat ini: {{currentFrame}} / Total bingkai: {{totalFrames}}",
+                "thumbnailAlt": "Gambar mini untuk bingkai {{frameNumber}}"
+            },
+            "errors": {
+                "network": "Tidak dapat memutar video karena kesalahan jaringan, muat ulang lalu coba lagi.",
+                "unableToPlay": "Tidak dapat memutar video, coba lagi.",
+                "unsupportedFormat": "Tidak dapat memutar video, coba format video lain (mp4/webm)."
+            }
+        }
+    },
+    "models": {
+        "jobs": {
+            "error": "Tugas gagal. Periksa log untuk detailnya lalu coba lagi.",
+            "pending": "Menunggu...",
+            "running": "Berjalan...",
+            "stopDialog": {
+                "title": "Hentikan tugas",
+                "confirmation": "Yakin ingin menghentikan tugas ini?"
+            },
+            "logs": "Log",
+            "startedAt": "Dimulai: {{time}}",
+            "waitingToStart": "Menunggu untuk dimulai...",
+            "device": "Perangkat: {{device}}"
+        },
+        "detail": {
+            "loadError": "Gagal memuat detail model",
+            "tabs": {
+                "variants": "Varian model",
+                "metrics": "Metrik model",
+                "parameters": "Parameter pelatihan",
+                "datasets": "Dataset pelatihan"
+            }
+        },
+        "metrics": {
+            "noMetrics": "Tidak ada metrik yang tersedia",
+            "loadError": "Gagal memuat metrik pelatihan",
+            "evaluationsTitle": "Evaluasi",
+            "noEvaluations": "Metrik evaluasi pengujian tidak tersedia"
+        },
+        "training": {
+            "logs": {
+                "copySuccess": "Berhasil Disalin",
+                "copyError": "Gagal menyalin",
+                "copyPathTooltip": "Klik untuk menyalin lokasi",
+                "showTraceback": "Tampilkan traceback",
+                "levelLabel": "Level",
+                "levelHelpTitle": "Level log minimum",
+                "levelHelpDescription": "Menampilkan entri log pada level yang dipilih dan yang lebih tinggi. Misalnya, memilih WARNING akan menampilkan entri WARNING, ERROR, dan CRITICAL, serta menyembunyikan DEBUG dan INFO.",
+                "searchPlaceholder": "Cari log...",
+                "connectionStatus": {
+                    "connecting": "Menghubungkan...",
+                    "connected": "Langsung",
+                    "error": "Kesalahan koneksi"
+                },
+                "entriesCount": "{{filtered}} / {{total}} entri",
+                "noEntries": "Tidak ada entri log",
+                "noMatchingEntries": "Tidak ada entri log yang cocok",
+                "scrollToBottom": "Gulir ke bawah",
+                "dialogTitle": "Log Pelatihan",
+                "loadError": "Gagal memuat log: {{message}}",
+                "noJobOrModel": "Tidak ada tugas atau model yang ditentukan",
+                "downloadStarted": "Pengunduhan log pelatihan dimulai"
+            },
+            "parameters": {
+                "noParameters": "Tidak ada parameter.",
+                "learningParameters": "PARAMETER PEMBELAJARAN",
+                "filters": "FILTER",
+                "augmentations": "AUGMENTASI",
+                "intensityMapping": "PEMETAAN INTENSITAS"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "Akurasi Top-1 pada ImageNet",
+                    "mapOnCoco": "mAP pada COCO",
+                    "map50OnCoco": "mAP50 pada COCO"
+                },
+                "card": {
+                    "numberOfParameters": "Jumlah parameter: {{count}} juta",
+                    "gigaflops": "Gigaflops: {{value}}"
+                },
+                "sort": {
+                    "label": "Urutkan Model berdasarkan:",
+                    "recommended": "Direkomendasikan dahulu",
+                    "nameAsc": "Nama (A ke Z)",
+                    "nameDesc": "Nama (Z ke A)",
+                    "speedAsc": "Kecepatan (tercepat dahulu)",
+                    "speedDesc": "Kecepatan (terlambat dahulu)",
+                    "accuracyAsc": "Akurasi (terendah dahulu)",
+                    "accuracyDesc": "Akurasi (tertinggi dahulu)"
+                },
+                "timm": {
+                    "heading": "Konfigurasi model TIMM",
+                    "architectureFamilyLabel": "Keluarga arsitektur",
+                    "selectArchitecturePlaceholder": "Pilih arsitektur",
+                    "modelVariantLabel": "Varian model",
+                    "selectVariantPlaceholder": "Pilih varian",
+                    "pretrainedWeightsLabel": "Bobot Prapelatihan",
+                    "selectWeightsPlaceholder": "Pilih bobot",
+                    "parameters": "Parameter: {{count}} juta",
+                    "gigaflops": "GigaFlops: {{value}}"
+                }
+            },
+            "devices": {
+                "selectLabel": "Pilih perangkat pelatihan"
+            },
+            "setup": {
+                "trigger": "Latih model",
+                "dialog": {
+                    "title": "Pilih model untuk dilatih",
+                    "disabledReasonTitle": "Mengapa saya tidak dapat memulai pelatihan?",
+                    "advancedSettings": "Pengaturan lanjutan"
+                },
+                "toast": {
+                    "trainingStarted": "Pelatihan model berhasil dimulai.",
+                    "trainingStartedWithLink": "Pelatihan model berhasil dimulai. <modelsLink>Buka halaman model untuk melihat progres.</modelsLink>"
+                },
+                "selectDataset": {
+                    "label": "Pilih dataset",
+                    "useEntireDataset": "Gunakan seluruh dataset",
+                    "helpTitle": "Memilih dataset",
+                    "helpDescription": "Pilih data yang akan digunakan untuk pelatihan. Pilih \"Gunakan seluruh dataset\" untuk melatih menggunakan versi terbaru dari seluruh data (yang Anda lihat di halaman \"Dataset\"). Pilih tampilan dataset untuk melatih hanya dengan media yang ditetapkan ke tampilan tersebut. Pilih revisi dataset untuk melatih menggunakan data (media dan anotasi) yang sama persis dengan model lain.",
+                    "sections": {
+                        "views": "Tampilan dataset",
+                        "revisions": "Revisi dataset"
+                    }
+                },
+                "selectModel": {
+                    "label": "Pilih bobot masukan",
+                    "defaultPretrainedWeights": "Bobot prapelatihan bawaan",
+                    "helpTitle": "Memilih bobot masukan",
+                    "helpDescription": "Pilih model yang ada untuk melanjutkan penyempurnaan, atau pilih \"Bobot prapelatihan bawaan\" untuk menyempurnakan model baru menggunakan bobot yang tersedia untuk umum dan telah dilatih sebelumnya pada dataset publik berukuran besar."
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "Untuk melatih model, Anda perlu memberi anotasi pada minimal 3 item dalam dataset. Namun, sebaiknya beri anotasi pada lebih banyak item agar hasilnya lebih baik.",
+                "notEnoughAnnotationsInView": "Untuk melatih model, Anda perlu memberi anotasi pada minimal 3 item dalam tampilan dataset yang dipilih. Namun, sebaiknya beri anotasi pada lebih banyak item agar hasilnya lebih baik.",
+                "emptySubsetsReason": "Untuk melatih model, setiap subset (pelatihan, validasi, pengujian) memerlukan minimal satu item. Kondisi ini belum dapat dipenuhi karena {{subsetClause}} kosong dan {{assignmentDetail}}.",
+                "emptySubsetClause_one": "subset {{list}}",
+                "emptySubsetClause_other": "subset {{list}}",
+                "reviewedOnly_one": "masih ada {{count}} item yang telah ditinjau untuk ditetapkan",
+                "reviewedOnly_other": "masih ada {{count}} item yang telah ditinjau untuk ditetapkan",
+                "unannotatedOnly_one": "ada {{count}} item yang masih perlu diberi anotasi sebelum dapat ditetapkan",
+                "unannotatedOnly_other": "ada {{count}} item yang masih perlu diberi anotasi sebelum dapat ditetapkan",
+                "mixedReviewedClause_one": "ada {{count}} item yang telah ditinjau dan siap ditetapkan",
+                "mixedReviewedClause_other": "ada {{count}} item yang telah ditinjau dan siap ditetapkan",
+                "mixedUnannotatedClause_one": "{{count}} item yang masih perlu diberi anotasi sebelum dapat ditetapkan",
+                "mixedUnannotatedClause_other": "{{count}} item yang masih perlu diberi anotasi sebelum dapat ditetapkan",
+                "mixedAssignmentDetail": "{{reviewedClause}} dan {{unannotatedClause}}",
+                "noUnassignedItems": "tidak ada item yang belum ditetapkan untuk didistribusikan ulang"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "Pengelolaan data"
+                },
+                "notAvailable": "Konfigurasi pelatihan tidak tersedia."
+            },
+            "learning": {
+                "title": "Parameter pembelajaran",
+                "tagDefault": "Bawaan",
+                "tagModified": "Diubah",
+                "inputSize": "Ukuran masukan"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "Subset pelatihan",
+                    "description": "Tentukan distribusi sampel beranotasi yang BELUM ditetapkan ke subset. Sampel yang digunakan pada putaran pelatihan sebelumnya sudah memiliki subset dan akan tetap berada di subset tersebut untuk menghindari kontaminasi data dan bias evaluasi.",
+                    "unavailableTitle": "Konfigurasi subset pelatihan tidak valid",
+                    "unavailableDescription": "Subset pelatihan tidak memiliki cukup item media untuk mendukung pembagian yang dapat dikonfigurasi antara subset pelatihan, validasi, dan pengujian.",
+                    "unavailableHint": "Tambahkan lebih banyak item media agar setiap subset berisi minimal satu item.",
+                    "datasetSamples": "Dataset: {{count}} sampel",
+                    "assignedSamples": "Ditetapkan: {{count}}",
+                    "unassignedSamples": "Belum ditetapkan: {{count}}",
+                    "distributionLabel": "Distribusi untuk sampel baru",
+                    "resultingDistribution": "Distribusi dataset yang dihasilkan:",
+                    "totalLabel": "Total:",
+                    "mediaItemsLabel": "item media"
+                },
+                "filters": {
+                    "noMinimum": "Tanpa batas minimum",
+                    "unlimited": "Tanpa batas"
+                },
+                "augmentation": {
+                    "title": "Augmentasi Data"
+                },
+                "tiling": {
+                    "title": "Tiling",
+                    "description": "Tiling adalah teknik yang membagi gambar beresolusi tinggi menjadi bagian-bagian kecil dan dapat meningkatkan akurasi untuk tugas deteksi objek kecil.",
+                    "modeLabel": "Mode tiling",
+                    "modes": {
+                        "automatic": "Otomatis",
+                        "custom": "Kustom"
+                    },
+                    "offDescription": "Model memproses seluruh gambar sebagai satu kesatuan tanpa membaginya menjadi bagian-bagian kecil. Pendekatan ini sederhana, tetapi dapat mengalami kesulitan mendeteksi objek kecil pada gambar beresolusi tinggi karena model mungkin melewatkan detail yang halus",
+                    "automaticDescription": "Sistem akan mengatur parameter secara otomatis berdasarkan resolusi gambar dan ukuran anotasi."
+                },
+                "intensityMapping": {
+                    "title": "Pemetaan Intensitas"
+                }
+            }
+        },
+        "list": {
+            "groupByPlaceholder": "Kelompokkan berdasarkan",
+            "groupByDataset": "Kelompokkan berdasarkan: Dataset",
+            "groupByArchitecture": "Kelompokkan berdasarkan: Arsitektur",
+            "hideFailedModels": "Sembunyikan model yang gagal",
+            "showFailedModels": "Tampilkan model yang gagal",
+            "searchPlaceholder": "Cari model...",
+            "noModelsFound": "Tidak ada model yang ditemukan",
+            "empty": {
+                "title": "Belum ada model.",
+                "description": "Latih model pertama Anda untuk memulai."
+            },
+            "deletedWeightsBadge": "Bobot dihapus",
+            "fineTunedFrom": "Disempurnakan dari",
+            "columns": {
+                "trained": "Dilatih",
+                "totalSize": "Ukuran total"
+            }
+        },
+        "performance": {
+            "metrics": {
+                "accuracy": "Akurasi",
+                "precision": "Presisi",
+                "recall": "Recall",
+                "fMeasure": "F-measure"
+            },
+            "categories": {
+                "balance": "Keseimbangan",
+                "speed": "Kecepatan",
+                "accuracy": "Akurasi"
+            }
+        },
+        "variants": {
+            "empty": "Tidak ada varian model yang tersedia.",
+            "columns": {
+                "precision": "PRESISI"
+            },
+            "quantizedInfo": {
+                "title": "Dikuantisasi dengan NNCF PTQ",
+                "maxAccuracyDrop": "Penurunan akurasi maksimum: {{value}}",
+                "calibrationDatasetSize": "Ukuran dataset kalibrasi: {{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "Pengunduhan model dimulai"
+        },
+        "optimize": {
+            "description": "Optimalkan model FP16 menggunakan OpenVINO NNCF (melalui kuantisasi INT8)",
+            "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) melalui kuantisasi INT8 mengurangi ukuran model dan mempercepat inferensi dengan dampak minimal pada akurasi",
+            "start": "Mulai kuantisasi",
+            "dialogTitle": "Kuantisasi",
+            "subheading": "Kuantisasi model ke INT8",
+            "jobStarted": "Tugas kuantisasi dimulai.",
+            "recommendedCalibrationSize": "Ukuran dataset kalibrasi yang direkomendasikan: antara 200-500 item media",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "Penurunan akurasi maksimum (%)",
+                    "help": {
+                        "paragraph1": "Penurunan akurasi validasi maksimum yang diizinkan.",
+                        "paragraph2": "Kuantisasi yang mempertimbangkan akurasi dapat memerlukan waktu lama jika batas penurunan akurasi yang diizinkan kecil.",
+                        "paragraph3": "Akurasi pengujian akhir juga dapat lebih rendah dari ambang akurasi validasi yang ditentukan, terutama untuk dataset yang relatif kecil."
+                    }
+                },
+                "maxIterations": {
+                    "label": "Jumlah iterasi maksimum",
+                    "help": {
+                        "paragraph1": "Jumlah iterasi maksimum untuk kuantisasi yang mempertimbangkan akurasi.",
+                        "paragraph2": "Kuantisasi yang mempertimbangkan akurasi secara bertahap mengecualikan lapisan model dari kuantisasi hingga kriteria penurunan akurasi maksimum terpenuhi. Membatasi jumlah iterasi dapat mengurangi waktu kuantisasi secara signifikan untuk model dengan banyak lapisan.",
+                        "paragraph3": "Parameter ini hanya digunakan jika batas penurunan akurasi maksimum ditetapkan."
+                    }
+                },
+                "calibrationSize": {
+                    "label": "Ukuran kalibrasi maksimum",
+                    "help": "Sampel kalibrasi akan dipilih secara acak dari dataset",
+                    "useFullDataset": "Gunakan seluruh dataset"
+                }
+            }
+        },
+        "actions": {
+            "deleteWeights": "Hapus bobot",
+            "deleteModel": "Hapus model",
+            "viewLogs": "Lihat log pelatihan",
+            "deleteWeightsDescription": "Yakin ingin menghapus bobot untuk model \"{{modelName}}\"?",
+            "deleteModelDescription": "Yakin ingin menghapus model \"{{modelName}}\"? Tindakan ini tidak dapat diurungkan.",
+            "renameDialog": {
+                "title": "Ubah nama model",
+                "nameLabel": "Nama model"
+            }
+        },
+        "columns": {
+            "modelName": "Nama Model"
+        }
+    },
+    "jobs": {
+        "allProjects": "Semua proyek",
+        "currentProjectLabel": "{{name}} (saat ini)",
+        "projectsSection": "Proyek",
+        "tabs": {
+            "all": "Semua",
+            "finished": "Selesai"
+        },
+        "status": {
+            "pending": "Dalam antrean",
+            "cancelling": "Membatalkan",
+            "done": "Selesai"
+        },
+        "type": {
+            "quantize": "Optimasi"
+        },
+        "columns": {
+            "type": "Jenis"
+        },
+        "cancel": {
+            "title": "Batalkan tugas",
+            "confirmation": "Yakin ingin membatalkan tugas {{jobId}}?"
+        },
+        "meta": {
+            "started": "Dimulai {{time}}",
+            "elapsed": "Waktu berlalu {{time}}",
+            "duration": "Durasi {{time}}",
+            "finished": "Selesai {{time}}",
+            "failed": "Gagal {{time}}",
+            "cancelled": "Dibatalkan {{time}}"
+        },
+        "emptyState": {
+            "all": "Tidak ada tugas",
+            "running": "Tidak ada tugas yang berjalan",
+            "finished": "Tidak ada tugas yang selesai",
+            "scheduled": "Tidak ada tugas dalam antrean",
+            "cancelled": "Tidak ada tugas yang dibatalkan",
+            "failed": "Tidak ada tugas yang gagal"
+        },
+        "actions": {
+            "viewLogs": "Lihat log"
+        }
+    },
+    "license": {
+        "label": "Lisensi: ",
+        "agreement": {
+            "title": "Perjanjian Lisensi",
+            "intro": "Tinjau dan setujui lisensi berikut untuk melanjutkan penggunaan Geti.",
+            "progress": "{{current}} dari {{total}}",
+            "required": "Wajib",
+            "optional": "Opsional",
+            "fullLicense": "Baca lisensi lengkap",
+            "previous": "Sebelumnya",
+            "accept": "Setuju dan lanjutkan"
+        }
+    },
+    "application": {
+        "startup": {
+            "loading": "Memuat... Harap tunggu."
+        },
+        "serverError": {
+            "heading": "Kesalahan Server"
+        },
+        "errorPage": {
+            "badRequest": "Server tidak dapat atau menolak memproses permintaan saat ini.",
+            "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini.",
+            "notFound": "Halaman ini tidak ada!",
+            "unauthorized": "Anda tidak memiliki otorisasi untuk melihat ini",
+            "serverError": "Server mengalami kesalahan dan tidak dapat menyelesaikan permintaan Anda.",
+            "serviceUnavailable": "Sepertinya API kami sedang tidak tersedia",
+            "goHome": "Kembali ke halaman beranda"
+        },
+        "notifications": {
+            "unexpectedError": "Terjadi kesalahan yang tidak terduga. Coba lagi.",
+            "networkError": "Kesalahan jaringan. Periksa koneksi Anda lalu coba lagi.",
+            "uploadTransferError": "Transfer berkas gagal. Coba lagi."
+        }
+    },
+    "downloads": {
+        "failure": {
+            "genericError": "Gagal mengunduh berkas"
+        },
+        "saveDialog": {
+            "allFiles": "Semua Berkas",
+            "fileTypeFilter": "Berkas {{extension}}"
+        }
+    }
+}

@@ -11,11 +11,11 @@ on:
       use-cache:
         description: "Enable Docker build cache. Always enabled for pull_request and merge_group events regardless of provided input."
         type: string
-        default: 'false'
+        default: "false"
       exclude-agpl-models:
         description: "Exclude Ultralytics and other AGPL-licensed models from the image"
         type: string
-        default: 'true'
+        default: "true"
   workflow_dispatch:
 
 permissions: {} # No permissions by default on workflow level
@@ -36,7 +36,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -53,10 +53,12 @@ jobs:
           files_yaml: |
             test:
               - application/**
-              - library/src/**
-              - library/pyproject.toml
-              - library/uv.lock
-              - library/MANIFEST.in
+              - libraries/getitune/src/**
+              - libraries/getidata/src/**
+              - libraries/getidata/pyproject.toml
+              - libraries/getitune/pyproject.toml
+              - libraries/getitune/uv.lock
+              - libraries/getitune/MANIFEST.in
               - .github/workflows/build.yaml
               - .github/actions/docker-build/**
               - .github/actions/install-common-deps/**
@@ -92,7 +94,7 @@ jobs:
           echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

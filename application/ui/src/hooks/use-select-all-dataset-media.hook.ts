@@ -1,13 +1,14 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import { i18n } from '@/i18n';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual, omit } from 'lodash-es';
 
+import { isImage } from '../shared/media-item-utils';
 import { useDatasetMediaFilterOptions } from './use-dataset-media-filter-options.hook';
 import { buildDatasetMediaQueryFilters } from './use-get-dataset-media-items.hook';
 import { useProjectIdentifier } from './use-project-identifier.hook';
@@ -22,7 +23,10 @@ export const useSelectAllDatasetMedia = () => {
     // The mutation callback closes over the filters of the render it was called in, so the latest
     // ones have to be reachable through a ref to detect that they changed mid-request.
     const latestQuery = useRef(query);
-    latestQuery.current = query;
+
+    useLayoutEffect(() => {
+        latestQuery.current = query;
+    });
 
     return useMutation({
         mutationFn: async () => {
@@ -33,7 +37,9 @@ export const useSelectAllDatasetMedia = () => {
             });
 
             if (error !== undefined || data === undefined) {
-                throw error ?? new Error(i18n.t('application.notifications.unexpectedError'));
+                throw error === undefined
+                    ? new Error(i18n.t('application.notifications.unexpectedError'))
+                    : new ApiError(error);
             }
 
             // The filters changed mid-request, so these ids no longer describe what the gallery
@@ -44,7 +50,7 @@ export const useSelectAllDatasetMedia = () => {
 
             return {
                 mediaIds: data.items.map(({ id }) => id),
-                imageIds: data.items.filter(({ type }) => type === 'image').map(({ id }) => id),
+                imageIds: data.items.filter(isImage).map(({ id }) => id),
             };
         },
     });

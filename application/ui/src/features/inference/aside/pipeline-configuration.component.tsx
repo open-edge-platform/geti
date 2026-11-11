@@ -6,9 +6,8 @@ import { ReactNode, Suspense } from 'react';
 import { useTranslation } from '@/i18n';
 import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
-import { FEATURE_FLAGS } from '../../../constants/feature-flags';
-import { SinkActions } from '../sinks/sink-actions.component';
-import { SourceActions } from '../sources/source-actions.component';
+import { Sinks } from '../sinks/sinks.component';
+import { Sources } from '../sources/sources.component';
 import { PipelineConfidenceThreshold } from './pipeline-confidence-threshold.component';
 import { StreamInferenceDevices } from './stream-inference-devices.component';
 
@@ -29,7 +28,7 @@ export const PipelineConfiguration = () => {
                 <StreamInferenceDevices />
             </Suspense>
 
-            {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PipelineConfidenceThreshold />}
+            <PipelineConfidenceThreshold />
 
             <Tabs
                 aria-label={'Pipeline configuration tabs'}
@@ -40,22 +39,22 @@ export const PipelineConfiguration = () => {
                 }}
             >
                 <TabList marginBottom={'size-200'}>
-                    <Item key='sources' textValue={t('inference.pipeline.configuration.sourcesTab')}>
-                        <Text>{t('inference.pipeline.configuration.sourcesTab')}</Text>
+                    <Item key='sources' textValue={t('inference.sources.title')}>
+                        <Text>{t('inference.sources.title')}</Text>
                     </Item>
-                    <Item key='sinks' textValue={t('inference.pipeline.configuration.sinksTab')}>
-                        <Text>{t('inference.pipeline.configuration.sinksTab')}</Text>
+                    <Item key='sinks' textValue={t('inference.sinks.title')}>
+                        <Text>{t('inference.sinks.title')}</Text>
                     </Item>
                 </TabList>
                 <TabPanels flex={1} minHeight={0} UNSAFE_style={{ overflowY: 'auto' }}>
                     <Item key='sources'>
                         <ConfigurationItem>
-                            <SourceActions />
+                            <Sources />
                         </ConfigurationItem>
                     </Item>
                     <Item key='sinks'>
                         <ConfigurationItem>
-                            <SinkActions />
+                            <Sinks />
                         </ConfigurationItem>
                     </Item>
                 </TabPanels>

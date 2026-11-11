@@ -6,7 +6,7 @@ import { useEffect, useMemo } from 'react';
 import type { DatasetSubset, Media } from '@/api/types';
 import { Content, Dialog, Grid, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import type { AnnotatorMode } from '../../../modules/annotator/annotator-mode';
@@ -27,7 +27,7 @@ import { useAnnotationsQuery } from '../../../modules/annotator/shell/api/use-an
 import { getInitialAnnotations, useAnnotatorMode } from '../../../modules/annotator/shell/utils';
 import { ToolProvider } from '../../../modules/annotator/tool-provider.component';
 import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../modules/annotator/tools/segment-anything-tool/use-segment-anything.hook';
-import { isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemPredictionRange } from '../../../shared/media-item-utils';
 import { useSelectDatasetItem } from '../gallery/hooks/use-select-dataset-item.hook';
 import { AnnotatorContainer } from './annotator.component';
 import { SIDEBAR_WIDTH } from './constants';
@@ -45,7 +45,6 @@ type MediaPreviewContentProps = {
     onSelectedMediaItem: (item: Media) => void;
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
-    isMediaItemReviewedById: (mediaItemId: string) => boolean;
 };
 
 type MediaPreviewPanelsProps = {
@@ -56,7 +55,6 @@ type MediaPreviewPanelsProps = {
     onSelectedMediaItem: (item: Media) => void;
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
-    isMediaItemReviewedById: (mediaItemId: string) => boolean;
     isCurrentMediaReviewed: boolean;
     subset: DatasetSubset;
 };
@@ -70,7 +68,6 @@ const MediaPreviewPanels = ({
     onSelectedMediaItem,
     isFetchingNextPage,
     fetchNextPage,
-    isMediaItemReviewedById,
     isCurrentMediaReviewed,
 }: MediaPreviewPanelsProps) => {
     const { mediaItem } = useSelectedMediaItem();
@@ -94,7 +91,6 @@ const MediaPreviewPanels = ({
                     mediaItem={mediaItem}
                     isFetchingNextPage={isFetchingNextPage}
                     fetchNextPage={fetchNextPage}
-                    isUserReviewed={isMediaItemReviewedById}
                     onSelectedMediaItem={handleMediaTransition}
                 />
             </View>
@@ -125,7 +121,6 @@ const MediaPreviewContent = ({
     onClose,
     isFetchingNextPage,
     fetchNextPage,
-    isMediaItemReviewedById,
 }: MediaPreviewContentProps) => {
     const { mediaItem } = useSelectedMediaItem();
     const { selectedModel, selectedDevice, confidenceThreshold } = usePredictionSetup();
@@ -138,9 +133,7 @@ const MediaPreviewContent = ({
         selectedModel,
         device: selectedDevice,
         confidenceThreshold,
-        range: isVideoFrame(mediaItem)
-            ? { start_frame: mediaItem.frame_number, end_frame: mediaItem.frame_number, stride: mediaItem.frame_stride }
-            : null,
+        range: getMediaItemPredictionRange(mediaItem),
     });
 
     const isCurrentMediaReviewed = annotationsData?.user_reviewed ?? false;
@@ -173,7 +166,6 @@ const MediaPreviewContent = ({
                     onSelectedMediaItem={onSelectedMediaItem}
                     isFetchingNextPage={isFetchingNextPage}
                     fetchNextPage={fetchNextPage}
-                    isMediaItemReviewedById={isMediaItemReviewedById}
                     isCurrentMediaReviewed={isCurrentMediaReviewed}
                     subset={subset}
                 />
@@ -183,13 +175,14 @@ const MediaPreviewContent = ({
 };
 
 export const MediaPreview = ({ close, onSelectedMediaItem }: MediaPreviewProps) => {
-    const { items, isFetchingNextPage, fetchNextPage, isMediaItemReviewedById } = useDatasetMediaWithReviewStatus();
+    const { items, isFetchingNextPage, fetchNextPage } = useFilteredDatasetMedia();
 
     // Reading the route param unmounts the content on close, without waiting for the dialog's exit animation.
     const { selectedMediaItem } = useSelectDatasetItem();
 
     return (
         <Dialog
+            aria-label='Annotator'
             UNSAFE_style={{
                 backgroundColor: 'var(--spectrum-global-color-gray-50)',
                 '--spectrum-dialog-padding-x': 'var(--spectrum-global-dimension-size-250)',
@@ -219,7 +212,6 @@ export const MediaPreview = ({ close, onSelectedMediaItem }: MediaPreviewProps) 
                                     onSelectedMediaItem={onSelectedMediaItem}
                                     isFetchingNextPage={isFetchingNextPage}
                                     fetchNextPage={fetchNextPage}
-                                    isMediaItemReviewedById={isMediaItemReviewedById}
                                 />
                             </PredictionsSetupProvider>
                         </SelectedMediaItemProvider>

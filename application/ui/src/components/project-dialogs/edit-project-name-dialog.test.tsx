@@ -17,7 +17,7 @@ describe('EditProjectNameDialog', () => {
     it('disables save button when name is empty', async () => {
         render(
             <EditProjectNameDialog
-                onClose={vi.fn()}
+                onClose={rs.fn()}
                 isOpen={true}
                 projectId={projectId}
                 projectName={projectName}
@@ -35,7 +35,7 @@ describe('EditProjectNameDialog', () => {
     it('disables save button when name is unchanged', () => {
         render(
             <EditProjectNameDialog
-                onClose={vi.fn()}
+                onClose={rs.fn()}
                 isOpen={true}
                 projectId={projectId}
                 projectName={projectName}
@@ -47,7 +47,7 @@ describe('EditProjectNameDialog', () => {
     });
 
     it('successfully updates project name and shows success toast', async () => {
-        const onClose = vi.fn();
+        const onClose = rs.fn();
         const newName = 'Updated Project Name';
 
         server.use(
@@ -78,14 +78,13 @@ describe('EditProjectNameDialog', () => {
     });
 
     it('shows error toast when updating project name fails', async () => {
-        const onClose = vi.fn();
+        const onClose = rs.fn();
         const newName = 'Updated Project Name';
         const errorMessage = 'Failed to update project 2';
 
         server.use(
             http.patch('/api/projects/{project_id}', () => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 500 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: errorMessage }, { status: 500 });
             })
         );
@@ -114,7 +113,7 @@ describe('EditProjectNameDialog', () => {
 
         render(
             <EditProjectNameDialog
-                onClose={vi.fn()}
+                onClose={rs.fn()}
                 isOpen={true}
                 projectId={projectId}
                 projectName={projectName}
@@ -134,7 +133,7 @@ describe('EditProjectNameDialog', () => {
 
         render(
             <EditProjectNameDialog
-                onClose={vi.fn()}
+                onClose={rs.fn()}
                 isOpen={true}
                 projectId={projectId}
                 projectName={projectName}
@@ -151,7 +150,7 @@ describe('EditProjectNameDialog', () => {
     it('enables save button when a valid new name is entered', () => {
         render(
             <EditProjectNameDialog
-                onClose={vi.fn()}
+                onClose={rs.fn()}
                 isOpen={true}
                 projectId={projectId}
                 projectName={projectName}

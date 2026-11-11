@@ -1,7 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+    createContext,
+    ReactNode,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react';
 
 type SelectedMediaKeys = Set<string>;
 
@@ -17,7 +26,7 @@ const SelectedDataContext = createContext<SelectedDataState>(null);
 export const SelectedDataProvider = ({ children }: { children: ReactNode }) => {
     const [selectedKeys, setSelectedKeys] = useState<SelectedMediaKeys>(new Set());
 
-    const toggleSelectedKeys = (keys: string[]) => {
+    const toggleSelectedKeys = useCallback((keys: string[]) => {
         setSelectedKeys((prevSelectedKeys) => {
             const updatedSelectedKeys = new Set(prevSelectedKeys);
 
@@ -27,24 +36,19 @@ export const SelectedDataProvider = ({ children }: { children: ReactNode }) => {
 
             return updatedSelectedKeys;
         });
-    };
+    }, []);
 
-    const isSelected = (key: string) => {
-        return selectedKeys.has(key);
-    };
-
-    return (
-        <SelectedDataContext.Provider
-            value={{
-                selectedKeys,
-                setSelectedKeys,
-                toggleSelectedKeys,
-                isSelected,
-            }}
-        >
-            {children}
-        </SelectedDataContext.Provider>
+    const value = useMemo(
+        () => ({
+            selectedKeys,
+            setSelectedKeys,
+            toggleSelectedKeys,
+            isSelected: (key: string) => selectedKeys.has(key),
+        }),
+        [selectedKeys, toggleSelectedKeys]
     );
+
+    return <SelectedDataContext value={value}>{children}</SelectedDataContext>;
 };
 
 export const useSelectedData = () => {

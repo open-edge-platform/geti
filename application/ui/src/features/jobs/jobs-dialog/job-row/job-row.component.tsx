@@ -5,11 +5,11 @@ import { getStatusGroup } from '../../utils';
 import { CancelledJobRow } from './cancelled-job-row.component';
 import { FailedJobRow } from './failed-job-row.component';
 import { FinishedJobRow } from './finished-job-row.component';
-import { JOB_GRID_COLUMNS, JobRowLayout, type JobRowProps } from './job-row-layout.component';
+import { JOB_GRID_COLUMNS, type JobRowProps } from './job-row-layout.component';
 import { QueuedJobRow } from './queued-job-row.component';
 import { RunningJobRow } from './running-job-row.component';
 
-export { JOB_GRID_COLUMNS, JobRowLayout };
+export { JOB_GRID_COLUMNS };
 export type { JobRowProps } from './job-row-layout.component';
 
 export const JobRow = (props: JobRowProps) => {

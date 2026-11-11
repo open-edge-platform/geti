@@ -36,15 +36,15 @@ test.describe('Model training flow E2E', () => {
         await projectPage.disableActivePipeline();
     });
 
-    test.afterEach(async ({ projectPage, inferencePage }) => {
+    test.afterEach(async ({ projectPage, inferencePage, sourcesPage, sinksPage }) => {
         // Sources and sinks are not project scoped, so deleting the project leaves them behind.
         await test.step('Delete source and sink', async () => {
-            if (await inferencePage.getInputTab().isVisible()) {
-                await inferencePage.deleteSource(sourceName);
-                await inferencePage.deleteSink(sinkName);
+            if (await inferencePage.getSourceTab().isVisible()) {
+                await sourcesPage.deleteSource(sourceName);
+                await sinksPage.deleteSink(sinkName);
 
-                await expect(inferencePage.getSourceCard(sourceName)).toBeHidden();
-                await expect(inferencePage.getSinkCard(sinkName)).toBeHidden();
+                await expect(sourcesPage.getSourceCard(sourceName)).toBeHidden();
+                await expect(sinksPage.getSinkCard(sinkName)).toBeHidden();
             }
         });
 
@@ -65,6 +65,8 @@ test.describe('Model training flow E2E', () => {
         boundingBoxTool,
         modelsPage,
         inferencePage,
+        sourcesPage,
+        sinksPage,
         page,
     }, testInfo) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
@@ -110,7 +112,8 @@ test.describe('Model training flow E2E', () => {
         await test.step('Train model', async () => {
             await page.getByRole('tab', { name: 'Models' }).click();
             await modelsPage.openTrainModelDialog();
-            const speedCard = modelsPage.getRecommendedModelArchitectures().getByLabel(/- speed/);
+            await modelsPage.sortModelArchitectures('Speed (fastest first)');
+            const speedCard = modelsPage.getModelArchitectureCards().first();
 
             const selectedArchitectureName = await speedCard.getAttribute('data-architecture-name');
 
@@ -215,24 +218,24 @@ test.describe('Model training flow E2E', () => {
             await inferencePage.openInferenceTab();
             await inferencePage.openPipelineConfiguration();
 
-            const uploadedVideoPath = await inferencePage.addVideoFileSource({
+            const uploadedVideoPath = await sourcesPage.addVideoFileSource({
                 name: sourceName,
                 videoPath: VIDEO_PATH,
                 loop: true,
             });
             // The source is only created once the video has finished uploading to the backend.
-            await expect(inferencePage.getSourceCard(sourceName)).toBeVisible({ timeout: TIMEOUTS.videoUploaded });
+            await expect(sourcesPage.getSourceCard(sourceName)).toBeVisible({ timeout: TIMEOUTS.videoUploaded });
 
             // The backend rejects a sink folder that does not already exist on its own filesystem, so the
             // directory it just stored the uploaded video in is reused as the output folder.
             const sinkFolderPath = uploadedVideoPath.replace(/[\\/][^\\/]+$/, '');
 
-            await inferencePage.addFolderSink({
+            await sinksPage.addFolderSink({
                 name: sinkName,
                 folderPath: sinkFolderPath,
                 outputFormats: ['Predictions', 'Image with Predictions'],
             });
-            await expect(inferencePage.getSinkCard(sinkName)).toBeVisible();
+            await expect(sinksPage.getSinkCard(sinkName)).toBeVisible();
         });
 
         await test.step('Select the trained model', async () => {

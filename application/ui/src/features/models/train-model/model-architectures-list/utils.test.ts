@@ -4,58 +4,7 @@
 import { createI18nInstance } from '@/i18n';
 
 import { getMockedModelArchitecture } from '../../../../../mocks/mock-model';
-import { getAccuracyMetric, getRecommendedArchitectures } from './utils';
-
-describe('getRecommendedArchitectures', () => {
-    it('returns recommended architectures when performanceCategory is defined', () => {
-        const modelArchitectures = [
-            getMockedModelArchitecture({ id: 'arch-1', performanceCategory: 'balance' }),
-            getMockedModelArchitecture({ id: 'arch-2', performanceCategory: 'speed' }),
-            getMockedModelArchitecture({ id: 'arch-3' }),
-        ];
-
-        const result = getRecommendedArchitectures(modelArchitectures);
-
-        expect(result).toHaveLength(2);
-        expect(result[0].id).toBe('arch-1');
-        expect(result[1].id).toBe('arch-2');
-    });
-
-    it('returns top 3 architectures when no performanceCategory is defined', () => {
-        const modelArchitectures = [
-            getMockedModelArchitecture({ id: 'arch-1' }),
-            getMockedModelArchitecture({ id: 'arch-2' }),
-            getMockedModelArchitecture({ id: 'arch-3' }),
-            getMockedModelArchitecture({ id: 'arch-4' }),
-        ];
-
-        const result = getRecommendedArchitectures(modelArchitectures);
-
-        expect(result).toHaveLength(3);
-        expect(result[0].id).toBe('arch-1');
-        expect(result[1].id).toBe('arch-2');
-        expect(result[2].id).toBe('arch-3');
-    });
-
-    it('handles empty model architectures array', () => {
-        const result = getRecommendedArchitectures([]);
-
-        expect(result).toHaveLength(0);
-    });
-
-    it('handles model architectures with less than 3 items and no performanceCategory', () => {
-        const modelArchitectures = [
-            getMockedModelArchitecture({ id: 'arch-1' }),
-            getMockedModelArchitecture({ id: 'arch-2' }),
-        ];
-
-        const result = getRecommendedArchitectures(modelArchitectures);
-
-        expect(result).toHaveLength(2);
-        expect(result[0].id).toBe('arch-1');
-        expect(result[1].id).toBe('arch-2');
-    });
-});
+import { getAccuracyMetric } from './utils';
 
 describe('getAccuracyMetric', () => {
     const { t } = createI18nInstance({ lng: 'en' });

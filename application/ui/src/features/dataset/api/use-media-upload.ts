@@ -14,7 +14,7 @@ export const MEDIA_UPLOAD_CONCURRENCY = 10;
 
 // Invalidating the media list refetches every page loaded so far, so doing it after each batch
 // would starve the uploads themselves once a few hundred files are queued.
-export const MEDIA_REFRESH_INTERVAL_MS = 2000;
+const MEDIA_REFRESH_INTERVAL_MS = 2000;
 
 type UploadTask<T> = () => Promise<T>;
 

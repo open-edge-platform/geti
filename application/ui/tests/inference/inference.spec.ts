@@ -57,7 +57,7 @@ test.describe('Inference', () => {
         );
     });
 
-    test('Inference workflow', async ({ streamPage, inferencePage, page, network }) => {
+    test('Inference workflow', async ({ streamPage, inferencePage, sourcesPage, sinksPage, page, network }) => {
         await test.step('starts stream', async () => {
             network.use(
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
@@ -126,7 +126,7 @@ test.describe('Inference', () => {
                     return HttpResponse.json({
                         project_id: '',
                         status: 'idle',
-                        device: 'images_folder',
+                        device: 'cpu',
                     });
                 }),
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
@@ -211,14 +211,14 @@ test.describe('Inference', () => {
                 })
             );
 
-            const framesField = page.getByRole('textbox', { name: 'Frames' });
+            const countField = page.getByRole('textbox', { name: 'Frames' });
             const secondsField = page.getByRole('textbox', { name: 'Seconds' });
 
-            await expect(framesField).toBeEnabled();
+            await expect(countField).toBeEnabled();
             await expect(secondsField).toBeEnabled();
 
-            await framesField.fill('20');
-            await expect(framesField).toHaveValue('20');
+            await countField.fill('20');
+            await expect(countField).toHaveValue('20');
 
             await expect(page.getByRole('switch', { name: 'Confidence threshold' })).not.toBeChecked();
 
@@ -330,7 +330,7 @@ test.describe('Inference', () => {
             await expect.poll(() => patchedBodies).toContainEqual({ inference: { confidence_threshold: 0.8 } });
         });
 
-        await test.step('updates input and output source', async () => {
+        await test.step('updates sink and source', async () => {
             network.use(
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
                     return response(200).json(getMockedPipeline({ source: null, sink: null }));
@@ -409,22 +409,22 @@ test.describe('Inference', () => {
                 })
             );
 
-            await expect(inferencePage.getAddSourceButton()).toBeVisible();
+            await expect(sourcesPage.getAddSourceButton()).toBeVisible();
 
-            await inferencePage.addUsbCameraSource({ name: usbCamera });
-            await inferencePage.addFolderSink({
+            await sourcesPage.addUsbCameraSource({ name: usbCamera });
+            await sinksPage.addFolderSink({
                 name: 'My Sink',
                 folderPath: 'my-output',
                 outputFormats: ['Predictions'],
                 rateLimitSamples: 5,
             });
 
-            await inferencePage.getInputTab().click();
-            await expect(inferencePage.getSourceCard(usbCamera)).toBeVisible();
+            await inferencePage.getSourceTab().click();
+            await expect(sourcesPage.getSourceCard(usbCamera)).toBeVisible();
             await expect(page.getByText('Device: FaceTime HD Camera')).toBeVisible();
 
-            await inferencePage.getOutputTab().click();
-            await expect(inferencePage.getSinkCard('My Sink')).toBeVisible();
+            await inferencePage.getSinkTab().click();
+            await expect(sinksPage.getSinkCard('My Sink')).toBeVisible();
             await expect(page.getByText('Folder path: e2e-output')).toBeVisible();
             await expect(page.getByText('Rate limit: 5 samples every 1 second')).toBeVisible();
             await expect(page.getByText('Output formats: predictions')).toBeVisible();

@@ -144,17 +144,14 @@ class TestMetricsCollector:
         assert measurements == []
 
     def test_latency_calculation_accuracy(self, fxt_metrics_service):
-        """Test that latency calculation is reasonably accurate"""
+        """Test that latency is the perf_counter delta in milliseconds"""
         model_id = uuid4()
 
-        start_time = time.perf_counter()
-        time.sleep(0.01)  # 10ms
-        fxt_metrics_service.record_inference_end(model_id=model_id, start_time=start_time)
+        with patch("app.services.metrics_service.time.perf_counter", return_value=100.010):
+            fxt_metrics_service.record_inference_end(model_id=model_id, start_time=100.0)
         measurements = fxt_metrics_service.get_latency_measurements(model_id=model_id)
-        latency_ms = measurements[0]
 
-        # Should be approximately 10ms (with some tolerance for timing precision)
-        assert 10.0 <= latency_ms <= 12.0, f"Latency was {latency_ms} ms"
+        assert measurements[0] == pytest.approx(10.0)
 
     def test_max_age_initialization_and_update(self, fxt_metrics_service):
         """Test that max_age_seconds is properly initialized and updated"""

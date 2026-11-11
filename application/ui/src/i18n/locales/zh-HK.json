@@ -25,8 +25,6 @@
             "refresh": "重新整理",
             "remove": "移除",
             "selectAll": "全選",
-            "showLess": "收起",
-            "showMore": "顯示更多",
             "skip": "跳過",
             "start": "開始",
             "submit": "提交",
@@ -74,8 +72,7 @@
             "model": "模型",
             "jobs": "工作",
             "labels": "標籤",
-            "bytesTransferred": "{{transferred}} / {{total}}",
-            "language": "語言"
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大縮略圖",
@@ -104,7 +101,6 @@
         "modelsDescription": "模型頁面，用於瀏覽模型",
         "inference": "推理",
         "inferenceDescription": "推理頁面，用於檢視項目的即時推理效果",
-        "preferences": "偏好設定",
         "help": {
             "documentation": "用戶文件",
             "whatsNew": "新功能",
@@ -133,7 +129,7 @@
             "deleteTitle": "刪除確認",
             "deleteConfirmation": "確定要刪除數據集視圖「{{viewName}}」嗎？",
             "deleteSuccess": "數據集視圖「{{viewName}}」已成功刪除。",
-            "unassignFromView": "從該視圖移除",
+            "unassignFromView": "從該視圖取消分配",
             "selectedMediaCount_one": "已選 {{count}} 個媒體檔案",
             "selectedMediaCount_other": "已選 {{count}} 個媒體檔案"
         },
@@ -317,7 +313,7 @@
                 "unsupportedItemsEmptyLabels": "空白標籤",
                 "unsupportedItemsVideos": "影片",
                 "unsupportedItems": "要保留{{items}}，請使用 Geti 匯出格式。",
-                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案的數據子集資訊。"
+                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案所屬的子集資訊。"
             }
         },
         "importExport": {
@@ -348,6 +344,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "金鑰不能為空白",
+            "keyDuplicate": "金鑰必須是唯一的",
             "valueEmpty": "值不能為空白"
         },
         "connection": {
@@ -365,6 +362,7 @@
             "label": "推理裝置"
         },
         "sources": {
+            "title": "輸入源",
             "uploadError": "影片檔案上載失敗。",
             "deleteVideoError": "無法刪除已上載的影片檔案。",
             "list": {
@@ -373,9 +371,7 @@
             "types": {
                 "usbCamera": "USB 攝影機",
                 "ipCamera": "IP 攝影機",
-                "videoFile": "影片檔案",
-                "imagesFolder": "圖片資料夾",
-                "disconnected": "未連線"
+                "videoFile": "影片檔案"
             },
             "options": {
                 "usbCamera": "USB 攝影機",
@@ -406,13 +402,10 @@
                 "loading": "載入中……",
                 "device": "裝置：{{name}}",
                 "unknownDevice": "未知裝置（id：{{deviceId}}）",
-                "ignoreExistingImages": "忽略已有圖片：{{value}}",
                 "streamUrl": "影片串流位址：{{url}}",
                 "videoPath": "影片路徑：{{path}}"
             },
             "fields": {
-                "imagesFolderPath": "圖片資料夾路徑",
-                "ignoreExistingImages": "忽略已有圖片",
                 "streamUrl": "影片串流位址：",
                 "requireAuthentication": "需要身份驗證",
                 "camera": "攝影機",
@@ -427,11 +420,11 @@
             }
         },
         "sinks": {
+            "title": "輸出端",
             "types": {
                 "folder": "資料夾",
                 "mqtt": "MQTT",
-                "webhook": "Webhook",
-                "ros": "ROS"
+                "webhook": "Webhook"
             },
             "options": {
                 "folder": "資料夾",
@@ -513,9 +506,7 @@
                 "disabledSuccess": "管線停用成功"
             },
             "configuration": {
-                "sidebarLabel": "管線設定",
-                "sourcesTab": "輸入",
-                "sinksTab": "輸出"
+                "sidebarLabel": "管線設定"
             }
         },
         "collection": {
@@ -559,10 +550,6 @@
                 "healthy": "健康",
                 "finished": "已完成",
                 "unavailable": "無法使用"
-            },
-            "componentLabels": {
-                "source": "輸入源",
-                "sink": "輸出端"
             }
         },
         "stream": {
@@ -594,7 +581,7 @@
             "manageProjects": "管理項目",
             "enablePipelineBlocked": {
                 "title": "無法啟用管線",
-                "message": "請確保在啟用管線之前，已選擇模型和來源。"
+                "message": "請確保在啟用管線之前，已選擇模型和輸入源。"
             }
         },
         "taskTypes": {
@@ -790,6 +777,7 @@
                 "unknownError": "發生未知錯誤，請重新整理頁面重試。",
                 "timeoutError": "{{operation}} 在 {{timeoutMs}}ms 後逾時，請嘗試重新整理頁面。",
                 "embeddingError": "無法取得圖片嵌入（{{status}}{{statusText}}）。",
+                "hint": "Shift + 按一下以包含區域，Alt + 按一下以排除區域。按一下以建立標註，按 Esc 清除這些點。",
                 "operations": {
                     "workerBuild": "SAM 背景程式建置",
                     "workerInit": "SAM 背景程式初始化",
@@ -892,7 +880,6 @@
                 "dialogTitle": "訓練記錄",
                 "loadError": "記錄載入失敗：{{message}}",
                 "noJobOrModel": "未指定工作或模型",
-                "fetchError": "模型記錄取得失敗：{{status}} {{statusText}}",
                 "downloadStarted": "訓練記錄下載已開始"
             },
             "parameters": {
@@ -909,11 +896,12 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "參數量：{{count}} 百萬",
+                    "numberOfParameters": "參數量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
                     "label": "模型排序：",
+                    "recommended": "推薦優先",
                     "nameAsc": "名稱（A 到 Z）",
                     "nameDesc": "名稱（Z 到 A）",
                     "speedAsc": "速度（最快優先）",
@@ -929,7 +917,7 @@
                     "selectVariantPlaceholder": "選擇變體",
                     "pretrainedWeightsLabel": "預訓練權重",
                     "selectWeightsPlaceholder": "選擇權重",
-                    "parameters": "參數量：{{count}} 百萬",
+                    "parameters": "參數量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -965,11 +953,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "要訓練模型，數據集中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "notEnoughAnnotationsInView": "要訓練模型，所選數據集視圖中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一項。目前不滿足該條件，因為{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集為空",
-                "emptySubsetClause_other": "{{list}} 子集均為空",
+                "notEnoughAnnotations": "要訓練模型，至少需要在數據集中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "notEnoughAnnotationsInView": "要訓練模型，至少需要在所選數據集視圖中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一個條目。目前尚未滿足該條件，因為 {{subsetClause}} 為空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "還有 {{count}} 個已審核項待分配",
                 "reviewedOnly_other": "還有 {{count}} 個已審核項待分配",
                 "unannotatedOnly_one": "還有 {{count}} 項需先完成標註才能分配",
@@ -1023,7 +1011,7 @@
                         "automatic": "自動",
                         "custom": "自訂"
                     },
-                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏精細細節",
+                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏細節",
                     "automaticDescription": "這意味著系統將根據圖片解像度和標註尺寸自動設定參數。"
                 },
                 "intensityMapping": {

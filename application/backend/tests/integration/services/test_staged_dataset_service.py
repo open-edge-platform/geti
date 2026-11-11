@@ -8,11 +8,11 @@ from uuid import UUID, uuid4
 import cv2
 import numpy as np
 import pytest
-from datumaro.experimental import Dataset, LazyImage, LazyVideoFrame, MediaInfo, export_dataset
-from datumaro.experimental.categories import Categories, LabelCategories
-from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoSample
-from datumaro.experimental.export_import import ExportMode
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import Dataset, LazyImage, LazyVideoFrame, MediaInfo, export_dataset
+from getidata.categories import Categories, LabelCategories
+from getidata.data_formats.coco.sample import CocoCategories, CocoSample
+from getidata.export_import import ExportMode
+from getidata.fields import ImageInfo, Subset
 
 from app.datumaro_converter import (
     MulticlassClassificationImportExportSample,

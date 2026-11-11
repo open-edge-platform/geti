@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AnnotationDTO } from '@/api/types';
-import { expect, type Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
 import { http, test } from '../../fixtures';
-import { withRelative } from '../../utils/mouse';
 import { candyBinaryHandler, redLabel } from '../annotator-fixtures';
 
 const mockedProject = getMockedProject({
@@ -22,34 +21,6 @@ const OUTLINE = [
     { x: 400, y: 495 },
     { x: 245, y: 285 },
 ];
-
-const getDrawnPointsCount = async (page: Page) => {
-    const points = await page.getByLabel('new polygon').getAttribute('points', { timeout: 1_000 });
-
-    return points?.trim().split(/\s+/).length ?? 0;
-};
-
-// Hovering makes the worker compute the edge-snapped segment to the cursor; it shows up on the next pointer move.
-const hoverUntilSnapped = async (page: Page, target: { x: number; y: number }) => {
-    const pointsBefore = await getDrawnPointsCount(page);
-
-    await page.mouse.move(target.x, target.y, { steps: 5 });
-
-    let nudge = 1;
-    await expect(async () => {
-        nudge = -nudge;
-        await page.mouse.move(target.x + nudge, target.y);
-
-        expect(await getDrawnPointsCount(page)).toBeGreaterThan(pointsBefore + 1);
-    }).toPass({ timeout: 10_000 });
-
-    await page.mouse.move(target.x, target.y);
-};
-
-const click = async (page: Page) => {
-    await page.mouse.down();
-    await page.mouse.up();
-};
 
 test.describe('Magnetic lasso tool', () => {
     test.beforeEach(async ({ network }) => {
@@ -67,34 +38,22 @@ test.describe('Magnetic lasso tool', () => {
         );
     });
 
-    test('snaps the outline to the object edges', async ({ page, annotatorPage }) => {
+    test('snaps the outline to the object edges', async ({ page, annotatorPage, magneticLassoTool }) => {
         await annotatorPage.goto(mockedProject.id, 'item-1');
 
         let points: { x: number; y: number }[] = [];
 
         await test.step('Place the first point once the worker is ready', async () => {
-            // The intelligent scissors worker boots in the background; restart the outline until it responds.
-            await expect(async () => {
-                await page.getByRole('button', { name: 'Selection' }).click();
-                await page.getByRole('button', { name: 'Magnetic Lasso' }).click();
-
-                // Resolved here because the initial zoom-to-fit may still be settling on the first attempt.
-                const relative = await withRelative(page);
-                points = OUTLINE.map(({ x, y }) => relative(x, y));
-
-                await page.mouse.move(points[0].x, points[0].y);
-                await click(page);
-                await hoverUntilSnapped(page, points[1]);
-            }).toPass({ timeout: 60_000 });
+            points = await magneticLassoTool.startOutline(OUTLINE);
         });
 
         await test.step('Click along the edges and close the outline', async () => {
             for (const point of [...points.slice(2), points[0]]) {
-                await click(page);
-                await hoverUntilSnapped(page, point);
+                await magneticLassoTool.click();
+                await magneticLassoTool.hoverUntilSnapped(point);
             }
 
-            await click(page);
+            await magneticLassoTool.click();
 
             await expect(async () => {
                 expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(1);
@@ -127,6 +86,37 @@ test.describe('Magnetic lasso tool', () => {
                     expect(y).toBeLessThanOrEqual(Math.max(...ys) + tolerance);
                 }
             }
+        });
+    });
+
+    test('right-clicking does not close the outline', async ({ page, annotatorPage, magneticLassoTool }) => {
+        await annotatorPage.goto(mockedProject.id, 'item-1');
+
+        let points: { x: number; y: number }[] = [];
+
+        await test.step('Outline the object up to the starting point', async () => {
+            points = await magneticLassoTool.startOutline(OUTLINE);
+
+            for (const point of [...points.slice(2), points[0]]) {
+                await magneticLassoTool.click();
+                await magneticLassoTool.hoverUntilSnapped(point);
+            }
+        });
+
+        await test.step('Right-click on the starting point', async () => {
+            await page.mouse.click(points[0].x, points[0].y, { button: 'right' });
+
+            await expect(page.getByLabel('new polygon')).toBeVisible();
+            expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(0);
+        });
+
+        await test.step('Left-click on the starting point closes the outline', async () => {
+            await magneticLassoTool.click();
+
+            await expect(async () => {
+                expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(1);
+            }).toPass();
+            await expect(page.getByLabel('new polygon')).toBeHidden();
         });
     });
 });

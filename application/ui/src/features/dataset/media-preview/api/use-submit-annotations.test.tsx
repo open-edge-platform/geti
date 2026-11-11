@@ -3,13 +3,14 @@
 
 import { type ReactNode } from 'react';
 
-import type { AnnotationDTO, Label, Media } from '@/api/types';
+import type { AnnotationDTO, Label, Media, MediaDTO, MediaWithPagination } from '@/api/types';
+import { InfiniteData, QueryClient } from '@tanstack/react-query';
 import { act, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
-import { getMockedMediaImage } from 'mocks/mock-media';
+import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
-import { HttpResponse } from 'msw';
+import { delay, HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
 import {
@@ -19,6 +20,7 @@ import {
 } from '../../../../modules/annotator/annotation-document-provider.component';
 import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import { server } from '../../../../msw-node-setup';
+import { createQueryClient } from '../../../../query-client/query-client';
 import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { renderHook } from '../../../../test-utils/render';
 import { useSubmitAnnotations } from './use-submit-annotations';
@@ -29,12 +31,14 @@ const renderSubmitAnnotations = ({
     mediaItem = getMockedMediaImage(),
     mode = 'prediction' as AnnotatorMode,
     labels = [],
+    queryClient,
 }: {
     initialAnnotationsDTO?: AnnotationDTO[];
     initialPredictionsDTO?: AnnotationDTO[];
     mediaItem?: Media;
     mode?: AnnotatorMode;
     labels: Label[];
+    queryClient?: QueryClient;
 }) => {
     server.use(
         http.get('/api/projects/{project_id}', () =>
@@ -54,9 +58,133 @@ const renderSubmitAnnotations = ({
 
     return renderHook(
         () => ({ ...useAnnotations(), ...useAnnotationCommands(), ...useSubmitAnnotations({ mediaItem }) }),
-        { wrapper }
+        { wrapper, queryClient }
     );
 };
+
+describe('dataset media cache after submitting', () => {
+    const mediaQueryKey = [
+        'get',
+        '/api/projects/{project_id}/dataset/media',
+        { params: { path: { project_id: '123' }, query: { offset: 0, limit: 40 } } },
+    ] as const;
+
+    const createQueryClientWithMedia = (items: MediaDTO[]) => {
+        const queryClient = createQueryClient();
+
+        queryClient.setQueryData<InfiniteData<MediaWithPagination>>(mediaQueryKey, {
+            pages: [{ items, pagination: { offset: 0, limit: 40, count: items.length, total: items.length } }],
+            pageParams: [0],
+        });
+
+        return queryClient;
+    };
+
+    const getCachedMedia = (queryClient: QueryClient) =>
+        queryClient.getQueryData<InfiniteData<MediaWithPagination>>(mediaQueryKey)?.pages[0].items;
+
+    beforeEach(() => {
+        server.use(
+            http.post('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () => HttpResponse.json({}))
+        );
+    });
+
+    it('marks a submitted image as annotated, even with no objects (empty annotation list)', async () => {
+        const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
+        const queryClient = createQueryClientWithMedia([image]);
+        let savedAnnotations: AnnotationDTO[] | undefined;
+
+        server.use(
+            http.post('/api/projects/{project_id}/dataset/media/{media_id}/annotations', async ({ request }) => {
+                savedAnnotations = ((await request.json()) as { annotations: AnnotationDTO[] }).annotations;
+
+                return HttpResponse.json({});
+            })
+        );
+
+        const { result } = renderSubmitAnnotations({ mediaItem: image, mode: 'annotation', labels: [], queryClient });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        // The server stores an empty list as the "no objects" annotation and reports the image as annotated
+        expect(savedAnnotations).toEqual([]);
+        expect(getCachedMedia(queryClient)).toEqual([{ ...image, annotation_status: { has_annotations: true } }]);
+    });
+
+    it('refetches the listings filtered by annotation status instead of patching them', async () => {
+        const image = getMockedMediaImage({ id: 'image-1', annotation_status: { has_annotations: false } });
+        const queryClient = createQueryClientWithMedia([image]);
+        const filteredQueryKey = [
+            'get',
+            '/api/projects/{project_id}/dataset/media',
+            { params: { path: { project_id: '123' }, query: { annotation_status: 'missing_annotations' } } },
+        ] as const;
+        queryClient.setQueryData<InfiniteData<MediaWithPagination>>(filteredQueryKey, {
+            pages: [{ items: [image], pagination: { offset: 0, limit: 40, count: 1, total: 1 } }],
+            pageParams: [0],
+        });
+
+        const { result } = renderSubmitAnnotations({ mediaItem: image, mode: 'annotation', labels: [], queryClient });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        expect(queryClient.getQueryState(filteredQueryKey)?.isInvalidated).toBe(true);
+        expect(queryClient.getQueryState(mediaQueryKey)?.isInvalidated).toBe(false);
+        expect(getCachedMedia(queryClient)).toEqual([{ ...image, annotation_status: { has_annotations: true } }]);
+    });
+
+    it("completes the submission of a frame once its video has the server's annotated frame count", async () => {
+        const video = getMockedVideo({
+            id: 'video-1',
+            annotation_status: { has_annotations: false, annotated_video_frames: 0 },
+        });
+        // The server is the source of truth: the count is not incremented locally, since the frame may have been
+        // annotated already
+        const refreshedVideo = { ...video, annotation_status: { has_annotations: true, annotated_video_frames: 2 } };
+        const queryClient = createQueryClientWithMedia([video]);
+
+        server.use(
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}', async () => {
+                await delay(100);
+
+                return HttpResponse.json(refreshedVideo);
+            })
+        );
+
+        const { result } = renderSubmitAnnotations({
+            mediaItem: getMockedVideoFrame({ id: video.id, frame_number: 3 }),
+            mode: 'annotation',
+            labels: [],
+            queryClient,
+        });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        expect(getCachedMedia(queryClient)).toEqual([refreshedVideo]);
+    });
+
+    it('completes the submission of a frame even if its video cannot be refreshed', async () => {
+        const video = getMockedVideo({ id: 'video-1' });
+        const queryClient = createQueryClientWithMedia([video]);
+
+        server.use(http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => HttpResponse.error()));
+
+        const { result } = renderSubmitAnnotations({
+            mediaItem: getMockedVideoFrame({ id: video.id, frame_number: 3 }),
+            mode: 'annotation',
+            labels: [],
+            queryClient,
+        });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        await act(() => result.current.submit('unassigned'));
+
+        expect(getCachedMedia(queryClient)).toEqual([video]);
+    });
+});
 
 describe('submit in prediction mode', () => {
     const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });

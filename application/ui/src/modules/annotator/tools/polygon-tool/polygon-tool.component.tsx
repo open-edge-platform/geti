@@ -1,12 +1,12 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { PointerEvent, useRef, useState, useTransition } from 'react';
 
 import { useZoom } from '@/components/zoom/zoom.provider';
-import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { isEmpty } from 'lodash-es';
 
+import { isLeftButton } from '../../../../shared/buttons-utils';
 import { Point } from '../../../../shared/types';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
@@ -15,11 +15,12 @@ import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { useAddAndSelectAnnotations } from '../use-add-and-select-annotations.hook';
 import { PolygonDraw } from './polygon-draw.component';
 import {
+    canClosePolygonAt,
     drawingStyles,
     getToolIcon,
     isCloseMode,
     isPolygonReadyToClose,
-    leftRightMouseButtonHandler,
+    leftMouseButtonHandler,
     PolygonMode,
     removeEmptySegments,
     START_POINT_FIELD_DEFAULT_RADIUS,
@@ -31,7 +32,7 @@ import classes from './polygon-tool.module.scss';
 export const PolygonTool = () => {
     const { scale: zoom } = useZoom();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
-    const { image } = useSelectedMediaItem();
+    const { image, roi } = useSelectedMediaItem();
     const { selectedLabel } = useAnnotatorLabels();
 
     const ref = useRef<SVGRectElement>({} as SVGRectElement);
@@ -49,9 +50,8 @@ export const PolygonTool = () => {
         setSegments,
         optimizePolygonOrSegments,
         resetTool,
-        onPointerMoveRemove,
         setPointFromEvent,
-    } = usePolygonConfig({ image, zoom, canvasRef: ref });
+    } = usePolygonConfig({ image, roi, zoom, canvasRef: ref });
 
     const toolIcon = getToolIcon(mode);
 
@@ -59,17 +59,8 @@ export const PolygonTool = () => {
         (isCloseMode(mode) ? START_POINT_FIELD_FOCUS_RADIUS : START_POINT_FIELD_DEFAULT_RADIUS) / zoom
     );
 
-    const canPathBeClosed = (point: Point): boolean => {
-        const flatSegments = segments.flat();
-
-        if (isEmpty(flatSegments)) return false;
-
-        return (
-            Boolean(polygon) &&
-            isPolygonValid({ shapeType: 'polygon', points: polygon?.points ?? [] }) &&
-            isPointOverPoint(flatSegments[0], point, STARTING_POINT_RADIUS)
-        );
-    };
+    const canPathBeClosed = (point: Point): boolean =>
+        canClosePolygonAt(segments, polygon, point, STARTING_POINT_RADIUS);
 
     const handleIsStartingPointHovered = (point: Point): void => {
         if (!isCloseMode(mode) && canPathBeClosed(point)) {
@@ -81,8 +72,8 @@ export const PolygonTool = () => {
         }
     };
 
-    const onPointerDown = leftRightMouseButtonHandler(
-        (event) => {
+    const onPointerDown = (pointerEvent: PointerEvent<SVGSVGElement>) =>
+        leftMouseButtonHandler((event) => {
             event.currentTarget.setPointerCapture(event.pointerId);
 
             setPointFromEvent((point: Point) => {
@@ -100,18 +91,13 @@ export const PolygonTool = () => {
                 setLassoSegment([]);
                 pendingHistoryCommit.current = true;
             })(event);
-        },
-        (event) => {
-            if (isEmpty(segments)) return;
-
-            event.currentTarget.setPointerCapture(event.pointerId);
-
-            setMode(PolygonMode.Eraser);
-        }
-    );
+        })(pointerEvent);
 
     const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
         event.currentTarget.releasePointerCapture(event.pointerId);
+
+        // Only the left button draws, other buttons must not add points nor close the polygon
+        if (!isLeftButton(event)) return;
 
         setPointFromEvent((point: Point): void => {
             // finish the drawing while releasing the button inside the area of starting point
@@ -142,28 +128,28 @@ export const PolygonTool = () => {
         })(event);
     };
 
-    const onPointerMove = setPointFromEvent((newPoint: Point) => {
-        if (isEmpty(segments)) return;
+    const onPointerMove = (event: PointerEvent<SVGElement>) =>
+        setPointFromEvent((newPoint: Point) => {
+            if (isEmpty(segments)) return;
 
-        if (mode === PolygonMode.Polygon && isPointerDown.current) setMode(PolygonMode.Lasso);
+            if (mode === PolygonMode.Polygon && isPointerDown.current) setMode(PolygonMode.Lasso);
 
-        if (mode === PolygonMode.Lasso) {
-            setLassoSegment((newLassoSegment: Point[]) => [...newLassoSegment, newPoint]);
-        }
+            if (mode === PolygonMode.Lasso) {
+                setLassoSegment((newLassoSegment: Point[]) => [...newLassoSegment, newPoint]);
+            }
 
-        handleIsStartingPointHovered(newPoint);
-        setPointerLine(() => [...segments.flat(), ...lassoSegment, newPoint]);
-    });
+            handleIsStartingPointHovered(newPoint);
+            setPointerLine(() => [...segments.flat(), ...lassoSegment, newPoint]);
+        })(event);
 
     return (
         <SvgToolCanvas
-            image={image}
             canvasRef={ref}
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}
             onPointerDown={onPointerDown}
-            onPointerMove={mode === PolygonMode.Eraser ? onPointerMoveRemove : onPointerMove}
-            onPointerLeave={mode === PolygonMode.Eraser ? onPointerMoveRemove : onPointerMove}
+            onPointerMove={onPointerMove}
+            onPointerLeave={onPointerMove}
             style={{ cursor: `url(${toolIcon.cursorUrl}) ${toolIcon.offset}, auto` }}
         >
             {polygon !== null && !isEmpty(polygon.points) && (

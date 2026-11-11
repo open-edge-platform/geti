@@ -69,28 +69,22 @@ export type ProjectCreate = components['schemas']['ProjectCreate'];
 export type TaskType = components['schemas']['TaskType'];
 export type Task = components['schemas']['TaskView'];
 
-export type ImagesFolderSourceConfig = components['schemas']['ImagesFolderSourceConfigView'];
 export type IPCameraSourceConfig = components['schemas']['IPCameraSourceConfigView'];
 export type USBCameraSourceConfig = components['schemas']['USBCameraSourceConfigView'];
 export type VideoFileSourceConfig = components['schemas']['VideoFileSourceConfigView'];
 type DisconnectedSourceConfig = components['schemas']['DisconnectedSourceConfigView'];
 
 export type SourceConfig =
-    | DisconnectedSourceConfig
-    | USBCameraSourceConfig
-    | IPCameraSourceConfig
-    | VideoFileSourceConfig
-    | ImagesFolderSourceConfig;
+    DisconnectedSourceConfig | USBCameraSourceConfig | IPCameraSourceConfig | VideoFileSourceConfig;
 
 export type SourceConfigPayload = Exclude<SourceConfig, DisconnectedSourceConfig>;
 
 export type LocalFolderSinkConfig = components['schemas']['FolderSinkConfigView'];
 export type MqttSinkConfig = components['schemas']['MqttSinkConfigView'];
 export type WebhookSinkConfig = components['schemas']['WebhookSinkConfigView'];
-export type RosSinkConfig = components['schemas']['RosSinkConfigView'];
 export type SinkOutputFormats = LocalFolderSinkConfig['output_formats'];
 
-export type SinkConfig = LocalFolderSinkConfig | MqttSinkConfig | WebhookSinkConfig | RosSinkConfig;
+export type SinkConfig = LocalFolderSinkConfig | MqttSinkConfig | WebhookSinkConfig;
 
 export type AnnotationDTO = components['schemas']['DatasetItemAnnotation'];
 export type PredictionDTO = components['schemas']['DatasetItemAnnotation'];
@@ -110,7 +104,7 @@ export type AnnotationType = components['schemas']['AnnotationType'];
 export type Point = components['schemas']['Point'];
 export type Rect = components['schemas']['Rectangle'];
 export type Polygon = components['schemas']['Polygon'];
-export type FullImage = components['schemas']['FullImage'];
+type FullImage = components['schemas']['FullImage'];
 
 export type Shape = Rect | Polygon | FullImage;
 
@@ -160,3 +154,4 @@ export type PipelineComponentsHealth = components['schemas']['PipelineComponents
 export type PipelineStatus = components['schemas']['Status'];
 
 export type DatasetView = components['schemas']['DatasetViewView'];
+export type PipelineMetrics = components['schemas']['PipelineMetricsView'];

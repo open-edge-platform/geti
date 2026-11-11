@@ -25,8 +25,6 @@
             "refresh": "Refresh",
             "remove": "Remove",
             "selectAll": "Select all",
-            "showLess": "Show less",
-            "showMore": "Show more",
             "skip": "Skip",
             "start": "Start",
             "submit": "Submit",
@@ -346,6 +344,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Key cannot be empty",
+            "keyDuplicate": "Key must be unique",
             "valueEmpty": "Value cannot be empty"
         },
         "connection": {
@@ -363,6 +362,7 @@
             "label": "Inference device"
         },
         "sources": {
+            "title": "Source",
             "uploadError": "Failed to upload video file.",
             "deleteVideoError": "Failed to delete uploaded video file.",
             "list": {
@@ -371,9 +371,7 @@
             "types": {
                 "usbCamera": "usb camera",
                 "ipCamera": "ip camera",
-                "videoFile": "video file",
-                "imagesFolder": "images folder",
-                "disconnected": "disconnected"
+                "videoFile": "video file"
             },
             "options": {
                 "usbCamera": "USB Camera",
@@ -404,13 +402,10 @@
                 "loading": "Loading...",
                 "device": "Device: {{name}}",
                 "unknownDevice": "Unknown device (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignore existing images: {{value}}",
                 "streamUrl": "Stream url: {{url}}",
                 "videoPath": "Video path: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Images folder path",
-                "ignoreExistingImages": "Ignore existing images",
                 "streamUrl": "Stream Url:",
                 "requireAuthentication": "Require Authentication",
                 "camera": "Camera",
@@ -425,11 +420,11 @@
             }
         },
         "sinks": {
+            "title": "Sink",
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Folder",
@@ -511,9 +506,7 @@
                 "disabledSuccess": "Pipeline disabled successfully"
             },
             "configuration": {
-                "sidebarLabel": "Pipeline configuration",
-                "sourcesTab": "Input",
-                "sinksTab": "Output"
+                "sidebarLabel": "Pipeline configuration"
             }
         },
         "collection": {
@@ -557,10 +550,6 @@
                 "healthy": "Healthy",
                 "finished": "Finished",
                 "unavailable": "Unavailable"
-            },
-            "componentLabels": {
-                "source": "Source",
-                "sink": "Sink"
             }
         },
         "stream": {
@@ -788,6 +777,7 @@
                 "unknownError": "Unknown error, please try refreshing the page.",
                 "timeoutError": "{{operation}} timed out after {{timeoutMs}}ms. Please try refreshing the page.",
                 "embeddingError": "Could not fetch the image embedding ({{status}}{{statusText}}).",
+                "hint": "Shift + click to include an area, Alt + click to exclude it. Click to create the annotation, Esc to clear the points.",
                 "operations": {
                     "workerBuild": "SAM worker build",
                     "workerInit": "SAM worker init",
@@ -890,7 +880,6 @@
                 "dialogTitle": "Training Logs",
                 "loadError": "Failed to load logs: {{message}}",
                 "noJobOrModel": "No job or model specified",
-                "fetchError": "Failed to fetch model logs: {{status}} {{statusText}}",
                 "downloadStarted": "Training logs download started"
             },
             "parameters": {
@@ -912,6 +901,7 @@
                 },
                 "sort": {
                     "label": "Sort Models by:",
+                    "recommended": "Recommended first",
                     "nameAsc": "Name (A to Z)",
                     "nameDesc": "Name (Z to A)",
                     "speedAsc": "Speed (fastest first)",
@@ -1180,7 +1170,7 @@
     },
     "application": {
         "startup": {
-            "loading": "Loading...Please wait."
+            "loading": "Loading... Please wait."
         },
         "serverError": {
             "heading": "Server Error"

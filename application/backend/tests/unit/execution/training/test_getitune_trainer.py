@@ -10,9 +10,9 @@ from uuid import uuid4
 import numpy as np
 import pytest
 import torch
-from datumaro.experimental import Dataset, LazyImage
-from datumaro.experimental.categories import LabelCategories
-from datumaro.experimental.fields import ImageInfo, Subset
+from getidata import Dataset, LazyImage
+from getidata.categories import LabelCategories
+from getidata.fields import ImageInfo, Subset
 from getitune import TaskType as GetiTuneTaskType
 from getitune.config.data import IntensityConfig
 from getitune.metrics.accuracy import MultiClassClsMetricCallable, MultiLabelClsMetricCallable

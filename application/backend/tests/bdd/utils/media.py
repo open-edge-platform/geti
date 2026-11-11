@@ -8,7 +8,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from datumaro.experimental import LazyImage, LazyVideoFrame, MediaInfo
+from getidata import LazyImage, LazyVideoFrame, MediaInfo
 from PIL import Image
 
 

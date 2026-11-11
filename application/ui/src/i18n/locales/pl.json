@@ -25,8 +25,6 @@
             "refresh": "Odśwież",
             "remove": "Usuń",
             "selectAll": "Zaznacz wszystko",
-            "showLess": "Pokaż mniej",
-            "showMore": "Pokaż więcej",
             "skip": "Pomiń",
             "start": "Rozpocznij",
             "submit": "Wyślij",
@@ -346,6 +344,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Klucz nie może być pusty",
+            "keyDuplicate": "Klucz musi być unikalny",
             "valueEmpty": "Wartość nie może być pusta"
         },
         "connection": {
@@ -363,6 +362,7 @@
             "label": "Urządzenie wnioskujące"
         },
         "sources": {
+            "title": "Źródło",
             "uploadError": "Nie udało się przesłać pliku wideo.",
             "deleteVideoError": "Nie udało się usunąć przesłanego pliku wideo.",
             "list": {
@@ -371,9 +371,7 @@
             "types": {
                 "usbCamera": "kamera usb",
                 "ipCamera": "kamera ip",
-                "videoFile": "plik wideo",
-                "imagesFolder": "folder obrazów",
-                "disconnected": "rozłączone"
+                "videoFile": "plik wideo"
             },
             "options": {
                 "usbCamera": "Kamera USB",
@@ -404,13 +402,10 @@
                 "loading": "Wczytywanie...",
                 "device": "Urządzenie: {{name}}",
                 "unknownDevice": "Nieznane urządzenie (id: {{deviceId}})",
-                "ignoreExistingImages": "Ignoruj istniejące obrazy: {{value}}",
                 "streamUrl": "Adres URL strumienia: {{url}}",
                 "videoPath": "Ścieżka wideo: {{path}}"
             },
             "fields": {
-                "imagesFolderPath": "Ścieżka folderu obrazów",
-                "ignoreExistingImages": "Ignoruj istniejące obrazy",
                 "streamUrl": "Adres URL strumienia:",
                 "requireAuthentication": "Wymagaj uwierzytelnienia",
                 "camera": "Kamera",
@@ -425,11 +420,11 @@
             }
         },
         "sinks": {
+            "title": "Odbiornik",
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Folder",
@@ -511,9 +506,7 @@
                 "disabledSuccess": "Pipeline został pomyślnie wyłączony"
             },
             "configuration": {
-                "sidebarLabel": "Konfiguracja pipelinu",
-                "sourcesTab": "Wejście",
-                "sinksTab": "Wyjście"
+                "sidebarLabel": "Konfiguracja pipelinu"
             }
         },
         "collection": {
@@ -557,10 +550,6 @@
                 "healthy": "Sprawny",
                 "finished": "Zakończony",
                 "unavailable": "Niedostępny"
-            },
-            "componentLabels": {
-                "source": "Źródło",
-                "sink": "Odbiornik"
             }
         },
         "stream": {
@@ -794,6 +783,7 @@
                 "unknownError": "Nieznany błąd, spróbuj odświeżyć stronę.",
                 "timeoutError": "Przekroczono limit czasu operacji {{operation}} po {{timeoutMs}} ms. Spróbuj odświeżyć stronę.",
                 "embeddingError": "Nie udało się pobrać embeddingu obrazu ({{status}}{{statusText}}).",
+                "hint": "Shift + kliknięcie, aby uwzględnić obszar, Alt + kliknięcie, aby go wykluczyć. Kliknij, aby utworzyć adnotację, Esc, aby wyczyścić punkty.",
                 "operations": {
                     "workerBuild": "Kompilacja workera automatycznej segmentacji",
                     "workerInit": "Inicjalizacja workera automatycznej segmentacji",
@@ -896,7 +886,6 @@
                 "dialogTitle": "Dzienniki trenowania",
                 "loadError": "Nie udało się wczytać dzienników: {{message}}",
                 "noJobOrModel": "Nie podano zadania ani modelu",
-                "fetchError": "Nie udało się pobrać dzienników modelu: {{status}} {{statusText}}",
                 "downloadStarted": "Rozpoczęto pobieranie dzienników trenowania"
             },
             "parameters": {
@@ -918,6 +907,7 @@
                 },
                 "sort": {
                     "label": "Sortuj modele według:",
+                    "recommended": "Najpierw rekomendowane",
                     "nameAsc": "Nazwa (A do Z)",
                     "nameDesc": "Nazwa (Z do A)",
                     "speedAsc": "Szybkość (najszybsze pierwsze)",

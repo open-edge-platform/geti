@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import type { AnnotationDTO, DatasetSubset, Media } from '@/api/types';
 import { queryOptions, useQuery, type QueryKey } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -9,18 +9,10 @@ import { isEmpty, isObject } from 'lodash-es';
 
 import { getQueryKey } from '../../../../query-client/query-client';
 import { EMPTY_LABEL_ID } from '../../../../shared/labels';
-import { isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaItemQueryParams } from '../../../../shared/media-item-utils';
 
 const isUnannotatedError = (error: unknown): boolean => {
     return isObject(error) && 'detail' in error && /Media has not been annotated yet/i.test(String(error.detail));
-};
-
-const getAnnotationsQueryParams = (media: Media) => {
-    return isVideoFrame(media)
-        ? {
-              frame_index: media.frame_number,
-          }
-        : undefined;
 };
 
 const getAnnotationsQueryKey = (projectId: string, media: Media): QueryKey => {
@@ -30,7 +22,7 @@ const getAnnotationsQueryKey = (projectId: string, media: Media): QueryKey => {
         {
             params: {
                 path: { project_id: projectId, media_id: media.id },
-                query: getAnnotationsQueryParams(media),
+                query: getMediaItemQueryParams(media),
             },
         },
     ]);
@@ -55,8 +47,8 @@ const isValidAnnotation = (annotation: AnnotationDTO): boolean => {
 const annotationsQueryFn = async (
     projectId: string,
     media: Media
-): Promise<{ annotations: AnnotationDTO[]; user_reviewed: boolean; subset: DatasetSubset } | undefined> => {
-    const queryParams = getAnnotationsQueryParams(media);
+): Promise<{ annotations: AnnotationDTO[]; user_reviewed: boolean; subset: DatasetSubset }> => {
+    const queryParams = getMediaItemQueryParams(media);
 
     const { data, error, response } = await fetchClient.GET(
         '/api/projects/{project_id}/dataset/media/{media_id}/annotations',
@@ -76,10 +68,14 @@ const annotationsQueryFn = async (
     }
 
     if (error) {
-        throw error;
+        throw new ApiError(error);
     }
 
-    if (data?.annotations.length === 0) {
+    if (data == undefined) {
+        throw new ApiError({ detail: `No data returned from API for media ${media.id}` });
+    }
+
+    if (data.annotations.length === 0) {
         const annotationDTO = {
             shape: {
                 type: 'full_image',
@@ -92,10 +88,6 @@ const annotationsQueryFn = async (
             user_reviewed: true,
             subset: data.subset,
         };
-    }
-
-    if (data === undefined) {
-        return data;
     }
 
     return {

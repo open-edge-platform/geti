@@ -9,7 +9,7 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 - FastAPI application server named `geti`.
 - Python 3.14, FastAPI, SQLAlchemy 2 (async where applicable), Pydantic v2,
   Alembic, `loguru`.
-- Consumes the local `getitune` library (`../../library`) for training,
+- Consumes the local `getitune` library (`../../libraries/getitune`) for training,
   inference, export, and quantization via the `getitune[cpu|xpu|cuda]` extras.
 - Packaged with PyInstaller (`geti.spec`).
 
@@ -84,7 +84,7 @@ Never return raw ORM models from a router — convert to a Pydantic schema.
 ## Services & Repositories
 
 - **Repositories** (`app/repositories/`): a generic `BaseRepository[ModelType]`
-  provides `get_by_id`, `list_all`, `save`, `update`, `delete`, `save_batch`;
+  provides `get_by_id`, `exists`, `list_all`, `save`, `update`, `delete`;
   per-resource repos subclass it (e.g. `ProjectRepository(BaseRepository[ProjectDB])`).
   Repos are CRUD only — no business rules.
 - **Services** (`app/services/`): orchestrate repositories, enforce business rules,
@@ -162,4 +162,4 @@ for the full table.
   coordination.
 - Never `pip install`; use `uv` via `just` recipes.
 - If you add a new top-level import, verify it appears in `geti.spec` `hiddenimports`.
-- Validate `library/` too when shared model or training behavior changes.
+- Validate `libraries/getitune/` too when shared model or training behavior changes.

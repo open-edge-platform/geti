@@ -4,25 +4,18 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
+import tanstackPluginQuery from '@tanstack/eslint-plugin-query';
 import header from 'eslint-plugin-header';
-import _import from 'eslint-plugin-import';
-import jsxA11Y from 'eslint-plugin-jsx-a11y';
+import importPlugin from 'eslint-plugin-import';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import { configs as tsConfigs, parser as tsParser } from 'typescript-eslint';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const compat = new FlatCompat({
-    baseDirectory: dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all,
-});
 
 // https://github.com/sindresorhus/globals/issues/239
 const GLOBALS_BROWSER_FIX = Object.assign({}, globals.browser, {
@@ -36,27 +29,14 @@ header.rules.header.meta.schema = false;
 
 export default [
     {
-        ignores: [
-            '**/build',
-            '**/coverage',
-            '**/node_modules',
-            '**/*.tsx.snap',
-            'src/assets',
-            'src/__mocks__',
-            '**/dex_templates',
-            '**/oauth2_proxy_templates',
-            '**/public',
-            'src/core/server/generated/*',
-        ],
+        ignores: ['**/build', '**/coverage', '**/node_modules', '**/*.tsx.snap', 'src/assets', '**/public'],
     },
-    ...fixupConfigRules(
-        compat.extends(
-            'plugin:jsx-a11y/recommended',
-            'plugin:@typescript-eslint/recommended',
-            'plugin:import/recommended',
-            'plugin:import/typescript'
-        )
-    ),
+    js.configs.recommended,
+    jsxA11y.flatConfigs.recommended,
+    ...tsConfigs.recommended,
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
+    ...tanstackPluginQuery.configs['flat/recommended'],
     {
         files: ['src/**/*.tsx', 'src/**/*.ts'],
         ...reactPlugin.configs.flat.recommended,
@@ -76,7 +56,6 @@ export default [
                 },
             ],
 
-            'react/jsx-indent-props': ['error', 4],
             'react/require-default-props': 'off',
             'react/prop-types': 'off',
             'react/display-name': 'off',
@@ -89,6 +68,8 @@ export default [
             ],
             'react/default-props-match-prop-types': 'warn',
             'react/no-unused-prop-types': 'warn',
+            'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
+            'react/jsx-no-constructed-context-values': 'error',
             'jsx-a11y/click-events-have-key-events': 'off',
             'jsx-a11y/no-noninteractive-element-interactions': 'off',
             'jsx-a11y/no-static-element-interactions': 'off',
@@ -96,9 +77,6 @@ export default [
     },
     {
         plugins: {
-            import: fixupPluginRules(_import),
-            'jsx-a11y': fixupPluginRules(jsxA11Y),
-            '@typescript-eslint': fixupPluginRules(typescriptEslint),
             header,
         },
         languageOptions: {
@@ -143,13 +121,6 @@ export default [
                 },
             ],
             '@typescript-eslint/no-duplicate-enum-values': ['off'],
-            'max-len': [
-                'error',
-                {
-                    code: 120,
-                    ignorePattern: '^import .*',
-                },
-            ],
 
             'no-underscore-dangle': ['error'],
 
@@ -178,6 +149,7 @@ export default [
             ],
 
             'import/order': ['off'],
+            'import/no-extraneous-dependencies': 'error',
 
             'import/no-unresolved': [
                 2,
@@ -201,10 +173,27 @@ export default [
         },
     },
     {
-        files: ['**/*.test.tsx', '**/*.test.ts'],
-
+        // Type-aware rules. Scoped to files covered by tsconfig.json `include`.
+        files: ['{src,tests,mocks}/**/*.{ts,tsx}'],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: dirname,
+            },
+        },
         rules: {
-            'max-len': 'off',
+            '@typescript-eslint/no-floating-promises': [
+                'error',
+                {
+                    // In data-router mode `navigate()` returns a Promise that only signals navigation
+                    // completion; errors go to the route's errorElement, so it is safe to not await it.
+                    allowForKnownSafeCalls: [{ from: 'package', name: 'NavigateFunction', package: 'react-router' }],
+                },
+            ],
+            '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+            '@typescript-eslint/only-throw-error': 'error',
+            '@typescript-eslint/await-thenable': 'error',
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
         },
     },
 ];

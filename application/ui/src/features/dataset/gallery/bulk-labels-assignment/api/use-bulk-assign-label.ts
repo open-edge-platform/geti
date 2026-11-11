@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
@@ -25,25 +25,33 @@ export const useBulkAssignLabel = () => {
     // follow the request dispatched last and flicker as each batch settles.
     const [isPending, setIsPending] = useState(false);
 
-    const invalidateQueries = () => {
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/items',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/media',
-                {
-                    params: {
-                        path: { project_id: projectId },
+    const invalidateQueries = (mediaIds: string[]) => {
+        return Promise.all([
+            ...mediaIds.map((mediaId) => {
+                return queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/media/{media_id}/annotations',
+                        {
+                            params: {
+                                path: { media_id: mediaId, project_id: projectId },
+                            },
+                        },
+                    ]),
+                });
+            }),
+            queryClient.invalidateQueries({
+                queryKey: getQueryKey([
+                    'get',
+                    '/api/projects/{project_id}/dataset/media',
+                    {
+                        params: {
+                            path: { project_id: projectId },
+                        },
                     },
-                },
-            ]),
-        });
+                ]),
+            }),
+        ]);
     };
 
     const assignLabel = async (mediaId: string, labelIds: string[]) => {
@@ -64,7 +72,7 @@ export const useBulkAssignLabel = () => {
         });
 
         if (error !== undefined) {
-            throw error;
+            throw new ApiError(error);
         }
     };
 
@@ -101,7 +109,7 @@ export const useBulkAssignLabel = () => {
                 });
             }
 
-            invalidateQueries();
+            void invalidateQueries(mediaIds);
         } finally {
             setIsPending(false);
         }

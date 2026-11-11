@@ -114,6 +114,26 @@ class TestTrainingJob:
         # Should not raise
         fxt_training_job.on_complete()
 
+    def test_cancel_after_start_cleans_up_without_keeping_log(self, fxt_training_job):
+        """A cancelled job that ran must remove its workspace and reconcile, without recreating the model dir."""
+        workspace_dir = fxt_training_job.data_dir / f"getitune-workspace-{fxt_training_job.params.model_id}"
+        workspace_dir.mkdir(parents=True)
+        (fxt_training_job.log_dir / fxt_training_job.log_file).write_text("Training log content")
+
+        fxt_training_job.start()
+        fxt_training_job.cancel()
+
+        assert not workspace_dir.exists()
+        assert not (fxt_training_job.data_dir / "projects").exists()
+        fxt_training_job._reconcile_stuck_training_status.assert_called_once()
+
+    def test_cancel_before_start_skips_cleanup(self, fxt_training_job):
+        """A job cancelled while pending never ran, so on_complete must not be called."""
+        with patch.object(TrainingJob, "on_complete") as mock_on_complete:
+            fxt_training_job.cancel()
+
+        mock_on_complete.assert_not_called()
+
 
 class TestTrainingJobReconcileTrainingStatus:
     @patch("app.services.ModelService")

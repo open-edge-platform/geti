@@ -26,7 +26,7 @@ from typing import Any
 
 from loguru import logger
 
-from app.core.jobs.models import Done, ExecutionEvent, Failed, Job, JobType, Started
+from app.core.jobs.models import Done, ExecutionEvent, Failed, Job, JobType
 from app.core.logging import LogConfig, logging_ctx
 from app.core.run import ExecutionContext, RunnableFactory, Runner
 from app.settings import get_settings
@@ -144,7 +144,6 @@ def _entrypoint(
     runnable = get_runnable(JobType(job_type))
 
     try:
-        conn.send(Started())
         with logging_ctx(LogConfig(log_folder=str(get_settings().job_dir), log_file=log_file)):
             runnable.run(ExecutionContext(payload=payload, report=report))
         conn.send(Done())

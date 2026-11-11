@@ -229,8 +229,7 @@ test.describe('Import dataset to project', () => {
             }),
             http.delete('/api/staged_datasets/{staged_dataset_id}', ({}) => {
                 return HttpResponse.json(
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
+                    // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                     { detail: errorMessage },
                     { status: 404 }
                 );
@@ -254,7 +253,7 @@ test.describe('Import dataset to project', () => {
 
         await test.step('Verify failed job card is visible', async () => {
             await expect(page.getByText(`Import dataset - ${DATASET_FILENAME} - 16 B`)).toBeVisible();
-            expect(await page.getByText(String(failedImportJob.message)).count()).toBe(2);
+            await expect(page.getByText(String(failedImportJob.message))).toHaveCount(2);
         });
 
         await test.step('Dismiss the failed status card despite delete failure', async () => {

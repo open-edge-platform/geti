@@ -3,22 +3,22 @@
 
 import { PointerEvent, RefObject, useEffect, useMemo, useRef } from 'react';
 
-import { clampPointBetweenImage, getIntersectionPoint } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
-import { Point, Polygon } from '../../../../shared/types';
+import { Point, Polygon, RegionOfInterest } from '../../../../shared/types';
+import { useIntelligentScissorsWorker } from '../../smart-tools/use-intelligent-scissors-worker.hook';
 import { usePolygonState } from '../polygon-tool/polygon-state-provider.component';
-import { deleteSegments, ERASER_FIELD_DEFAULT_RADIUS } from '../polygon-tool/utils';
-import { convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
-import { useIntelligentScissorsWorker } from './use-intelligent-scissors-worker.hook';
+import { clampPointToRoi, convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
 
 export const usePolygonConfig = ({
     zoom,
     image,
+    roi,
     canvasRef,
 }: {
     zoom: number;
     image: ImageData;
+    roi: RegionOfInterest;
     canvasRef: RefObject<SVGRectElement>;
 }) => {
     const isMounted = useRef(true);
@@ -32,13 +32,13 @@ export const usePolygonConfig = ({
 
         return () => {
             isMounted.current = false;
-            worker?.cleanImg();
+            void worker?.cleanImg();
         };
     }, [worker]);
 
     useEffect(() => {
         if (!isMounted.current || !image || isImageOversized(image)) return;
-        worker?.loadImage(image);
+        void worker?.loadImage(image);
     }, [image, worker]);
 
     const polygon = useMemo<Polygon | null>(() => {
@@ -66,7 +66,7 @@ export const usePolygonConfig = ({
     };
 
     const getPointerRelativePosition = (event: PointerEvent<SVGElement>): Point => {
-        const clampPoint = clampPointBetweenImage(image);
+        const clampPoint = clampPointToRoi(roi);
 
         return clampPoint(getRelativePoint(canvasRef.current, { x: event.clientX, y: event.clientY }, zoom));
     };
@@ -79,19 +79,6 @@ export const usePolygonConfig = ({
 
         callback(getPointerRelativePosition(event));
     };
-
-    const onPointerMoveRemove = setPointFromEvent((newPoint: Point) => {
-        const intersectionPoint = getIntersectionPoint(
-            Math.ceil(ERASER_FIELD_DEFAULT_RADIUS / zoom),
-            newPoint,
-            segments.flat()
-        );
-
-        if (!intersectionPoint) return;
-
-        setLassoSegment([]);
-        setSegments(deleteSegments(intersectionPoint));
-    });
 
     const resetTool = (): void => {
         undoRedoActions.reset();
@@ -106,12 +93,11 @@ export const usePolygonConfig = ({
         setPointerLine,
         lassoSegment,
         setLassoSegment,
-        isMounted: isMounted.current,
+        isMountedRef: isMounted,
         segments,
         setSegments,
         optimizePolygonOrSegments,
         resetTool,
-        onPointerMoveRemove,
         setPointFromEvent,
     };
 };

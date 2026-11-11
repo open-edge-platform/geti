@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, RefObject, use, useRef } from 'react';
+import { createContext, ReactNode, RefObject, use, useMemo, useRef } from 'react';
 
 type AnnotatorContextProps = {
     canvasRef: RefObject<HTMLDivElement | null>;
@@ -15,8 +15,9 @@ type AnnotatorProviderProps = {
 
 export const AnnotatorProvider = ({ children }: AnnotatorProviderProps) => {
     const canvasRef = useRef<HTMLDivElement | null>(null);
+    const value = useMemo(() => ({ canvasRef }), []);
 
-    return <AnnotatorContext value={{ canvasRef }}>{children}</AnnotatorContext>;
+    return <AnnotatorContext value={value}>{children}</AnnotatorContext>;
 };
 
 export const useAnnotator = () => {

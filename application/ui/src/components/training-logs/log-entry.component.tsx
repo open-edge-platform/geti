@@ -70,7 +70,7 @@ const MessageWithPaths = ({ message }: { message: string }) => {
 
                         if (event.key === 'Enter' || event.key === ' ') {
                             event.preventDefault();
-                            copyPath(part);
+                            void copyPath(part);
                         }
                     }}
                     role={'button'}

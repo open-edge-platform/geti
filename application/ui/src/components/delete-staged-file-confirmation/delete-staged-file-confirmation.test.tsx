@@ -13,12 +13,12 @@ describe('DeleteStagedFileConfirmation', () => {
     const stagedDatasetId = 'test-staged-dataset-id';
 
     beforeEach(() => {
-        vi.clearAllMocks();
+        rs.clearAllMocks();
     });
 
     it('calls delete API and removes staged dataset from localStorage on success', async () => {
-        const deleteSpy = vi.fn();
-        const mockedDeleteImportEntry = vi.fn();
+        const deleteSpy = rs.fn();
+        const mockedDeleteImportEntry = rs.fn();
 
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () => {
@@ -41,14 +41,13 @@ describe('DeleteStagedFileConfirmation', () => {
     });
 
     it('does not remove staged dataset from localStorage when delete API fails', async () => {
-        const deleteSpy = vi.fn();
-        const mockedDeleteImportEntry = vi.fn();
+        const deleteSpy = rs.fn();
+        const mockedDeleteImportEntry = rs.fn();
 
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () => {
                 deleteSpy();
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 500 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: 'Something went wrong' }, { status: 500 });
             })
         );
@@ -68,14 +67,13 @@ describe('DeleteStagedFileConfirmation', () => {
     });
 
     it('removes staged dataset from localStorage when delete API indicates staged file is invalid', async () => {
-        const deleteSpy = vi.fn();
-        const mockedDeleteImportEntry = vi.fn();
+        const deleteSpy = rs.fn();
+        const mockedDeleteImportEntry = rs.fn();
 
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () => {
                 deleteSpy();
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: 'Staged dataset not found' }, { status: 404 });
             })
         );

@@ -11,6 +11,7 @@ export const getMockedMediaImage = (props: Partial<MediaImage> = {}): MediaImage
     width: 0,
     height: 0,
     size: 0,
+    annotation_status: { has_annotations: false },
     ...props,
 });
 
@@ -26,6 +27,7 @@ export const getMockedVideo = (props: Partial<MediaVideo> = {}): MediaVideo => (
     format: 'mp4',
     frame_count: 400,
     annotated_frame_count: 100,
+    annotation_status: { has_annotations: true, annotated_video_frames: 100 },
     source_id: undefined,
     ...props,
 });
@@ -42,6 +44,7 @@ export const getMockedVideoFrame = (props: Partial<MediaVideoFrame> = {}): Media
     duration: 10,
     frame_count: 10,
     annotated_frame_count: 5,
+    annotation_status: { has_annotations: true, annotated_video_frames: 5 },
     frame_stride: 1,
     frame_number: 0,
     ...props,

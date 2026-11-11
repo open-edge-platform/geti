@@ -76,16 +76,12 @@ describe('filterJobs', () => {
         expect(filterJobs(jobs, 'project-1', 'all')).toEqual([jobA]);
     });
 
-    it('keeps every project when scoped to ALL_PROJECTS', () => {
+    it('keeps every job when scoped to ALL_PROJECTS and group is "all"', () => {
         expect(filterJobs(jobs, ALL_PROJECTS, 'all')).toEqual(jobs);
     });
 
     it('filters by status group', () => {
         expect(filterJobs(jobs, ALL_PROJECTS, 'finished')).toEqual([jobB]);
-    });
-
-    it('keeps every status when group is "all"', () => {
-        expect(filterJobs(jobs, ALL_PROJECTS, 'all')).toEqual(jobs);
     });
 
     it('combines project and status group filters', () => {
@@ -110,12 +106,12 @@ describe('sortJobs', () => {
 
 describe('formatElapsed', () => {
     beforeEach(() => {
-        vi.useFakeTimers();
-        vi.setSystemTime(new Date('2026-01-01T01:00:00.000000+00:00'));
+        rs.useFakeTimers();
+        rs.setSystemTime(new Date('2026-01-01T01:00:00.000000+00:00'));
     });
 
     afterEach(() => {
-        vi.useRealTimers();
+        rs.useRealTimers();
     });
 
     it('returns "—" for a job that has not started', () => {

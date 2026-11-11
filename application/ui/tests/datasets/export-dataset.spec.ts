@@ -128,7 +128,7 @@ test.describe('Export dataset', () => {
         });
 
         await test.step('Verify export job completes and download dataset', async () => {
-            await page.waitForSelector(`text="Dataset is ready for download"`);
+            await expect(page.getByText('Dataset is ready for download')).toBeVisible();
 
             const downloadButton = page.getByRole('button', { name: /download dataset/i });
             await expect(downloadButton).toBeVisible();

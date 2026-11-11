@@ -9,28 +9,27 @@ import { OutputFormat } from '../utils';
 
 import classes from './output-formats.module.scss';
 
-type OutputFormatsProps = {
-    config?: SinkOutputFormats;
-};
+interface OutputFormatsProps {
+    value: SinkOutputFormats;
+    onChange: (value: SinkOutputFormats) => void;
+}
 
-export const OutputFormats = ({ config = [] }: OutputFormatsProps) => {
+export const OutputFormats = ({ value, onChange }: OutputFormatsProps) => {
     const { t } = useTranslation();
 
     return (
         <CheckboxGroup
             isRequired
             label={t('inference.sinks.fields.outputFormatsLabel')}
-            name='output_formats'
-            defaultValue={config}
+            value={value}
+            onChange={(next) => onChange(next as SinkOutputFormats)}
             UNSAFE_className={classes.itemList}
         >
-            <Checkbox name='output_formats' value={OutputFormat.PREDICTIONS}>
-                {t('inference.sinks.fields.outputFormatPredictions')}
-            </Checkbox>
-            <Checkbox name='output_formats' value={OutputFormat.IMAGE_ORIGINAL}>
+            <Checkbox value={OutputFormat.PREDICTIONS}>{t('inference.sinks.fields.outputFormatPredictions')}</Checkbox>
+            <Checkbox value={OutputFormat.IMAGE_ORIGINAL}>
                 {t('inference.sinks.fields.outputFormatImageOriginal')}
             </Checkbox>
-            <Checkbox name='output_formats' value={OutputFormat.IMAGE_WITH_PREDICTIONS}>
+            <Checkbox value={OutputFormat.IMAGE_WITH_PREDICTIONS}>
                 {t('inference.sinks.fields.outputFormatImageWithPredictions')}
             </Checkbox>
         </CheckboxGroup>

@@ -1,43 +1,83 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SinkOutputFormats, WebhookSinkConfig } from '@/api/types';
+import type { WebhookSinkConfig } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 
-import { getObjectFromFormData, rateLimitFromFormData, WebhookHttpMethod } from '../utils';
-
-export type Pair = Record<Fields, string>;
-
-export enum Fields {
-    KEY = 'key',
-    VALUE = 'value',
+export enum WebhookHttpMethod {
+    PUT = 'PUT',
+    POST = 'POST',
+    PATCH = 'PATCH',
 }
 
-const INITIAL_WEBHOOK_TIMEOUT = 1;
-
-export const getPairsFromObject = (obj: Record<string, string>): Pair[] => {
-    return Object.entries(obj).map(([key, value]) => ({ key, value }));
+export type HeaderRow = {
+    key: string;
+    value: string;
 };
 
-export const getWebhookInitialConfig = (): WebhookSinkConfig => ({
+// Headers are edited as an array of rows (duplicates and empty keys are possible while typing) and
+// converted to the API's object only when the request body is built.
+export type WebhookFormState = Omit<WebhookSinkConfig, 'headers'> & {
+    headers: HeaderRow[];
+};
+
+const BACKEND_DEFAULT_TIMEOUT = 10;
+
+export const headersToRows = (headers: Record<string, string> | null | undefined): HeaderRow[] =>
+    Object.entries(headers ?? {}).map(([key, value]) => ({ key, value }));
+
+export const rowsToHeaders = (rows: HeaderRow[]): Record<string, string> =>
+    Object.fromEntries(rows.filter(({ key }) => key.trim().length > 0).map(({ key, value }) => [key.trim(), value]));
+
+// Indexes of rows whose (trimmed, non-empty) key already appeared in an earlier row.
+export const getDuplicateKeyIndexes = (rows: HeaderRow[]): Set<number> => {
+    const seen = new Set<string>();
+    const duplicates = new Set<number>();
+
+    rows.forEach(({ key }, index) => {
+        const normalized = key.trim().toLocaleLowerCase();
+
+        if (normalized.length === 0) return;
+
+        if (seen.has(normalized)) {
+            duplicates.add(index);
+        }
+
+        seen.add(normalized);
+    });
+
+    return duplicates;
+};
+
+export const getWebhookInitialConfig = (t: TranslateFn): WebhookFormState => ({
     id: '',
-    name: '',
-    timeout: INITIAL_WEBHOOK_TIMEOUT,
+    name: t('inference.sinks.defaultNames.webhook'),
     sink_type: 'webhook',
-    rate_limit: null,
     webhook_url: '',
     http_method: WebhookHttpMethod.POST,
+    timeout: BACKEND_DEFAULT_TIMEOUT,
+    headers: [],
+    rate_limit: null,
     output_formats: [],
-    headers: {},
 });
 
-export const webhookBodyFormatter = (formData: FormData): WebhookSinkConfig => ({
-    id: String(formData.get('id')),
-    name: String(formData.get('name')),
-    headers: getObjectFromFormData(formData.getAll('headers-keys'), formData.getAll('headers-values')),
-    timeout: Number(formData.get('timeout')),
-    sink_type: 'webhook',
-    rate_limit: rateLimitFromFormData(formData),
-    webhook_url: String(formData.get('webhook_url')),
-    http_method: formData.get('http_method') as WebhookHttpMethod,
-    output_formats: formData.getAll('output_formats') as SinkOutputFormats,
+export const toWebhookFormState = (sink: WebhookSinkConfig): WebhookFormState => ({
+    ...sink,
+    headers: headersToRows(sink.headers),
 });
+
+export const toWebhookBody = (config: WebhookFormState): Omit<WebhookSinkConfig, 'id' | 'sink_type'> => ({
+    name: config.name,
+    webhook_url: config.webhook_url,
+    http_method: config.http_method,
+    timeout: config.timeout,
+    headers: rowsToHeaders(config.headers),
+    rate_limit: config.rate_limit,
+    output_formats: config.output_formats,
+});
+
+export const isWebhookConfigValid = ({ webhook_url, headers, output_formats }: WebhookFormState): boolean =>
+    webhook_url.trim().length > 0 &&
+    output_formats.length > 0 &&
+    headers.every(({ key, value }) => key.trim().length > 0 && value.trim().length > 0) &&
+    getDuplicateKeyIndexes(headers).size === 0;

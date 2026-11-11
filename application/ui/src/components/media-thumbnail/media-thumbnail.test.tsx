@@ -10,8 +10,8 @@ import { render } from 'test-utils/render';
 import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { MediaThumbnail } from './media-thumbnail.component';
 
-vi.mock('../../hooks/use-is-scrolling.hook', () => ({
-    useIsScrolling: vi.fn(),
+rs.mock('../../hooks/use-is-scrolling.hook', () => ({
+    useIsScrolling: rs.fn(),
 }));
 
 const getImage = () => screen.getByRole('img', { name: 'Test Image' });
@@ -20,11 +20,11 @@ const querySkeleton = () => screen.queryByRole('img', { name: 'Loading…' });
 
 describe('MediaThumbnail', () => {
     beforeEach(() => {
-        vi.mocked(useIsScrolling).mockReturnValue(false);
+        rs.mocked(useIsScrolling).mockReturnValue(false);
     });
 
     it('calls onClick when image is clicked', async () => {
-        const mockedClick = vi.fn();
+        const mockedClick = rs.fn();
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' onClick={mockedClick} item={{ type: 'image' }} />);
 
         await userEvent.click(getImage());
@@ -33,7 +33,7 @@ describe('MediaThumbnail', () => {
     });
 
     it('calls onDoubleClick when image is double-clicked', async () => {
-        const mockedDblClick = vi.fn();
+        const mockedDblClick = rs.fn();
         render(
             <MediaThumbnail
                 url='test-image.jpg'
@@ -48,20 +48,14 @@ describe('MediaThumbnail', () => {
         expect(mockedDblClick).toHaveBeenCalled();
     });
 
-    it('displays frames count when item is a video', () => {
-        render(
-            <MediaThumbnail
-                url='test-video.mp4'
-                alt='Test Image'
-                item={{ type: 'video', frame_count: 3600, annotated_frame_count: 10, duration: 60 }}
-            />
-        );
+    it('displays the duration when item is a video', () => {
+        render(<MediaThumbnail url='test-video.mp4' alt='Test Image' item={{ type: 'video', duration: 60 }} />);
 
         expect(screen.getByText('01:00')).toBeInTheDocument();
     });
 
     it('does not set the image src while scrolling', () => {
-        vi.mocked(useIsScrolling).mockReturnValue(true);
+        rs.mocked(useIsScrolling).mockReturnValue(true);
 
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
@@ -111,7 +105,7 @@ describe('MediaThumbnail', () => {
         render(<Thumbnail />);
         fireEvent.load(getImage());
 
-        vi.mocked(useIsScrolling).mockReturnValue(true);
+        rs.mocked(useIsScrolling).mockReturnValue(true);
         await userEvent.click(screen.getByRole('button'));
 
         expect(getImage()).toHaveAttribute('src', 'test-image.jpg');

@@ -81,15 +81,28 @@
 > only the media assigned to that [dataset view](#views) are returned. This is the only endpoint to list the
 > content of a dataset view.
 
+> Every media info returned by these endpoints includes an `annotation_status` object, so that clients do not
+> need to cross-reference the [dataset items](#dataset-items) to know which media are annotated:
+>
+> - images and video frames: `{"has_annotations": true}` if the media is annotated (an annotation with an empty
+>   label counts as annotated);
+> - videos: `{"has_annotations": true, "annotated_video_frames": 14}`, where `has_annotations` is true if at least
+>   one frame is annotated. Compare `annotated_video_frames` with `frame_count` to know whether every frame is
+>   annotated.
+
+> **Deprecated:** the video field `annotated_frame_count` is deprecated in favor of
+> `annotation_status.annotated_video_frames`. It is marked `deprecated: true` in the OpenAPI spec and will be
+> removed in a future version.
+
+> `GET /api/projects/<id>/dataset/media/<id>/binary` returns images that browsers cannot display (TIFF and high
+> bit depth images, e.g. 16-bit) as an 8-bit PNG. Pass `?raw=true` to get the original file instead. The media
+> `format` field always reports the format of the stored file, not of the returned content.
+
 ### Predictions
 
 | Method | Path                                       | Payload              | Return                 | Description                                 |
 | ------ | ------------------------------------------ | -------------------- | ---------------------- | ------------------------------------------- |
 | `POST` | `/api/projects/<id>/dataset/media:predict` | model id, media list | batch inference result | Get predictions for one or more media items |
-
-> **Deprecated:** `POST /api/projects/<id>/dataset/media/media:predict` (with the duplicated `media` path
-> segment) is deprecated in favor of `POST /api/projects/<id>/dataset/media:predict` above. The deprecated
-> path is marked `deprecated: true` in the OpenAPI spec and will be removed in version 3.4.
 
 ### Annotations
 
@@ -138,15 +151,15 @@
 
 ### Models
 
-| Method   | Path                                                                      | Payload | Return           | Description                                                             |
-| -------- | ------------------------------------------------------------------------- | ------- | ---------------- | ----------------------------------------------------------------------- |
-| `GET`    | `/api/projects/<id>/models`                                               | -       | list of models   | List all the models in a project                                        |
-| `GET`    | `/api/projects/<id>/models/<model_id>`                                    | -       | model info       | Get info about a specific model                                         |
-| `GET`    | `/api/projects/<id>/models/<model_id>/labels`                             | -       | labels           | Get the labels used to train the model                                  |
-| `GET`    | `/api/projects/<id>/models/<model_id>/variants/<model_variant_id>/binary` | -       | zip              | Download model binary of the requested model variant                    |
-| `DELETE` | `/api/projects/<id>/models/<model_id>`                                    | -       | -                | Delete a model (option 'weights_only')                                  |
-| `GET`    | `/api/projects/<id>/models/<model_id>/training_metrics`                   | -       | training metrics | Get training metrics                                                    |
-| `GET`    | `/api/projects/<id>/models/<model_id>/logs`                               | -       | training log     | Get training logs (supports Accept: text/plain or application/x-ndjson) |
+| Method   | Path                                                                      | Payload | Return           | Description                                                       |
+| -------- | ------------------------------------------------------------------------- | ------- | ---------------- | ----------------------------------------------------------------- |
+| `GET`    | `/api/projects/<id>/models`                                               | -       | list of models   | List all the models in a project                                  |
+| `GET`    | `/api/projects/<id>/models/<model_id>`                                    | -       | model info       | Get info about a specific model                                   |
+| `GET`    | `/api/projects/<id>/models/<model_id>/labels`                             | -       | labels           | Get the labels used to train the model                            |
+| `GET`    | `/api/projects/<id>/models/<model_id>/variants/<model_variant_id>/binary` | -       | zip              | Download model binary of the requested model variant              |
+| `DELETE` | `/api/projects/<id>/models/<model_id>`                                    | -       | -                | Delete a model (option 'weights_only')                            |
+| `GET`    | `/api/projects/<id>/models/<model_id>/training_metrics`                   | -       | training metrics | Get training metrics                                              |
+| `GET`    | `/api/projects/<id>/models/<model_id>/logs`                               | -       | training log     | Get training logs as NDJSON, or as plain text with `?format=text` |
 
 ### Dataset revisions (training datasets, etc...)
 
@@ -244,14 +257,25 @@ within the backend process, so do not share one uploads directory between severa
 
 ## Jobs
 
-| Method | Path                    | Payload             | Return       | Description                                        |
-| ------ | ----------------------- | ------------------- | ------------ | -------------------------------------------------- |
-| `POST` | `/api/jobs`             | job type and params | job id       | Create and submit a new job                        |
-| `GET`  | `/api/jobs`             | -                   | list of jobs | List the jobs in a project (scheduled or running)  |
-| `GET`  | `/api/jobs/<id>`        | -                   | job info     | Get info about a specific job                      |
-| `POST` | `/api/jobs/<id>:cancel` | -                   | -            | Cancel a job                                       |
-| `GET`  | `/api/jobs/<id>/status` | -                   | job status   | Stream real-time status updates for a specific job |
-| `GET`  | `/api/jobs/<id>/logs`   | -                   | job logs     | Stream real-time log output for a specific job     |
+| Method | Path                    | Payload             | Return       | Description                                                                         |
+| ------ | ----------------------- | ------------------- | ------------ | ----------------------------------------------------------------------------------- |
+| `POST` | `/api/jobs`             | job type and params | job id       | Create and submit a new job                                                         |
+| `GET`  | `/api/jobs`             | -                   | list of jobs | List the jobs in a project (scheduled or running)                                   |
+| `GET`  | `/api/jobs/<id>`        | -                   | job info     | Get info about a specific job                                                       |
+| `POST` | `/api/jobs/<id>:cancel` | -                   | -            | Cancel a job                                                                        |
+| `GET`  | `/api/jobs/<id>/status` | -                   | job status   | Stream real-time status updates for a specific job                                  |
+| `GET`  | `/api/jobs/<id>/logs`   | -                   | job logs     | Stream real-time log output (SSE), or download it as plain text with `?format=text` |
+
+By default, job logs are streamed as Server-Sent Events, one NDJSON log record per event. Add `?format=text` to
+download them instead as a human-readable text file, containing only the formatted text of each record:
+
+```bash
+# Follow the logs in real time
+curl -k -N https://localhost:7860/api/jobs/<id>/logs
+
+# Download the logs written so far as plain text
+curl -k -o job.log "https://localhost:7860/api/jobs/<id>/logs?format=text"
+```
 
 Job types:
 

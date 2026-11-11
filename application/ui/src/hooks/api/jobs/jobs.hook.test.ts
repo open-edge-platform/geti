@@ -5,12 +5,16 @@ import * as toastModule from '@/components/toast/toast.component';
 import { act, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
-import { vi } from 'vitest';
 
 import { getMockedJob, getMockedQuantizeJob } from '../../../../mocks/mock-job';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
-import { MockEventSourceConstructor, resetMockEventSource } from '../../../test-utils/mock-event-source';
+import {
+    getLastEventSource,
+    MockEventSourceConstructor,
+    resetMockEventSource,
+    simulateSSEMessage,
+} from '../../../test-utils/mock-event-source';
 import { useDismissedJobs } from '../../storage/use-dismissed-jobs.hook';
 import { useGetCurrentRunningJobs, useModelJobs, useStreamJobStatus } from './jobs.hook';
 
@@ -179,8 +183,29 @@ describe('useStreamJobStatus', () => {
         resetMockEventSource();
     });
 
+    it('writes streamed job updates into the job list cache', async () => {
+        const job = createMockJobForProject({ status: 'RUNNING' });
+        server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
+
+        const { result } = renderHook(() => {
+            useStreamJobStatus(job.job_id, PROJECT_ID);
+            return useGetCurrentRunningJobs();
+        });
+
+        await waitFor(() => expect(result.current).toHaveLength(1));
+
+        act(() => {
+            simulateSSEMessage(getLastEventSource(), { ...job, progress: 50, message: 'Epoch 5/10' });
+        });
+
+        await waitFor(() => {
+            expect(result.current?.[0].progress).toBe(50);
+            expect(result.current?.[0].message).toBe('Epoch 5/10');
+        });
+    });
+
     it('shows a toast when job status is FAILED', async () => {
-        const toastSpy = vi.spyOn(toastModule, 'toast');
+        const toastSpy = rs.spyOn(toastModule, 'toast');
         const failedJob = getMockedJob({ status: 'FAILED' });
 
         renderHook(() => useStreamJobStatus(failedJob.job_id, PROJECT_ID));

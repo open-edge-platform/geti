@@ -17,5 +17,5 @@ export { Trans, useTranslation } from 'react-i18next';
 /** Engine-agnostic alias for the translate function, for modules that take `t` as an argument. */
 export type TranslateFn = TFunction;
 
-export { createI18nInstance, LANGUAGE_STORAGE_KEY } from './config';
-export { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from './locales';
+export { createI18nInstance } from './config';
+export { SUPPORTED_LANGUAGES } from './locales';

@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from queue import Empty, Queue
 from typing import Any
 
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, Job, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, Job, Progress
 from app.core.run import ExecutionContext, RunnableFactory, Runner
 
 from .exceptions import CancelledExc
@@ -75,9 +75,6 @@ class ThreadRun(Runner[Job, ExecutionEvent]):
     def _execute_job(self):
         """Execute the job in a separate thread."""
         try:
-            # Always emit Started event first
-            self._event_queue.put(Started())
-
             # Create execution context
             ctx = self._create_execution_context()
 

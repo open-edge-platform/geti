@@ -11,7 +11,6 @@ import { Link } from '../../platform/components/link.component';
 // Everything in this file has legal meaning, so it is kept verbatim in English and never translated.
 
 const ULTRALYTICS_TERMS_URL =
-    // eslint-disable-next-line max-len
     'https://www.ultralytics.com/license?utm_source=intel&utm_medium=referral&utm_campaign=geti-model-garden&utm_content=user-notice';
 
 const FullLicenseLink = ({ href }: { href: string }) => {
@@ -24,7 +23,6 @@ const FullLicenseLink = ({ href }: { href: string }) => {
     );
 };
 
-/* eslint-disable max-len */
 const INTEL_SIMPLIFIED_NOTICE = [
     'The Geti Windows application is licensed under the Intel Simplified Software License (Version October 2022).',
     'The license sets out the conditions under which you may use and redistribute the application, together with its disclaimers and limitations of liability. Third-party components included with the application may be governed by their own license terms.',
@@ -47,7 +45,6 @@ export const LEGAL_STATEMENTS = {
     agree: (licenseName: string) => `I have read and agree to the ${licenseName}`,
     optionalInfo: 'This license is provided for your information. It applies only if you use the models it covers.',
 };
-/* eslint-enable max-len */
 
 export type LicenseNotice = {
     id: string;
@@ -65,7 +62,6 @@ export const INTEL_SIMPLIFIED_LICENSE: LicenseNotice = {
             {'\n\n'}
             <FullLicenseLink
                 href={
-                    // eslint-disable-next-line max-len
                     'https://www.intel.com/content/www/us/en/content-details/749362/intel-simplified-software-license-version-october-2022.html'
                 }
             />

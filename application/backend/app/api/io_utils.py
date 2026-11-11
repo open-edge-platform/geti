@@ -3,6 +3,7 @@
 from collections.abc import Generator
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import quote
 
 from PIL.Image import Image
 from starlette.responses import FileResponse, Response, StreamingResponse
@@ -47,7 +48,14 @@ def write_bytes_to_response(
     Returns:
         FastAPI Response if content is bytes, StreamingResponse otherwise.
     """
-    headers = {"Content-Disposition": f"inline; filename={filename}"}
+    # Header values must be latin-1, so non-ASCII names (e.g. media names) are sent percent-encoded (RFC 6266)
+    quoted_filename = quote(filename, safe="")
+    disposition = (
+        f'inline; filename="{filename}"'
+        if quoted_filename == filename
+        else f"inline; filename*=utf-8''{quoted_filename}"
+    )
+    headers = {"Content-Disposition": disposition}
     if cache_control:
         headers["Cache-Control"] = cache_control
     if isinstance(content, bytes):
