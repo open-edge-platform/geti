@@ -250,7 +250,6 @@
             "type": "Type de média",
             "image": "Image",
             "video": "Vidéo",
-            "video_frame": "Image vidéo",
             "frameRate": "Fréquence d'images",
             "duration": "Durée",
             "frames": "Nombre d'images",

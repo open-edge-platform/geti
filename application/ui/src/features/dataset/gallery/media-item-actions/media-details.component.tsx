@@ -86,7 +86,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
         [t('dataset.mediaDetails.resolution'), `${item.width} × ${item.height} px`],
         [t('dataset.mediaDetails.fileSize'), formatBytes(item.size)],
         [t('dataset.mediaDetails.format'), item.format.toUpperCase()],
-        [t('dataset.mediaDetails.type'), t(`dataset.mediaDetails.${item.type}`)],
+        [t('dataset.mediaDetails.type'), t(isVideoItem ? 'dataset.mediaDetails.video' : 'dataset.mediaDetails.image')],
         ...(isVideoItem
             ? [
                   [t('dataset.mediaDetails.frameRate'), `${number.format(item.fps)} FPS`],

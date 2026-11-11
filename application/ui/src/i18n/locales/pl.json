@@ -237,7 +237,6 @@
             "type": "Typ mediów",
             "image": "Obraz",
             "video": "Wideo",
-            "video_frame": "Klatka wideo",
             "frameRate": "Liczba klatek na sekundę",
             "duration": "Czas trwania",
             "frames": "Wszystkie klatki",

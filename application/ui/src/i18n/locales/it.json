@@ -237,7 +237,6 @@
             "type": "Tipo di media",
             "image": "Immagine",
             "video": "Video",
-            "video_frame": "Fotogramma video",
             "frameRate": "Frequenza fotogrammi",
             "duration": "Durata",
             "frames": "Fotogrammi totali",
