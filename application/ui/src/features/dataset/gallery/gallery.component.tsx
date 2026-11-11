@@ -38,6 +38,8 @@ import { MediaDetails } from './media-item-actions/media-details.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
 import { useUploadFiles } from './use-upload-files';
 
+import classes from './gallery.module.scss';
+
 type GalleryProps = {
     items: Media[];
     viewMode: GalleryViewMode;
@@ -113,6 +115,7 @@ const GalleryList = ({
 
                 return (
                     <MediaItem
+                        className={classes.galleryItem}
                         contentElement={() => (
                             <MediaThumbnail
                                 item={item}
