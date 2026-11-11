@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Upuść tutaj pliki multimedialne",
                 "description": "Obrazy i filmy zostaną przesłane do tego zbioru danych."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Liczba klatek z adnotacjami: {{count}}",
-                "totalFrames": "Łączna liczba klatek: {{count}}"
             }
         },
         "import": {

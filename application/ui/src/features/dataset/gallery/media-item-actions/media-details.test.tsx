@@ -1,8 +1,6 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
-
 import type { AnnotatedVideoFrame, AnnotationDTO, Media } from '@/api/types';
 import { DialogContainer } from '@geti-ui/ui';
 import { screen, waitFor } from '@testing-library/react';
@@ -17,7 +15,6 @@ import { server } from '../../../../msw-node-setup';
 import { createQueryClient } from '../../../../query-client/query-client';
 import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { MediaDetails } from './media-details.component';
-import { MediaItemActions } from './media-item-actions.component';
 
 rs.mock('hooks/use-project-identifier.hook', () => ({ useProjectIdentifier: () => 'project-123' }));
 
@@ -27,24 +24,6 @@ const annotations: AnnotationDTO[] = [
 ];
 
 const getValue = (label: string) => screen.getByText(label, { selector: 'dt' }).nextElementSibling;
-
-const DetailsMenu = ({ item }: { item: Media }) => {
-    const [isOpen, setOpen] = useState(false);
-    return (
-        <>
-            <MediaItemActions
-                id={item.id}
-                mediaUrl='/photo'
-                mediaFileName='inspection.jpg'
-                onAnnotate={rs.fn()}
-                onDetails={() => setOpen(true)}
-            />
-            <DialogContainer onDismiss={() => setOpen(false)}>
-                {isOpen && <MediaDetails item={item} onClose={() => setOpen(false)} />}
-            </DialogContainer>
-        </>
-    );
-};
 
 const renderDetails = (
     item: Media = getMockedMediaImage({ annotation_status: { has_annotations: true } }),
@@ -61,7 +40,7 @@ const renderDetails = (
 };
 
 describe('Media details', () => {
-    it('opens from the actions menu and shows resolution, file size and exact annotation counts', async () => {
+    it('shows resolution, file size and exact annotation counts', async () => {
         const request = rs.fn();
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () => {
@@ -77,27 +56,19 @@ describe('Media details', () => {
             annotation_status: { has_annotations: true },
         });
         const user = userEvent.setup();
-        render(<DetailsMenu item={item} />);
+        const onClose = renderDetails(item);
 
-        expect(request).not.toHaveBeenCalled();
-        await user.click(screen.getByRole('button', { name: 'Media actions' }));
-        expect((await screen.findAllByRole('menuitem')).map((menuItem) => menuItem.textContent)).toEqual([
-            'Annotate',
-            'Download',
-            'Details',
-            'Delete',
-        ]);
-        await user.click(await screen.findByRole('menuitem', { name: 'Details' }));
         await screen.findByRole('dialog', { name: 'Details' });
         expect(screen.queryByRole('region', { name: 'Details' })).not.toBeInTheDocument();
         await waitFor(() => expect(getValue('Annotations')).toHaveTextContent('2'));
+        expect(request).toHaveBeenCalledTimes(1);
         expect(getValue('Unique labels')).toHaveTextContent('1');
         expect(getValue('Resolution')).toHaveTextContent('1920 × 1080 px');
         expect(getValue('File size')).toHaveTextContent('1.5 MB');
         expect(screen.getByRole('status')).toHaveTextContent('Annotated');
         expect(screen.queryByText('Frame rate')).not.toBeInTheDocument();
         await user.click(screen.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it.each([

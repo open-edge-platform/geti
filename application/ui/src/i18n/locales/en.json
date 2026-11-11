@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Drop media files here",
                 "description": "Images and videos will be uploaded to this dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Number of annotated frames: {{count}}",
-                "totalFrames": "Total frames: {{count}}"
             }
         },
         "import": {

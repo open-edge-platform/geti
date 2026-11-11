@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Zet mediabestanden hier neer",
                 "description": "Afbeeldingen en video's worden naar deze dataset geüpload."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Aantal geannoteerde frames: {{count}}",
-                "totalFrames": "Totaal aantal frames: {{count}}"
             }
         },
         "import": {

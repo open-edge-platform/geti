@@ -277,10 +277,6 @@
             "dropZone": {
                 "title": "Déposez les fichiers multimédias ici",
                 "description": "Les images et vidéos seront téléversées dans ce jeu de données."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Nombre de trames annotées : {{count}}",
-                "totalFrames": "Nombre total de trames : {{count}}"
             }
         },
         "import": {

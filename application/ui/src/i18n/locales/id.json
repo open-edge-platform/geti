@@ -263,10 +263,6 @@
             "dropZone": {
                 "title": "Letakkan berkas media di sini",
                 "description": "Gambar dan video akan diunggah ke dataset ini."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Jumlah bingkai beranotasi: {{count}}",
-                "totalFrames": "Total bingkai: {{count}}"
             }
         },
         "import": {
