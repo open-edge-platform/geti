@@ -68,20 +68,9 @@ Note that Datumaro also allows to export datasets in a variety of formats, usefu
 ## Media details
 
 In the dataset gallery, select the **Details** info button (i) on a media item.
-The button is available for both annotated and unannotated media.
-The dialog shows a preview, filename, resolution, file size, format, media type,
-annotation status, annotation count and number of unique labels. Videos also show
-frame rate, duration, total frames and annotated frames. Video annotation
-counts include annotations across all annotated frames, not just the preview frame.
-
-Media marked as "No object" or "No label" are considered annotated. Each such image
-or reviewed empty video frame counts as one annotation. The empty label counts as
-one unique label per media item, regardless of how many reviewed empty frames a
-video contains. A video is considered annotated if at least one of its frames is
-annotated.
-
-Unannotated media has zero annotations. Metadata remains visible while annotation
-details load; failed annotation requests show **Unavailable** and can be retried.
+The dialog shows a preview, file metadata, annotation status,
+annotation counts and unique-label counts.
+Videos also show frame rate, duration, total frames and annotated frames.
 
 ## Dataset views
 

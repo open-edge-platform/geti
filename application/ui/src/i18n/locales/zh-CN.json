@@ -237,7 +237,6 @@
             "type": "媒体类型",
             "image": "图像",
             "video": "视频",
-            "video_frame": "视频帧",
             "frameRate": "帧率",
             "duration": "时长",
             "frames": "总帧数",

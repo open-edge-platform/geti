@@ -237,7 +237,6 @@
             "type": "媒體類型",
             "image": "圖像",
             "video": "影片",
-            "video_frame": "影片影格",
             "frameRate": "影格率",
             "duration": "時長",
             "frames": "影格總數",

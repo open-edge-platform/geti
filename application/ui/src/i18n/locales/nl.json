@@ -237,7 +237,6 @@
             "type": "Mediatype",
             "image": "Afbeelding",
             "video": "Video",
-            "video_frame": "Videoframe",
             "frameRate": "Framesnelheid",
             "duration": "Duur",
             "frames": "Totaal frames",

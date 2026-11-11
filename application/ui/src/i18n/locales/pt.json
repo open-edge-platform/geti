@@ -237,7 +237,6 @@
             "type": "Tipo de mídia",
             "image": "Imagem",
             "video": "Vídeo",
-            "video_frame": "Quadro de vídeo",
             "frameRate": "Taxa de quadros",
             "duration": "Duração",
             "frames": "Total de quadros",

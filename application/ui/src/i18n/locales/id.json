@@ -237,7 +237,6 @@
             "type": "Jenis media",
             "image": "Gambar",
             "video": "Video",
-            "video_frame": "Bingkai video",
             "frameRate": "Laju bingkai",
             "duration": "Durasi",
             "frames": "Total bingkai",
