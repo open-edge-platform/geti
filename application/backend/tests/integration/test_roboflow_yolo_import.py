@@ -40,5 +40,5 @@ def test_prepare_roboflow_yolo_archive(tmp_path: Path) -> None:
     assert len(dataset) == 3
     assert {sample.subset for sample in dataset} == {Subset.TRAINING, Subset.VALIDATION, Subset.TESTING}
     for sample in dataset:
-        assert sample.labels.tolist() == [0]
+        assert sample.label.tolist() == [0]
         assert sample.bboxes.tolist() == [[50, 50, 40, 20]]
