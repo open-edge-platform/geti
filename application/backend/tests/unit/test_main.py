@@ -1,9 +1,25 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 import app.main as main
+
+
+def test_openapi_metadata_matches_generated_spec(tmp_path, monkeypatch):
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[2] / "app"))
+    from create_openapi import create_openapi
+
+    schema = main.create_app().openapi()
+    assert schema["info"]["contact"] == {"name": "Intel Geti", "url": "https://github.com/open-edge-platform/geti"}
+    assert schema["info"]["license"] == {"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"}
+
+    output = tmp_path / "openapi.json"
+    create_openapi(str(output))
+    assert json.loads(output.read_text()) == schema
 
 
 def test_spa_fallback_does_not_handle_api_paths(tmp_path, monkeypatch):
