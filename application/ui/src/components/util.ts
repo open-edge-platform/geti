@@ -10,7 +10,7 @@ export const getFormatOptions = (task: Task) => {
         ? [
               { label: 'Geti', value: 'geti' },
               { label: 'VOC', value: 'voc' },
-              { label: 'YOLO', value: 'yolo_cls' },
+              { label: 'YOLO', value: 'yolo' },
           ]
         : [
               { label: 'Geti', value: 'geti' },
@@ -22,7 +22,7 @@ export const getFormatOptions = (task: Task) => {
         instance_segmentation: [
             { label: 'Geti', value: 'geti' },
             { label: 'COCO', value: 'coco' },
-            { label: 'YOLO', value: 'yolo_seg' },
+            { label: 'YOLO', value: 'yolo' },
         ],
         detection: [
             { label: 'Geti', value: 'geti' },

@@ -164,17 +164,19 @@ class TestDatasetExporter:
             )
 
     @pytest.mark.parametrize(
-        "export_format, data_format",
+        "export_format, task_type, data_format",
         [
-            (DatasetFormat.COCO, DataFormat.COCO),
-            (DatasetFormat.YOLO, DataFormat.YOLO),
-            (DatasetFormat.YOLO_CLS, DataFormat.YOLO_ULTRALYTICS_CLS),
-            (DatasetFormat.YOLO_SEG, DataFormat.YOLO_ULTRALYTICS_SEG),
+            (DatasetFormat.COCO, TaskType.DETECTION, DataFormat.COCO),
+            (DatasetFormat.YOLO, TaskType.DETECTION, DataFormat.YOLO),
+            (DatasetFormat.YOLO, TaskType.CLASSIFICATION, DataFormat.YOLO_ULTRALYTICS_CLS),
+            (DatasetFormat.YOLO, TaskType.INSTANCE_SEGMENTATION, DataFormat.YOLO_ULTRALYTICS_SEG),
+            (DatasetFormat.VOC, TaskType.CLASSIFICATION, DataFormat.VOC),
         ],
     )
     def test_export_dataset(
         self,
         export_format: DatasetFormat,
+        task_type: TaskType,
         data_format: DataFormat,
         fxt_export: ExportDataset,
         fxt_staged_datasets_dir: Path,
@@ -184,7 +186,7 @@ class TestDatasetExporter:
         project_id = uuid4()
 
         with patch("app.execution.dataset_export.export.export_dataset") as mock_export_dataset:
-            target_dir = fxt_export.export_dataset(dataset_id, dataset, export_format, project_id)
+            target_dir = fxt_export.export_dataset(dataset_id, dataset, export_format, task_type, project_id)
 
             assert target_dir
             assert target_dir == fxt_staged_datasets_dir / str(dataset_id)
@@ -203,7 +205,9 @@ class TestDatasetExporter:
         with (
             patch("app.execution.dataset_export.export.export_dataset") as mock_export_dataset,
         ):
-            target_dir = fxt_export.export_dataset(dataset_id, dataset, DatasetFormat.GETI, project_id)
+            target_dir = fxt_export.export_dataset(
+                dataset_id, dataset, DatasetFormat.GETI, TaskType.DETECTION, project_id
+            )
 
             assert target_dir
             assert target_dir == fxt_staged_datasets_dir / str(dataset_id)
@@ -228,7 +232,11 @@ class TestDatasetExporter:
             mock_prepare.assert_called_once_with(fxt_export_params)
             mock_update_metadata.assert_called_once_with({"dataset_id": dataset_id})
             mock_export.assert_called_once_with(
-                dataset_id, dataset, fxt_export_params.export_format, fxt_export_params.project_id
+                dataset_id,
+                dataset,
+                fxt_export_params.export_format,
+                fxt_export_params.task.task_type,
+                fxt_export_params.project_id,
             )
 
     def test_execute_empty_dataset(self, fxt_export: ExportDataset, fxt_export_params: ExportDatasetJobParams):

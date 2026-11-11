@@ -18,8 +18,16 @@ from getidata.fields import (
 )
 
 
+class _YoloBaseSample(Sample):
+    """Fields common to every Ultralytics YOLO layout."""
+
+    image: LazyImage = image_path_field()
+    image_info: ImageInfo = image_info_field()
+    subset: Subset = subset_field()
+
+
 @register_sample
-class YoloClsSample(Sample):
+class YoloClsSample(_YoloBaseSample):
     """
     Sample class for Ultralytics YOLO classification format datasets.
 
@@ -30,19 +38,12 @@ class YoloClsSample(Sample):
     folder that contains the image, so each image carries exactly one label.
     """
 
-    # Basic image information
-    image: LazyImage = image_path_field()
-    image_info: ImageInfo = image_info_field()
-
     # Single class label per image
     label: int | None = label_field(dtype=pl.UInt16(), is_list=False)
 
-    # Dataset organization
-    subset: Subset = subset_field()
-
 
 @register_sample
-class YoloSegSample(Sample):
+class YoloSegSample(_YoloBaseSample):
     """
     Sample class for Ultralytics YOLO instance segmentation format datasets.
 
@@ -56,20 +57,13 @@ class YoloSegSample(Sample):
     polygon.
     """
 
-    # Basic image information
-    image: LazyImage = image_path_field()
-    image_info: ImageInfo = image_info_field()
-
     # Instance segmentation annotations
     polygons: np.ndarray | None = polygon_field(dtype=pl.Float32())
     labels: np.ndarray | None = label_field(dtype=pl.UInt16(), is_list=True)
 
-    # Dataset organization
-    subset: Subset = subset_field()
-
 
 @register_sample
-class YoloSample(Sample):
+class YoloSample(_YoloBaseSample):
     """
     Sample class for YOLO format datasets.
 
@@ -78,13 +72,6 @@ class YoloSample(Sample):
     to image dimensions, with each box having a class label.
     """
 
-    # Basic image information
-    image: LazyImage = image_path_field()
-    image_info: ImageInfo = image_info_field()
-
     # Object detection annotations
     bboxes: np.ndarray | None = bbox_field(dtype=pl.Float32(), format="cxcywh")
     labels: np.ndarray | None = label_field(dtype=pl.UInt8(), is_list=True)
-
-    # Dataset organization
-    subset: Subset = subset_field()

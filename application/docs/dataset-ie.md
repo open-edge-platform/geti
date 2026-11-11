@@ -172,19 +172,6 @@ following rules:
 
 Conversions not listed in the table are not supported and will cause the import operation to fail.
 
-> [!NOTE]
-> The Ultralytics YOLO classification format stores each image in the folder of a single class, so it can only
-> represent single-label (multiclass) classification datasets. Exporting to this format is therefore only offered
-> for classification projects with exclusive labels; multi-label classification projects can use the Geti and VOC
-> formats instead.
-
-> [!NOTE]
-> The Ultralytics YOLO segmentation format stores each instance as a single polygon with normalized coordinates,
-> so it cannot represent holes inside objects. Exporting to this format is only offered for instance segmentation
-> projects; object detection projects can use the Geti, COCO and YOLO (detection) formats instead. On import, the
-> format is told apart from YOLO detection by the label file content: segmentation rows hold a class index followed
-> by at least three normalized (x, y) coordinate pairs, while detection rows always have exactly five fields.
-
 ### Concurrency
 
 If the client attempts to launch multiple import/export operations on the same dataset at the same time, there could

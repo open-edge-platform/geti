@@ -15,25 +15,35 @@ from sqlalchemy.orm import Session
 
 from app.datumaro_converter import SampleMode
 from app.execution.base import Execution, step
-from app.models import DatasetFormat, DatasetItemAnnotationStatus, ExportDatasetJobParams
+from app.models import DatasetFormat, DatasetItemAnnotationStatus, ExportDatasetJobParams, TaskType
 from app.services import DatasetRevisionService, DatasetService, ProjectService
 
 
-def get_dm_format(dataset_format: DatasetFormat) -> DataFormat:
+def get_dm_format(dataset_format: DatasetFormat, task_type: TaskType) -> DataFormat:
     """
     Convert DatasetFormat to Datumaro DataFormat.
 
+    YOLO covers several Ultralytics layouts, so its getidata DataFormat is
+    selected by the task type of the exported dataset.
+
     Args:
         dataset_format: DatasetFormat enum value.
+        task_type: Task type of the dataset being exported.
 
     Returns:
         Corresponding DataFormat enum value.
     """
+    if dataset_format is DatasetFormat.YOLO:
+        yolo_format_mapping = {
+            TaskType.CLASSIFICATION: DataFormat.YOLO_ULTRALYTICS_CLS,
+            TaskType.DETECTION: DataFormat.YOLO,
+            TaskType.INSTANCE_SEGMENTATION: DataFormat.YOLO_ULTRALYTICS_SEG,
+        }
+        if task_type not in yolo_format_mapping:
+            raise ValueError(f"Unsupported task type for YOLO export: {task_type}")
+        return yolo_format_mapping[task_type]
     format_mapping = {
         DatasetFormat.COCO: DataFormat.COCO,
-        DatasetFormat.YOLO: DataFormat.YOLO,
-        DatasetFormat.YOLO_CLS: DataFormat.YOLO_ULTRALYTICS_CLS,
-        DatasetFormat.YOLO_SEG: DataFormat.YOLO_ULTRALYTICS_SEG,
         DatasetFormat.VOC: DataFormat.VOC,
     }
     if dataset_format not in format_mapping:
@@ -97,23 +107,22 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
 
     @step("Export dataset", 100)
     def export_dataset(
-        self, dataset_id: UUID, dataset: Dataset, export_format: DatasetFormat, project_id: UUID
+        self,
+        dataset_id: UUID,
+        dataset: Dataset,
+        export_format: DatasetFormat,
+        task_type: TaskType,
+        project_id: UUID,
     ) -> Path | None:
         target_dir = self._staged_datasets_dir / str(dataset_id)
         logger.info("Exporting dataset {} to {} in {} format", dataset_id, target_dir, export_format)
         target_dir.mkdir(parents=True, exist_ok=True)
         filename = self._build_zip_archive_name(project_id, export_format)
         match export_format:
-            case (
-                DatasetFormat.COCO
-                | DatasetFormat.YOLO
-                | DatasetFormat.VOC
-                | DatasetFormat.YOLO_CLS
-                | DatasetFormat.YOLO_SEG
-            ):
+            case DatasetFormat.COCO | DatasetFormat.YOLO | DatasetFormat.VOC:
                 export_dataset(
                     dataset=dataset,
-                    data_format=get_dm_format(export_format),
+                    data_format=get_dm_format(export_format, task_type),
                     output_path=str(target_dir / filename),
                     as_zip=True,
                 )
@@ -133,4 +142,4 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
             self.pin_message("Dataset is empty after applying filters. Nothing to export.")
             return
         self.update_metadata({"dataset_id": dataset_id})
-        self.export_dataset(dataset_id, dataset, params.export_format, params.project_id)
+        self.export_dataset(dataset_id, dataset, params.export_format, params.task.task_type, params.project_id)
