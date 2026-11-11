@@ -263,7 +263,7 @@ describe('Media details', () => {
         expect(requestedRange).toHaveBeenCalledWith('0', '399');
         expect(getValue('Total frames')).toHaveTextContent('400');
         expect(getValue('Frame rate')).toHaveTextContent('29.97 FPS');
-        expect(getValue('Duration')).toHaveTextContent('12.5 s');
+        expect(getValue('Duration')).toHaveTextContent('00:12');
     });
 
     it.each([
