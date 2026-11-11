@@ -143,7 +143,7 @@ const GalleryList = ({
                                 <TooltipTrigger>
                                     <ActionButton
                                         isQuiet
-                                        aria-label={t('dataset.mediaDetails.title')}
+                                        aria-label={'Details'}
                                         aria-haspopup='dialog'
                                         onPress={() => onDetails(item)}
                                     >
