@@ -71,7 +71,7 @@ In the dataset gallery, select the **Details** info button (i) on a media item.
 The button is available for both annotated and unannotated media.
 The dialog shows a preview, filename, resolution, file size, format, media type,
 annotation status, annotation count and number of unique labels. Videos also show
-frame rate, duration in seconds, total frames and annotated frames. Video annotation
+frame rate, duration, total frames and annotated frames. Video annotation
 counts include annotations across all annotated frames, not just the preview frame.
 
 Media marked as "No object" or "No label" are considered annotated. Each such image

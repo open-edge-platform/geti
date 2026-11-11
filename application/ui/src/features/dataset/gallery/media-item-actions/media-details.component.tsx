@@ -3,17 +3,18 @@
 
 import { $api } from '@/api';
 import type { Media } from '@/api/types';
+import { formatCompactDuration } from '@/components/media-thumbnail/util';
 import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Content, Dialog, Heading } from '@geti-ui/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import prettyBytes from 'pretty-bytes';
 import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
 import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { isVideo } from '../../../../shared/media-item-utils';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
+import { formatBytes } from '../../../../shared/util';
 
 import classes from './media-details.module.scss';
 
@@ -23,7 +24,7 @@ type MediaDetailsProps = {
 };
 
 export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const number = useNumberFormatter({ maximumFractionDigits: 2 });
     const mediaFileName = `${item.name}.${item.format}`;
@@ -83,13 +84,13 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     const status = t(hasAnnotations ? 'dataset.statistics.annotated' : 'dataset.statistics.unannotated');
     const fields = [
         [t('dataset.mediaDetails.resolution'), `${item.width} × ${item.height} px`],
-        [t('dataset.mediaDetails.fileSize'), prettyBytes(item.size, { locale: i18n.language })],
+        [t('dataset.mediaDetails.fileSize'), formatBytes(item.size)],
         [t('dataset.mediaDetails.format'), item.format.toUpperCase()],
         [t('dataset.mediaDetails.type'), t(`dataset.mediaDetails.${item.type}`)],
         ...(isVideoItem
             ? [
                   [t('dataset.mediaDetails.frameRate'), `${number.format(item.fps)} FPS`],
-                  [t('dataset.mediaDetails.duration'), `${number.format(item.duration)} s`],
+                  [t('dataset.mediaDetails.duration'), formatCompactDuration(item.duration)],
                   [t('dataset.mediaDetails.frames'), number.format(item.frame_count)],
                   [
                       t('dataset.mediaDetails.annotatedFrames'),
