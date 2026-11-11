@@ -103,7 +103,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     ];
 
     return (
-        <Dialog width='1000px'>
+        <Dialog size={'L'}>
             <Heading>{t('dataset.mediaDetails.title')}</Heading>
             <Content UNSAFE_className={classes.content}>
                 <div className={classes.layout}>
