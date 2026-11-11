@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Suspense, useContext, type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 
 import { Toast } from '@/components/toast/toast.component';
 import { Loading, ThemeProvider } from '@geti-ui/ui';
@@ -21,11 +21,6 @@ type RenderOptions = RTLRenderOptions & {
     path?: string;
     queryClient?: QueryClient;
 };
-
-// Update the route's content without recreating the router or remounting its providers on rerender.
-const RenderedUIContext = createContext<ReactNode>(null);
-
-const RenderedUI = () => useContext(RenderedUIContext);
 
 const TestProviders = ({ children, queryClient }: { children: ReactNode; queryClient: QueryClient }) => {
     return (
@@ -58,15 +53,9 @@ const createTestRouter = (children: ReactNode, options: RenderOptions, queryClie
 
 export const render = (ui: ReactNode, options: RenderOptions = {}) => {
     const testQueryClient = options.queryClient ?? createQueryClient();
-    const router = createTestRouter(<RenderedUI />, options, testQueryClient);
-    const withRouter = (children: ReactNode) => (
-        <RenderedUIContext.Provider value={children}>
-            <RouterProvider router={router} />
-        </RenderedUIContext.Provider>
-    );
-    const result = rtlRender(withRouter(ui));
+    const router = createTestRouter(ui, options, testQueryClient);
 
-    return { ...result, rerender: (updatedUI: ReactNode) => result.rerender(withRouter(updatedUI)) };
+    return rtlRender(<RouterProvider router={router} />);
 };
 
 export const renderHook = <TProps, TResult>(callback: (props: TProps) => TResult, options: RenderOptions = {}) => {
