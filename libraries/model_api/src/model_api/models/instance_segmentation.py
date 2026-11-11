@@ -131,6 +131,17 @@ class InstanceSegmentationModel(ImageModel):
             Binary mask of shape (im_h, im_w) with dtype uint8.
         """
 
+    def _postprocess_tile_mask(
+        self,
+        box: np.ndarray,
+        raw_cls_mask: np.ndarray,
+        coord: list[int],
+        im_h: int,
+        im_w: int,
+    ) -> np.ndarray:
+        """Place a tile's object-crop mask using its full-image bounding box."""
+        return self._postprocess_single_mask(box, raw_cls_mask, im_h, im_w)
+
     def postprocess(self, outputs: dict, meta: dict) -> InstanceSegmentationResult:
         if (
             outputs[self.output_blob_name["labels"]].ndim == 2
@@ -290,6 +301,21 @@ class DETRInstanceSegmentation(InstanceSegmentationModel):
 
     def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
         return _full_image_mask_postprocess(raw_cls_mask, im_h, im_w)
+
+    def _postprocess_tile_mask(
+        self,
+        box: np.ndarray,
+        raw_cls_mask: np.ndarray,
+        coord: list[int],
+        im_h: int,
+        im_w: int,
+    ) -> np.ndarray:
+        """Resize the full-tile mask before placing it on the full-image canvas."""
+        x1, y1, x2, y2 = coord
+        tile_mask = self._postprocess_single_mask(box, raw_cls_mask, y2 - y1, x2 - x1)
+        image_mask = np.zeros((im_h, im_w), dtype=np.uint8)
+        image_mask[y1:y2, x1:x2] = tile_mask
+        return image_mask
 
 
 def _average_and_normalize(saliency_maps: list) -> list:

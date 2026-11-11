@@ -4,7 +4,14 @@
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 from model_api.models import InstanceSegmentationResult
+from model_api.models.instance_segmentation import (
+    DETRInstanceSegmentation,
+    MaskRCNNModel,
+    _full_image_mask_postprocess,
+    _segm_postprocess,
+)
 from model_api.tilers.instance_segmentation import InstanceSegmentationTiler
 
 
@@ -32,6 +39,26 @@ def _make_instance_seg_result(n=2, offset=(0, 0)):
         saliency_map=[np.zeros((10, 10), dtype=np.float32)],
         feature_vector=np.zeros((1,), dtype=np.float32),
     )
+
+
+def _make_detr_model():
+    model = MagicMock(spec=DETRInstanceSegmentation)
+    model.inference_adapter = MagicMock()
+    model.inference_adapter.get_rt_info.side_effect = RuntimeError(
+        "Cannot get runtime attribute. Path to runtime attribute is incorrect.",
+    )
+    model.params = MagicMock()
+    model.params.postprocess_semantic_masks = True
+    model.get_label_name.return_value = "object"
+    model._postprocess_single_mask.side_effect = lambda *args: DETRInstanceSegmentation._postprocess_single_mask(  # noqa: SLF001
+        model,
+        *args,
+    )
+    model._postprocess_tile_mask.side_effect = lambda *args: DETRInstanceSegmentation._postprocess_tile_mask(  # noqa: SLF001
+        model,
+        *args,
+    )
+    return model
 
 
 class TestInstanceSegmentationTilerInit:
@@ -135,6 +162,11 @@ class TestInstanceSegmentationTilerMergeSaliencyMaps:
         result = tiler._merge_saliency_maps([[]], (100, 100, 3), [[0, 0, 100, 100]])  # noqa: SLF001
         assert result == []
 
+    def test_merge_saliency_maps_empty_numpy_array(self):
+        tiler = InstanceSegmentationTiler(_make_model(), execution_mode="sync")
+        result = tiler._merge_saliency_maps([np.array([])], (100, 100, 3), [[0, 0, 100, 100]])  # noqa: SLF001
+        assert result.size == 0
+
     def test_merge_saliency_maps_with_tiles(self):
         model = _make_model()
         tiler = InstanceSegmentationTiler(
@@ -190,6 +222,83 @@ class TestInstanceSegmentationTilerMergeSaliencyMaps:
 
 
 class TestInstanceSegmentationTilerPredictTiles:
+    @pytest.mark.parametrize("external_tiles", [False, True])
+    def test_detr_masks_cover_tile_not_box(self, external_tiles):
+        """DETR masks use tile coordinates in both full-image and pre-tiled inference."""
+        model = _make_detr_model()
+
+        masks = np.zeros((2, 10, 10), dtype=np.float32)
+        masks[0, 3:6, 2:5] = 1
+        masks[1, 1:4, 6:9] = 1
+
+        def result(i):
+            box = [[20, 30, 50, 60], [60, 10, 90, 40]][i]
+            return InstanceSegmentationResult(
+                bboxes=np.array([box], dtype=np.float32),
+                labels=np.array([0], dtype=np.int32),
+                scores=np.array([0.9 - i * 0.1], dtype=np.float32),
+                masks=masks[i : i + 1],
+                saliency_map=[],
+                feature_vector=np.empty(0),
+            )
+
+        model.side_effect = [result(0), result(1)]
+        tiler = InstanceSegmentationTiler(
+            model,
+            configuration={"tile_size": 100, "tiles_overlap": 0.0, "tile_with_full_img": False},
+            execution_mode="sync",
+        )
+        image = np.zeros((100, 200, 3), dtype=np.uint8)
+        if external_tiles:
+            merged = tiler.predict_tiles(
+                [image[:, :100], image[:, 100:]],
+                [[0, 0, 100, 100], [100, 0, 200, 100]],
+                image.shape,
+            )
+        else:
+            merged = tiler(image)
+        expected = np.zeros((2, 100, 200), dtype=np.uint8)
+        expected[0, :, :100] = _full_image_mask_postprocess(masks[0], 100, 100)
+        expected[1, :, 100:] = _full_image_mask_postprocess(masks[1], 100, 100)
+        np.testing.assert_array_equal(merged.bboxes, [[20, 30, 50, 60], [160, 10, 190, 40]])
+        np.testing.assert_array_equal(merged.masks, expected)
+
+    def test_detr_masks_follow_nms_and_rectangular_edge_tile(self):
+        model = _make_detr_model()
+        coords = [[0, 0, 100, 100], [50, 0, 150, 100], [150, 60, 200, 100]]
+        masks = np.zeros((3, 10, 10), dtype=np.float32)
+        masks[0, 2:6, 6:10] = 1
+        masks[1, 2:6, 1:5] = 1
+        masks[2, 2:7, 4:8] = 1
+        boxes = [[60, 20, 100, 60], [10, 20, 50, 60], [20, 8, 40, 28]]
+        scores = [0.5, 0.9, 0.8]
+        model.side_effect = [
+            InstanceSegmentationResult(
+                bboxes=np.array([box], dtype=np.float32),
+                labels=np.array([0], dtype=np.int32),
+                scores=np.array([score], dtype=np.float32),
+                masks=mask[None],
+                saliency_map=[],
+                feature_vector=np.empty(0),
+            )
+            for box, score, mask in zip(boxes, scores, masks)
+        ]
+        tiler = InstanceSegmentationTiler(model, execution_mode="sync")
+        tiles = [np.zeros((100, 100, 3)), np.zeros((100, 100, 3)), np.zeros((40, 50, 3))]
+        merged = tiler.predict_tiles(tiles, coords, (100, 200, 3))
+        np.testing.assert_array_equal(merged.bboxes, [[60, 20, 100, 60], [170, 68, 190, 88]])
+        expected = np.zeros((2, 100, 200), dtype=np.uint8)
+        expected[0, :, 50:150] = _full_image_mask_postprocess(masks[1], 100, 100)
+        expected[1, 60:100, 150:200] = _full_image_mask_postprocess(masks[2], 40, 50)
+        np.testing.assert_array_equal(merged.masks, expected)
+
+    def test_maskrcnn_keeps_existing_box_mask_placement(self):
+        model = object.__new__(MaskRCNNModel)
+        box = np.array([45, 10, 60, 30])
+        mask = np.ones((10, 10), dtype=np.float32)
+        actual = model._postprocess_tile_mask(box, mask, [0, 0, 50, 50], 50, 100)  # noqa: SLF001
+        np.testing.assert_array_equal(actual, _segm_postprocess(box, mask, 50, 100))
+
     @patch("model_api.tilers.instance_segmentation.multiclass_nms")
     @patch("model_api.tilers.instance_segmentation._segm_postprocess")
     def test_predict_tiles_sync_end_to_end(self, mock_segm, mock_nms):

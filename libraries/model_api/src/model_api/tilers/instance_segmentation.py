@@ -98,6 +98,7 @@ class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
         saliency_maps = []
         tiles_coords = []
         masks = []
+        mask_coords = []
         for result in results:
             if len(result["bboxes"]):
                 detections_array = np.concatenate((detections_array, result["bboxes"]))
@@ -106,6 +107,7 @@ class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
             tiles_coords.append(result["coords"])
             if len(result["masks"]):
                 masks.extend(result["masks"])
+                mask_coords.extend([result["coords"]] * len(result["masks"]))
 
         keep_idxs = []
         if np.prod(detections_array.shape):
@@ -118,6 +120,7 @@ class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
             )
         detections_array = detections_array[keep_idxs]
         masks = [masks[keep_idx] for keep_idx in keep_idxs]
+        mask_coords = [mask_coords[keep_idx] for keep_idx in keep_idxs]
 
         merged_vector = np.mean(feature_vectors, axis=0) if feature_vectors else np.ndarray(0)
         saliency_map = self._merge_saliency_maps(saliency_maps, shape, tiles_coords) if saliency_maps else []
@@ -125,9 +128,12 @@ class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
         labels, scores, bboxes = np.hsplit(detections_array, [1, 2])
         labels = labels.astype(np.int32)
         resized_masks, label_names = [], []
-        for mask, box, label_idx in zip(masks, bboxes, labels):
+        for mask, box, label_idx, coord in zip(masks, bboxes, labels, mask_coords):
             label_names.append(self.model.get_label_name(int(label_idx.squeeze())))
-            resized_masks.append(_segm_postprocess(box, mask, *shape[:-1]))
+            if isinstance(self.model, InstanceSegmentationModel):
+                resized_masks.append(self.model._postprocess_tile_mask(box, mask, coord, *shape[:-1]))  # noqa: SLF001
+            else:
+                resized_masks.append(_segm_postprocess(box, mask, *shape[:-1]))
 
         resized_masks = np.stack(resized_masks) if resized_masks else masks
         return InstanceSegmentationResult(
@@ -156,7 +162,7 @@ class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
 
         image_saliency_map = saliency_maps[0]
 
-        if not image_saliency_map:
+        if len(image_saliency_map) == 0:
             return image_saliency_map
 
         num_classes = len(image_saliency_map)
