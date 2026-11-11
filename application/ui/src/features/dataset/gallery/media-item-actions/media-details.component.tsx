@@ -11,10 +11,10 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
-import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { isVideo } from '../../../../shared/media-item-utils';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 import { formatBytes } from '../../../../shared/util';
+import { getAnnotationCounts } from './media-details.utils';
 
 import classes from './media-details.module.scss';
 
@@ -50,29 +50,13 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     );
     const query = isVideoItem ? framesQuery : annotationsQuery;
     const hasError = hasAnnotations && query.isError;
-    const savedAnnotations = isVideoItem
-        ? framesQuery.data?.flatMap((frame) => frame.annotation_data.annotations)
-        : annotationsQuery.data?.annotations;
-    const annotationCount = isVideoItem
-        ? (framesQuery.data?.reduce(
-              (total, { annotation_data }) =>
-                  total + (annotation_data.annotations.length || (annotation_data.user_reviewed ? 1 : 0)),
-              0
-          ) ?? 0)
-        : (savedAnnotations?.length ?? 0);
-    // Count No object/No label as a distinct category, as DatasetLabelsChart does.
-    // Unlike this count, MediaFilterLabels only lists project labels, excluding the empty label.
-    // Image queries normalize empty annotations to EMPTY_LABEL_ID; video frames need it added explicitly.
-    const labelIds = new Set(savedAnnotations?.flatMap((annotation) => annotation.labels.map((label) => label.id)));
-    if (
-        isVideoItem &&
-        framesQuery.data?.some(
-            ({ annotation_data }) => annotation_data.user_reviewed && annotation_data.annotations.length === 0
-        )
-    ) {
-        labelIds.add(EMPTY_LABEL_ID);
-    }
-    const labelCount = labelIds.size;
+    const { annotationCount, labelCount } = getAnnotationCounts(
+        isVideoItem
+            ? (framesQuery.data?.map((frame) => frame.annotation_data) ?? [])
+            : annotationsQuery.data
+              ? [annotationsQuery.data]
+              : []
+    );
     const annotationValue = (value: number) =>
         !hasAnnotations
             ? number.format(0)
