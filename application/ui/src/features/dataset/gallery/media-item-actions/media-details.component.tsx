@@ -45,7 +45,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
                     : undefined,
             },
         },
-        { enabled: isVideoItem && hasAnnotations, retry: false }
+        { enabled: isVideoItem && hasAnnotations }
     );
     const query = isVideoItem ? framesQuery : annotationsQuery;
     const hasError = hasAnnotations && query.isError;
