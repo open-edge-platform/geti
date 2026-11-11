@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import * as actualUi from '@geti-ui/ui' with { rstest: 'importActual' };
 import { ViewModes } from '@geti-ui/ui';
-import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
@@ -195,30 +195,35 @@ describe('Gallery item deletion and selection', () => {
                 HttpResponse.json({ annotations: [], user_reviewed: true, subset: 'unassigned' })
             )
         );
+        const GalleryWithChangingItems = () => {
+            const [items, setItems] = useState([item]);
+
+            return (
+                <>
+                    <button
+                        onClick={() => setItems([getMockedMediaImage({ id: 'another-item', name: 'replacement' })])}
+                    >
+                        Replace gallery items
+                    </button>
+                    <MediaUploadProvider>
+                        <SelectedDataProvider>
+                            <GalleryWithSelectionCount items={items} />
+                        </SelectedDataProvider>
+                    </MediaUploadProvider>
+                </>
+            );
+        };
         const user = userEvent.setup();
-        const { rerender } = render(
-            <MediaUploadProvider>
-                <SelectedDataProvider>
-                    <GalleryWithSelectionCount items={[item]} />
-                </SelectedDataProvider>
-            </MediaUploadProvider>
-        );
+        render(<GalleryWithChangingItems />);
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
         const originalCard = screen.getByRole('option');
+        const replaceItemsButton = screen.getByRole('button', { name: 'Replace gallery items' });
 
         await user.click(screen.getByRole('button', { name: 'Media actions' }));
         await user.click(await screen.findByRole('menuitem', { name: 'Details' }));
         await screen.findByRole('dialog', { name: 'Details' });
 
-        rerender(
-            <MediaUploadProvider>
-                <SelectedDataProvider>
-                    <GalleryWithSelectionCount
-                        items={[getMockedMediaImage({ id: 'another-item', name: 'replacement' })]}
-                    />
-                </SelectedDataProvider>
-            </MediaUploadProvider>
-        );
+        fireEvent.click(replaceItemsButton);
 
         expect(originalCard).not.toBeInTheDocument();
         expect(screen.getByLabelText('Selection state of media item another-item')).toBeInTheDocument();
