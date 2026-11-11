@@ -201,7 +201,7 @@ export const ProjectList = ({ jobsButton }: { jobsButton?: ReactNode }) => {
                     <ImportJobsList />
 
                     <View flex={1} UNSAFE_style={{ overflow: 'auto' }}>
-                        <Suspense fallback={<Loading size='M' mode='inline' />}>
+                        <Suspense fallback={<Loading variant={'intel'} mode={'inline'} style={{ height: '100%' }} />}>
                             <ProjectGrid jobsButton={jobsButton} />
                         </Suspense>
                     </View>
