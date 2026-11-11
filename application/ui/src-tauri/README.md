@@ -554,7 +554,8 @@ never holds the file in memory and needs no
 filesystem permissions. The command only accepts `https://localhost:7860` URLs
 and only trusts the backend's own certificate (`<data dir>/certs/localhost.pem`).
 Content the webview already has, such as a chart exported as a `data:` URL, is
-sent as bytes to the `save_file` command instead, which shows the same dialog.
+sent as bytes to the `save_file` command instead, which shows the same dialog
+and writes the file the same way.
 
 ### Where is my data?
 

@@ -63,8 +63,8 @@ pub async fn save_file(
         return Ok(());
     };
     let _ = on_started.send(());
-    std::fs::write(&path, contents)
-        .map_err(|e| e.to_string())
+    let written = std::fs::write(part_path(&path), contents).map_err(|e| e.to_string());
+    replace_with_part(&path, written)
         .inspect_err(|e| log::error!("Saving {} failed: {e}", path.display()))
 }
 
@@ -123,10 +123,14 @@ async fn save(client: &Client, url: Url, path: &Path) -> Result<(), String> {
         return Err(format!("backend responded with {}", response.status()));
     }
 
+    let written = write_body(&mut response, &part_path(path)).await;
+    replace_with_part(path, written)
+}
+
+/// Move the `written` `<path>.part` over `path`, or remove it if writing failed.
+fn replace_with_part(path: &Path, written: Result<(), String>) -> Result<(), String> {
     let part = part_path(path);
-    let saved = write_body(&mut response, &part)
-        .await
-        .and_then(|()| std::fs::rename(&part, path).map_err(|e| e.to_string()));
+    let saved = written.and_then(|()| std::fs::rename(&part, path).map_err(|e| e.to_string()));
     if saved.is_err() {
         let _ = std::fs::remove_file(&part);
     }
