@@ -11,7 +11,7 @@ import prettyBytes from 'pretty-bytes';
 import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
-import { isNonEmptyLabel } from '../../../../shared/labels';
+import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { isVideo } from '../../../../shared/media-item-utils';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 
@@ -59,9 +59,19 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
               0
           ) ?? 0)
         : (savedAnnotations?.length ?? 0);
-    const labelCount = new Set(
-        savedAnnotations?.flatMap((annotation) => annotation.labels.filter(isNonEmptyLabel).map((label) => label.id))
-    ).size;
+    // Count No object/No label as a distinct category, as DatasetLabelsChart does.
+    // Unlike this count, MediaFilterLabels only lists project labels, excluding the empty label.
+    // Image queries normalize empty annotations to EMPTY_LABEL_ID; video frames need it added explicitly.
+    const labelIds = new Set(savedAnnotations?.flatMap((annotation) => annotation.labels.map((label) => label.id)));
+    if (
+        isVideoItem &&
+        framesQuery.data?.some(
+            ({ annotation_data }) => annotation_data.user_reviewed && annotation_data.annotations.length === 0
+        )
+    ) {
+        labelIds.add(EMPTY_LABEL_ID);
+    }
+    const labelCount = labelIds.size;
     const annotationValue = (value: number) =>
         !hasAnnotations
             ? number.format(0)
