@@ -74,10 +74,13 @@ frame rate, duration in seconds, total frames and annotated frames. Video annota
 counts include annotations across all annotated frames, not just the preview frame.
 
 A saved empty annotation ("No object" or "No label") counts as one annotation, including
-one per reviewed empty video frame. It does not add to the number of unique project labels.
-Unannotated media has zero annotations. Metadata remains visible while annotation details load; failed annotation requests show
-**Unavailable** and can be retried. Annotation status and the number of annotated
-video frames remain available even if annotation details cannot be loaded.
+one per reviewed empty video frame. The empty label also counts as one unique label
+for both images and videos. Multiple reviewed empty frames in a video contribute
+only one unique label.
+Unannotated media has zero annotations. Metadata remains visible while annotation
+details load; failed annotation requests show **Unavailable** and can be retried.
+Annotation status and the number of annotated video frames remain available even
+if annotation details cannot be loaded.
 
 ## Dataset views
 

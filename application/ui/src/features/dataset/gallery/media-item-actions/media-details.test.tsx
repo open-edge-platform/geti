@@ -122,7 +122,7 @@ describe('Media details', () => {
         );
     });
 
-    it('counts a saved No object image as one annotation without adding a unique label', async () => {
+    it('counts a saved No object image as one annotation and one unique label', async () => {
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () =>
                 HttpResponse.json({ annotations: [], user_reviewed: true, subset: 'unassigned' })
@@ -130,7 +130,7 @@ describe('Media details', () => {
         );
         renderDetails();
         await waitFor(() => expect(getValue('Annotations')).toHaveTextContent('1'));
-        expect(getValue('Unique labels')).toHaveTextContent('0');
+        expect(getValue('Unique labels')).toHaveTextContent('1');
         expect(screen.getByRole('status')).toHaveTextContent('Annotated');
     });
 
@@ -173,7 +173,7 @@ describe('Media details', () => {
         renderDetails(item, queryClient);
 
         expect(getValue('Annotations')).toHaveTextContent('1');
-        expect(getValue('Unique labels')).toHaveTextContent('0');
+        expect(getValue('Unique labels')).toHaveTextContent('1');
         expect(screen.getByRole('status')).toHaveTextContent('Annotated');
         expect(request).toHaveBeenCalledTimes(1);
     });
@@ -288,7 +288,7 @@ describe('Media details', () => {
         expect(getValue('Annotated frames')).toHaveTextContent('3');
         expect(getValue('Annotations')).toHaveTextContent('Loading...');
         await waitFor(() => expect(getValue('Annotations')).toHaveTextContent('5'));
-        expect(getValue('Unique labels')).toHaveTextContent('2');
+        expect(getValue('Unique labels')).toHaveTextContent('3');
         expect(requestedRange).toHaveBeenCalledWith('0', '399');
         expect(getValue('Total frames')).toHaveTextContent('400');
         expect(getValue('Frame rate')).toHaveTextContent('29.97 FPS');
@@ -296,11 +296,11 @@ describe('Media details', () => {
     });
 
     it.each([
-        { userReviewed: true, expectedCount: 2 },
-        { userReviewed: false, expectedCount: 0 },
+        { userReviewed: true, expectedCount: 2, expectedLabelCount: 1 },
+        { userReviewed: false, expectedCount: 0, expectedLabelCount: 0 },
     ])(
-        'counts empty video frames with user_reviewed=$userReviewed as $expectedCount annotations',
-        async ({ userReviewed, expectedCount }) => {
+        'counts empty video frames with user_reviewed=$userReviewed as $expectedCount annotations and $expectedLabelCount unique labels',
+        async ({ userReviewed, expectedCount, expectedLabelCount }) => {
             server.use(
                 http.get('/api/projects/{project_id}/dataset/media/{media_id}/frames', () =>
                     HttpResponse.json(
@@ -319,7 +319,7 @@ describe('Media details', () => {
             renderDetails(getMockedVideo({ annotation_status: { has_annotations: true, annotated_video_frames: 2 } }));
 
             await waitFor(() => expect(getValue('Annotations')).toHaveTextContent(String(expectedCount)));
-            expect(getValue('Unique labels')).toHaveTextContent('0');
+            expect(getValue('Unique labels')).toHaveTextContent(String(expectedLabelCount));
             expect(getValue('Annotated frames')).toHaveTextContent('2');
         }
     );
