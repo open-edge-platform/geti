@@ -19,8 +19,15 @@ const saveDownload = async (url: string, name?: string, startedMessage?: string)
                 toast({ type: 'info', message: startedMessage });
             }
         };
+        const args = { fileName, filter: getFilterForFilename(fileName), onStarted };
 
-        await invoke('download_file', { url, fileName, filter: getFilterForFilename(fileName), onStarted });
+        if (url.startsWith('data:')) {
+            // The shell only downloads from the backend, so hand over the bytes instead (e.g. charts).
+            const contents = Array.from(new Uint8Array(await (await fetch(url)).arrayBuffer()));
+            await invoke('save_file', { ...args, contents });
+        } else {
+            await invoke('download_file', { ...args, url });
+        }
     } catch (error: unknown) {
         console.error('[tauri downloadFile] failed', error);
         toast({ type: 'error', message: i18n.t('downloads.failure.genericError') });
