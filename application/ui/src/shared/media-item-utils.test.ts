@@ -8,6 +8,7 @@ import {
     getMediaItemKey,
     getMediaItemPredictionRange,
     getMediaItemQueryParams,
+    isAnnotatableMedia,
 } from './media-item-utils';
 import { getMediaBinaryUrl } from './media-url.utils';
 
@@ -16,6 +17,14 @@ const video = getMockedVideo({ id: 'video-1' });
 const videoFrame = getMockedVideoFrame({ id: 'video-1', frame_number: 7, frame_stride: 30 });
 
 describe('media-item utils', () => {
+    it.each([
+        { name: 'image', media: image, expected: true },
+        { name: 'video frame', media: videoFrame, expected: true },
+        { name: 'video', media: video, expected: false },
+        { name: 'undefined', media: undefined, expected: false },
+    ])('isAnnotatableMedia is $expected for $name', ({ media, expected }) => {
+        expect(isAnnotatableMedia(media)).toBe(expected);
+    });
     describe.each([
         { name: 'image', media: image },
         { name: 'video', media: video },

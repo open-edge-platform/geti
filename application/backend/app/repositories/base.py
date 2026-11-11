@@ -64,32 +64,6 @@ class BaseRepository(Generic[ModelType]):
         result = cast(CursorResult, self.db.execute(stmt))
         return result.rowcount > 0
 
-    def save_batch(self, items: list[ModelType]) -> list[ModelType]:
-        now = datetime.now(UTC)
-        for item in items:
-            item.updated_at = now
-        self.db.add_all(items)
-        try:
-            self.db.flush()
-        except IntegrityError as e:
-            BaseRepository._handle_integrity_error(e)
-        return items
-
-    def update_batch(self, updates: list[ModelType]) -> None:
-        now = datetime.now(UTC)
-        for update in updates:
-            update.updated_at = now
-            self.db.merge(update)
-        try:
-            self.db.flush()
-        except IntegrityError as e:
-            BaseRepository._handle_integrity_error(e)
-
-    def delete_batch(self, obj_ids: list[str]) -> int:
-        stmt = delete(self.model).where(self.model.id.in_(obj_ids))
-        result = cast(CursorResult, self.db.execute(stmt))
-        return result.rowcount
-
     @staticmethod
     def _handle_integrity_error(error: IntegrityError) -> None:
         if error.orig is None or not isinstance(error.orig, SQLIntegrityError):

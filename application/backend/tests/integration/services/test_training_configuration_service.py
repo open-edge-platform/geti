@@ -55,9 +55,9 @@ def fxt_training_configuration() -> TrainingConfiguration:
                 max_epochs=100,
                 early_stopping=EarlyStopping(enable=True, patience=5),
                 learning_rate=0.001,
-                input_size_width=256,
-                input_size_height=256,
-                allowed_values_input_size=[128, 256, 512],
+                input_size_width=640,
+                input_size_height=640,
+                allowed_values_input_size=[640],
             ),
         ),
     )
@@ -586,3 +586,39 @@ class TestTrainingConfigurationService:
             .all()
         )
         assert len(task_level_configs) == 1
+
+    def test_stale_persisted_allowed_values_input_size_does_not_break_loading(
+        self,
+        fxt_training_configuration_service,  # adjust to the actual fixture name used in this file
+        fxt_project,
+    ):
+        """Regression test: a previously-persisted training configuration whose `allowed_values_input_size` predates a
+        manifest update (e.g. it only contained [640]) must not break loading, and the resynced value must reflect
+        the *current* manifest rather than the stale persisted one.
+        """
+        model_architecture_id = "object-detection-dfine-x"
+        project_id = UUID(fxt_project.id)
+        # Simulate a stale persisted config: narrower allowed_values_input_size,
+        # as if it was saved before the manifest was widened to 5 values.
+        stale_config = fxt_training_configuration_service.get_default_by_model_architecture(model_architecture_id)
+        stale_config = stale_config.model_copy(deep=True)
+        stale_config.algo_level_parameters.training.allowed_values_input_size = [640]
+        fxt_training_configuration_service.update(
+            project_id=project_id,
+            model_architecture_id=model_architecture_id,
+            training_configuration=stale_config,
+        )
+
+        # Loading must not raise, and must resync allowed values to the live manifest.
+        loaded = fxt_training_configuration_service.get_by_model_architecture(
+            project_id=project_id, model_architecture_id=model_architecture_id
+        )
+        assert loaded.algo_level_parameters.training.allowed_values_input_size == [
+            384,
+            512,
+            640,
+            800,
+            960,
+            1024,
+            1280,
+        ]

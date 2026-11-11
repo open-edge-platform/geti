@@ -1,7 +1,7 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SourceConfig } from '@/api/types';
+import type { SourceConfigPayload } from '@/api/types';
 import { ConnectionStatusBadge } from '@/components/connection-status-badge/connection-status-badge.component';
 import { useTranslation } from '@/i18n';
 import { Button, dimensionValue, Flex, Text } from '@geti-ui/ui';
@@ -13,7 +13,7 @@ import { isEqual } from 'lodash-es';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useTestSource } from '../api/use-test-source';
 import { SourceMenu } from '../source-menu/source-menu.component';
-import { SettingsList } from './settings-list/settings-list.component';
+import { SourceDetails } from './source-details/source-details.component';
 import { SourceIcon } from './source-icon/source-icon.component';
 
 import classes from './source-list.module.scss';
@@ -22,20 +22,19 @@ const SOURCE_TYPE_LABEL_KEYS = {
     usb_camera: 'inference.sources.types.usbCamera',
     ip_camera: 'inference.sources.types.ipCamera',
     video_file: 'inference.sources.types.videoFile',
-    disconnected: 'inference.sources.types.disconnected',
-} as const satisfies Record<SourceConfig['source_type'], string>;
+} as const satisfies Record<SourceConfigPayload['source_type'], string>;
 
 type SourcesListProps = {
-    sources: SourceConfig[];
+    sources: SourceConfigPayload[];
     onAddSource: () => void;
-    onEditSource: (config: SourceConfig) => void;
+    onEditSource: (config: SourceConfigPayload) => void;
 };
 
 type SourceListItemProps = {
-    source: SourceConfig;
+    source: SourceConfigPayload;
     isConnected: boolean;
     isPipelineRunning: boolean;
-    onEditSource: (config: SourceConfig) => void;
+    onEditSource: (config: SourceConfigPayload) => void;
 };
 
 const SourceListItem = ({ source, isConnected, onEditSource, isPipelineRunning }: SourceListItemProps) => {
@@ -75,7 +74,7 @@ const SourceListItem = ({ source, isConnected, onEditSource, isPipelineRunning }
             </Flex>
 
             <Flex justifyContent={'space-between'}>
-                <SettingsList source={source} />
+                <SourceDetails source={source} />
 
                 <SourceMenu
                     id={String(source.id)}

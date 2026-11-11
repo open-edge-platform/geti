@@ -3,123 +3,7 @@
 
 import { createI18nInstance } from '@/i18n';
 
-import { formatRateLimit, getObjectFromFormData, rateLimitFromFormData } from './utils';
-
-describe('getObjectFromFormData', () => {
-    it('return an object mapping keys to values', () => {
-        const keys = ['a', 'b', 'c'];
-        const values = ['1', '2', '3'];
-        expect(getObjectFromFormData(keys, values)).toEqual({ a: '1', b: '2', c: '3' });
-    });
-
-    it('skip entries with empty keys', () => {
-        const keys = ['', 'b', ''];
-        const values = ['1', '2', '3'];
-        expect(getObjectFromFormData(keys, values)).toEqual({ b: '2' });
-    });
-
-    it('skip entries with empty values', () => {
-        const keys = ['a', 'b', 'c'];
-        const values = ['', '2', ''];
-        expect(getObjectFromFormData(keys, values)).toEqual({ b: '2' });
-    });
-
-    it('return an empty object if all keys are empty', () => {
-        const keys = ['', '', ''];
-        const values = ['1', '2', '3'];
-        expect(getObjectFromFormData(keys, values)).toEqual({});
-    });
-
-    it('return an empty object if all values are empty', () => {
-        const keys = ['a', 'b', 'c'];
-        const values = ['', '', ''];
-        expect(getObjectFromFormData(keys, values)).toEqual({});
-    });
-
-    it('handle different lengths of keys and values', () => {
-        const keys = ['a', 'b'];
-        const values = ['1', '2', '3'];
-        expect(getObjectFromFormData(keys, values)).toEqual({ a: '1', b: '2' });
-    });
-
-    it('handle keys and values with whitespace', () => {
-        const keys = [' ', 'b', 'c'];
-        const values = ['1', ' ', '3'];
-        expect(getObjectFromFormData(keys, values)).toEqual({ c: '3' });
-    });
-});
-
-describe('rateLimitFromFormData', () => {
-    it('returns null when fields are missing', () => {
-        const formData = new FormData();
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null for non-numeric values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', 'abc');
-        formData.set('rate_limit_seconds', '1');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null for NaN values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', 'NaN');
-        formData.set('rate_limit_seconds', '1');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null for empty string values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', '');
-        formData.set('rate_limit_seconds', '2');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null when values are not finite numbers', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', 'Infinity');
-        formData.set('rate_limit_seconds', '2');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null for non-positive values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', '0');
-        formData.set('rate_limit_seconds', '2');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns computed rate for valid values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', '10');
-        formData.set('rate_limit_seconds', '2');
-
-        expect(rateLimitFromFormData(formData)).toBe(5);
-    });
-
-    it('returns null for decimal comma values', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', '0,1');
-        formData.set('rate_limit_seconds', '1');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-
-    it('returns null for invalid mixed separators', () => {
-        const formData = new FormData();
-        formData.set('rate_limit_samples', '1,2.3');
-        formData.set('rate_limit_seconds', '1');
-
-        expect(rateLimitFromFormData(formData)).toBeNull();
-    });
-});
+import { formatRateLimit, toRateLimit } from './utils';
 
 describe('formatRateLimit', () => {
     const { t } = createI18nInstance({ lng: 'en' });
@@ -141,5 +25,36 @@ describe('formatRateLimit', () => {
 
     it('formats rates below one as canonical ratio', () => {
         expect(formatRateLimit(0.5, t)).toBe('1 sample every 2 seconds');
+    });
+});
+
+describe('toRateLimit', () => {
+    it('returns null when samples or seconds are missing', () => {
+        expect(toRateLimit(null, null)).toBeNull();
+        expect(toRateLimit(null, 1)).toBeNull();
+        expect(toRateLimit(1, null)).toBeNull();
+    });
+
+    it('returns null for NaN and non-finite values', () => {
+        expect(toRateLimit(Number.NaN, 1)).toBeNull();
+        expect(toRateLimit(1, Number.NaN)).toBeNull();
+        expect(toRateLimit(Number.POSITIVE_INFINITY, 2)).toBeNull();
+    });
+
+    it('returns null for non-positive values', () => {
+        expect(toRateLimit(0, 2)).toBeNull();
+        expect(toRateLimit(-1, 2)).toBeNull();
+        expect(toRateLimit(2, 0)).toBeNull();
+        expect(toRateLimit(2, -1)).toBeNull();
+    });
+
+    it('returns samples per second for valid values', () => {
+        expect(toRateLimit(10, 2)).toBe(5);
+        expect(toRateLimit(5, 1)).toBe(5);
+    });
+
+    it('supports decimal values', () => {
+        expect(toRateLimit(0.5, 1)).toBe(0.5);
+        expect(toRateLimit(1, 0.5)).toBe(2);
     });
 });

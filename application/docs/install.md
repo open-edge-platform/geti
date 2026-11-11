@@ -509,7 +509,7 @@ docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_T
 
 The location depends on how Geti™ is installed:
 
-- Windows app (MSIX): `%LOCALAPPDATA%\Intel\Geti` folder.
+- Windows app (MSIX): `%LOCALAPPDATA%\Intel\Geti\logs` folder.
 - Docker container: `geti-logs` Docker volume.
 
 In the Docker case, you can view these logs by running

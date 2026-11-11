@@ -186,14 +186,20 @@ export const useCapturePipelineFrame = () => {
 
 export const useConnectSourceToPipeline = () => {
     const project_id = useProjectIdentifier();
-    const pipeline = usePatchPipeline();
+    const { mutateAsync, isPending } = usePatchPipeline();
 
-    return (source_id: string) => pipeline.mutateAsync({ params: { path: { project_id } }, body: { source_id } });
+    return {
+        mutateAsync: (source_id: string) => mutateAsync({ params: { path: { project_id } }, body: { source_id } }),
+        isPending,
+    };
 };
 
 export const useConnectSinkToPipeline = () => {
     const project_id = useProjectIdentifier();
-    const pipeline = usePatchPipeline();
+    const { mutateAsync, isPending } = usePatchPipeline();
 
-    return (sink_id: string) => pipeline.mutateAsync({ params: { path: { project_id } }, body: { sink_id } });
+    return {
+        mutateAsync: (sink_id: string) => mutateAsync({ params: { path: { project_id } }, body: { sink_id } }),
+        isPending,
+    };
 };

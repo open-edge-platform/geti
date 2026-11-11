@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod backend;
+mod download;
 #[cfg(windows)]
 mod job;
 #[cfg(windows)]
@@ -68,16 +69,16 @@ const SHELL_LOG_FILE_NAME: &str = "shell";
 const SHELL_LOG_MAX_BYTES: u128 = 5 * 1024 * 1024;
 const SHELL_LOG_KEEP_FILES: usize = 3;
 
-/// Per-user directory the **Windows** backend actually uses for both data and
-/// logs.
+/// Per-user directory the **Windows** backend actually uses for data (logs go in
+/// its `logs` subfolder).
 ///
 /// The frozen Windows backend's PyInstaller runtime hook
 /// (`application/backend/pyinstaller/windows/uwp.py`) unconditionally overrides
-/// `DATA_DIR` *and* `LOG_DIR` to `%LOCALAPPDATA%\Intel\Geti`, ignoring the
-/// environment, so on Windows the shell must not honour those variables either
-/// or its dialogs would point users at the wrong folder and
-/// `read_and_clear_fatal_status` would look for the backend's status file in the
-/// wrong place. Keep this in sync with `uwp.py`.
+/// `DATA_DIR` to `%LOCALAPPDATA%\Intel\Geti` and `LOG_DIR` to its `logs`
+/// subfolder, ignoring the environment, so on Windows the shell must not honour
+/// those variables either or its dialogs would point users at the wrong folder
+/// and `read_and_clear_fatal_status` would look for the backend's status file in
+/// the wrong place. Keep this in sync with `uwp.py`.
 #[cfg(windows)]
 fn backend_app_data_dir() -> Option<PathBuf> {
     std::env::var_os("LOCALAPPDATA").map(|p| PathBuf::from(p).join("Intel").join("Geti"))
@@ -101,7 +102,7 @@ fn explicit_data_dir() -> Option<PathBuf> {
 fn explicit_log_dir() -> Option<PathBuf> {
     #[cfg(windows)]
     {
-        backend_app_data_dir()
+        backend_app_data_dir().map(|dir| dir.join("logs"))
     }
     #[cfg(not(windows))]
     {
@@ -492,7 +493,6 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_log::Builder::default()
@@ -579,7 +579,7 @@ fn main() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![download::download_file])
         .build(tauri::generate_context!())
         .expect("error building Tauri");
 

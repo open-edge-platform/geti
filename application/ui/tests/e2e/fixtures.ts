@@ -8,6 +8,8 @@ import { AnnotatorPage } from '../datasets/annotator-page';
 import { DatasetPage } from '../datasets/dataset-page';
 import { ImportDatasetPage } from '../datasets/import-dataset-page';
 import { InferencePage } from '../inference/inference-page';
+import { SinksPage } from '../inference/sinks-page';
+import { SourcesPage } from '../inference/sources-page';
 import { StreamPage } from '../inference/stream-page';
 import { ModelsPage } from '../models/models-page';
 import { ProjectPage } from '../projects/project-page';
@@ -21,6 +23,8 @@ interface Fixtures {
     boundingBoxTool: BoundingBoxToolPage;
     modelsPage: ModelsPage;
     inferencePage: InferencePage;
+    sourcesPage: SourcesPage;
+    sinksPage: SinksPage;
     streamPage: StreamPage;
 }
 
@@ -63,6 +67,16 @@ const test = testBase.extend<Fixtures>({
         const inferencePage = new InferencePage(page);
 
         await use(inferencePage);
+    },
+    sourcesPage: async ({ page }, use) => {
+        const sourcesPage = new SourcesPage(page);
+
+        await use(sourcesPage);
+    },
+    sinksPage: async ({ page }, use) => {
+        const sinksPage = new SinksPage(page);
+
+        await use(sinksPage);
     },
     streamPage: async ({ page }, use) => {
         const streamPage = new StreamPage(page);

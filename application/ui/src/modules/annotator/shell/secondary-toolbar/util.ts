@@ -15,6 +15,9 @@ export const toggleLabel = (newLabel: Label, labels: AnnotationLabelRef[]): Anno
     return [...labels, { id: newLabel.id }];
 };
 
-export const getNextItem = (totalItems: number, newIndex: number) => {
-    return Math.min(totalItems, newIndex + 1);
+export const getItemAfterDeletion = <T extends { id: string }>(items: T[], deletedId: string): T | undefined => {
+    const deletedIndex = items.findIndex(({ id }) => id === deletedId);
+    const isLastItem = deletedIndex === items.length - 1;
+
+    return items[isLastItem ? deletedIndex - 1 : deletedIndex + 1];
 };

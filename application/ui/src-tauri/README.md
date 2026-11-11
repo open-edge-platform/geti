@@ -542,6 +542,18 @@ Grep for `__TAURI_INTERNALS__`, not `@tauri-apps` — the bundler erases import
 specifiers, so the package name does not survive into the output, but every
 `@tauri-apps/api` entry point calls through that global.
 
+### Downloads
+
+On the desktop, `downloadFile()`
+([`download-file.tauri.ts`](../src/platform/download-file.tauri.ts)) calls the
+shell's `download_file` command ([`src/download.rs`](./src/download.rs)). The
+shell shows the save dialog and streams the backend response into
+`<file>.part` next to the chosen file, renaming it over the target only once
+complete, so a failed download never replaces an existing file. The webview
+never holds the file in memory and needs no
+filesystem permissions. The command only accepts `https://localhost:7860` URLs
+and only trusts the backend's own certificate (`<data dir>/certs/localhost.pem`).
+
 ### Where is my data?
 
 The desktop shell pins the backend's `DATA_DIR`, `LOG_DIR` and matplotlib
@@ -550,20 +562,20 @@ cache to OS-conventional per-user directories (resolved via Tauri's
 **outside** the install prefix, so reinstalls and upgrades preserve them
 — same convention as Chrome and VSCode.
 
-| Platform | Data                                           | Logs                            | Cache (matplotlib)                           |
-| -------- | ---------------------------------------------- | ------------------------------- | -------------------------------------------- |
-| macOS    | `~/Library/Application Support/com.intel.geti` | `~/Library/Logs/com.intel.geti` | `~/Library/Caches/com.intel.geti/matplotlib` |
-| Windows  | `%LOCALAPPDATA%\Intel\Geti`                    | `%LOCALAPPDATA%\Intel\Geti`     | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
-| Linux    | `~/.local/share/com.intel.geti`                | `~/.local/state/com.intel.geti` | `~/.cache/com.intel.geti/matplotlib`         |
+| Platform | Data                                           | Logs                             | Cache (matplotlib)                           |
+| -------- | ---------------------------------------------- | -------------------------------- | -------------------------------------------- |
+| macOS    | `~/Library/Application Support/com.intel.geti` | `~/Library/Logs/com.intel.geti`  | `~/Library/Caches/com.intel.geti/matplotlib` |
+| Windows  | `%LOCALAPPDATA%\Intel\Geti`                    | `%LOCALAPPDATA%\Intel\Geti\logs` | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
+| Linux    | `~/.local/share/com.intel.geti`                | `~/.local/state/com.intel.geti`  | `~/.cache/com.intel.geti/matplotlib`         |
 
 The logs folder holds both the backend's `app.log` and the desktop shell's
 `shell.log`.
 
 On macOS and Linux, set `DATA_DIR`, `LOG_DIR`, or `MPLCONFIGDIR` in the
 environment to override any of them (the Rust shell only fills in what's
-missing). On Windows the backend's `uwp.py` runtime hook pins data and logs to
-`%LOCALAPPDATA%\Intel\Geti` regardless of the environment; only `MPLCONFIGDIR`
-can be overridden. The WebView2 profile lives in
+missing). On Windows the backend's `uwp.py` runtime hook pins data to
+`%LOCALAPPDATA%\Intel\Geti` and logs to its `logs` subfolder regardless of the
+environment; only `MPLCONFIGDIR` can be overridden. The WebView2 profile lives in
 `%LOCALAPPDATA%\com.intel.geti\EBWebView`.
 
 ### Cleanup / uninstall

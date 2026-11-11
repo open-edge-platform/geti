@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.datumaro_converter import SampleMode
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewItemDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project, Video
+from app.models.media import MediaAnnotationStatus, VideoAnnotationStatus
 from app.services.base import ResourceNotFoundError, ResourceWithNameAlreadyExistsError
 from app.services.dataset_service import DatasetItemFilters, DatasetService
 from app.services.dataset_view_service import DatasetViewService
@@ -462,7 +463,25 @@ class TestDatasetViewServiceMedia:
         assert str(assigned[0].id) == media["video1"].id
         # The video's annotated frame count is correctly reported even though frames themselves
         # are not directly assigned to the view.
-        assert assigned[0].annotated_frame_count == 1
+        assert assigned[0].annotation_status == VideoAnnotationStatus(annotated_video_frames=1)
+
+    def test_list_dataset_view_media_annotation_status(
+        self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_media
+    ):
+        project, media = fxt_project_with_media
+        view = fxt_dataset_view_service.create_dataset_view(
+            project_id=project.id,
+            name="My view",
+            media_ids=[UUID(media[name].id) for name in ("image1", "image2", "video1")],
+        )
+
+        assigned = fxt_dataset_view_service.list_dataset_view_media(project_id=project.id, dataset_view_id=view.id)
+
+        assert {str(m.id): m.annotation_status for m in assigned} == {
+            media["image1"].id: MediaAnnotationStatus(has_annotations=False),
+            media["image2"].id: MediaAnnotationStatus(has_annotations=True),
+            media["video1"].id: VideoAnnotationStatus(annotated_video_frames=1),
+        }
 
     def test_list_dataset_view_media_ids(self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_media):
         """list_dataset_view_media_ids should return the same (id, type) pairs as list_dataset_view_media."""

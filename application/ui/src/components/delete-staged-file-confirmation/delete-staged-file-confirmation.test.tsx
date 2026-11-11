@@ -47,8 +47,7 @@ describe('DeleteStagedFileConfirmation', () => {
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () => {
                 deleteSpy();
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 500 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: 'Something went wrong' }, { status: 500 });
             })
         );
@@ -74,8 +73,7 @@ describe('DeleteStagedFileConfirmation', () => {
         server.use(
             http.delete('/api/staged_datasets/{staged_dataset_id}', () => {
                 deleteSpy();
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error The 404 response has no documented schema in the OpenAPI spec.
                 return HttpResponse.json({ detail: 'Staged dataset not found' }, { status: 404 });
             })
         );

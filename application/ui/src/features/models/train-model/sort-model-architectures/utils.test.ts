@@ -22,6 +22,21 @@ describe('SORTING_HANDLERS', () => {
         });
     });
 
+    describe('Sort by recommended', () => {
+        it('puts recommended architectures first, each group sorted by name', () => {
+            const architectures = [
+                getMockedModelArchitecture({ name: 'Zebra', performanceCategory: 'speed' }),
+                getMockedModelArchitecture({ name: 'Alpha' }),
+                getMockedModelArchitecture({ name: 'Mango', performanceCategory: 'accuracy' }),
+                getMockedModelArchitecture({ name: 'Beta' }),
+            ];
+
+            const result = SORTING_HANDLERS[SortingOptions.RECOMMENDED](architectures);
+
+            expect(result.map((a) => a.name)).toEqual(['Mango', 'Zebra', 'Alpha', 'Beta']);
+        });
+    });
+
     describe('Sort by name', () => {
         const architectures = [
             getMockedModelArchitecture({ name: 'Zebra' }),

@@ -1,24 +1,17 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { LocalFolderSinkConfig, SinkOutputFormats } from '@/api/types';
+import type { LocalFolderSinkConfig } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 
-import { rateLimitFromFormData } from '../utils';
-
-export const getLocalFolderInitialConfig = (): LocalFolderSinkConfig => ({
+export const getLocalFolderInitialConfig = (t: TranslateFn): LocalFolderSinkConfig => ({
     id: '',
-    name: '',
+    name: t('inference.sinks.defaultNames.localFolder'),
     sink_type: 'folder',
     rate_limit: null,
     folder_path: '',
     output_formats: [],
 });
 
-export const localFolderBodyFormatter = (formData: FormData): LocalFolderSinkConfig => ({
-    id: String(formData.get('id')),
-    name: String(formData.get('name')),
-    sink_type: 'folder',
-    rate_limit: rateLimitFromFormData(formData),
-    folder_path: String(formData.get('folder_path')),
-    output_formats: formData.getAll('output_formats') as SinkOutputFormats,
-});
+export const isLocalFolderConfigComplete = ({ folder_path, output_formats }: LocalFolderSinkConfig): boolean =>
+    folder_path.trim().length > 0 && output_formats.length > 0;

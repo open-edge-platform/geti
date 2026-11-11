@@ -1,32 +1,24 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReactNode } from 'react';
 
-import type { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { IpCamera as IpCameraIcon, VideoFile as VideoFileIcon, Webcam as WebcamIcon } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
-import { AddSource } from './add-source/add-source.component';
-import { DisclosureGroup } from './disclosure-group.component';
-import { IpCamera } from './ip-camera/ip-camera.component';
-import { getIpCameraInitialConfig, ipCameraBodyFormatter } from './ip-camera/utils';
-import { UsbCamera } from './usb-camera/usb-camera-fields.component';
-import { getUsbCameraInitialConfig, usbCameraBodyFormatter } from './usb-camera/utils';
-import { useVideoFileUpload } from './video-file/use-video-file-upload.hook';
-import { getVideoFileInitialConfig, videoFileBodyFormatter } from './video-file/utils';
-import { VideoFile } from './video-file/video-file.component';
+import { DisclosureGroup } from '../shared/disclosure-group/disclosure-group.component';
+import { AddIpCameraSource } from './ip-camera/add-ip-camera-source.component';
+import type { AddSourceProps } from './types';
+import { AddUsbCameraSource } from './usb-camera/add-usb-camera-source.component';
+import { AddVideoFileSource } from './video-file/add-video-file-source.component';
 
-interface SourceOptionsProps {
-    onSaved: () => void;
+interface SourceOptionsProps extends AddSourceProps {
     hasHeader: boolean;
     children: ReactNode;
-    existingNames?: string[];
 }
 
-export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = [] }: SourceOptionsProps) => {
+export const SourceOptions = ({ onSaved, hasHeader, children, existingNames }: SourceOptionsProps) => {
     const { t } = useTranslation();
-    const videoFileUpload = useVideoFileUpload();
 
     return (
         <>
@@ -39,48 +31,19 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                         label: t('inference.sources.options.usbCamera'),
                         value: 'usb_camera',
                         icon: <WebcamIcon width={'24px'} />,
-                        content: (
-                            <AddSource
-                                onSaved={onSaved}
-                                config={getUsbCameraInitialConfig(t, existingNames)}
-                                componentFields={(state: USBCameraSourceConfig) => <UsbCamera defaultState={state} />}
-                                bodyFormatter={usbCameraBodyFormatter}
-                            />
-                        ),
+                        content: <AddUsbCameraSource existingNames={existingNames} onSaved={onSaved} />,
                     },
                     {
                         label: t('inference.sources.options.ipCamera'),
                         value: 'ip_camera',
                         icon: <IpCameraIcon width={'24px'} />,
-                        content: (
-                            <AddSource
-                                onSaved={onSaved}
-                                config={getIpCameraInitialConfig(t, existingNames)}
-                                componentFields={(state: IPCameraSourceConfig) => <IpCamera defaultState={state} />}
-                                bodyFormatter={ipCameraBodyFormatter}
-                            />
-                        ),
+                        content: <AddIpCameraSource existingNames={existingNames} onSaved={onSaved} />,
                     },
                     {
                         label: t('inference.sources.options.videoFile'),
                         value: 'video_file',
                         icon: <VideoFileIcon width={'24px'} />,
-
-                        content: (
-                            <AddSource
-                                onSaved={onSaved}
-                                config={getVideoFileInitialConfig(t, existingNames)}
-                                componentFields={(state: VideoFileSourceConfig) => (
-                                    <VideoFile
-                                        defaultState={state}
-                                        uploadProgress={videoFileUpload.progress}
-                                        onCancelUpload={videoFileUpload.cancel}
-                                    />
-                                )}
-                                bodyFormatter={videoFileBodyFormatter}
-                                prepareFormData={videoFileUpload.prepareFormData}
-                            />
-                        ),
+                        content: <AddVideoFileSource existingNames={existingNames} onSaved={onSaved} />,
                     },
                 ]}
             />

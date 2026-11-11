@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from loguru import logger
 from pydantic import Field, computed_field
 
-from app.core.jobs.models import JobParams, JobType, ProjectJob
+from app.core.jobs.models import JobParams, JobStatus, JobType, ProjectJob
 from app.models.project import Task
 from app.models.system import DeviceInfo
 
@@ -54,7 +54,10 @@ class TrainingJob(ProjectJob[TrainingJobParams]):
     def on_complete(self) -> None:
         """Copy the training log and clean up the getitune workspace upon job completion."""
         log_path = self.log_dir / self.log_file
-        if not log_path.exists():
+        if self.status == JobStatus.CANCELLED:
+            # The trainer deletes a cancelled model; copying the log would recreate its directory.
+            logger.info("Training job {} was cancelled, not keeping its log", self.id)
+        elif not log_path.exists():
             logger.warning("Log file {} does not exist", log_path)
         else:
             new_path = (

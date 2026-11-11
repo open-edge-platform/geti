@@ -132,8 +132,9 @@ fn apply_default_env(command: &mut Command, app: &AppHandle) {
     // so they survive reinstalls — same convention as Chrome/VSCode.
     //   macOS  : ~/Library/{Application Support, Logs, Caches}/com.intel.geti
     //   Linux  : ~/.local/share, ~/.local/state, ~/.cache (each /com.intel.geti)
-    // On Windows the frozen backend's `uwp.py` hook pins DATA_DIR and LOG_DIR to
-    // %LOCALAPPDATA%\Intel\Geti and ignores the environment, so nothing is passed.
+    // On Windows the frozen backend's `uwp.py` hook pins DATA_DIR to
+    // %LOCALAPPDATA%\Intel\Geti and LOG_DIR to its `logs` subfolder, ignoring the
+    // environment, so nothing is passed.
     let resolver = app.path();
     #[cfg(not(windows))]
     {

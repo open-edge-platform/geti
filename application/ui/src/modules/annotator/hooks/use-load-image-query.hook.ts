@@ -6,15 +6,19 @@ import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getMediaItemBinaryUrl, getMediaItemKey } from '../../../shared/media-item-utils';
-import { getImageData, loadImage } from '../tools/utils';
+import { canRasteriseAtFullSize, loadImageData } from '../tools/utils';
 
 export const loadImageQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
         queryKey: ['mediaItem', projectId, getMediaItemKey(media)],
-        queryFn: async () => {
-            const image = await loadImage(getMediaItemBinaryUrl(projectId, media));
+        queryFn: async ({ signal }) => {
+            // Oversized media is displayed by an <img> instead (see tools/utils.ts), so downloading and decoding it
+            // here would only produce a placeholder.
+            if (!canRasteriseAtFullSize(media.width, media.height)) {
+                return new ImageData(1, 1);
+            }
 
-            return getImageData(image);
+            return loadImageData(getMediaItemBinaryUrl(projectId, media), signal);
         },
         staleTime: Infinity,
         retry: 0,

@@ -25,8 +25,6 @@
             "refresh": "Odśwież",
             "remove": "Usuń",
             "selectAll": "Zaznacz wszystko",
-            "showLess": "Pokaż mniej",
-            "showMore": "Pokaż więcej",
             "skip": "Pomiń",
             "start": "Rozpocznij",
             "submit": "Wyślij",
@@ -346,6 +344,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Klucz nie może być pusty",
+            "keyDuplicate": "Klucz musi być unikalny",
             "valueEmpty": "Wartość nie może być pusta"
         },
         "connection": {
@@ -372,8 +371,7 @@
             "types": {
                 "usbCamera": "kamera usb",
                 "ipCamera": "kamera ip",
-                "videoFile": "plik wideo",
-                "disconnected": "rozłączone"
+                "videoFile": "plik wideo"
             },
             "options": {
                 "usbCamera": "Kamera USB",
@@ -426,8 +424,7 @@
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
-                "webhook": "webhook",
-                "ros": "ros"
+                "webhook": "webhook"
             },
             "options": {
                 "folder": "Folder",
@@ -910,6 +907,7 @@
                 },
                 "sort": {
                     "label": "Sortuj modele według:",
+                    "recommended": "Najpierw rekomendowane",
                     "nameAsc": "Nazwa (A do Z)",
                     "nameDesc": "Nazwa (Z do A)",
                     "speedAsc": "Szybkość (najszybsze pierwsze)",

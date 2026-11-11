@@ -1,14 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { canRasteriseAtFullSize, getImageData } from './utils';
+import { canRasteriseAtFullSize, clampPointToRoi, getImageData, loadImageData, projectPointOnLine } from './utils';
 
-const createImage = (width: number, height: number, naturalWidth = width, naturalHeight = height): HTMLImageElement =>
-    ({ width, height, naturalWidth, naturalHeight }) as HTMLImageElement;
+const createImage = (width: number, height: number): ImageBitmap => ({ width, height, close: rs.fn() }) as ImageBitmap;
 
 const createCanvasContext = () => {
     return {
-        filter: '',
         drawImage: rs.fn(),
         getImageData: rs.fn((_x: number, _y: number, width: number, height: number) => {
             return {
@@ -42,6 +40,21 @@ afterEach(() => {
     rs.restoreAllMocks();
 });
 
+describe('projectPointOnLine', () => {
+    it('returns undefined when the segment endpoints coincide', () => {
+        const point = { x: 10, y: 10 };
+
+        expect(projectPointOnLine([point, { ...point }], point)).toBeUndefined();
+    });
+
+    it('projects onto a non-zero-length segment', () => {
+        const start = { x: 0, y: 0 };
+        const end = { x: 10, y: 10 };
+
+        expect(projectPointOnLine([start, end], { x: 10, y: 0 })).toEqual({ x: 5, y: 5 });
+    });
+});
+
 describe('canRasteriseAtFullSize', () => {
     it('accepts the exact boundary size 16384x16384', () => {
         expect(canRasteriseAtFullSize(16384, 16384)).toBe(true);
@@ -50,6 +63,23 @@ describe('canRasteriseAtFullSize', () => {
     it('rejects dimensions one pixel over the boundary', () => {
         expect(canRasteriseAtFullSize(16385, 16384)).toBe(false);
         expect(canRasteriseAtFullSize(16384, 16385)).toBe(false);
+    });
+});
+
+describe('clampPointToRoi', () => {
+    it('keeps points inside the region of interest', () => {
+        const clampPoint = clampPointToRoi({ x: 0, y: 0, width: 100, height: 50 });
+
+        expect(clampPoint({ x: -5, y: 70 })).toEqual({ x: 0, y: 50 });
+        expect(clampPoint({ x: 30, y: 20 })).toEqual({ x: 30, y: 20 });
+    });
+
+    it('clamps media-space points to a region of interest away from the origin', () => {
+        const clampPoint = clampPointToRoi({ x: 20, y: 10, width: 100, height: 50 });
+
+        expect(clampPoint({ x: 5, y: 5 })).toEqual({ x: 20, y: 10 });
+        expect(clampPoint({ x: 200, y: 100 })).toEqual({ x: 120, y: 60 });
+        expect(clampPoint({ x: 30, y: 20 })).toEqual({ x: 30, y: 20 });
     });
 });
 
@@ -68,14 +98,16 @@ describe('getImageData', () => {
         expect(imageData.height).toBe(1);
     });
 
-    it('rasterises images within the canvas limit at full size', () => {
+    it('rasterises images within the canvas limit at full size on a CPU-backed canvas', () => {
         const context = createCanvasContext();
-        mockCanvasCreation([context]);
+        const createElementSpy = mockCanvasCreation([context]);
 
         const imageData = getImageData(createImage(4000, 3000));
 
         expect(imageData.width).toBe(4000);
         expect(imageData.height).toBe(3000);
+        const canvas = createElementSpy.mock.results[0]?.value as HTMLCanvasElement;
+        expect(canvas.getContext).toHaveBeenCalledWith('2d', { willReadFrequently: true });
     });
 
     it('returns a 1x1 placeholder when the canvas context is unavailable', () => {
@@ -85,5 +117,52 @@ describe('getImageData', () => {
 
         expect(imageData.width).toBe(1);
         expect(imageData.height).toBe(1);
+    });
+});
+
+describe('loadImageData', () => {
+    let fetchSpy: ReturnType<typeof rs.spyOn>;
+    let decodeSpy: ReturnType<typeof rs.fn>;
+    let bitmap: ImageBitmap;
+
+    beforeEach(() => {
+        // Rasterising is covered by the getImageData tests; an empty bitmap keeps the canvas out of these.
+        bitmap = createImage(0, 0);
+        fetchSpy = rs.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('png'));
+        decodeSpy = rs.fn(async () => bitmap);
+        rs.stubGlobal('createImageBitmap', decodeSpy);
+    });
+
+    afterEach(() => {
+        rs.unstubAllGlobals();
+    });
+
+    it('passes the abort signal to fetch and releases the bitmap', async () => {
+        const signal = new AbortController().signal;
+
+        await loadImageData('/binary', signal);
+
+        expect(fetchSpy).toHaveBeenCalledWith('/binary', expect.objectContaining({ signal }));
+        expect(bitmap.close).toHaveBeenCalled();
+    });
+
+    it('applies EXIF orientation, like <img>', async () => {
+        await loadImageData('/binary');
+
+        expect(decodeSpy).toHaveBeenCalledWith(expect.anything(), { imageOrientation: 'from-image' });
+    });
+
+    it('rejects when the server responds with an error', async () => {
+        fetchSpy.mockResolvedValue(new Response(null, { status: 404 }));
+
+        await expect(loadImageData('/binary')).rejects.toThrow('404');
+    });
+
+    it('rejects without rasterising once aborted', async () => {
+        const controller = new AbortController();
+        controller.abort();
+
+        await expect(loadImageData('/binary', controller.signal)).rejects.toThrow();
+        expect(bitmap.close).toHaveBeenCalled();
     });
 });

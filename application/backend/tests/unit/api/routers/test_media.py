@@ -23,7 +23,15 @@ from app.api.dependencies import (
     get_media_service,
     get_project_service,
 )
-from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
+from app.api.schemas.media import (
+    ImageView,
+    MediaAnnotationStatusView,
+    MediaViewAdapter,
+    SetMediaAnnotations,
+    VideoAnnotationStatusView,
+    VideoFrameView,
+    VideoView,
+)
 from app.models import (
     BatchInferenceMedia,
     BatchInferencePrediction,
@@ -41,10 +49,12 @@ from app.models import (
 )
 from app.models.media import (
     ImageFormat,
+    MediaAnnotationStatus,
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaSortBy,
     SortDirection,
+    VideoAnnotationStatus,
     VideoFormat,
     VideoRange,
 )
@@ -94,7 +104,7 @@ def fxt_video_media():
         size=2048,
         fps=25,
         frame_count=1000,
-        annotated_frame_count=100,
+        annotation_status=VideoAnnotationStatus(annotated_video_frames=100),
         source_id=uuid4(),
     )
 
@@ -113,6 +123,7 @@ def fxt_video_frame_media():
         frame_index=3,
         video_id=uuid4(),
         source_id=uuid4(),
+        annotation_status=MediaAnnotationStatus(has_annotations=True),
     )
 
 
@@ -177,6 +188,7 @@ def test_convert_image_to_view(fxt_image_media) -> None:
         height=fxt_image_media.height,
         size=fxt_image_media.size,
         source_id=fxt_image_media.source_id,
+        annotation_status=MediaAnnotationStatusView(has_annotations=False),
     )
 
 
@@ -192,9 +204,10 @@ def test_convert_video_to_view(fxt_video_media) -> None:
         size=fxt_video_media.size,
         fps=fxt_video_media.fps,
         frame_count=fxt_video_media.frame_count,
-        annotated_frame_count=fxt_video_media.annotated_frame_count,
+        annotated_frame_count=100,
         source_id=fxt_video_media.source_id,
         duration=fxt_video_media.duration,
+        annotation_status=VideoAnnotationStatusView(has_annotations=True, annotated_video_frames=100),
     )
 
 
@@ -211,6 +224,7 @@ def test_convert_video_frame_to_view(fxt_video_frame_media) -> None:
         frame_index=fxt_video_frame_media.frame_index,
         video_id=fxt_video_frame_media.video_id,
         source_id=fxt_video_frame_media.source_id,
+        annotation_status=MediaAnnotationStatusView(has_annotations=True),
     )
 
 
@@ -252,6 +266,7 @@ class TestMediaEndpoints:
             "size": 2048,
             "source_id": str(fxt_image_media.source_id),
             "width": 1024,
+            "annotation_status": {"has_annotations": False},
         }
         fxt_media_service.create_image.assert_called_once()
         metadata: ImageMetadata = fxt_media_service.create_image.call_args.args[0]
@@ -307,6 +322,7 @@ class TestMediaEndpoints:
             "frame_count": 1000,
             "annotated_frame_count": 100,
             "duration": 40,
+            "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
         fxt_media_service.create_video.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -459,6 +475,10 @@ class TestMediaEndpoints:
         response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media")
 
         assert response.status_code == status.HTTP_200_OK
+        assert [item["annotation_status"] for item in response.json()["items"]] == [
+            {"has_annotations": False},
+            {"has_annotations": True, "annotated_video_frames": 100},
+        ]
         fxt_media_service.count_media.assert_called_once_with(
             project=fxt_get_project,
             start_date=None,
@@ -942,8 +962,11 @@ class TestMediaEndpoints:
         assert response.status_code == status.HTTP_404_NOT_FOUND
         fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
 
-    def test_get_image_success(self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_client):
-        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+    @pytest.mark.parametrize("has_annotations", [True, False])
+    def test_get_image_success(self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_client, has_annotations):
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media.model_copy(
+            update={"annotation_status": MediaAnnotationStatus(has_annotations=has_annotations)}
+        )
 
         response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}")
 
@@ -957,6 +980,7 @@ class TestMediaEndpoints:
             "size": fxt_image_media.size,
             "source_id": str(fxt_image_media.source_id),
             "width": fxt_image_media.width,
+            "annotation_status": {"has_annotations": has_annotations},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_image_media.id
@@ -979,8 +1003,9 @@ class TestMediaEndpoints:
             "width": fxt_video_media.width,
             "fps": fxt_video_media.fps,
             "frame_count": fxt_video_media.frame_count,
-            "annotated_frame_count": fxt_video_media.annotated_frame_count,
+            "annotated_frame_count": 100,
             "duration": fxt_video_media.duration,
+            "annotation_status": {"has_annotations": True, "annotated_video_frames": 100},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_video_media.id
@@ -1003,6 +1028,7 @@ class TestMediaEndpoints:
             "width": fxt_video_frame_media.width,
             "video_id": str(fxt_video_frame_media.video_id),
             "frame_index": fxt_video_frame_media.frame_index,
+            "annotation_status": {"has_annotations": True},
         }
         fxt_media_service.get_media_by_id.assert_called_once_with(
             project_id=fxt_get_project.id, media_id=fxt_video_frame_media.id
@@ -2217,14 +2243,8 @@ class TestMediaEndpoints:
             frame_index_to=9,
         )
 
-    @pytest.mark.parametrize(
-        "predict_path_suffix",
-        ["media:predict", "media/media:predict"],
-        ids=["new_path", "deprecated_path"],
-    )
     def test_media_predict(
         self,
-        predict_path_suffix,
         fxt_get_project,
         fxt_media_prediction_service,
         fxt_inference_media_limit,
@@ -2256,7 +2276,7 @@ class TestMediaEndpoints:
         )
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/{predict_path_suffix}",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 

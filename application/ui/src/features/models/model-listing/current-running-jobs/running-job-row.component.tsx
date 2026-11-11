@@ -6,7 +6,6 @@ import { useState } from 'react';
 import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { AlertDialog, Badge, Button, DialogContainer, Flex, Loading, Text } from '@geti-ui/ui';
-import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
 import { getJobStatusLabel } from 'hooks/api/util';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
@@ -77,7 +76,6 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
 
 export const RunningJobRow = ({ job, onCancel, datasetRevisions, modelArchitectures }: RunningJobRowProps) => {
     const { t } = useTranslation();
-    useStreamJobStatus(job.job_id, job.metadata.project.id);
 
     const statusMessage =
         job.message || (job.status === 'PENDING' ? t('models.jobs.pending') : t('models.jobs.running'));

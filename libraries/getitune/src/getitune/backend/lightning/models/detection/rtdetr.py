@@ -139,6 +139,24 @@ class RTDETR(LightningDetectionModel):
 
         return model
 
+    def load_state_dict(self, ckpt: dict[str, Any], *args, **kwargs) -> None:
+        """Load state dictionary from checkpoint state dictionary.
+
+        D-FINE-family decoders (``DFINETransformer``) precompute ``anchors`` and
+        ``valid_mask`` buffers from ``eval_spatial_size``, so they are stored in
+        checkpoints. Their size depends on the training input size only; they are
+        regenerated on model instantiation. When loading a checkpoint trained at a
+        different input size they would raise a RuntimeError, so they are removed
+        before loading and the freshly-generated buffers are kept instead.
+        """
+        try:
+            return super().load_state_dict(ckpt, *args, **kwargs)
+        except RuntimeError:
+            # Remove size-dependent decoder buffers from the checkpoint to avoid size mismatch.
+            ckpt.pop("model.decoder.anchors", None)
+            ckpt.pop("model.decoder.valid_mask", None)
+            return super().load_state_dict(ckpt, *args, strict=False, **kwargs)
+
     def _customize_inputs(
         self,
         entity: SampleBatch,

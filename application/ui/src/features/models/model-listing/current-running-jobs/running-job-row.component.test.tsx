@@ -1,22 +1,15 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { getMockedTrainJob } from 'mocks/mock-job';
 import { getMockedModel, getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
-import { render, renderHook } from 'test-utils/render';
+import { render } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import { useGetCurrentRunningJobs, useStreamJobStatus } from '../../../../hooks/api/jobs/jobs.hook';
 import { server } from '../../../../msw-node-setup';
-import {
-    getLastEventSource,
-    MockEventSourceConstructor,
-    resetMockEventSource,
-    simulateSSEMessage,
-} from '../../../../test-utils/mock-event-source';
 import { RunningJobRow } from './running-job-row.component';
 
 describe('RunningJobRow', () => {
@@ -43,7 +36,6 @@ describe('RunningJobRow', () => {
     });
 
     beforeEach(() => {
-        resetMockEventSource();
         server.use(
             http.get('/api/projects/{project_id}/models/{model_id}', () => {
                 return HttpResponse.json(mockModel);
@@ -199,84 +191,5 @@ describe('RunningJobRow', () => {
 
         const cancelButton = await screen.findByRole('button', { name: /cancel job/i });
         expect(cancelButton).toBeDisabled();
-    });
-
-    describe('useStreamJobStatus', () => {
-        const job = getMockedTrainJob({
-            metadata: {
-                project: { id: '123' },
-                model: {
-                    id: 'ef3983f1-cef0-4ebe-91db-7330f1dd6e27',
-                    name: 'ATSS (ef3983f1)',
-                    architecture: 'Custom_Object_Detection_Gen3_ATSS',
-                    parent_revision_id: null,
-                    dataset_revision_id: 'dataset-123',
-                },
-                device: {
-                    type: 'cpu',
-                    name: 'CPU',
-                },
-            },
-            status: 'RUNNING',
-        });
-
-        beforeEach(() => {
-            resetMockEventSource();
-        });
-
-        it('subscribes to SSE when the component mounts with a running job', async () => {
-            render(<RunningJobRow job={job} datasetRevisions={[]} modelArchitectures={[modelArchitecture]} />);
-
-            await waitFor(() => {
-                expect(MockEventSourceConstructor).toHaveBeenCalled();
-                expect(getLastEventSource().url).toContain(`/api/jobs/${job.job_id}/status`);
-            });
-        });
-
-        it('updates the React Query cache when an SSE message arrives', async () => {
-            server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
-
-            const { result: jobsResult } = renderHook(() => {
-                useStreamJobStatus(job.job_id, job.metadata.project.id);
-                return useGetCurrentRunningJobs();
-            });
-
-            await waitFor(() => {
-                expect(jobsResult.current).toBeDefined();
-            });
-
-            const es = getLastEventSource();
-            const updatedJob = { ...job, progress: 50, message: 'Epoch 5/10' };
-
-            act(() => {
-                simulateSSEMessage(es, updatedJob);
-            });
-
-            await waitFor(() => {
-                expect(jobsResult.current?.[0].progress).toBe(50);
-                expect(jobsResult.current?.[0].message).toBe('Epoch 5/10');
-            });
-        });
-
-        it('closes the SSE connection when a terminal status is received', async () => {
-            server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
-
-            renderHook(() => {
-                useStreamJobStatus(job.job_id, job.metadata.project.id);
-            });
-
-            await waitFor(() => {
-                expect(MockEventSourceConstructor).toHaveBeenCalled();
-            });
-
-            const es = getLastEventSource();
-            const completedJob = { ...job, status: 'DONE' as const, progress: 100 };
-
-            act(() => {
-                simulateSSEMessage(es, completedJob);
-            });
-
-            expect(es.close).toHaveBeenCalled();
-        });
     });
 });

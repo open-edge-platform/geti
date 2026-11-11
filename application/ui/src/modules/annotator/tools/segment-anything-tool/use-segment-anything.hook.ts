@@ -10,7 +10,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getQueryKey } from '../../../../query-client/query-client';
-import { getMediaItemQueryParams, isVideo } from '../../../../shared/media-item-utils';
+import { getMediaItemQueryParams, isAnnotatableMedia } from '../../../../shared/media-item-utils';
 import { isDetectionTask } from '../../../../shared/task-type-guards';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import { executeWithTimeout } from '../../smart-tools/execute-with-timeout';
@@ -101,10 +101,10 @@ const segmentAnythingEncodingQueryOptions = (projectId: string, mediaItem: Media
     });
 
 const useEncodingQuery = (projectId: string, mediaItem: Media | undefined, enabled = true) => {
-    // A whole video has no frame to encode. The selected media item is always converted
-    // to a video frame, but `nextMediaItem` comes straight from the dataset listing and
-    // can still be the video itself; asking for its embedding would 400.
-    const isEncodable = mediaItem !== undefined && !isVideo(mediaItem);
+    // Only annotatable media can be encoded. The selected media item is always converted to a
+    // video frame, but `nextMediaItem` comes straight from the dataset listing and can still be
+    // a whole video; asking for its embedding would 400.
+    const isEncodable = mediaItem !== undefined && isAnnotatableMedia(mediaItem);
 
     return useQuery(
         isEncodable

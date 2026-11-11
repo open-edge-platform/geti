@@ -76,16 +76,12 @@ describe('filterJobs', () => {
         expect(filterJobs(jobs, 'project-1', 'all')).toEqual([jobA]);
     });
 
-    it('keeps every project when scoped to ALL_PROJECTS', () => {
+    it('keeps every job when scoped to ALL_PROJECTS and group is "all"', () => {
         expect(filterJobs(jobs, ALL_PROJECTS, 'all')).toEqual(jobs);
     });
 
     it('filters by status group', () => {
         expect(filterJobs(jobs, ALL_PROJECTS, 'finished')).toEqual([jobB]);
-    });
-
-    it('keeps every status when group is "all"', () => {
-        expect(filterJobs(jobs, ALL_PROJECTS, 'all')).toEqual(jobs);
     });
 
     it('combines project and status group filters', () => {

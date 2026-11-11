@@ -10,6 +10,7 @@ import { useTranslation } from '@/i18n';
 import { Flex, Heading, Loading } from '@geti-ui/ui';
 import { Outlet } from 'react-router';
 
+import { ActiveJobsSync } from '../../features/jobs/active-jobs-sync.component';
 import { LicenseCheck } from '../../features/license/license-check.component';
 
 const REFETCH_INTERVAL = 5000;
@@ -53,6 +54,7 @@ export const RootLayout = () => {
         <Suspense fallback={<Loading variant={'intel'} />}>
             <HealthCheck>
                 <LicenseCheck>
+                    <ActiveJobsSync />
                     <Outlet />
                 </LicenseCheck>
             </HealthCheck>

@@ -1,11 +1,11 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { PointerEvent, useRef, useState } from 'react';
 
 import type { Label } from '@/api/types';
 import selectionCursor from '@/assets/icons/selection.svg?url';
-import { clampBox, clampPointBetweenImage, pointsToRect } from '@geti-ui/smart-tools/utils';
+import { clampBox, pointsToRect } from '@geti-ui/smart-tools/utils';
 import { useEventListener } from 'hooks/event-listener.hook';
 
 import { isLeftButton } from '../../../../shared/buttons-utils';
@@ -13,7 +13,7 @@ import type { Point, Rect as RectInterface, RegionOfInterest } from '../../../..
 import { Rectangle } from '../../shapes/rectangle.component';
 import { DEFAULT_ANNOTATION_STYLES } from '../../utils';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
-import { getRelativePoint, PointerType } from '../utils';
+import { clampPointToRoi, getRelativePoint, PointerType } from '../utils';
 import { Crosshair } from './crosshair/crosshair.component';
 import { useCrosshair } from './crosshair/use-crosshair.hook';
 
@@ -21,26 +21,18 @@ const CURSOR_OFFSET = '7 8';
 interface DrawingBoxInterface {
     onComplete: (shapes: RectInterface[], labels: Label[]) => string[];
     roi: RegionOfInterest;
-    image: ImageData;
     selectedLabel: Label | null;
     zoom: number;
     isDisabled?: boolean;
 }
 
-export const DrawingBox = ({
-    roi,
-    zoom,
-    image,
-    selectedLabel,
-    onComplete,
-    isDisabled = false,
-}: DrawingBoxInterface) => {
+export const DrawingBox = ({ roi, zoom, selectedLabel, onComplete, isDisabled = false }: DrawingBoxInterface) => {
     const [startPoint, setStartPoint] = useState<Point | null>(null);
     const [boundingBox, setBoundingBox] = useState<RectInterface | null>(null);
 
     const ref = useRef<SVGRectElement>(null);
 
-    const clampPoint = clampPointBetweenImage(image);
+    const clampPoint = clampPointToRoi(roi);
     const crosshair = useCrosshair(ref, zoom);
 
     const onPointerMove = (event: PointerEvent<SVGSVGElement>): void => {
@@ -113,7 +105,6 @@ export const DrawingBox = ({
 
     return (
         <SvgToolCanvas
-            image={image}
             canvasRef={ref}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}

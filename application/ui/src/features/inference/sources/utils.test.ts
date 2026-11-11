@@ -22,9 +22,9 @@ describe('getUniqueName', () => {
         );
     });
 
-    it('skips to the next available counter even when some are missing', () => {
-        expect(
-            getUniqueName('USB camera source', ['USB camera source', 'USB camera source (1)', 'USB camera source (2)'])
-        ).toBe('USB camera source (3)');
+    it('fills the first free counter when there is a gap', () => {
+        expect(getUniqueName('USB camera source', ['USB camera source', 'USB camera source (2)'])).toBe(
+            'USB camera source (1)'
+        );
     });
 });
