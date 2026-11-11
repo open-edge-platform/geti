@@ -14,6 +14,7 @@ and swaps the GPU pipeline on the GPUAugmentationCallback at each epoch boundary
 
 from __future__ import annotations
 
+import copy
 import logging
 import secrets
 from typing import TYPE_CHECKING, Any
@@ -50,7 +51,8 @@ class DataAugSwitch:
             Each config must have ``augmentations_cpu`` (list of transform dicts).
             Optionally ``augmentations_gpu`` (list of transform dicts).
         input_size (tuple[int,int] | list[int] | None): Model input size for
-            ``$(input_size)`` placeholder resolution.
+            ``$(input_size)`` placeholder resolution. Can be updated later with
+            :meth:`set_input_size` (e.g. to follow the datamodule input size).
 
     Example::
 
@@ -84,10 +86,17 @@ class DataAugSwitch:
         self._shared_epoch = None
         self.input_size = tuple(input_size) if input_size is not None else None
         self._gpu_pipeline_cache: dict[tuple[str, tuple[str, ...] | None], GPUAugmentationPipeline] = {}
+        # Keep pristine configs: placeholder resolution mutates init_args in place.
+        self._policy_configs = copy.deepcopy(policies)
 
-        # Build pipelines for each policy
         self.policies: dict[str, dict[str, Any]] = {}
-        for name, config in policies.items():
+        self._build_policies()
+
+    def _build_policies(self) -> None:
+        """Build CPU pipelines and collect GPU configs for each policy."""
+        self.policies = {}
+        self._gpu_pipeline_cache = {}
+        for name, config in copy.deepcopy(self._policy_configs).items():
             cpu_aug_configs = config.get("augmentations_cpu", [])
             gpu_aug_configs = config.get("augmentations_gpu", [])
 
@@ -103,6 +112,20 @@ class DataAugSwitch:
                 "cpu_pipeline": cpu_pipeline,
                 "gpu_aug_configs": gpu_aug_configs,
             }
+
+    def set_input_size(self, input_size: tuple[int, int] | list[int]) -> None:
+        """Update the input size and rebuild the policy pipelines if it changed.
+
+        Args:
+            input_size: New model input size ``(H, W)`` used to resolve
+                ``$(input_size)`` placeholders in the policies.
+        """
+        new_input_size = tuple(input_size)
+        if new_input_size == self.input_size:
+            return
+        logger.info("Rebuilding augmentation policies for input size %s (was %s)", new_input_size, self.input_size)
+        self.input_size = new_input_size
+        self._build_policies()
 
     def set_shared_epoch(self, shared_epoch: Value) -> None:  # type: ignore[valid-type]
         """Set the shared multiprocessing epoch value."""
