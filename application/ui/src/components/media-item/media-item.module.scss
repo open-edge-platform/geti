@@ -33,7 +33,7 @@
     opacity: 1;
 }
 
-div[class*='mediaItem']:is([data-hovered], [data-selected], :focus-within) {
+div[class*='mediaItem']:is([data-hovered], [data-selected]) {
     .floatingContainer {
         opacity: 1;
     }
@@ -42,12 +42,6 @@ div[class*='mediaItem']:is([data-hovered], [data-selected], :focus-within) {
 // When media actions menu is open, we don't want to hide the button that opens it
 div[class*='mediaItem']:has(button[aria-label='Media actions'][aria-expanded='true']) {
     .rightTopElement {
-        opacity: 1;
-    }
-}
-
-@media (hover: none) {
-    .floatingContainer {
         opacity: 1;
     }
 }
