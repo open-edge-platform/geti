@@ -141,6 +141,31 @@ class VideoFrame(BaseMedia):
     frame_index: int
     annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
 
+    @model_validator(mode="before")
+    @classmethod
+    def _map_parent_id(cls, value: object) -> object:
+        """Accept ORM payloads using `parent_id` while keeping `video_id` on the public model."""
+        if isinstance(value, dict):
+            if value.get("video_id") is None and value.get("parent_id") is not None:
+                return {**value, "video_id": str(value["parent_id"])}
+            return value
+
+        if getattr(value, "video_id", None) is None and (parent_id := getattr(value, "parent_id", None)) is not None:
+            return {
+                "id": getattr(value, "id"),
+                "project_id": getattr(value, "project_id"),
+                "type": getattr(value, "type"),
+                "name": getattr(value, "name"),
+                "format": getattr(value, "format"),
+                "width": getattr(value, "width"),
+                "height": getattr(value, "height"),
+                "size": getattr(value, "size"),
+                "source_id": getattr(value, "source_id"),
+                "video_id": str(parent_id),
+                "frame_index": getattr(value, "frame_index"),
+            }
+        return value
+
 
 class Video(BaseMedia):
     """

@@ -71,12 +71,20 @@ def _query_model_variants(engine: Engine, metadata: MetaData, project_id: str):
     return select(mv).join(mr, mv.c.model_revision_id == mr.c.id).where(mr.c.project_id == project_id)
 
 
-def _query_video_frames(engine: Engine, metadata: MetaData, project_id: str):
-    """Join through media (video_id) to get project-related video frames."""
-    vf = Table("video_frames", metadata, autoload_with=engine)
+def _query_ome_images(engine: Engine, metadata: MetaData, project_id: str):
+    """Join through media (media_id) to get project-related OME images."""
+    oi = Table("ome_images", metadata, autoload_with=engine)
     media = Table("media", metadata, autoload_with=engine)
 
-    return select(vf).join(media, vf.c.video_id == media.c.id).where(media.c.project_id == project_id)
+    return select(oi).join(media, oi.c.media_id == media.c.id).where(media.c.project_id == project_id)
+
+
+def _query_ome_channel_views(engine: Engine, metadata: MetaData, project_id: str):
+    """Join through ome_channel_views and media (media_id) to get project-related OME channel views."""
+    ocv = Table("ome_channel_views", metadata, autoload_with=engine)
+    media = Table("media", metadata, autoload_with=engine)
+
+    return select(ocv).join(media, ocv.c.media_id == media.c.id).where(media.c.project_id == project_id)
 
 
 # Mapping of table names to their query strategy to fetch the relevant records for the given project.
@@ -89,6 +97,7 @@ QUERY_STRATEGY_BY_TABLE = {
     "alembic_version": None,
     "sources": None,
     "sinks": None,
+    "uploads": None,
     # Tables with direct project_id column
     "projects": "project_id",
     "pipelines": "project_id",
@@ -105,7 +114,8 @@ QUERY_STRATEGY_BY_TABLE = {
     "model_variants": _query_model_variants,
     "evaluations": _query_evaluations,
     "metric_scores": _query_metric_scores,
-    "video_frames": _query_video_frames,
+    "ome_images": _query_ome_images,
+    "ome_channel_views": _query_ome_channel_views,
 }
 
 

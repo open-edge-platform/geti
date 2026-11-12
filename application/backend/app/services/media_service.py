@@ -235,7 +235,7 @@ class MediaService(BaseSessionManagedService):
                 height=image.height,
                 size=os.path.getsize(binary_path),
                 source_id=str(metadata.source_id) if metadata.source_id is not None else None,
-                video_id=str(metadata.video_id) if metadata.video_id is not None else None,
+                parent_id=str(metadata.video_id) if metadata.video_id is not None else None,
                 frame_index=metadata.frame_idx,
             )
 
@@ -489,7 +489,7 @@ class MediaService(BaseSessionManagedService):
                 format=str(format),
                 width=frame_image.width,
                 height=frame_image.height,
-                video_id=str(video.id),
+                parent_id=str(video.id),
                 frame_index=frame_index,
                 size=os.path.getsize(video_frame_path),
                 source_id=None,
