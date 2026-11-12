@@ -26,12 +26,12 @@ the [postprocessing for the model type](#output-contract-per-model_type) yoursel
 
 ## Sources
 
-| Source                                        | File                                                               | Content                                                 |
-| --------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------- |
-| `TaskLevelExportParameters.to_metadata()`     | `library/src/getitune/types/export.py`                             | Task info, labels, postprocessing, tiling               |
-| `ModelExporter._extend_model_metadata()`      | `library/src/getitune/backend/lightning/exporter/base.py`          | Preprocessing (normalization, resize, intensity)        |
-| `HFModelExporter.metadata`                    | `library/src/getitune/backend/huggingface/exporter/hf_exporter.py` | Default intensity keys when no `IntensityConfig` is set |
-| `ModelExporter._embed_openvino_ir_metadata()` | `library/src/getitune/backend/lightning/exporter/base.py`          | Writes all keys via `ov_model.set_rt_info()`            |
+| Source                                        | File                                                                          | Content                                                 |
+| --------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `TaskLevelExportParameters.to_metadata()`     | `libraries/getitune/src/getitune/types/export.py`                             | Task info, labels, postprocessing, tiling               |
+| `ModelExporter._extend_model_metadata()`      | `libraries/getitune/src/getitune/backend/lightning/exporter/base.py`          | Preprocessing (normalization, resize, intensity)        |
+| `HFModelExporter.metadata`                    | `libraries/getitune/src/getitune/backend/huggingface/exporter/hf_exporter.py` | Default intensity keys when no `IntensityConfig` is set |
+| `ModelExporter._embed_openvino_ir_metadata()` | `libraries/getitune/src/getitune/backend/lightning/exporter/base.py`          | Writes all keys via `ov_model.set_rt_info()`            |
 
 Where a key comes from both sources, the value from `to_metadata()` is used.
 
