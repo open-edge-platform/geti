@@ -21,19 +21,15 @@ const withEmptyLabelAnnotation = (frame: AnnotatedVideoFrame): AnnotatedVideoFra
     return { ...frame, annotation_data: { ...frame.annotation_data, annotations: [emptyAnnotation] } };
 };
 
-const useGetVideoFramesAnnotationsQueryOptions = ({
-    frameNumber,
-    frameSkip,
+export const useGetVideoFramesAnnotationsQueryOptions = ({
+    startFrameIndex,
+    endFrameIndex,
 }: {
-    frameSkip: number;
-    frameNumber: number;
+    startFrameIndex: number;
+    endFrameIndex: number;
 }) => {
     const projectId = useProjectIdentifier();
     const { videoFrame } = useVideoPlayer();
-
-    const frames = videoFrame.frame_count - 1;
-
-    const { startFrameIndex, endFrameIndex } = getVideoFrameRangeIndexes({ frames, frameSkip, frameNumber });
 
     const queryOptions = $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
         params: {
@@ -55,6 +51,12 @@ const useGetVideoFramesAnnotationsQueryOptions = ({
     };
 };
 
+const useVideoFramesRange = ({ frameNumber, frameSkip }: { frameNumber: number; frameSkip: number }) => {
+    const { videoFrame } = useVideoPlayer();
+
+    return getVideoFrameRangeIndexes({ frames: videoFrame.frame_count - 1, frameSkip, frameNumber });
+};
+
 export const usePrefetchVideoFramesAnnotations = ({
     frameNumber,
     frameSkip,
@@ -62,7 +64,7 @@ export const usePrefetchVideoFramesAnnotations = ({
     frameNumber: number;
     frameSkip: number;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({ frameNumber, frameSkip });
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
 
     return usePrefetchQuery(queryOptions);
 };
@@ -76,10 +78,7 @@ export const useVideoFramesAnnotations = <T>({
     frameSkip: number;
     selector: (data: AnnotatedVideoFrame[]) => T;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({
-        frameSkip,
-        frameNumber,
-    });
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
 
     return useQuery({
         ...queryOptions,
