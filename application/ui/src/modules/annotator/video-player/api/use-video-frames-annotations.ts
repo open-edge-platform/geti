@@ -2,12 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import type { AnnotatedVideoFrame } from '@/api/types';
+import type { AnnotatedVideoFrame, AnnotationDTO } from '@/api/types';
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { getVideoFrameRangeIndexes } from './utils';
+
+// A frame returned with no annotations was annotated as empty, same as `annotationsQueryFn` for images
+const withEmptyLabelAnnotation = (frame: AnnotatedVideoFrame): AnnotatedVideoFrame => {
+    if (frame.annotation_data.annotations.length > 0) {
+        return frame;
+    }
+
+    const emptyAnnotation = { shape: { type: 'full_image' }, labels: [{ id: EMPTY_LABEL_ID }] } satisfies AnnotationDTO;
+
+    return { ...frame, annotation_data: { ...frame.annotation_data, annotations: [emptyAnnotation] } };
+};
 
 const useGetVideoFramesAnnotationsQueryOptions = ({
     frameNumber,
@@ -23,7 +35,7 @@ const useGetVideoFramesAnnotationsQueryOptions = ({
 
     const { startFrameIndex, endFrameIndex } = getVideoFrameRangeIndexes({ frames, frameSkip, frameNumber });
 
-    return $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
+    const queryOptions = $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
         params: {
             path: {
                 project_id: projectId,
@@ -35,6 +47,12 @@ const useGetVideoFramesAnnotationsQueryOptions = ({
             },
         },
     });
+
+    return {
+        ...queryOptions,
+        queryFn: async (...params: Parameters<typeof queryOptions.queryFn>) =>
+            (await queryOptions.queryFn(...params)).map(withEmptyLabelAnnotation),
+    };
 };
 
 export const usePrefetchVideoFramesAnnotations = ({
