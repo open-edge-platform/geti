@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-import os.path
-import shutil
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,7 +16,16 @@ from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
 from app.db.schema import MediaDB
-from app.models import DatasetItem, DatasetItemAnnotationStatus, Media, MediaType, Project, Video, VideoFrame
+from app.models import (
+    DatasetItem,
+    DatasetItemAnnotationStatus,
+    Media,
+    MediaStorage,
+    MediaType,
+    Project,
+    Video,
+    VideoFrame,
+)
 from app.models.media import (
     ImageFormat,
     MediaAdapter,
@@ -31,6 +38,12 @@ from app.models.media import (
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
+from app.utils.media_storage_ops import (
+    delete_media_storage,
+    discard_media_storage,
+    media_storage_size,
+    move_media_storage,
+)
 
 from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
 
@@ -159,14 +172,6 @@ class MediaService(BaseSessionManagedService):
             raise InvalidImageError from error
 
     @staticmethod
-    def _discard_binary(binary_path: Path, source_path: Path | None) -> None:
-        """Remove a binary after a failure, or move it back to where it came from if it was moved."""
-        if source_path is not None:
-            shutil.move(binary_path, source_path)
-        else:
-            binary_path.unlink(missing_ok=True)
-
-    @staticmethod
     def _generate_and_save_thumbnail(image: Image.Image, path: Path) -> None:
         try:
             thumbnail_image = crop_to_thumbnail(
@@ -191,25 +196,26 @@ class MediaService(BaseSessionManagedService):
         """Creates a new media (image)"""
         media_id = uuid4()
         original_binary: BinaryIO | BytesIO | None = None
-        source_path: Path | None = None
+        source_storage: MediaStorage | None = None
         match metadata.data:
             case Image.Image():
                 image = metadata.data
             case np.ndarray():
                 image = self._read_image_from_ndarray(metadata.data)
             case Path():
-                source_path = metadata.data
-                image = self._read_image_from_path(source_path)
+                source_storage = MediaStorage(root=metadata.data)
+                image = self._read_image_from_path(source_storage.root)
             case _:
                 original_binary = metadata.data
                 image = self._read_image_from_binary(metadata.data)
 
         dataset_dir = self.projects_dir / f"{metadata.project_id}/dataset"
         dataset_dir.mkdir(parents=True, exist_ok=True)
-        binary_path = dataset_dir / f"{media_id}.{metadata.image_format}"
+        target_storage = MediaStorage(root=dataset_dir / f"{media_id}.{metadata.image_format}")
+        binary_path = target_storage.root
 
-        if source_path is not None:
-            shutil.move(source_path, binary_path)
+        if source_storage is not None:
+            move_media_storage(source_storage, target_storage)
         elif original_binary is not None:
             self._copy_binary(original_binary, binary_path)
         else:
@@ -233,7 +239,7 @@ class MediaService(BaseSessionManagedService):
                 format=str(metadata.image_format),
                 width=image.width,
                 height=image.height,
-                size=os.path.getsize(binary_path),
+                size=media_storage_size(target_storage),
                 source_id=str(metadata.source_id) if metadata.source_id is not None else None,
                 parent_id=str(metadata.video_id) if metadata.video_id is not None else None,
                 frame_index=metadata.frame_idx,
@@ -242,7 +248,7 @@ class MediaService(BaseSessionManagedService):
             repo = MediaRepository(project_id=str(metadata.project_id), db=self.db_session)
             db_media = repo.save(media)
         except Exception as e:
-            self._discard_binary(binary_path, source_path)
+            discard_media_storage(target_storage, source_storage)
             raise e
         return MediaAdapter.validate_python(db_media)
 
@@ -263,12 +269,13 @@ class MediaService(BaseSessionManagedService):
 
         dataset_dir = self.projects_dir / f"{project_id}/dataset"
         dataset_dir.mkdir(parents=True, exist_ok=True)
-        binary_path = dataset_dir / f"{media_id}.{video_format}"
+        target_storage = MediaStorage(root=dataset_dir / f"{media_id}.{video_format}")
+        binary_path = target_storage.root
 
-        source_path: Path | None = None
+        source_storage: MediaStorage | None = None
         if isinstance(data, Path):
-            source_path = data
-            shutil.move(source_path, binary_path)
+            source_storage = MediaStorage(root=data)
+            move_media_storage(source_storage, target_storage)
         else:
             self._copy_binary(data, binary_path, VIDEO_WRITE_CHUNK_SIZE)
 
@@ -284,7 +291,7 @@ class MediaService(BaseSessionManagedService):
                 height=video_metadata.height,
                 frame_count=video_metadata.frame_count,
                 fps=video_metadata.fps,
-                size=os.path.getsize(binary_path),
+                size=media_storage_size(target_storage),
                 source_id=str(source_id) if source_id is not None else None,
             )
 
@@ -298,7 +305,7 @@ class MediaService(BaseSessionManagedService):
         except Exception as e:
             # Release any cached handle on the video, otherwise it cannot be moved/deleted on Windows
             self._get_video_service().release(binary_path)
-            self._discard_binary(binary_path, source_path)
+            discard_media_storage(target_storage, source_storage)
             raise e
         return MediaAdapter.validate_python(db_media)
 
@@ -391,8 +398,15 @@ class MediaService(BaseSessionManagedService):
         return result
 
     def get_media_binary_path(self, project_id: UUID, media: MediaDB | Media) -> Path:
+        storage = self.get_media_storage(project_id=project_id, media=media)
+        if storage.is_directory:
+            raise ValueError(f"Media {media.id} is directory-backed and has no single binary path.")
+        return storage.root
+
+    def get_media_storage(self, project_id: UUID, media: MediaDB | Media) -> MediaStorage:
+        """Get where a media payload lives on disk."""
         dataset_dir = self.projects_dir / f"{project_id}/dataset"
-        return dataset_dir / f"{media.id}.{media.format}"
+        return MediaStorage(root=dataset_dir / f"{media.id}.{media.format}")
 
     def get_media_binary_path_by_id(self, project_id: UUID, media_id: UUID) -> Path:
         """Get a media binary content by its ID"""
@@ -420,11 +434,12 @@ class MediaService(BaseSessionManagedService):
         media = self.get_media_by_id(project_id=project.id, media_id=media_id)
         repo = MediaRepository(project_id=str(project.id), db=self.db_session)
 
-        binary_path = self.get_media_binary_path(project_id=project.id, media=media)
+        storage = self.get_media_storage(project_id=project.id, media=media)
+        binary_path = storage.effective_path
         if media.type == MediaType.VIDEO:
             self._get_video_service().release(binary_path)
         try:
-            os.remove(binary_path)
+            delete_media_storage(storage)
         except FileNotFoundError:
             logger.warning("Media {} binary was not found during deletion", media_id)
         thumbnail_path = self.get_media_thumbnail_path(project=project, media=media)
