@@ -39,6 +39,8 @@ hyperparameters:
       - 624
       - 672
       - 768
+      - 912
+      - 1152
     input_size_width: 624
     input_size_height: 624
   dataset_preparation:
