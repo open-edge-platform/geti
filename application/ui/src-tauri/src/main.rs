@@ -579,7 +579,10 @@ fn main() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![download::download_file])
+        .invoke_handler(tauri::generate_handler![
+            download::download_file,
+            download::save_file
+        ])
         .build(tauri::generate_context!())
         .expect("error building Tauri");
 
