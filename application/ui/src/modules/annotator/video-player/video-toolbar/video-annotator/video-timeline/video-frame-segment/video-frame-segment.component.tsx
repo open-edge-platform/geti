@@ -5,10 +5,8 @@ import { ReactNode } from 'react';
 
 import type { AnnotatedVideoFrame, Label, VideoFramePrediction } from '@/api/types';
 import { Flex, View } from '@geti-ui/ui';
-import { isEmpty } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
-import { EMPTY_LABEL_ID } from '../../../../../../../shared/labels';
 import type { AnnotatorMode } from '../../../../../annotator-mode';
 import { PREDICTION_CHUNK_SIZE } from '../../../../api/prediction-constants';
 import { useVideoFramesAnnotations } from '../../../../api/use-video-frames-annotations';
@@ -84,14 +82,9 @@ const useVideoTimelineAnnotations = ({ frameNumber }: { frameNumber: number }) =
         selector: selectAnnotationsForFrame(frameNumber),
     });
 
-    const annotations = videoFramesAnnotations?.annotation_data?.annotations;
-
-    const annotatedLabels =
-        annotations === undefined
-            ? undefined
-            : isEmpty(annotations)
-              ? [EMPTY_LABEL_ID]
-              : annotations.flatMap((annotation) => annotation.labels.map(({ id }) => id));
+    const annotatedLabels = videoFramesAnnotations?.annotation_data?.annotations.flatMap((annotation) =>
+        annotation.labels.map(({ id }) => id)
+    );
 
     return {
         annotatedLabels,
