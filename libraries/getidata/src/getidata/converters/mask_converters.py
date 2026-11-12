@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import polars as pl
 
-from getidata.categories import Colormap, LabelCategories, MaskCategories, RgbColor, generate_colormap
+from getidata.categories import LabelCategories, MaskCategories, generate_colormap
 from getidata.converters.base import Converter, copy_columns_with_shape
 from getidata.converters.registry import converter
 from getidata.fields.annotations import LabelField, PolygonField
@@ -208,12 +208,11 @@ class PolygonToMaskConverter(Converter):
             # Create a colormap for mask categories
             # Generate colors for all labels plus background
             num_classes = len(self.input_labels.categories) + 1  # +1 for background
-            colormap_dict = generate_colormap(num_classes, include_background=True)
-            colormap_struct_dict = {i: RgbColor(*color) for i, color in colormap_dict.items()}
-
             # Create mask categories with the generated colormap
             labels = ("background", *self.input_labels.categories.labels)
-            mask_categories = MaskCategories(colormap=Colormap(data=colormap_struct_dict), labels=labels)
+            mask_categories = MaskCategories(
+                colormap=generate_colormap(num_classes, include_background=True), labels=labels
+            )
 
         # Configure output for mask format
         self.output_mask = AttributeSpec(

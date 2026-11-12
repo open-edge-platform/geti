@@ -82,7 +82,7 @@ loaded = import_dataset("my_dataset.zip")
 ## Categories
 
 ```python
-from getidata.categories import LabelCategories, HierarchicalLabelCategories, MaskCategories
+from getidata.categories import LabelCategories, HierarchicalLabelCategories, MaskCategories, generate_colormap
 
 # Simple labels
 labels = LabelCategories(labels=("cat", "dog", "bird"))
@@ -94,11 +94,14 @@ hierarchy = HierarchicalLabelCategories(
 )
 
 # Mask colormap
-mask_cats = MaskCategories(colormap={0: (0,0,0), 1: (255,0,0)})
+mask_cats = MaskCategories(colormap=generate_colormap(2))
 
 # Attach to dataset
 dataset = Dataset(MySample, categories={"labels": labels})
 ```
+
+`generate_colormap` returns a `Colormap` instead of a dictionary. Existing callers
+that need dictionary methods or key iteration can use `generate_colormap(...).data`.
 
 ## Detailed Documentation
 

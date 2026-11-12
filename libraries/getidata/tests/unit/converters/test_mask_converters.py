@@ -6,6 +6,7 @@ import numpy as np
 import polars as pl
 import pytest
 
+from getidata.categories import Colormap, LabelCategories, MaskCategories, RgbColor
 from getidata.converters import (
     InstanceMaskCallableToInstanceMaskConverter,
     MaskCallableToMaskConverter,
@@ -65,7 +66,7 @@ def test_polygon_to_mask_converter():
     setattr(
         converter_instance,
         "input_labels",
-        AttributeSpec(name="labels", field=input_labels_field),
+        AttributeSpec(name="labels", field=input_labels_field, categories=LabelCategories(labels=("a", "b", "c"))),
     )
     setattr(
         converter_instance,
@@ -80,6 +81,11 @@ def test_polygon_to_mask_converter():
 
     # Test filter - should return True when we have valid input
     assert converter_instance.filter_output_spec() is True
+    categories = converter_instance.output_mask.categories
+    assert isinstance(categories, MaskCategories)
+    assert categories.labels == ("background", "a", "b", "c")
+    assert isinstance(categories.colormap, Colormap)
+    assert categories.colormap.inverse_colormap[RgbColor(128, 0, 0)] == 1
 
     # Test conversion
     result_df = converter_instance.convert(df)
