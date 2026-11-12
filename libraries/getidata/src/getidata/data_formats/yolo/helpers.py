@@ -958,7 +958,7 @@ def _load_yolo_cls(root_path: Path) -> Dataset:
 
     The class names are taken from the per-class directory names, collected across all subsets and
     sorted alphabetically so that the label indices are deterministic. A class directory named
-    ``unannotated`` is reserved for images without annotations: its images are loaded as samples
+    ``_unannotated`` is reserved for images without annotations: its images are loaded as samples
     without a label, and the name never becomes a class, so unannotated media exported by getidata
     round-trips. Third-party datasets with a real class of that name are not supported.
     """
@@ -1214,7 +1214,7 @@ def _cls_destination_dir_name(
     """
     Resolve the name of the directory a sample belongs to in the classification layout.
 
-    Returns the class directory name for labeled samples, the reserved ``unannotated``
+    Returns the class directory name for labeled samples, the reserved ``_unannotated``
     directory name for samples without a label, or None when the sample cannot be
     represented and must be skipped.
     """
@@ -1240,8 +1240,8 @@ def _save_yolo_cls(
     Save a dataset in the Ultralytics YOLO classification (ImageNet-style) layout.
 
     Samples without a label cannot be represented as class members, so they are written into the
-    reserved ``unannotated`` directory of their subset, where the loader picks them up again as
-    samples without a label. When an actual class is named ``unannotated``, the directory cannot
+    reserved ``_unannotated`` directory of their subset, where the loader picks them up again as
+    samples without a label. When an actual class is named ``_unannotated``, the directory cannot
     be reserved and such samples are skipped with a warning.
     """
     label_names = _get_cls_label_names_from_dataset(dataset)
@@ -1257,7 +1257,7 @@ def _save_yolo_cls(
             class_name,
         )
 
-    # The 'unannotated' directory is reserved for unlabeled samples; a class of the same name
+    # The '_unannotated' directory is reserved for unlabeled samples; a class of the same name
     # would collide with it, in which case unlabeled samples cannot be exported.
     reserved_name_taken = any(class_name.lower() == UNANNOTATED_DIR_NAME for class_name in label_names)
 
