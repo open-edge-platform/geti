@@ -146,7 +146,7 @@ def fxt_project_with_media(
                 "size": 512,
                 "width": 640,
                 "height": 480,
-                "video_id": video1.id,
+                "parent_id": video1.id,
                 "frame_index": 10,
             },
             {
@@ -156,7 +156,7 @@ def fxt_project_with_media(
                 "size": 512,
                 "width": 640,
                 "height": 480,
-                "video_id": video1.id,
+                "parent_id": video1.id,
                 "frame_index": 20,
             },
         ],

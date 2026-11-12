@@ -299,7 +299,7 @@ class TestSubsetServiceVideoGroups:
                 width=1920,
                 height=1080,
                 project_id=project_id,
-                video_id=video.id,
+                parent_id=video.id,
                 frame_index=frame_index,
                 created_at=created,
             )

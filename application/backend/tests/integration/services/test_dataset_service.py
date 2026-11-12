@@ -498,7 +498,7 @@ def fxt_project_with_rich_dataset_items(fxt_project_with_pipeline, db_session) -
         type="video_frame",
         name="vf1",
         format="jpg",
-        video_id=str(annotated_video.id),
+        parent_id=str(annotated_video.id),
         frame_index=3,
         **default_media_values,
     )
@@ -517,7 +517,7 @@ def fxt_project_with_rich_dataset_items(fxt_project_with_pipeline, db_session) -
         type="video_frame",
         name="vf2",
         format="jpg",
-        video_id=str(annotated_video.id),
+        parent_id=str(annotated_video.id),
         frame_index=8,
         **default_media_values,
     )

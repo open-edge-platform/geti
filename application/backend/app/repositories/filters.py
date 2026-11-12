@@ -68,7 +68,7 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
             select(frame_alias.id)
             .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
-                frame_alias.video_id == MediaDB.id,
+                frame_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
@@ -86,7 +86,7 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
             select(func.count(frame_alias.id))
             .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
-                frame_alias.video_id == MediaDB.id,
+                frame_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
@@ -140,7 +140,7 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
         select(frame_alias.id)
         .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == frame_alias.id)
         .where(
-            frame_alias.video_id == MediaDB.id,
+            frame_alias.parent_id == MediaDB.id,
             DatasetItemLabelDB.label_id.in_(label_ids),
         )
         .correlate(MediaDB)
@@ -196,7 +196,7 @@ def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | N
         select(frame_alias.id)
         .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
         .where(
-            frame_alias.video_id == MediaDB.id,
+            frame_alias.parent_id == MediaDB.id,
             DatasetItemDB.subset.in_(subsets),
         )
         .correlate(MediaDB)
