@@ -69,6 +69,9 @@ datas = [
     *copy_metadata("torchmetrics"),
     *copy_metadata("jsonargparse"),
     *copy_metadata("rich"),
+    # onnxruntime is bundled through imports, but Ultralytics' check_requirements looks it up via
+    # importlib.metadata during ONNX export; without the dist-info it tries to pip-install it.
+    *copy_metadata("onnxruntime"),
 ]
 binaries = [(dll, 'Library/bin/') for dll in glob.glob('.venv/Library/bin/*')]
 hiddenimports = []
