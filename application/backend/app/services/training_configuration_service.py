@@ -109,13 +109,21 @@ class TrainingConfigurationService(BaseSessionManagedService):
         else:
             task_level_parameters = TaskLevelParameters.model_validate(task_level_config_db.configuration_data)
 
+        model_manifest = ModelManifestService.get_model_manifest_by_id(model_manifest_id=model_architecture_id)
+
         algo_level_config_db = training_config_repo.get_algo_level_configuration(
             project_id=str(project_id), model_architecture_id=model_architecture_id
         )
         if algo_level_config_db is None:
             algo_level_parameters = deepcopy(default_config.algo_level_parameters)
         else:
-            algo_level_parameters = AlgoLevelParameters.model_validate(algo_level_config_db.configuration_data)
+            configuration_data = deepcopy(algo_level_config_db.configuration_data)
+            # allowed_values_input_size is a manifest-derived constraint, not user data: always resync it to the
+            # current manifest instead of trusting a stale, previously-persisted snapshot.
+            configuration_data.setdefault("training", {})["allowed_values_input_size"] = (
+                model_manifest.hyperparameters.training.allowed_values_input_size
+            )
+            algo_level_parameters = AlgoLevelParameters.model_validate(configuration_data)
 
         training_configuration = TrainingConfiguration(
             task_level_parameters=task_level_parameters,

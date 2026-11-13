@@ -2,28 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import type { AnnotatedVideoFrame } from '@/api/types';
+import type { AnnotatedVideoFrame, AnnotationDTO } from '@/api/types';
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { getVideoFrameRangeIndexes } from './utils';
 
-const useGetVideoFramesAnnotationsQueryOptions = ({
-    frameNumber,
-    frameSkip,
+// A frame returned with no annotations was annotated as empty, same as `annotationsQueryFn` for images
+const withEmptyLabelAnnotation = (frame: AnnotatedVideoFrame): AnnotatedVideoFrame => {
+    if (frame.annotation_data.annotations.length > 0) {
+        return frame;
+    }
+
+    const emptyAnnotation = { shape: { type: 'full_image' }, labels: [{ id: EMPTY_LABEL_ID }] } satisfies AnnotationDTO;
+
+    return { ...frame, annotation_data: { ...frame.annotation_data, annotations: [emptyAnnotation] } };
+};
+
+export const useGetVideoFramesAnnotationsQueryOptions = ({
+    startFrameIndex,
+    endFrameIndex,
 }: {
-    frameSkip: number;
-    frameNumber: number;
+    startFrameIndex: number;
+    endFrameIndex: number;
 }) => {
     const projectId = useProjectIdentifier();
     const { videoFrame } = useVideoPlayer();
 
-    const frames = videoFrame.frame_count - 1;
-
-    const { startFrameIndex, endFrameIndex } = getVideoFrameRangeIndexes({ frames, frameSkip, frameNumber });
-
-    return $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
+    const queryOptions = $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
         params: {
             path: {
                 project_id: projectId,
@@ -35,6 +43,18 @@ const useGetVideoFramesAnnotationsQueryOptions = ({
             },
         },
     });
+
+    return {
+        ...queryOptions,
+        queryFn: async (...params: Parameters<typeof queryOptions.queryFn>) =>
+            (await queryOptions.queryFn(...params)).map(withEmptyLabelAnnotation),
+    };
+};
+
+const useVideoFramesRange = ({ frameNumber, frameSkip }: { frameNumber: number; frameSkip: number }) => {
+    const { videoFrame } = useVideoPlayer();
+
+    return getVideoFrameRangeIndexes({ frames: videoFrame.frame_count - 1, frameSkip, frameNumber });
 };
 
 export const usePrefetchVideoFramesAnnotations = ({
@@ -44,7 +64,7 @@ export const usePrefetchVideoFramesAnnotations = ({
     frameNumber: number;
     frameSkip: number;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({ frameNumber, frameSkip });
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
 
     return usePrefetchQuery(queryOptions);
 };
@@ -58,10 +78,7 @@ export const useVideoFramesAnnotations = <T>({
     frameSkip: number;
     selector: (data: AnnotatedVideoFrame[]) => T;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({
-        frameSkip,
-        frameNumber,
-    });
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
 
     return useQuery({
         ...queryOptions,

@@ -944,11 +944,18 @@ class HybridEncoder:
         },
     }
 
-    def __new__(cls, model_name: str) -> HybridEncoderModule:
+    def __new__(
+        cls,
+        model_name: str,
+        eval_spatial_size: tuple[int, int] | list[int] | None = None,
+    ) -> HybridEncoderModule:
         """Create a HybridEncoder instance.
 
         Args:
             model_name: Model configuration name.
+            eval_spatial_size: Model input size ``(H, W)``. Overrides the size used to
+                cache positional embeddings for configurations that cache them, so that
+                evaluation works at input sizes other than the default 640x640.
 
         Returns:
             Configured HybridEncoderModule instance.
@@ -959,4 +966,7 @@ class HybridEncoder:
         if model_name not in cls.encoder_cfg:
             msg = f"Model type '{model_name}' is not supported. Available: {list(cls.encoder_cfg.keys())}"
             raise KeyError(msg)
-        return HybridEncoderModule(**cls.encoder_cfg[model_name])
+        cfg = dict(cls.encoder_cfg[model_name])
+        if eval_spatial_size is not None and "eval_spatial_size" in cfg:
+            cfg["eval_spatial_size"] = list(eval_spatial_size)
+        return HybridEncoderModule(**cfg)

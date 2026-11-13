@@ -374,7 +374,7 @@ class TrainingConfigurationView(BaseModel):
                     parameters.append(nested_group)
             else:
                 # Resolve allowed_values from another field or StrEnum annotation
-                allowed_values = cls._resolve_allowed_values(model, child_field_info)
+                allowed_values = cls._resolve_allowed_values(default_model or model, child_field_info)
 
                 # Get the default value from the default model, falling back to field_info.default
                 if default_model is not None:

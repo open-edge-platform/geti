@@ -149,6 +149,20 @@ def fxt_training_configuration() -> TrainingConfiguration:
 
 
 @pytest.fixture
+def fxt_training_configuration_stale_allowed_input_sizes(
+    fxt_training_configuration: TrainingConfiguration,
+) -> TrainingConfiguration:
+    """A persisted/current config with a stale (narrower) allowed_values_input_size.
+
+    Simulates a project whose training configuration was saved to the DB before
+    the model manifest was updated to support additional input sizes.
+    """
+    config = fxt_training_configuration.model_copy(deep=True)
+    config.algo_level_parameters.training.allowed_values_input_size = [256]
+    return config
+
+
+@pytest.fixture
 def fxt_default_training_configuration() -> TrainingConfiguration:
     """Create a default training configuration with default values."""
     return TrainingConfiguration(
@@ -1812,3 +1826,26 @@ class TestTrainingConfigurationView:
                 deim_param = param
                 break
         assert deim_param is None, "deim_framework parameter should be excluded when value is None"
+
+    def test_allowed_values_input_size_always_reflects_manifest_default(
+        self,
+        fxt_training_configuration_stale_allowed_input_sizes,
+        fxt_default_training_configuration,
+    ):
+        """allowed_values for input_size_width/height must come from the manifest-derived
+        default configuration, not from the (possibly stale) persisted/current configuration.
+        """
+        view = TrainingConfigurationView.from_training_configuration(
+            fxt_training_configuration_stale_allowed_input_sizes,
+            fxt_default_training_configuration,
+        )
+        result = view.model_dump(mode="json")
+
+        training_group = next(p for p in result["parameters"] if p["key"] == "training")
+        width_param = next(p for p in training_group["parameters"] if p["key"] == "input_size_width")
+        height_param = next(p for p in training_group["parameters"] if p["key"] == "input_size_height")
+
+        # Must match the manifest/default config's allowed values ([128, 256, 512]),
+        # not the stale current config's value ([256]).
+        assert width_param["allowed_values"] == [128, 256, 512]
+        assert height_param["allowed_values"] == [128, 256, 512]

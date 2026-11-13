@@ -5,6 +5,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedVideoFrame } from 'mocks/mock-media';
+import { MOCKED_VIDEO_PLAYER_CONTEXT } from 'mocks/mock-video-player-context';
 import { render } from 'test-utils/render';
 
 import { EMPTY_LABEL_ID } from '../../../../shared/labels';
@@ -13,33 +14,7 @@ import * as actualPredictionsSetup from '../../predictions-setup-provider.compon
 import * as actualVideoFramesPredictions from '../api/use-video-frames-predictions' with { rstest: 'importActual' };
 import { VideoToolbar } from './video-toolbar.component';
 
-const mockVideoFrame = getMockedVideoFrame({
-    fps: 60,
-    frame_count: 600,
-    frame_number: 42,
-    frame_stride: 1,
-    duration: 10,
-});
-
-const MOCKED_VIDEO_PLAYER_CONTEXT = {
-    videoFrame: mockVideoFrame,
-    step: 1,
-    changeStep: rs.fn(),
-    isMuted: false,
-    toggleMute: rs.fn(),
-    playbackRate: 1,
-    changePlaybackRate: rs.fn(),
-    videoControls: {
-        isPlaying: false,
-        play: rs.fn(),
-        pause: rs.fn(),
-        goto: rs.fn(),
-        previousFrame: rs.fn(),
-        nextFrame: rs.fn(),
-        canSelectPreviousFrame: true,
-        canSelectNextFrame: true,
-    },
-};
+const { videoFrame: mockVideoFrame } = MOCKED_VIDEO_PLAYER_CONTEXT;
 
 rs.mock('../video-player-provider.component', () => ({
     useVideoPlayer: () => MOCKED_VIDEO_PLAYER_CONTEXT,

@@ -65,7 +65,7 @@ callbacks:
               augmentations_cpu:
                 - class_path: getitune.data.augmentation.transforms.Resize
                   init_args:
-                    size: [640, 640]
+                    size: $(input_size)
                     keep_aspect_ratio: false
               augmentations_gpu:
                 - class_path: kornia.augmentation.RandomHorizontalFlip
@@ -87,7 +87,7 @@ callbacks:
                     min_size: 1
                 - class_path: getitune.data.augmentation.transforms.Resize
                   init_args:
-                    size: [640, 640]
+                    size: $(input_size)
                     keep_aspect_ratio: false
               augmentations_gpu:
                 - class_path: kornia.augmentation.ColorJiggle
@@ -110,10 +110,10 @@ callbacks:
                   init_args:
                     random_pop: true
                     max_cached_images: 20
-                    img_scale: [640, 640]
+                    img_scale: $(input_size)
                 - class_path: getitune.data.augmentation.transforms.CachedMixUp
                   init_args:
-                    img_scale: [640, 640]
+                    img_scale: $(input_size)
                     alpha: 1.5
                     p: 0.5
                     random_pop: true
@@ -149,7 +149,7 @@ callbacks:
                     min_size: 1
                 - class_path: getitune.data.augmentation.transforms.CachedMixUp
                   init_args:
-                    img_scale: [640, 640]
+                    img_scale: $(input_size)
                     alpha: 1.5
                     p: 0.5
                     random_pop: true
@@ -159,7 +159,7 @@ callbacks:
                     min_size: 1
                 - class_path: getitune.data.augmentation.transforms.Resize
                   init_args:
-                    size: [640, 640]
+                    size: $(input_size)
                     keep_aspect_ratio: false
               augmentations_gpu:
                 - class_path: kornia.augmentation.RandomHorizontalFlip
