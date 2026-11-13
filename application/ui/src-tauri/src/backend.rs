@@ -110,8 +110,8 @@ fn locate_backend(exe_dir: &std::path::Path) -> PathBuf {
     exe_dir.join(backend_filename())
 }
 
-/// Apply the default environment for the side-car. Each var is only set if the
-/// inherited environment doesn't already provide one, so callers can override.
+/// Apply the default environment for the side-car. Apart from `CORS_ORIGINS`, each var is
+/// only set if the inherited environment doesn't already provide one, so callers can override.
 fn apply_default_env(command: &mut Command, app: &AppHandle) {
     // The Tauri 2 webview loads the UI from `tauri://localhost` on macOS/Linux
     // and `https://tauri.localhost` on Windows (we enable `useHttpsScheme=true`

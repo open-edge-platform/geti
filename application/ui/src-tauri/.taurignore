@@ -1,6 +1,6 @@
-# Tauri 2 file-watcher ignore list (gitignore syntax). Without this, the
-# backend writing to data/ and logs/ at runtime triggers `tauri dev` to
-# rebuild and restart the app on every write — an infinite loop.
+# Tauri 2 file-watcher ignore list (gitignore syntax). The backend only writes
+# data/ and logs/ here when the sidecar is run directly from this folder; without
+# this, `tauri dev` would then rebuild and restart the app on every write.
 data/
 logs/
 
