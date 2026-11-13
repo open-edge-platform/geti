@@ -399,6 +399,7 @@ class TestCreateProjectInputValidationSecurity:
                 response = fxt_client.get(f"/api/projects/{str(fxt_project.id)}/thumbnail")
 
             assert response.status_code == status.HTTP_200_OK
+            assert response.headers["cache-control"] == "no-cache"
             fxt_project_service.get_project_thumbnail_path.assert_called_once()
         finally:
             if tmp_file_path and os.path.exists(tmp_file_path):

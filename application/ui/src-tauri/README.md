@@ -294,7 +294,13 @@ Windows build provisions one automatically — a PyInstaller runtime hook
 ([`windows/certs.py`](../../backend/pyinstaller/windows/certs.py)) writes a
 self-signed certificate into `DATA_DIR` on first launch, and WebView2 is
 started with `--ignore-certificate-errors` (see `additionalBrowserArgs` in
-[`tauri.conf.json`](./tauri.conf.json)).
+[`tauri.conf.json`](./tauri.conf.json)). Once the certificate exists, the shell
+also pins its public key with `--ignore-certificate-errors-spki-list` (see
+`browser_args` in [`src/main.rs`](./src/main.rs)): Chromium never caches
+responses that only got through by ignoring a certificate error, so without the
+pin every thumbnail and image is downloaded again. Because any server can match
+the pin by replaying the public certificate, the cache lives in a new
+`webview-cache` directory for every run and never outlives it.
 
 Neither applies on macOS: there is no cert-generation hook, and WKWebView has
 no flag to skip certificate validation. Without this step the window loads but
