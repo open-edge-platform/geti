@@ -42,7 +42,7 @@ def _main() -> None:
     local_app_data = os.getenv("LOCALAPPDATA")
     if not local_app_data:
         raise OSError("LOCALAPPDATA environment variable is not set.")
-    if not local_app_data.is_absolute():
+    if not Path(local_app_data).is_absolute():
         raise OSError("LOCALAPPDATA must be an absolute path.")
 
     app_data_folder = Path(local_app_data) / "Intel" / "Geti"

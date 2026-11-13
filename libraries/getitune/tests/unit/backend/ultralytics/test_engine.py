@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 import torch
 from torchvision import tv_tensors
+from ultralytics import utils
 
 from getitune.backend.ultralytics.data.geometry import scale_boxes_to_letterbox
 from getitune.backend.ultralytics.engine import UltralyticsEngine
@@ -82,6 +83,48 @@ def test_ultralytics_engine_supports_ultralytics_model_with_datamodule(mocker) -
     data = mocker.MagicMock(spec=DataModule)
 
     assert UltralyticsEngine.is_supported(model, data)
+
+
+@pytest.mark.parametrize("relative", [False, True], ids=["absolute", "relative"])
+def test_engine_propagates_aux_weights_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, relative: bool) -> None:
+    model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+    datamodule = MagicMock(spec=DataModule)
+    monkeypatch.chdir(tmp_path)
+    aux_weights_dir = Path("auxiliary") / "weights" if relative else tmp_path / "auxiliary" / "weights"
+    expected_dir = aux_weights_dir.resolve()
+    settings = {"weights_dir": "weights"}
+    monkeypatch.setattr(utils, "SETTINGS", settings)
+    monkeypatch.setattr(utils, "WEIGHTS_DIR", Path("weights"))
+
+    engine = UltralyticsEngine(
+        model=model,
+        data=datamodule,
+        work_dir=tmp_path / "work",
+        device="cpu",
+        aux_weights_dir=aux_weights_dir,
+    )
+
+    assert settings["weights_dir"] == str(expected_dir)
+    weights_dir = utils.WEIGHTS_DIR
+    assert weights_dir == expected_dir
+    assert expected_dir.is_dir()
+    assert "aux_weights_dir" not in engine._kwargs
+
+
+def test_engine_preserves_aux_weights_settings_when_omitted(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+    datamodule = MagicMock(spec=DataModule)
+    existing_dir = tmp_path / "existing-weights"
+    settings = {"weights_dir": str(existing_dir)}
+    monkeypatch.setattr(utils, "SETTINGS", settings)
+    monkeypatch.setattr(utils, "WEIGHTS_DIR", existing_dir)
+
+    UltralyticsEngine(model=model, data=datamodule, work_dir=tmp_path / "work", device="cpu")
+
+    assert settings["weights_dir"] == str(existing_dir)
+    weights_dir = utils.WEIGHTS_DIR
+    assert weights_dir == existing_dir
+    assert not existing_dir.exists()
 
 
 def test_engine_propagates_intensity_config_from_datamodule(mocker, tmp_path) -> None:

@@ -72,7 +72,6 @@ MODEL_WEIGHTS_PATH = "model_weights_path"
 @dataclass(frozen=True)
 class TrainingDependencies:
     data_dir: Path
-    ultralytics_aux_weights_dir: Path
     base_weights_service: BaseWeightsService
     subset_service: SubsetService
     dataset_service: DatasetService
@@ -81,6 +80,7 @@ class TrainingDependencies:
     training_configuration_service: TrainingConfigurationService
     subset_assigner: SubsetAssigner
     db_session_factory: Callable[[], AbstractContextManager[Session]]
+    ultralytics_aux_weights_dir: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -485,7 +485,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
         }
-        if is_ultralytics:
+        if is_ultralytics and self._ultralytics_aux_weights_dir is not None:
             engine_kwargs["aux_weights_dir"] = self._ultralytics_aux_weights_dir
         # timm weights (`weights_path=None`) are loaded in the library
         if weights_path is not None:

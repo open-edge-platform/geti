@@ -79,11 +79,11 @@ class UltralyticsEngine(Engine):
         model: UltralyticsModel,
         data: DataModule | PathLike,
         work_dir: PathLike | None = None,
-        aux_weights_dir: PathLike | None = None,
         device: str | DeviceType = "auto",
         checkpoint: PathLike | None = None,
         train_args: Mapping[str, Any] | None = None,
         export_args: Mapping[str, Any] | None = None,
+        aux_weights_dir: PathLike | None = None,
         **kwargs,
     ) -> None:
         """Initialize the engine.
