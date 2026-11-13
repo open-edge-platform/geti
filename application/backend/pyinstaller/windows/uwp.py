@@ -42,14 +42,20 @@ def _main() -> None:
     local_app_data = os.getenv("LOCALAPPDATA")
     if not local_app_data:
         raise OSError("LOCALAPPDATA environment variable is not set.")
+    if not local_app_data.is_absolute():
+        raise OSError("LOCALAPPDATA must be an absolute path.")
 
     app_data_folder = Path(local_app_data) / "Intel" / "Geti"
     # Keep logs in their own subfolder: the logs download zips the whole LOG_DIR.
     log_folder = app_data_folder / "logs"
 
+    yolo_config_folder = app_data_folder / "ultralytics"
+    yolo_config_folder.mkdir(parents=True, exist_ok=True)
+
     print(f"Setup Hook: Using folder: {app_data_folder}")
     os.environ["DATA_DIR"] = str(app_data_folder)
     os.environ["LOG_DIR"] = str(log_folder)
+    os.environ["YOLO_CONFIG_DIR"] = str(yolo_config_folder)
 
     _copy_initial_data(app_data_folder)
 

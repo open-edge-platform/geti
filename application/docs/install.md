@@ -52,6 +52,13 @@ Installing Geti™ as a Windows app is the simplest way to run it on Windows.
 
 If Windows shows a security prompt, verify that the package is from the official Geti™ release before continuing.
 
+The Windows app starts its backend with `%LOCALAPPDATA%\Intel\Geti` as the working directory.
+It keeps its own Ultralytics settings in `%LOCALAPPDATA%\Intel\Geti\ultralytics` and auxiliary
+model weights in that directory's `weights` subfolder, independently of any external
+`YOLO_CONFIG_DIR` setting. CUDA training with automatic mixed precision (AMP) may download
+an additional `yolo26n.pt` checkpoint there on first use for the AMP compatibility check.
+This checkpoint is separate from Geti's pretrained training weights.
+
 ![Launch Geti™ from Start menu](media/geti-task-bar.jpg)
 
 ## Run with Docker
