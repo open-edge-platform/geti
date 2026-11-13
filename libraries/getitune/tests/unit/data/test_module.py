@@ -122,6 +122,59 @@ class TestDataModule:
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
 
+    def test_adaptive_tiling_called_when_enabled(
+        self, mock_dm_dataset, mock_dataset_factory, mock_detect_image_dtype, fxt_config, mocker
+    ) -> None:
+        """``adapt_tile_config`` runs on the training subset when tiler + adaptive are both on."""
+        adapt = mocker.patch("getitune.data.module.adapt_tile_config")
+        train_subset = MagicMock()
+        train_subset.__len__ = lambda _: 10
+        val_subset, test_subset = MagicMock(), MagicMock()
+        mock_dm_dataset.return_value.filter_by_subset.side_effect = [
+            train_subset,
+            train_subset,
+            val_subset,
+            test_subset,
+        ]
+        mock_dataset_factory.create.return_value.task_type = TaskType.DETECTION
+
+        tile_config = TileConfig(enable_tiler=True, enable_adaptive_tiling=True)
+        DataModule(
+            task=TaskType.DETECTION,
+            data_root=fxt_config.data_root,
+            tile_config=tile_config,
+            input_size=(240, 240),
+        )
+
+        adapt.assert_called_once()
+        called_subset = adapt.call_args.args[1]
+        assert called_subset is train_subset
+
+    def test_adaptive_tiling_skipped_when_disabled(
+        self, mock_dm_dataset, mock_dataset_factory, mock_detect_image_dtype, fxt_config, mocker
+    ) -> None:
+        """``adapt_tile_config`` is not called when ``enable_adaptive_tiling`` is off."""
+        adapt = mocker.patch("getitune.data.module.adapt_tile_config")
+        train_subset = MagicMock()
+        train_subset.__len__ = lambda _: 10
+        val_subset, test_subset = MagicMock(), MagicMock()
+        mock_dm_dataset.return_value.filter_by_subset.side_effect = [
+            train_subset,
+            train_subset,
+            val_subset,
+            test_subset,
+        ]
+        mock_dataset_factory.create.return_value.task_type = TaskType.DETECTION
+
+        DataModule(
+            task=TaskType.DETECTION,
+            data_root=fxt_config.data_root,
+            tile_config=TileConfig(enable_tiler=True, enable_adaptive_tiling=False),
+            input_size=(240, 240),
+        )
+
+        adapt.assert_not_called()
+
     def test_tiled_test_and_predict_loaders_are_not_persistent(self, mocker) -> None:
         """Data loaders for tiled test and predict subsets must not keep workers alive.
 

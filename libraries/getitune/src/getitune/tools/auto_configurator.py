@@ -449,6 +449,11 @@ class AutoConfigurator:
             updated.tile_config = datamodule.tile_config
             return updated
 
+        # The tile parameters are already final here (adapted during the original DataModule
+        # construction); a rebuilt evaluation module must not re-adapt or it could silently
+        # turn tiling off. Clone so the source datamodule's config is not mutated either.
+        ov_tile_config = datamodule.tile_config.clone()
+        ov_tile_config.enable_adaptive_tiling = False
         return DataModule(
             task=datamodule.task,
             data_root=datamodule.data_root,
@@ -456,7 +461,7 @@ class AutoConfigurator:
             val_subset=datamodule.val_subset,
             test_subset=datamodule.test_subset,
             input_size=actual_input_size,
-            tile_config=datamodule.tile_config,
+            tile_config=ov_tile_config,
             ignore_index=datamodule.ignore_index,
             unannotated_items_ratio=datamodule.unannotated_items_ratio,
             auto_num_workers=datamodule.auto_num_workers,

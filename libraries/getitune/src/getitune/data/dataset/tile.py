@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 import logging as log
 from typing import TYPE_CHECKING, Callable
 
@@ -29,6 +30,8 @@ from getitune.data.utils.utils import fill_null_annotation_lists as _fill_null_a
 from getitune.types.task import TaskType
 
 from .base import VisionDataset, _ensure_chw_format
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from getitune.config.data import TileConfig
@@ -66,6 +69,18 @@ class TileDatasetFactory:
             TileDataset: Tile dataset.
         """
         subset = dataset.dm_subset[0].subset  # type: ignore[attr-defined]
+        logger.info(
+            "Tiling %s subset with tile_size=%s overlap=%s min_object_ratio_thr=%s iou_threshold=%s "
+            "max_num_instances=%s sampling_ratio=%s tile_inference_batch_size=%s",
+            getattr(subset, "name", subset),
+            tile_config.tile_size,
+            tile_config.overlap,
+            tile_config.min_object_ratio_thr,
+            tile_config.iou_threshold,
+            tile_config.max_num_instances,
+            tile_config.sampling_ratio,
+            tile_config.tile_inference_batch_size,
+        )
         if subset == Subset.TRAINING:
             dm_dataset = dataset.dm_subset
             dm_dataset = dm_dataset.transform(  # type: ignore[attr-defined]

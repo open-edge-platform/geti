@@ -223,7 +223,13 @@ size can be left out of every tile when no tile contains the required fraction, 
 threshold according to the size of the objects in the dataset.
 
 Before this setting existed, bounding boxes were kept on any intersection while polygons already used `0.5`. Training
-configurations saved earlier use the `0.5` default; models that were already trained are not affected.
+configurations saved earlier use the `0.5` default; models that are already trained are not affected.
+
+In automatic mode the tile parameters are computed from the training annotations: the overlap is set to `0.25` and the
+tile size is derived from the larger edge of the objects so that about 95% of the objects are fully visible in at least
+one tile. When the typical object is already large enough in the model input after the whole-image resize to the model
+input size, tiling brings no benefit and is switched off for that dataset; the object visibility threshold above then
+applies to the full images as usual.
 
 ### Evaluation metrics
 

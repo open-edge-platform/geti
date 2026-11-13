@@ -22,7 +22,7 @@ from getitune.data.augmentation import CPUAugmentationPipeline
 from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
-from getitune.data.utils import get_adaptive_num_workers, instantiate_sampler
+from getitune.data.utils import adapt_tile_config, get_adaptive_num_workers, instantiate_sampler
 from getitune.types.device import DeviceType
 from getitune.types.label import LabelInfo
 from getitune.types.task import TaskType
@@ -155,6 +155,15 @@ class DataModule(LightningDataModule):
             )
             raise ValueError(msg)
         config_mapping = {cfg.subset_name: cfg for cfg in subset_configs}
+
+        if self.tile_config.enable_tiler and self.tile_config.enable_adaptive_tiling:
+            train_dm_subset = dataset.filter_by_subset(Subset.TRAINING)
+            if len(train_dm_subset) > 0:
+                adapt_tile_config(self.tile_config, train_dm_subset, self.train_subset.input_size)
+            else:
+                logger.warning(
+                    "Adaptive tiling: the training subset is empty; keeping the configured tiling parameters."
+                )
 
         if self.auto_num_workers:
             if self.device not in [DeviceType.gpu, DeviceType.auto]:
