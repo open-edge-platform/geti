@@ -245,7 +245,7 @@ class Settings(BaseSettings):
             self.source_media_dir,
             self.uploads_dir,
             self.sam_ov_cache_path,
-            self.ultralytics_weights_dir,
+            self.ultralytics_aux_weights_dir,
         ]:
             if d:
                 d.mkdir(parents=True, exist_ok=True)
