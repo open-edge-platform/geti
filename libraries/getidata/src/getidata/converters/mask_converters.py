@@ -209,7 +209,7 @@ class PolygonToMaskConverter(Converter):
             # Generate colors for all labels plus background
             num_classes = len(self.input_labels.categories) + 1  # +1 for background
             # Create mask categories with the generated colormap
-            labels = ("background", *self.input_labels.categories.labels)
+            labels = ["background", *self.input_labels.categories.labels]
             mask_categories = MaskCategories(
                 colormap=generate_colormap(num_classes, include_background=True), labels=labels
             )

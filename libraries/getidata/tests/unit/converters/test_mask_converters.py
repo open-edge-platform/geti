@@ -83,7 +83,7 @@ def test_polygon_to_mask_converter():
     assert converter_instance.filter_output_spec() is True
     categories = converter_instance.output_mask.categories
     assert isinstance(categories, MaskCategories)
-    assert categories.labels == ("background", "a", "b", "c")
+    assert categories.labels == ["background", "a", "b", "c"]
     assert isinstance(categories.colormap, Colormap)
     assert categories.colormap.inverse_colormap[RgbColor(128, 0, 0)] == 1
 
