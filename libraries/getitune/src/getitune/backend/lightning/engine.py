@@ -1093,7 +1093,10 @@ class LightningEngine(Engine):
         has_val_gpu_augs = val_config and hasattr(val_config, "augmentations_gpu") and val_config.augmentations_gpu
         has_test_gpu_augs = test_config and hasattr(test_config, "augmentations_gpu") and test_config.augmentations_gpu
 
-        if not has_train_gpu_augs and not has_val_gpu_augs:
+        # Tiled evaluation tiles arrive raw from the dataset and are converted here, so the
+        # callback is needed even when no GPU augmentation is configured.
+        tiling = self._datamodule.tile_config.enable_tiler
+        if not has_train_gpu_augs and not has_val_gpu_augs and not tiling:
             return None
 
         logging.info("Building GPU augmentation callback with Kornia augmentations")
@@ -1101,6 +1104,10 @@ class LightningEngine(Engine):
             train_config=train_config if has_train_gpu_augs else None,
             val_config=val_config if has_val_gpu_augs else None,
             test_config=test_config if has_test_gpu_augs else None,
+            val_device_pipeline=self._datamodule.device_preprocess_pipeline(val_config.subset_name) if tiling else None,
+            test_device_pipeline=self._datamodule.device_preprocess_pipeline(test_config.subset_name)
+            if tiling
+            else None,
         )
 
     def _setup_augmentation_scheduler(self) -> None:

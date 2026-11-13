@@ -111,6 +111,17 @@ class OVModel:
         """Set up the tiler for tile-based tasks."""
         raise NotImplementedError
 
+    def _apply_tile_config_to_tiler(self, tiler: Tiler) -> None:
+        """Merge tile predictions with the datamodule's tile settings instead of the IR's.
+
+        The IR's ``iou_threshold`` also configures per-tile model NMS and can differ from the cross-tile merge
+        threshold used by the datamodule. ModelAPI keeps both settings as plain tiler attributes, and the tiler is
+        created in ``__init__`` before ``tile_config`` is known, so they are overridden here.
+        """
+        if self.tile_config.enable_tiler:
+            tiler.iou_threshold = self.tile_config.iou_threshold  # pyrefly: ignore[missing-attribute]
+            tiler.max_pred_number = self.tile_config.max_num_instances  # pyrefly: ignore[missing-attribute]
+
     @property
     def _is_onnx(self) -> bool:
         """Check if the loaded model is an ONNX model."""

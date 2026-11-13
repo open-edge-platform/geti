@@ -4,9 +4,12 @@
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from app.api.schemas import TrainingConfigurationView
 from app.db.schema import ModelRevisionDB, ProjectDB, TrainingConfigurationDB
+from app.execution.common.geti_config_converter import GetiConfigConverter
 from app.models import TaskType
 from app.models.training_configuration.configuration import (
     AlgoLevelParameters,
@@ -67,6 +70,141 @@ def fxt_training_configuration_service(db_session: Session) -> TrainingConfigura
 
 class TestTrainingConfigurationService:
     """Tests for TrainingConfigurationService."""
+
+    @pytest.mark.parametrize(
+        ("architecture", "task", "tiling"),
+        [
+            ("image-classification-efficientnet-b0", "MULTI_CLASS_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_CLASS_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_CLASS_CLS", False),
+            ("image-classification-efficientnet-b0", "MULTI_LABEL_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_LABEL_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_LABEL_CLS", False),
+            ("object-detection-dfine-x", "DETECTION", False),
+            ("object-detection-dfine-x", "DETECTION", True),
+            ("object-detection-rtdetrv2-r18", "DETECTION", False),
+            ("object-detection-yolo26-n", "DETECTION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", True),
+            ("instance-segmentation-mask2former-swin-s", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-yolo26-n", "INSTANCE_SEGMENTATION", False),
+        ],
+    )
+    @pytest.mark.parametrize("workers", [0, 2, 6])
+    def test_worker_settings_follow_application_and_recipe(
+        self, architecture: str, task: str, tiling: bool, workers: int
+    ) -> None:
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture).model_copy(deep=True)
+        assert config.algo_level_parameters.training.num_workers == 2
+        config.apply_updates({"training.num_workers": workers})
+        if tiling:
+            config.apply_updates({"dataset_preparation.augmentation.tiling.enable": True})
+        serialized = config.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=task)
+        resolved = GetiConfigConverter.convert(serialized)["data"]
+        assert [resolved[f"{subset}_subset"]["num_workers"] for subset in ("train", "val", "test")] == [
+            workers,
+            workers,
+            1,
+        ]
+
+    @pytest.mark.parametrize("workers", [0, 4, 6])
+    def test_existing_worker_setting_is_preserved(
+        self,
+        workers: int,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ) -> None:
+        architecture = "object-detection-yolox-s"
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        config.apply_updates({"training.num_workers": workers})
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        assert loaded.algo_level_parameters.training.num_workers == workers
+
+    def test_object_threshold_round_trip(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
+        config.apply_updates(
+            {
+                "dataset_preparation.augmentation.tiling.enable": True,
+                "dataset_preparation.augmentation.tiling.min_object_ratio_thr": 0.25,
+            }
+        )
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        loaded_tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert loaded_tiling is not None
+        assert loaded_tiling.min_object_ratio_thr == 0.25
+        view = TrainingConfigurationView.from_training_configuration(loaded, default).model_dump()
+
+        def find_parameter(nodes):
+            for node in nodes:
+                if node["key"] == "min_object_ratio_thr":
+                    return node
+                if "parameters" in node:
+                    result = find_parameter(node["parameters"])
+                    if result is not None:
+                        return result
+            return None
+
+        parameter = find_parameter(view["parameters"])
+        assert parameter is not None
+        assert (parameter["value"], parameter["default_value"], parameter["min_value"], parameter["max_value"]) == (
+            0.25,
+            0.5,
+            0.0,
+            1.0,
+        )
+        serialized = loaded.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=None)
+        converted = GetiConfigConverter.convert(serialized)
+        assert converted["data"]["tile_config"]["min_object_ratio_thr"] == 0.25
+
+        for invalid in (-0.01, 1.01):
+            with pytest.raises(ValidationError):
+                loaded.apply_updates({"dataset_preparation.augmentation.tiling.min_object_ratio_thr": invalid})
+
+    @pytest.mark.parametrize("architecture", ["object-detection-yolox-s", "instance-segmentation-mask-rcnn-resnet50"])
+    def test_object_threshold_default_for_tiling_architectures(self, architecture: str):
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
+
+    def test_existing_tiling_configuration_uses_threshold_default(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+        db_session: Session,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        legacy = default.algo_level_parameters.model_dump()
+        legacy["dataset_preparation"]["augmentation"]["tiling"].pop("min_object_ratio_thr")
+        db_session.add(
+            TrainingConfigurationDB(
+                id=str(uuid4()),
+                project_id=fxt_project.id,
+                model_architecture_id=architecture,
+                configuration_data=legacy,
+            )
+        )
+        db_session.flush()
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
 
     def test_get_by_model_revision(
         self,

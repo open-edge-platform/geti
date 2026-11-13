@@ -428,6 +428,7 @@ class TestGetiConfigConverterConvert:
                             "enable_adaptive_tiling": True,
                             "tile_size": 512,
                             "tile_overlap": 0.3,
+                            "min_object_ratio_thr": 0.25,
                         }
                     }
                 }
@@ -442,6 +443,7 @@ class TestGetiConfigConverterConvert:
         assert tc["enable_adaptive_tiling"] is True
         assert tc["tile_size"] == (512, 512)
         assert tc["overlap"] == 0.3
+        assert tc["min_object_ratio_thr"] == 0.25
 
     def test_convert_applies_batch_size(self) -> None:
         getitune_cfg = _make_getitune_config()
@@ -456,38 +458,55 @@ class TestGetiConfigConverterConvert:
 
     @pytest.mark.parametrize("num_workers", [0, 6])
     def test_convert_applies_num_workers(self, num_workers: int) -> None:
-        getitune_cfg = _make_getitune_config()
+        recipe_test_workers = 3  # whatever the recipe configures; the converter must not touch it
+
+        def recipe_config() -> dict:
+            cfg = _make_getitune_config()
+            cfg["data"]["test_subset"]["num_workers"] = recipe_test_workers
+            return cfg
+
         geti_cfg = _make_geti_config(hyper_parameters={"training": {"num_workers": num_workers}})
+        baseline_cfg = _make_geti_config(hyper_parameters={"training": {}})
 
         with patch("getitune.tools.auto_configurator.AutoConfigurator") as MockAutoConfigurator:
-            MockAutoConfigurator.return_value.config = getitune_cfg
+            MockAutoConfigurator.return_value.config = recipe_config()
             result = GetiConfigConverter.convert(geti_cfg)
+            MockAutoConfigurator.return_value.config = recipe_config()
+            baseline = GetiConfigConverter.convert(baseline_cfg)
 
-        for subset in ("train_subset", "val_subset", "test_subset"):
+        for subset in ("train_subset", "val_subset"):
             assert result["data"][subset]["num_workers"] == num_workers
+        # The test loader keeps the recipe worker count (tiled test loaders are memory-heavy).
+        assert result["data"]["test_subset"]["num_workers"] == recipe_test_workers
+        assert baseline["data"]["test_subset"]["num_workers"] == recipe_test_workers
 
     def test_convert_huggingface_applies_num_workers(self) -> None:
         from getitune.utils import get_getitune_root_path
 
         recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
         geti_cfg = _make_geti_config(hyper_parameters={"training": {"num_workers": 0}})
+        baseline_cfg = _make_geti_config(hyper_parameters={"training": {}})
 
         with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
             result = GetiConfigConverter.convert(geti_cfg)
+            baseline = GetiConfigConverter.convert(baseline_cfg)
 
-        for subset in ("train_subset", "val_subset", "test_subset"):
+        for subset in ("train_subset", "val_subset"):
             assert result["data"][subset]["num_workers"] == 0
+        assert result["data"]["test_subset"]["num_workers"] == baseline["data"]["test_subset"]["num_workers"]
 
-    def test_convert_ultralytics_applies_num_workers(self) -> None:
+    @pytest.mark.parametrize("num_workers", [0, 2, 6])
+    def test_convert_ultralytics_applies_num_workers(self, num_workers: int) -> None:
         geti_cfg = _make_geti_config(
             model_manifest_id="object-detection-yolo26-n",
-            hyper_parameters={"training": {"num_workers": 0}},
+            hyper_parameters={"training": {"num_workers": num_workers}},
         )
 
         result = GetiConfigConverter.convert(geti_cfg)
 
-        for subset in ("train_subset", "val_subset", "test_subset"):
-            assert result["data"][subset]["num_workers"] == 0
+        for subset in ("train_subset", "val_subset"):
+            assert result["data"][subset]["num_workers"] == num_workers
+        assert result["data"]["test_subset"]["num_workers"] == 1
 
     def test_convert_applies_max_epochs(self) -> None:
         getitune_cfg = _make_getitune_config()
@@ -755,6 +774,7 @@ class TestGetiConfigConverterConvert:
                             "enable_adaptive_tiling": True,
                             "tile_size": 512,
                             "tile_overlap": 0.3,
+                            "min_object_ratio_thr": 0.25,
                         }
                     }
                 }
@@ -769,6 +789,7 @@ class TestGetiConfigConverterConvert:
         assert result["data"]["tile_config"]["enable_adaptive_tiling"] is True
         assert result["data"]["tile_config"]["tile_size"] == (512, 512)
         assert result["data"]["tile_config"]["overlap"] == 0.3
+        assert result["data"]["tile_config"]["min_object_ratio_thr"] == 0.25
 
 
 class TestHyperparametersUpdater:
@@ -914,6 +935,30 @@ class TestTransformsUpdater:
         assert tc["enable_adaptive_tiling"] is True
         assert tc["tile_size"] == (256, 256)
         assert tc["overlap"] == 0.5
+
+    @pytest.mark.parametrize("adaptive", [False, True])
+    @pytest.mark.parametrize("threshold", [0.0, 0.5, 1.0])
+    def test_tiling_update_passes_object_threshold(self, adaptive: bool, threshold: float) -> None:
+        config = _make_getitune_config()
+        TransformsUpdater.update_tiling(
+            {
+                "enable": True,
+                "enable_adaptive_tiling": adaptive,
+                "tile_size": 400,
+                "tile_overlap": 0.2,
+                "min_object_ratio_thr": threshold,
+            },
+            config,
+        )
+        assert config["data"]["tile_config"]["min_object_ratio_thr"] == threshold
+
+    def test_tiling_update_without_threshold_leaves_library_default(self) -> None:
+        """A tiling dict without the threshold must not set it, so the getitune TileConfig default applies."""
+        config = _make_getitune_config()
+        TransformsUpdater.update_tiling(
+            {"enable": True, "enable_adaptive_tiling": True, "tile_size": 400, "tile_overlap": 0.2}, config
+        )
+        assert "min_object_ratio_thr" not in config["data"]["tile_config"]
 
     def test_tiling_update_disabled(self) -> None:
         config = _make_getitune_config()

@@ -520,6 +520,10 @@ class LightningModel(LightningModule):
                 self._label_info = self._dispatch_label_info(ckpt_label_info)
             if ckpt_tile_config := hyper_parameters.get("tile_config"):
                 if isinstance(ckpt_tile_config, dict):
+                    legacy, current = "drop_annotation_threshold", "min_object_ratio_thr"
+                    if legacy in ckpt_tile_config and current not in ckpt_tile_config:
+                        # Key renamed while this PR was in review; keep older branch checkpoints loadable.
+                        ckpt_tile_config[current] = ckpt_tile_config.pop(legacy)
                     ckpt_tile_config = TileConfig(**ckpt_tile_config)
                 self._tile_config = ckpt_tile_config
 

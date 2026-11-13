@@ -194,43 +194,46 @@ class InstanceMaskTiler(Tiler):
     Extracts the corresponding region from each instance mask and prunes
     instances that do not overlap the tile.
 
-    Instance masks are stored as a flattened array plus a separate shape column,
-    a format that the coordinated ``keep``-column filtering mechanism (used by
-    :class:`BboxTiler` and :class:`LabelTiler`) cannot express. To keep masks
-    aligned with the independently filtered bounding boxes and labels, this
-    tiler self-filters instances using the **same tile-intersection criterion**
-    as :class:`BboxTiler` (the instance's full-image mask bounding box must
-    intersect the tile rectangle). Instances are kept in their original order so
-    alignment with boxes/labels is preserved.
+    Instance masks are stored as a flattened array plus a separate shape column.
+    When bounding boxes or polygons are available, the tiling transform passes
+    their shared keep flags to preserve instance alignment. Otherwise, masks are
+    filtered by whether their bounding boxes intersect the tile.
     """
 
     field_spec: AttributeSpec[InstanceMaskField]
 
-    def tile(self, df: pl.DataFrame, tiles_df: pl.DataFrame, slice_offset: int = 0) -> pl.DataFrame:
+    def tile(
+        self,
+        df: pl.DataFrame,
+        tiles_df: pl.DataFrame,
+        slice_offset: int = 0,
+        keep_masks: pl.Series | None = None,
+    ) -> pl.DataFrame:
         """Extract and filter instance mask regions for each tile."""
         column_name = self.field_spec.name
         shape_column = f"{column_name}_shape"
         results_data = []
         results_shape = []
+        keeps = []
 
-        # Cache per source image so the O(H*W) mask scan (reshape + bbox
-        # derivation) is paid at most once per image instead of once per tile.
+        # Cache per source image so the O(H*W) mask reshape (and, when no keep flags are
+        # supplied, the bbox derivation) is paid at most once per image instead of once per tile.
         # Many tiles typically share the same source image, so this avoids
         # O(num_tiles * num_instances * H * W) work on large / dense images.
         # Tiles are processed contiguously per image (see _calculate_tiles), so a
         # single-slot cache captures all the reuse while keeping memory bounded
         # to one image -- avoiding the unbounded growth (and OOM risk on large
         # datasets) of a per-image dictionary.
-        cache: _LastImageCache[tuple[np.ndarray, np.ndarray]] = _LastImageCache()
+        cache: _LastImageCache[tuple[np.ndarray, np.ndarray | None]] = _LastImageCache()
 
-        def _load(image_id: int) -> tuple[np.ndarray, np.ndarray]:
+        def _load(image_id: int) -> tuple[np.ndarray, np.ndarray | None]:
             instances_data = df[column_name][image_id]  # Flattened 3D array
             instances_shape = df[shape_column][image_id]  # (num_instances, height, width)
             # Reshape flattened data once per image: (N, H, W)
             instances = instances_data.reshape(instances_shape).to_numpy()
-            return instances, _instance_bounding_boxes(instances)
+            return instances, _instance_bounding_boxes(instances) if keep_masks is None else None
 
-        for tile_row in tiles_df["tile"]:
+        for tile_index, tile_row in enumerate(tiles_df["tile"]):
             image_id = tile_row["source_sample_idx"] - slice_offset
             instances, boxes = cache.get(image_id, lambda: _load(image_id))
 
@@ -240,14 +243,15 @@ class InstanceMaskTiler(Tiler):
             width = tile_row["width"]
             height = tile_row["height"]
 
-            # Keep only instances whose (cached) full-image bounding box
-            # intersects the tile, mirroring BboxTiler so masks stay aligned
-            # with boxes/labels. This is a cheap vectorized check per tile.
-            if instances.shape[0] > 0:
+            if keep_masks is not None:
+                keep = np.asarray(keep_masks[tile_index], dtype=bool)
+                if len(keep) != len(instances):
+                    raise ValueError("Instance masks are not aligned with the other annotations")
+            elif boxes is not None:
                 keep = _boxes_intersect_tile(boxes, x, y, width, height)
-                kept_instances = instances[keep]
             else:
-                kept_instances = instances
+                keep = np.zeros(0, dtype=bool)
+            kept_instances = instances[keep]
 
             # Extract tile region: shape (num_kept_instances, tile_height, tile_width)
             tile_result = kept_instances[:, y : y + height, x : x + width]
@@ -255,11 +259,13 @@ class InstanceMaskTiler(Tiler):
             # Flatten result for storage
             results_data.append(tile_result.reshape(-1))
             results_shape.append(tile_result.shape)
+            keeps.append(keep.tolist())
 
         return pl.DataFrame(
             {
                 column_name: results_data,
                 shape_column: results_shape,
+                "keep": pl.Series(keeps, dtype=pl.List(pl.Boolean())),
             }
         )
 
@@ -270,11 +276,13 @@ class BboxTiler(Tiler):
 
     Handles:
     - Adjusting bbox coordinates relative to tile origin
-    - Filtering out boxes that don't intersect with tile
+    - Filtering out boxes that don't intersect with tile, or whose visible area is below
+      ``threshold_drop_ann`` of their full area
     - Adding keep flags for filtering
     """
 
     field_spec: AttributeSpec[BBoxField]
+    threshold_drop_ann: float = 0.5  # Proportion of area below which to drop annotation
 
     def is_filterable(self) -> bool:
         return True
@@ -310,6 +318,15 @@ class BboxTiler(Tiler):
             image_id = tile_row["source_sample_idx"] - slice_offset
             # with_columns below returns new frames, so the cached frame is never mutated.
             boxes = boxes_cache.get(image_id, lambda: _load_boxes(image_id))
+            if len(boxes) == 1 and boxes[column_name][0] is None:
+                # Image without any annotation list: the explode above yields a single null row.
+                results.append(
+                    pl.DataFrame(
+                        {column_name: [[]], "keep": [[]]},
+                        schema={column_name: df.schema[column_name], "keep": pl.List(pl.Boolean())},
+                    )
+                )
+                continue
 
             # Get tile coordinates
             tile_x = tile_row["x"]
@@ -319,6 +336,11 @@ class BboxTiler(Tiler):
             tile_x2 = tile_x + tile_width
             tile_y2 = tile_y + tile_height
 
+            # Area of the original box (before clipping), for the threshold rule below.
+            boxes = boxes.with_columns(
+                full_area=(pl.col("x2") - pl.col("x1")) * (pl.col("y2") - pl.col("y1")),
+            )
+
             # Check if box intersects with tile
             boxes = boxes.with_columns(
                 keep=(pl.col("x2") > tile_x)
@@ -327,12 +349,24 @@ class BboxTiler(Tiler):
                 & (pl.col("y1") < tile_y2)
             )
 
-            # Calculate intersection
+            # Calculate visible (clipped) part of the box in the tile
             boxes = boxes.with_columns(
                 pl.col("x1").clip(lower_bound=tile_x) - tile_x,
                 pl.col("y1").clip(lower_bound=tile_y) - tile_y,
                 pl.col("x2").clip(upper_bound=tile_x2) - tile_x,
                 pl.col("y2").clip(upper_bound=tile_y2) - tile_y,
+            )
+
+            # Drop annotations whose visible part is below the configured ratio of their full area
+            # (visible_area >= 0 * full_area is always true, so threshold 0 keeps any intersection).
+            boxes = (
+                boxes.with_columns(
+                    visible_area=(pl.col("x2") - pl.col("x1")) * (pl.col("y2") - pl.col("y1")),
+                )
+                .with_columns(
+                    keep=pl.col("keep") & (pl.col("visible_area") >= self.threshold_drop_ann * pl.col("full_area")),
+                )
+                .drop("full_area", "visible_area")
             )
 
             boxes = boxes.with_columns(bboxes=pl.concat_arr("x1", "y1", "x2", "y2"))

@@ -223,6 +223,15 @@ class TestLightningModel:
         assert model.tile_config == restored
         assert not caught
 
+    def test_on_load_checkpoint_maps_renamed_threshold_key(self) -> None:
+        """Checkpoints saved before the key rename keep loading, with the value preserved."""
+        model = ATSS(label_info=1, pretrained=False)
+        checkpoint = {"hyper_parameters": {"tile_config": {"drop_annotation_threshold": 0.25}}}
+
+        model.on_load_checkpoint(checkpoint)
+
+        assert model.tile_config.min_object_ratio_thr == 0.25
+
 
 class TestDataInputParams:
     def test_as_dict(self):

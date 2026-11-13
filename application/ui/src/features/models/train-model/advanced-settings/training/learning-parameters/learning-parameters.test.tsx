@@ -134,6 +134,19 @@ describe('LearningParameters', () => {
         expect(getParameter('Minimum learning rate')).toBeInTheDocument();
     });
 
+    it('allows zero workers and resets to two', async () => {
+        render(<App learningParameters={learningParameters} />);
+
+        const workers = screen.getByRole('textbox', { name: 'Change Number of workers' });
+        expect(workers).toHaveValue('2');
+        await userEvent.click(workers);
+        await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+        expect(workers).toHaveValue('0');
+        resetParameter('Number of workers');
+        expect(workers).toHaveValue('2');
+        expect(screen.queryByRole('textbox', { name: 'Change Test workers' })).not.toBeInTheDocument();
+    });
+
     describe('updates parameters and resets them to default properly', () => {
         const parametersWithoutInputSizeParameters = {
             ...learningParameters,

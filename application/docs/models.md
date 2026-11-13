@@ -176,6 +176,10 @@ The data used for training can be scoped in three ways:
 The last two parameters are mutually exclusive. In the first two cases, the job creates a new dataset revision unless
 an up-to-date one already exists for the same scope.
 
+In advanced training settings, **Number of workers** controls data-loading subprocesses for training and validation.
+It defaults to `2`; set it to `0` to load data in the main process. Testing uses `1` worker from the model recipe and
+is not changed by this setting. Existing saved training configurations keep their configured worker count.
+
 The actual training loop is controlled by the OTX `Engine`, configured with an `OTXDataModule` that is initialized
 from the previously created `Dataset`. Just before the loop starts, the hyperparameters are serialized to a YAML file
 in OTX-compatible format, and any necessary base weights are downloaded if not already cached locally.
@@ -202,6 +206,30 @@ compared to the ground truth annotations to compute the metrics.
 > However, persisting it to disk is still necessary if, at a later time, the user wants to re-train another model
 > on the same dataset revision, or to simply inspect the dataset contents. For this reason, it is recommended to
 > store the dataset in a format like Parquet that allows efficient loading and querying, with or without Datumaro.
+
+### Tiling
+
+Models that support tiling (detection and instance segmentation) can be trained on tiles of large images, enabled in
+automatic or custom mode in the advanced training settings. **Object visibility threshold in tile** sets how much of an
+object's bounding box or polygon area must be visible inside a tile for the object to be included, in its visible
+(cut) extent, on that tile:
+
+- `0.5` (default): include an object only if at least half of it is visible;
+- `0`: include every object that intersects the tile, however little is visible;
+- `1`: include only objects that are fully inside the tile.
+
+The setting applies to the objects of training and validation tiles. Objects that are large compared to the tile
+size can be left out of every tile when no tile contains the required fraction, so choose the tile size and the
+threshold according to the size of the objects in the dataset.
+
+Before this setting existed, bounding boxes were kept on any intersection while polygons already used `0.5`. Training
+configurations saved earlier use the `0.5` default; models that are already trained are not affected.
+
+In automatic mode the tile parameters are computed from the training annotations: the overlap is set to `0.25` and the
+tile size is derived from the larger edge of the objects so that about 95% of the objects are fully visible in at least
+one tile. When the typical object is already large enough in the model input after the whole-image resize to the model
+input size, tiling brings no benefit and is switched off for that dataset; the object visibility threshold above then
+applies to the full images as usual.
 
 ### Evaluation metrics
 

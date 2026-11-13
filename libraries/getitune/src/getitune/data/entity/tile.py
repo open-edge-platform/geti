@@ -63,6 +63,24 @@ class TileDetDataEntity(TileDataEntity):
 TileAttrDictList = list[dict[str, int | str]]
 
 
+def require_float_tiles(batch_tiles: Sequence[Sequence[torch.Tensor]]) -> None:
+    """Fail loudly if any tile still holds raw (integer) pixels.
+
+    Evaluation tiles travel from the dataset worker as raw uint8/uint16 pixels and
+    are converted to float (intensity mapping + resize) on the device before the
+    model sees them. A raw tile reaching the model would silently produce wrong
+    predictions, so this check guards every tile-merge entry point.
+    """
+    for tiles in batch_tiles:
+        for tile in tiles:
+            if not tile.is_floating_point():
+                msg = (
+                    f"Tile images must be float before the model, got {tile.dtype}. "
+                    "Raw tiles are converted on the device by the GPU augmentation callback."
+                )
+                raise RuntimeError(msg)
+
+
 @dataclass
 class TileBatchData:
     """Base batch data entity for tile task.
@@ -103,6 +121,7 @@ class TileBatchDetDataEntity(TileBatchData):
 
     def unbind(self, tile_batch_size: int) -> list[tuple[list[TileInfo], SampleBatch]]:
         """Unbind batch data entity for detection task."""
+        require_float_tiles(self.batch_tiles)
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
         tile_tile_infos = [tile_info for tile_infos in self.batch_tile_tile_infos for tile_info in tile_infos]
@@ -191,6 +210,7 @@ class TileBatchInstSegDataEntity(TileBatchData):
 
     def unbind(self, tile_batch_size: int) -> list[tuple[TileAttrDictList, SampleBatch]]:
         """Unbind batch data entity for instance segmentation task."""
+        require_float_tiles(self.batch_tiles)
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
         tile_tile_infos = [tile_info for tile_infos in self.batch_tile_tile_infos for tile_info in tile_infos]
@@ -268,6 +288,7 @@ class TileBatchSegDataEntity(TileBatchData):
 
     def unbind(self, tile_batch_size: int) -> list[tuple[list[dict[str, int | str]], SampleBatch]]:
         """Unbind batch data entity for semantic segmentation task."""
+        require_float_tiles(self.batch_tiles)
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
         tile_tile_infos = [tile_info for tile_infos in self.batch_tile_tile_infos for tile_info in tile_infos]

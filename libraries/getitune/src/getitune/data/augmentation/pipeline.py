@@ -29,6 +29,7 @@ from torch import nn
 from getitune.config.data import IntensityConfig
 from getitune.data.augmentation.cache import CacheableMixin
 from getitune.data.augmentation.intensity import build_intensity_transform
+from getitune.data.augmentation.transforms import Resize
 from getitune.data.entity.sample import BaseSample
 from getitune.data.utils import import_object_from_module
 
@@ -368,6 +369,19 @@ class CPUAugmentationPipeline(nn.Module):
 
         msg = f"CPUAugmentationPipeline accepts only DictConfig | dict | nn.Module, got {type(cfg_transform)}."
         raise TypeError(msg)
+
+    def is_intensity_resize_only(self) -> bool:
+        """Return True when the pipeline is exactly one intensity mapping followed by one Resize.
+
+        Such a pipeline can run on the device instead of the dataset worker: the raw
+        pixels travel to the device unchanged and the same two steps run there.
+        """
+        modules = list(self.augmentations)
+        if len(modules) != 2:
+            return False
+        intensity, resize = modules
+        # Targets of evaluation tiles are never rescaled, so the device path can skip them.
+        return isinstance(intensity, _IntensityAdapter) and isinstance(resize, Resize) and not resize.resize_targets
 
     def _is_native_torchvision_transform(self, transform: nn.Module) -> bool:
         """Return True if the transform should be applied via ``_apply_native_transform``.

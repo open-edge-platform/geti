@@ -43,6 +43,18 @@ export const learningParameters: LearningConfigurationGroup = getMockedConfigura
             max_value: null,
             allowed_values: null,
         }),
+        getMockedConfigurationParameter({
+            value_type: 'int',
+            key: 'num_workers',
+            name: 'Number of workers',
+            description: 'Number of workers for training and validation data loading.',
+            depends_on: null,
+            value: 2,
+            default_value: 2,
+            min_value: 0,
+            max_value: 64,
+            allowed_values: null,
+        }),
         getMockedConfigurationParameterGroup({
             key: 'early_stopping',
             name: 'Early stopping',
