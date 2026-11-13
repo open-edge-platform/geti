@@ -45,6 +45,21 @@ def test_spa_fallback_does_not_handle_api_paths(tmp_path, monkeypatch):
     assert frontend_route.text == "spa shell"
 
 
+def test_static_assets_are_gzipped(tmp_path, monkeypatch):
+    bundle = "console.log('geti');" * 100
+    (tmp_path / "index.html").write_text("spa shell")
+    (tmp_path / "index.js").write_text(bundle)
+    monkeypatch.setattr(main.settings, "static_files_dir", tmp_path)
+    monkeypatch.setenv("ASSET_PREFIX", "/html")
+    client = TestClient(main.create_app())
+
+    response = client.get("/html/index.js", headers={"Accept-Encoding": "gzip"})
+
+    assert response.status_code == 200
+    assert response.headers["content-encoding"] == "gzip"
+    assert response.text == bundle
+
+
 def test_uuid_path_parameters_are_documented_as_uuids():
     schema = main.create_app().openapi()
     parameters = schema["paths"]["/api/projects/{project_id}/dataset/views"]["get"]["parameters"]

@@ -36,7 +36,7 @@ from hypercorn.typing import ASGIFramework
 from loguru import logger
 from starlette.routing import compile_path
 
-from app.api.cache_utils import CachedStaticFiles
+from app.api.cache_utils import CachedStaticFiles, StaticGZipMiddleware
 from app.api.routers import (
     dataset_ie,
     dataset_revisions,
@@ -143,7 +143,7 @@ def _configure_static_routes(app: FastAPI) -> None:
 
     asset_prefix = getenv("ASSET_PREFIX", "/html")
     logger.info("Serving static files from {} by context {}", static_dir, asset_prefix)
-    app.mount(asset_prefix, CachedStaticFiles(directory=static_dir), name="static")
+    app.mount(asset_prefix, StaticGZipMiddleware(CachedStaticFiles(directory=static_dir)), name="static")
 
     @app.get("/", include_in_schema=False)
     @app.api_route(

@@ -8,7 +8,7 @@ from httpx import ASGITransport, AsyncClient
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
-from app.api.cache_utils import CachedStaticFiles
+from app.api.cache_utils import CachedStaticFiles, StaticGZipMiddleware
 
 
 @pytest.fixture
@@ -97,3 +97,60 @@ async def test_fallback_cache_control(app, static_dir):
         response = await client.get("/static/readme.txt")
     assert response.status_code == 200
     assert response.headers["cache-control"] == "public, max-age=3600"
+
+
+# Above GZipMiddleware's 500-byte minimum so compression actually kicks in.
+LARGE_CONTENT = b"geti " * 400
+
+
+@pytest.fixture
+def gzip_app(tmp_path):
+    """Create a Starlette app serving large static files through StaticGZipMiddleware."""
+    for name in ("app.js", "style.css", "ort.wasm", "image.png", "font.woff2", "model.onnx"):
+        (tmp_path / name).write_bytes(LARGE_CONTENT)
+    return Starlette(
+        routes=[
+            Mount("/static", StaticGZipMiddleware(CachedStaticFiles(directory=tmp_path)), name="static"),
+        ]
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("filename", ["app.js", "style.css", "ort.wasm"])
+async def test_gzip_compresses_text_like_assets(gzip_app, filename):
+    async with AsyncClient(transport=ASGITransport(app=gzip_app), base_url="http://test") as client:
+        response = await client.get(f"/static/{filename}", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == 200
+    assert response.headers["content-encoding"] == "gzip"
+    assert "Accept-Encoding" in response.headers["vary"]
+    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
+    assert response.content == LARGE_CONTENT
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("filename", ["image.png", "font.woff2", "model.onnx"])
+async def test_gzip_skips_already_compressed_assets(gzip_app, filename):
+    async with AsyncClient(transport=ASGITransport(app=gzip_app), base_url="http://test") as client:
+        response = await client.get(f"/static/{filename}", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == 200
+    assert "content-encoding" not in response.headers
+    assert response.content == LARGE_CONTENT
+
+
+@pytest.mark.asyncio
+async def test_gzip_skipped_when_client_does_not_accept_it(gzip_app):
+    async with AsyncClient(transport=ASGITransport(app=gzip_app), base_url="http://test") as client:
+        response = await client.get("/static/app.js", headers={"Accept-Encoding": "identity"})
+    assert response.status_code == 200
+    assert "content-encoding" not in response.headers
+    assert response.content == LARGE_CONTENT
+
+
+@pytest.mark.asyncio
+async def test_gzip_skipped_for_range_requests(gzip_app):
+    async with AsyncClient(transport=ASGITransport(app=gzip_app), base_url="http://test") as client:
+        response = await client.get("/static/ort.wasm", headers={"Accept-Encoding": "gzip", "Range": "bytes=0-999"})
+    assert response.status_code == 206
+    assert "content-encoding" not in response.headers
+    assert response.headers["content-range"] == f"bytes 0-999/{len(LARGE_CONTENT)}"
+    assert response.content == LARGE_CONTENT[:1000]

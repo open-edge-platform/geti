@@ -1,11 +1,16 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Custom StaticFiles handler that adds Cache-Control headers to static asset responses."""
+"""Static asset serving: Cache-Control headers and on-the-fly gzip compression."""
 
 from fastapi.staticfiles import StaticFiles
+from starlette.datastructures import Headers
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.responses import Response
-from starlette.types import Scope
+from starlette.types import ASGIApp, Receive, Scope, Send
+
+# Images, fonts and ONNX weights are already compressed; gzipping them burns CPU for little to no gain.
+GZIP_EXTENSIONS = (".html", ".js", ".mjs", ".css", ".json", ".svg", ".txt", ".wasm")
 
 
 class CachedStaticFiles(StaticFiles):
@@ -37,3 +42,19 @@ class CachedStaticFiles(StaticFiles):
             # Fallback for anything not explicitly matched
             response.headers["Cache-Control"] = "public, max-age=3600"
         return response
+
+
+class StaticGZipMiddleware(GZipMiddleware):
+    """Gzip text-like static assets for clients that accept it; other requests pass through untouched."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        # Level 6 compresses as well as the default 9 for our bundles at roughly half the CPU cost.
+        super().__init__(app, compresslevel=6)
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Compress only whole-file responses of compressible asset types."""
+        # GZipMiddleware would compress a 206 body while keeping the identity Content-Range.
+        if scope["type"] == "http" and scope["path"].endswith(GZIP_EXTENSIONS) and "range" not in Headers(scope=scope):
+            await super().__call__(scope, receive, send)
+        else:
+            await self.app(scope, receive, send)
