@@ -229,6 +229,24 @@
             "assignAllFailure": "Toewijzen van label(s) aan alle {{count}} afbeelding(en) mislukt",
             "assignPartialSuccess": "Label(s) toegewezen aan {{succeeded}} van {{total}} afbeelding(en) ({{failed}} mislukt)"
         },
+        "mediaDetails": {
+            "title": "Details",
+            "resolution": "Resolutie",
+            "fileSize": "Bestandsgrootte",
+            "format": "Formaat",
+            "type": "Mediatype",
+            "image": "Afbeelding",
+            "video": "Video",
+            "frameRate": "Framesnelheid",
+            "duration": "Duur",
+            "frames": "Totaal frames",
+            "annotatedFrames": "Geannoteerde frames",
+            "annotations": "Annotaties",
+            "labels": "Unieke labels",
+            "loading": "Laden...",
+            "unavailable": "Niet beschikbaar",
+            "retry": "Opnieuw proberen"
+        },
         "mediaActions": {
             "downloadStarted": "Download van {{fileName}} is gestart"
         },
@@ -244,10 +262,6 @@
             "dropZone": {
                 "title": "Zet mediabestanden hier neer",
                 "description": "Afbeeldingen en video's worden naar deze dataset geüpload."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Aantal geannoteerde frames: {{count}}",
-                "totalFrames": "Totaal aantal frames: {{count}}"
             }
         },
         "import": {

@@ -1,0 +1,96 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+.content {
+    min-height: 0;
+}
+
+.layout {
+    display: grid;
+    padding-top: var(--spectrum-global-dimension-size-200);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--spectrum-global-dimension-size-400);
+    align-items: start;
+}
+
+.preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    background: var(--spectrum-global-color-gray-50);
+    overflow: hidden;
+    border-radius: var(--spectrum-global-dimension-size-50);
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.details {
+    min-width: 0;
+}
+
+.name {
+    margin: 0 0 var(--spectrum-global-dimension-size-100);
+    font-size: var(--spectrum-global-dimension-font-size-300);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.status {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-100);
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spectrum-global-dimension-size-225) var(--spectrum-global-dimension-size-300);
+    margin: var(--spectrum-global-dimension-size-300) 0 0;
+
+    dt {
+        color: var(--spectrum-global-color-gray-700);
+        font-size: var(--spectrum-global-dimension-font-size-75);
+    }
+
+    dd {
+        margin: var(--spectrum-global-dimension-size-50) 0 0;
+        font-size: var(--spectrum-global-dimension-font-size-100);
+        font-weight: var(--spectrum-global-font-weight-semi-bold);
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 640px) {
+    .layout {
+        grid-template-columns: 1fr;
+        gap: var(--spectrum-global-dimension-size-200);
+    }
+
+    .preview {
+        aspect-ratio: auto;
+        height: calc(var(--spectrum-global-dimension-size-200) * 7);
+    }
+
+    .fields {
+        gap: var(--spectrum-global-dimension-size-125) var(--spectrum-global-dimension-size-200);
+        margin-top: var(--spectrum-global-dimension-size-150);
+    }
+}
+
+@media (max-height: 700px) {
+    .layout {
+        padding-top: var(--spectrum-global-dimension-size-100);
+        gap: var(--spectrum-global-dimension-size-200);
+    }
+
+    .fields {
+        gap: var(--spectrum-global-dimension-size-125) var(--spectrum-global-dimension-size-200);
+        margin-top: var(--spectrum-global-dimension-size-150);
+    }
+}

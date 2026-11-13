@@ -229,6 +229,24 @@
             "assignAllFailure": "为 {{count}} 张图片分配标签时全部失败",
             "assignPartialSuccess": "{{total}} 张图片中，已有 {{succeeded}} 张分配成功（{{failed}} 张失败）"
         },
+        "mediaDetails": {
+            "title": "详情",
+            "resolution": "分辨率",
+            "fileSize": "文件大小",
+            "format": "格式",
+            "type": "媒体类型",
+            "image": "图像",
+            "video": "视频",
+            "frameRate": "帧率",
+            "duration": "时长",
+            "frames": "总帧数",
+            "annotatedFrames": "已标注帧数",
+            "annotations": "标注数量",
+            "labels": "不同标签数",
+            "loading": "加载中...",
+            "unavailable": "不可用",
+            "retry": "重试"
+        },
         "mediaActions": {
             "downloadStarted": "{{fileName}} 已开始下载"
         },
@@ -244,10 +262,6 @@
             "dropZone": {
                 "title": "把媒体文件拖拽到这里",
                 "description": "图片和视频将上传到此数据集。"
-            },
-            "mediaInfo": {
-                "annotatedFrames": "已标注帧数：{{count}}",
-                "totalFrames": "总帧数：{{count}}"
             }
         },
         "import": {

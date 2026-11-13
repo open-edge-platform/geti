@@ -229,6 +229,24 @@
             "assignAllFailure": "Failed to assign label(s) to all {{count}} image(s)",
             "assignPartialSuccess": "Assigned label(s) to {{succeeded}} of {{total}} image(s) ({{failed}} failed)"
         },
+        "mediaDetails": {
+            "title": "Details",
+            "resolution": "Resolution",
+            "fileSize": "File size",
+            "format": "Format",
+            "type": "Media type",
+            "image": "Image",
+            "video": "Video",
+            "frameRate": "Frame rate",
+            "duration": "Duration",
+            "frames": "Total frames",
+            "annotatedFrames": "Annotated frames",
+            "annotations": "Annotations",
+            "labels": "Unique labels",
+            "loading": "Loading...",
+            "unavailable": "Unavailable",
+            "retry": "Retry"
+        },
         "mediaActions": {
             "downloadStarted": "{{fileName}} download has started"
         },
@@ -244,10 +262,6 @@
             "dropZone": {
                 "title": "Drop media files here",
                 "description": "Images and videos will be uploaded to this dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Number of annotated frames: {{count}}",
-                "totalFrames": "Total frames: {{count}}"
             }
         },
         "import": {

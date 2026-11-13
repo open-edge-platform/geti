@@ -229,6 +229,24 @@
             "assignAllFailure": "Nie udało się przypisać etykietę(-y) do wszystkich {{count}} obrazów",
             "assignPartialSuccess": "Przypisano etykietę(-y) do {{succeeded}} z {{total}} obrazów ({{failed}} nieudanych)"
         },
+        "mediaDetails": {
+            "title": "Szczegóły",
+            "resolution": "Rozdzielczość",
+            "fileSize": "Rozmiar pliku",
+            "format": "Format",
+            "type": "Typ mediów",
+            "image": "Obraz",
+            "video": "Wideo",
+            "frameRate": "Liczba klatek na sekundę",
+            "duration": "Czas trwania",
+            "frames": "Wszystkie klatki",
+            "annotatedFrames": "Klatki z adnotacjami",
+            "annotations": "Adnotacje",
+            "labels": "Unikalne etykiety",
+            "loading": "Ładowanie...",
+            "unavailable": "Niedostępne",
+            "retry": "Ponów"
+        },
         "mediaActions": {
             "downloadStarted": "Rozpoczęto pobieranie {{fileName}}"
         },
@@ -244,10 +262,6 @@
             "dropZone": {
                 "title": "Upuść tutaj pliki multimedialne",
                 "description": "Obrazy i filmy zostaną przesłane do tego zbioru danych."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Liczba klatek z adnotacjami: {{count}}",
-                "totalFrames": "Łączna liczba klatek: {{count}}"
             }
         },
         "import": {

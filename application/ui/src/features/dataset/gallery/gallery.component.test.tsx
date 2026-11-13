@@ -1,11 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
+import type { Media } from '@/api/types';
 import * as actualUi from '@geti-ui/ui' with { rstest: 'importActual' };
 import { ViewModes } from '@geti-ui/ui';
-import { screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedMediaImage, getMockedVideo } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
@@ -152,7 +153,7 @@ describe('Gallery annotation status', () => {
 describe('Gallery item deletion and selection', () => {
     const item = getMockedMediaImage({ id: 'item-1' });
 
-    const GalleryWithSelectionCount = ({ items }: { items: (typeof item)[] }) => {
+    const GalleryWithSelectionCount = ({ items }: { items: Media[] }) => {
         const { selectedKeys } = useSelectedData();
         const count = selectedKeys instanceof Set ? selectedKeys.size : 0;
 
@@ -171,7 +172,7 @@ describe('Gallery item deletion and selection', () => {
         );
     };
 
-    const renderGalleryWithItems = async (items: (typeof item)[]) => {
+    const renderGalleryWithItems = async (items: Media[]) => {
         server.use(
             http.get('/api/projects/{project_id}', () => HttpResponse.json(getMockedProject({ id: 'project-123' }))),
             http.delete('/api/projects/{project_id}/dataset/media', () => new HttpResponse(null, { status: 204 }))
@@ -187,6 +188,105 @@ describe('Gallery item deletion and selection', () => {
 
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
     };
+
+    it.each(
+        [
+            getMockedMediaImage({ annotation_status: { has_annotations: false } }),
+            getMockedMediaImage({ annotation_status: { has_annotations: true } }),
+            getMockedVideo({ annotation_status: { has_annotations: false, annotated_video_frames: 0 } }),
+            getMockedVideo({ annotation_status: { has_annotations: true, annotated_video_frames: 1 } }),
+        ].map((media) => ({ media, type: media.type, hasAnnotations: media.annotation_status.has_annotations }))
+    )('opens Details from the info button for $type with has_annotations=$hasAnnotations', async ({ media }) => {
+        const request = rs.fn();
+        server.use(
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () => {
+                request();
+                return HttpResponse.json({ annotations: [], user_reviewed: true, subset: 'unassigned' });
+            }),
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/frames', () => {
+                request();
+                return HttpResponse.json([]);
+            })
+        );
+        const user = userEvent.setup();
+        await renderGalleryWithItems([media]);
+
+        expect(request).not.toHaveBeenCalled();
+        const detailsButton = screen.getByRole('button', { name: 'Details' });
+        expect(detailsButton).toHaveAttribute('aria-haspopup', 'dialog');
+        act(() => screen.getByRole('option').focus());
+        act(() => detailsButton.focus());
+        expect(detailsButton).toHaveFocus();
+        await user.keyboard('{Enter}');
+
+        const dialog = await screen.findByRole('dialog', { name: 'Details' });
+        expect(within(dialog).getByRole('heading', { name: `${media.name}.${media.format}`, level: 3 })).toBeVisible();
+        if (media.annotation_status.has_annotations) {
+            await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+        } else {
+            expect(request).not.toHaveBeenCalled();
+        }
+        await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+        expect(screen.queryByText(/\d+ selected/)).not.toBeInTheDocument();
+    });
+
+    it('offers only Annotate, Download and Delete in the actions menu', async () => {
+        const user = userEvent.setup();
+        await renderGalleryWithItems([item]);
+
+        await user.click(screen.getByRole('button', { name: 'Media actions' }));
+        expect((await screen.findAllByRole('menuitem')).map((menuItem) => menuItem.textContent)).toEqual([
+            'Annotate',
+            'Download',
+            'Delete',
+        ]);
+    });
+
+    it('keeps Details open when its gallery card unmounts', async () => {
+        server.use(
+            http.get('/api/projects/{project_id}', () => HttpResponse.json(getMockedProject({ id: 'project-123' }))),
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () =>
+                HttpResponse.json({ annotations: [], user_reviewed: true, subset: 'unassigned' })
+            )
+        );
+        const GalleryWithChangingItems = () => {
+            const [items, setItems] = useState([item]);
+
+            return (
+                <>
+                    <button
+                        onClick={() => setItems([getMockedMediaImage({ id: 'another-item', name: 'replacement' })])}
+                    >
+                        Replace gallery items
+                    </button>
+                    <MediaUploadProvider>
+                        <SelectedDataProvider>
+                            <GalleryWithSelectionCount items={items} />
+                        </SelectedDataProvider>
+                    </MediaUploadProvider>
+                </>
+            );
+        };
+        const user = userEvent.setup();
+        render(<GalleryWithChangingItems />);
+        await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
+        const originalCard = screen.getByRole('option');
+        const replaceItemsButton = screen.getByRole('button', { name: 'Replace gallery items' });
+
+        await user.click(screen.getByRole('button', { name: 'Details' }));
+        await screen.findByRole('dialog', { name: 'Details' });
+
+        fireEvent.click(replaceItemsButton);
+
+        expect(originalCard).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Selection state of media item another-item')).toBeInTheDocument();
+        const dialog = screen.getByRole('dialog', { name: 'Details' });
+        expect(dialog).toBeVisible();
+        expect(within(dialog).getByRole('heading', { name: `${item.name}.${item.format}`, level: 3 })).toBeVisible();
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
 
     it('does not show a selected count after deleting a non-selected item', async () => {
         const user = userEvent.setup();
