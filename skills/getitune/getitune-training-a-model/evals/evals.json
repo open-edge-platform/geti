@@ -1,0 +1,34 @@
+{
+  "skill_name": "getitune-training-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a short Python smoke script that trains a classification model with getitune 0.4.0 for one epoch on my dataset.",
+      "expected_output": "The agent provides a script using create_engine and engine.train(max_epochs=1), an explicit device and clearly marked dataset placeholder, plus installation instructions with the matching PyTorch index. It explains checkpoint and metric verification without claiming to have executed the script.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Fine-tune a getitune model from an existing checkpoint and verify the result. I have not provided the checkpoint, model or task, dataset, or target device; no task assets are available in this environment.",
+      "expected_output": "The agent requests the checkpoint, matching model or task, dataset with training and evaluation subsets, and target device. It proposes a bounded smoke run after those inputs are supplied, without claiming training or evaluation has occurred.",
+      "assertions": [
+        "Requests the checkpoint, model or task, dataset, and target device.",
+        "Proposes a bounded smoke run and subsequent checkpoint and task-metric verification.",
+        "Does not invent training results, checkpoint paths, or measured metrics."
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write a Python script, without executing it, to fine-tune efficientnet_b0 using installed getitune 0.4.0 on CPU for one epoch. Use ./weights/classifier.ckpt, a prepared single-label classification dataset at ./dataset with train/validation/test subsets, and ./run as the output directory. Evaluate the result and explain what I must verify; do not export or quantize.",
+      "expected_output": "Uses create_engine with the specified model, checkpoint, data, CPU device and work_dir; calls train(max_epochs=1) and test(), and describes checkpoint and task-metric verification without fabricating a run.",
+      "assertions": [
+        "Uses create_engine from getitune.engine with efficientnet_b0, task=MULTI_CLASS_CLS (or its unambiguous recipe), ./dataset, device=cpu and work_dir=./run; does not invent a CLASSIFICATION task.",
+        "Loads ./weights/classifier.ckpt via the checkpoint parameter before training.",
+        "Bounds training to max_epochs=1 and evaluates with test().",
+        "Explains checking a saved checkpoint and task metrics without claiming measured results or performing export or quantization."
+      ],
+      "files": []
+    }
+  ]
+}

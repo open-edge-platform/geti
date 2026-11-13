@@ -1,11 +1,13 @@
 # Library agent skills
 
-Skills for `libraries/getitune/` (`getitune`, the Geti training library): models, recipes,
+Skills for the `getitune` package: models, recipes,
 datasets, training, export, optimization, and inference. Library skills cover
 both the Python API and the `getitune` CLI whenever both surfaces exist.
 
-Run commands from `libraries/getitune/` unless noted otherwise (`just venv`, `just lint`,
-`just test-unit`, `getitune ...`).
+The six user-facing `getitune-*` skills use the published package
+(`getitune==0.4.0`) and can run from any working directory. The separate
+`geti-library-dev` skill is for contributor work in the Geti checkout and uses
+the repository's `just` recipes.
 
 ## Skills
 

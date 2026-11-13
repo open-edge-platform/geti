@@ -1,0 +1,25 @@
+{
+  "skill_name": "geti-library-dev",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I changed a utility under the getitune library. Set up the CPU development environment and run relevant unit tests and lint. This environment has no Geti checkout, changed source files, or diff; I have not supplied a repository location.",
+      "expected_output": "The agent requests the checkout location and changed file or diff before selecting tests. It explains the contributor just workflow without running it in an unrelated directory or claiming validation succeeded.",
+      "assertions": [
+        "Requests the Geti checkout and changed source file or diff.",
+        "Does not claim to have run tests or lint without the checkout."
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Add a unit test for a helper in the getitune library and validate only the affected test file. There is no Geti checkout in this environment, and I have not supplied the helper source, its expected behavior, or a path.",
+      "expected_output": "The agent requests the checkout, helper source or path, and expected behavior. It describes using mirrored unit tests and existing fixtures once available, but does not invent a helper or claim a passing test.",
+      "assertions": [
+        "Requests the checkout, target helper source or path, and expected behavior.",
+        "Does not fabricate a helper implementation or claim a passing test."
+      ],
+      "files": []
+    }
+  ]
+}

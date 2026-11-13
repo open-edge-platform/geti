@@ -1,29 +1,44 @@
 ---
 name: getitune-training-a-model
-description: Train a computer-vision model with the getitune library (the Geti training library) using its Python API or CLI. Use when a user wants to train, fine-tune, or evaluate a model with `create_engine(...)` and `engine.train()/engine.test()`, run `getitune train`/`getitune test`, pick or override a recipe under `getitune.recipe.TASK`, choose a device (cpu/gpu/xpu/cuda), warm-start from a checkpoint, or debug a training run. Covers classification, detection, instance/semantic segmentation, and keypoint detection.
+description: Train a computer-vision model with the getitune package using its Python API or CLI. Use when a user wants to train, fine-tune, or evaluate a model with `create_engine(...)` and `engine.train()/engine.test()`, run `getitune train`/`getitune test`, choose a model or task, select a device (cpu/gpu/xpu/cuda), warm-start from a checkpoint, or debug a training run. This skill is not for changing getitune source code or recipes.
 ---
 
 # Training a model with getitune
 
 `getitune` is a low-code transfer-learning library. Training is driven by an
 `Engine` created with `create_engine(...)`, which pairs a **model/recipe** with a
-**dataset** and returns a runnable engine. Recipes (YAML under
-`libraries/getitune/src/getitune/recipe/<task>/`) bundle model + data pipeline + training
-config, so a model name alone gives a strong baseline.
+**dataset** and returns a runnable engine. The installed package includes recipes
+that bundle the model, data pipeline, and training config, so a model name alone
+gives a strong baseline.
 
-There are two equal entry points that share the same objects and recipes:
+Use the Python API as the default entry point:
 
 - **Python API** — `from getitune.engine import create_engine`, then
-  `engine.train()` / `engine.test()`. Preferred for notebooks, scripts, tests,
-  and library integration. See `libraries/getitune/README.md` ("Quick Start") and the
-  [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start).
-- **CLI** — `getitune train --data_root <path> --model <name|recipe.yaml>`.
-  Preferred for reproducible experiments and shell workflows. See
-  `getitune train --help` and the
-  [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro).
+  `engine.train()` / `engine.test()` for notebooks, scripts, and smoke tests.
+  Use the CLI when the workflow must be driven entirely from shell commands.
 
-Run everything from `libraries/getitune/`. Install with the extra that matches your
-hardware: `uv sync` (cpu), `uv sync --extra xpu`, or `uv sync --extra cuda`.
+Use Python 3.11-3.14 in a dedicated environment. Before installing, check
+`python --version` and `python -m pip show getitune`; if a different version is
+present, use a separate environment instead of downgrading it in place.
+Installation and pretrained-weight downloads require network access.
+Install the pinned package with the extra that matches your hardware:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+For Intel GPUs, replace `[cpu]` with `[xpu]` and the index suffix `/cpu` with
+`/xpu`. For NVIDIA GPUs, use `[cuda]` and `/cu130`. Install only the extra for
+the selected hardware; the accelerator wheels also require compatible drivers.
+After installation, check the selected accelerator before training:
+
+```bash
+python -c "import torch; print('CUDA:', torch.cuda.is_available(), 'XPU:', torch.xpu.is_available())"
+```
+
+If the selected accelerator is unavailable, check drivers and the installed
+wheel. Offer CPU as an explicit fallback rather than silently changing the
+user's device. Missing checkpoints or datasets require user input before a run.
 
 ## Python API workflow
 
@@ -32,6 +47,7 @@ from getitune.engine import create_engine
 
 engine = create_engine(
     model="efficientnet_b0",          # model name, recipe .yaml path, or model class
+    task="MULTI_CLASS_CLS",           # single-label classification; this model also has a multilabel recipe
     data="/path/to/dataset_root",     # dataset root (COCO/YOLO/VOC/native), auto-detected
     work_dir="./my_workspace",        # checkpoints + logs; defaults to ./getitune-workspace
     device="auto",                    # "auto", "cpu", "gpu", "xpu", "cuda", "0", ...
@@ -41,9 +57,11 @@ engine.test()
 ```
 
 1. **Pick the model/recipe.** Pass a model name (`"efficientnet_b0"`), a recipe
-   path (`"src/getitune/recipe/detection/yolox_s.yaml"`), or a model class. If a
-   name matches recipes under several tasks, pass `task=` (e.g.
-   `task="DETECTION"`) to disambiguate. Use the `getitune-discovering-models`
+   path provided by your own package or script, or a model class. If a
+   name matches recipes under several tasks, pass the dataset's exact task:
+   `MULTI_CLASS_CLS` for single-label or `MULTI_LABEL_CLS` for multilabel
+   classification. `CLASSIFICATION` is not a valid task in 0.4.0.
+   Use the `getitune-discovering-models`
    skill to list options.
    - Done when: `create_engine(...)` returns without a `ValueError`/`FileNotFoundError`.
 2. **Point `data=` at the dataset root.** Format is auto-detected by Datumaro; see
@@ -64,7 +82,6 @@ Warm-start from existing weights with
 ## CLI workflow
 
 ```bash
-# from libraries/getitune/
 # 1. Simplest: data only — getitune picks a default model for the task
 getitune train --data_root /path/to/dataset
 
@@ -75,8 +92,8 @@ getitune train --data_root /path/to/dataset --model yolox_s
 getitune train --data_root /path/to/dataset --model yolox_s \
   --max_epochs 200 --checkpoint /path/to/weights.pt
 
-# 4. Run a full, resolved config file
-getitune train --data_root /path/to/dataset --config src/getitune/recipe/detection/yolox_s.yaml
+# 4. Inspect all available training CLI options
+getitune train --help -v
 ```
 
 `getitune test` and `getitune predict` share the same `--model` / `--data_root`
@@ -87,9 +104,9 @@ argument list.
 
 - `device="auto"` selects an available accelerator; force with `"cpu"`, `"gpu"`,
   `"xpu"`, `"cuda"`, or an index like `"0"`.
-- The device must match the installed extra — `--extra xpu` for Intel GPUs,
-  `--extra cuda` for NVIDIA. Guard nothing yourself; the library handles
-  capability checks.
+- The device must match the installed extra: `[xpu]` for Intel GPUs or `[cuda]`
+  for NVIDIA, using the matching PyTorch index above. Check availability before
+  starting a long run; a selected extra alone does not install GPU drivers.
 
 ## Debugging a run
 
@@ -103,15 +120,10 @@ argument list.
 
 ## Verify
 
-```bash
-# from libraries/getitune/
-just lint
-just test-unit -- -k engine        # when you changed engine/training code
-```
-
-For API-facing work, add or run a short Python smoke test that calls
-`create_engine(...)` + `engine.train(max_epochs=1)` on a tiny fixture rather than
-a long real run.
+Run a short Python smoke test with `create_engine(...)` +
+`engine.train(max_epochs=1)` on a tiny fixture before a long real run. Verify that
+the checkpoint is written under `work_dir` and that `engine.test()` produces a
+task metric, not only a loss value.
 
 ## Related skills
 
@@ -119,4 +131,3 @@ a long real run.
 - `getitune-preparing-datasets` — the `data=` half of the engine.
 - `getitune-exporting-a-model` — export a trained checkpoint to OpenVINO/ONNX.
 - `getitune-running-inference` — run predictions with a trained or exported model.
-- `geti-library-dev` — when the libraries/getitune/model code itself needs changes.
