@@ -100,9 +100,6 @@ mask_cats = MaskCategories(colormap=generate_colormap(2))
 dataset = Dataset(MySample, categories={"labels": labels})
 ```
 
-`generate_colormap` returns a `Colormap` instead of a dictionary. Existing callers
-that need dictionary methods or key iteration can use `generate_colormap(...).data`.
-
 ## Detailed Documentation
 
 The full documentation is split into focused pages:
