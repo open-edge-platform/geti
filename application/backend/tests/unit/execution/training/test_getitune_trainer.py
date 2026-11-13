@@ -112,6 +112,7 @@ def fxt_getitune_trainer(
                 model_service=fxt_model_service,
                 training_configuration_service=fxt_training_configuration_service,
                 db_session_factory=fxt_db_session_factory,
+                ultralytics_aux_weights_dir=tmp_path / "ultralytics" / "weights",
             )
         )
         execution_ctx = Mock(spec=ExecutionContext)
@@ -1014,6 +1015,7 @@ class TestGetiTuneTrainerTrainModel:
         mock_create_engine.assert_called_once()
         engine_call_kwargs = mock_create_engine.call_args.kwargs
         assert engine_call_kwargs["checkpoint"] == weights_path
+        assert engine_call_kwargs["aux_weights_dir"] == tmp_path / "ultralytics" / "weights"
         mock_engine.train.assert_called_once()
         assert trained_model_path == expected_checkpoint_path
         assert returned_engine == mock_engine

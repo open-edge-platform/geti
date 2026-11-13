@@ -117,7 +117,7 @@ class UltralyticsEngine(Engine):
 
         # Pin auxiliary Ultralytics aux weights location.
         if aux_weights_dir is not None:
-            aux_weights_dir = aux_weights_dir.resolve()
+            aux_weights_dir = Path(aux_weights_dir).resolve()
             aux_weights_dir.mkdir(parents=True, exist_ok=True)
             logger.info("Using Ultralytics auxiliary weights directory: %s", aux_weights_dir)
             utils.SETTINGS.update({"weights_dir": str(aux_weights_dir)})
