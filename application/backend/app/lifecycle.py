@@ -124,7 +124,7 @@ async def collect_upload_garbage_periodically(upload_service: UploadService, int
 
 
 def setup_job_controller(
-    data_dir: Path, staged_datasets_dir: Path | None, max_parallel_jobs: int
+    data_dir: Path, ultralytics_aux_weights_dir: Path, staged_datasets_dir: Path | None, max_parallel_jobs: int
 ) -> tuple[JobQueue, JobController]:
     """
     Initializes and configures the job queue and job controller for managing parallel job execution.
@@ -135,6 +135,7 @@ def setup_job_controller(
 
     Args:
         data_dir: Path to the directory containing data required for job execution.
+        ultralytics_aux_weights_dir: Path to the directory with auxiliary Ultralytics weights.
         staged_datasets_dir: Path to the directory for storing staged datasets.
         max_parallel_jobs (int): Maximum number of jobs that can run concurrently.
 
@@ -168,6 +169,7 @@ def setup_job_controller(
             model_service=ModelService(data_dir=data_dir),
             training_configuration_service=TrainingConfigurationService(),
             data_dir=data_dir,
+            ultralytics_aux_weights_dir=ultralytics_aux_weights_dir,
             db_session_factory=get_db_session,
         ),
     )
@@ -356,6 +358,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
 
     job_queue, job_controller = setup_job_controller(
         data_dir=settings.data_dir,
+        ultralytics_aux_weights_dir=settings.ultralytics_aux_weights_dir,
         staged_datasets_dir=settings.staged_datasets_dir,
         max_parallel_jobs=settings.gpu_slots,
     )
