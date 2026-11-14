@@ -840,7 +840,7 @@ def test_find_conversion_path_inferred_categories():
     assert isinstance(mask_categories, MaskCategories)
 
     # Check that the mask categories include background + original labels
-    expected_labels = ("background", "cat", "dog", "bird")
+    expected_labels = ["background", "cat", "dog", "bird"]
     assert mask_categories.labels == expected_labels
 
 
