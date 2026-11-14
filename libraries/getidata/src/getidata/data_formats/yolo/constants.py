@@ -45,6 +45,14 @@ TRADITIONAL_SUBSET_CONFIG_KEYS = {
     Subset.TESTING: "test",
 }
 
+# Name of the per-subset directory holding images without annotations in the classification
+# layout. The Ultralytics format has no standard way to represent them, so getidata reserves
+# this directory name: on export, unlabeled images are written into it, and on import, its
+# images are loaded as samples without a label instead of as members of a class. The leading
+# underscore keeps the reserved name clear of real class names while remaining a safe path
+# component on every supported OS.
+UNANNOTATED_DIR_NAME = "_unannotated"
+
 # Mapping from traditional YOLO directory names to subset enum
 TRADITIONAL_DIR_NAME_TO_SUBSET = {
     "obj_train_data": Subset.TRAINING,

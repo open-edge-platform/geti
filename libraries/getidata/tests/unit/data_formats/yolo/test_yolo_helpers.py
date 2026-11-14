@@ -20,18 +20,21 @@ from getidata.data_formats.yolo.helpers import (
     _get_image_size,
     _get_label_names_from_dataset,
     _group_samples_by_subset,
+    _has_segmentation_rows,
     _load_categories_from_names,
     _load_categories_from_yaml,
     _load_ultralytics_categories,
     _make_yolo_bbox,
     _parse_yolo_annotation,
+    _parse_yolo_seg_annotation,
     _save_sample_to_dir,
     _save_traditional_sample,
     _write_obj_data,
     _write_obj_names,
     _write_sample_annotation,
+    _write_sample_seg_annotation,
 )
-from getidata.data_formats.yolo.sample import YoloSample
+from getidata.data_formats.yolo.sample import YoloSample, YoloSegSample
 from getidata.fields import ImageInfo, Subset
 
 
@@ -631,3 +634,103 @@ def test_get_image_size_respects_exif_orientation(tmp_path, orientation, expecte
 
     height, width = _get_image_size(path)
     assert (height, width) == (expected_height, expected_width)
+
+
+# ==========================
+# Segmentation Helper Tests
+# ==========================
+
+
+def _create_seg_layout(root: Path, label_text: str) -> Path:
+    """Create an Ultralytics detection layout holding a single label file with the given text."""
+    (root / "images" / "train").mkdir(parents=True)
+    _create_test_image(root / "images" / "train" / "img1.jpg")
+    labels_dir = root / "labels" / "train"
+    labels_dir.mkdir(parents=True)
+    (labels_dir / "img1.txt").write_text(label_text)
+    (root / "data.yaml").write_text("names: [cat]\ntrain: images/train\n")
+    return labels_dir / "img1.txt"
+
+
+def test_has_segmentation_rows_detects_parseable_polygon_row(tmp_path: Path):
+    """Test that a row with a class index and coordinate pairs marks a dataset as segmentation."""
+    _create_seg_layout(tmp_path, "0 0.1 0.2 0.3 0.2 0.3 0.4\n")
+
+    assert _has_segmentation_rows(tmp_path)
+
+
+def test_has_segmentation_rows_ignores_malformed_long_rows(tmp_path: Path):
+    """Test that a 7+-field row that fails to parse does not mark a detection dataset as segmentation."""
+    # A malformed line (non-numeric class index and coordinates) in a detection dataset must not
+    # block loading it with the explicit ultralytics format by misdetecting it as segmentation.
+    _create_seg_layout(tmp_path, "0 0.5 0.5 0.2 0.3\nnot an int x y z w v u\n")
+
+    assert not _has_segmentation_rows(tmp_path)
+
+
+def test_has_segmentation_rows_ignores_numeric_row_with_even_field_count(tmp_path: Path):
+    """Test that a parseable row with an even field count does not count as a segmentation row."""
+    _create_seg_layout(tmp_path, "0 0.1 0.2 0.3 0.2 0.3 0.4 0.5\n")
+
+    assert not _has_segmentation_rows(tmp_path)
+
+
+def test_parse_yolo_seg_annotation_emits_one_warning_summary_per_file(tmp_path, caplog):
+    """Test that many skipped lines produce a single warning summary instead of one per line."""
+    anno_path = _create_seg_layout(
+        tmp_path,
+        "0 0.1 0.2 0.3 0.2 0.3 0.4\n"  # valid
+        "0 0.5 0.5 0.2 0.3\n"  # detection row (5 fields)
+        "0 0.5 0.5 0.2 0.3\n"  # detection row (5 fields)
+        "0 0.1 0.2 0.3 0.2 0.3 0.4 0.5\n"  # unpaired coordinates (8 fields)
+        "0 0.1 0.2 0.3 abc 0.3 0.4\n",  # malformed value
+    )
+
+    with caplog.at_level("DEBUG", logger="getidata.data_formats.yolo.helpers"):
+        polygons, labels = _parse_yolo_seg_annotation(anno_path, 640, 480)
+
+    assert len(polygons) == 1
+    assert labels == [0]
+    warnings = [r for r in caplog.records if r.levelname == "WARNING" and r.name.endswith("yolo.helpers")]
+    assert len(warnings) == 1
+    assert "Skipped 4 of 5 annotation line(s)" in warnings[0].getMessage()
+    # The per-line detail is still available, at debug level
+    assert any(r.levelname == "DEBUG" and "unpaired coordinates" in r.getMessage() for r in caplog.records)
+    assert any(r.levelname == "DEBUG" and "malformed annotation line" in r.getMessage() for r in caplog.records)
+
+
+def test_parse_yolo_seg_annotation_no_warning_for_clean_file(tmp_path, caplog):
+    """Test that a fully parseable file does not emit a skip summary."""
+    anno_path = _create_seg_layout(tmp_path, "0 0.1 0.2 0.3 0.2 0.3 0.4\n")
+
+    with caplog.at_level("WARNING", logger="getidata.data_formats.yolo.helpers"):
+        _parse_yolo_seg_annotation(anno_path, 640, 480)
+
+    assert not [r for r in caplog.records if r.levelname == "WARNING"]
+
+
+def test_write_sample_seg_annotation_skips_only_malformed_polygon(tmp_path: Path):
+    """Test that an unreshapeable polygon is skipped while the valid polygons of the sample are written."""
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    _create_test_image(src_dir / "img1.jpg")
+
+    # The second polygon holds an odd number of coordinate values and cannot be reshaped to (n, 2)
+    polygons = np.empty(2, dtype=object)
+    polygons[0] = np.asarray([[64, 96], [192, 96], [192, 192]], dtype=np.float32)
+    polygons[1] = np.asarray([1.0, 2.0, 3.0], dtype=np.float32)
+    sample = YoloSegSample(
+        image=str(src_dir / "img1.jpg"),
+        image_info=ImageInfo(height=480, width=640),
+        polygons=polygons,
+        labels=np.array([0, 0], dtype=np.int32),
+        subset=Subset.TRAINING,
+    )
+
+    anno_path = tmp_path / "img1.txt"
+    _write_sample_seg_annotation(anno_path, sample)  # must not raise
+
+    lines = anno_path.read_text().splitlines()
+    assert len(lines) == 1
+    assert lines[0].split()[0] == "0"
+    assert len(lines[0].split()) == 7
