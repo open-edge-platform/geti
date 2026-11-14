@@ -24,5 +24,13 @@ describe('import-upload-file utils', () => {
             const file = new File([''], 'unknownfile');
             expect(isSupportedDatasetZip(file)).toBe(false);
         });
+
+        it.each(['dataset.zip', 'DATASET.ZIP'])('accepts %s when the browser does not provide a MIME type', (name) => {
+            expect(isSupportedDatasetZip(new File([''], name))).toBe(true);
+        });
+
+        it('does not accept a ZIP extension in the middle of an untyped filename', () => {
+            expect(isSupportedDatasetZip(new File([''], 'dataset.zip.exe'))).toBe(false);
+        });
     });
 });
