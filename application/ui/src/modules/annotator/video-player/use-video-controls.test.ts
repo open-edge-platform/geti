@@ -165,34 +165,41 @@ describe('useVideoControls', () => {
             expect(changeCurrentFrameIndex).toHaveBeenCalledWith(frameNumber + step);
         });
 
-        it('advances videoRef.currentTime when playing instead of selecting a frame', async () => {
-            const selectVideoFrame = rs.fn();
-            const changeCurrentFrameIndex = rs.fn();
-            const videoRef = makeVideoRef();
-            const { result } = renderControls({
-                frameNumber: 0,
-                step: 1,
-                videoRef,
-                selectVideoFrame,
-                changeCurrentFrameIndex,
-            });
+        it.each([
+            { frameNumber: 60, step: 1, nextFrameNumber: 61 },
+            { frameNumber: 70, step: 60, nextFrameNumber: 120 },
+        ])(
+            'seeks to frame $nextFrameNumber when stepping forward during playback',
+            async ({ frameNumber, step, nextFrameNumber }) => {
+                const selectVideoFrame = rs.fn();
+                const changeCurrentFrameIndex = rs.fn();
+                const videoRef = makeVideoRef({ currentTime: frameNumber / FPS });
+                const { result } = renderControls({
+                    frameNumber,
+                    step,
+                    videoRef,
+                    selectVideoFrame,
+                    changeCurrentFrameIndex,
+                });
 
-            await act(async () => {
-                await result.current.play();
-            });
+                await act(async () => {
+                    await result.current.play();
+                });
 
-            // reset call counts after play
-            selectVideoFrame.mockClear();
-            changeCurrentFrameIndex.mockClear();
+                // reset call counts after play
+                selectVideoFrame.mockClear();
+                changeCurrentFrameIndex.mockClear();
 
-            act(() => {
-                result.current.nextFrame();
-            });
+                act(() => {
+                    result.current.nextFrame();
+                });
 
-            expect(videoRef.current.currentTime).toBe(1);
-            expect(changeCurrentFrameIndex).toHaveBeenCalledWith(1);
-            expect(selectVideoFrame).not.toHaveBeenCalled();
-        });
+                expect(videoRef.current.currentTime).toBe(nextFrameNumber / FPS);
+                expect(changeCurrentFrameIndex).toHaveBeenCalledWith(nextFrameNumber);
+                expect(selectVideoFrame).not.toHaveBeenCalled();
+                expect(result.current.isPlaying).toBe(true);
+            }
+        );
 
         it('does nothing when already at the last frame', () => {
             const selectVideoFrame = rs.fn();
@@ -247,37 +254,40 @@ describe('useVideoControls', () => {
             expect(changeCurrentFrameIndex).toHaveBeenCalledWith(frameNumber - step);
         });
 
-        it('rewinds videoRef.currentTime when playing instead of selecting a frame', async () => {
-            const selectVideoFrame = rs.fn();
-            const changeCurrentFrameIndex = rs.fn();
-            const ONE_SECOND = 1;
-            const currentTime = 10;
-            const step = 1;
-            const frameNumber = 5;
-            const videoRef = makeVideoRef({ currentTime });
-            const { result } = renderControls({
-                frameNumber,
-                step,
-                videoRef,
-                selectVideoFrame,
-                changeCurrentFrameIndex,
-            });
+        it.each([
+            { frameNumber: 60, step: 1, previousFrameNumber: 59 },
+            { frameNumber: 70, step: 60, previousFrameNumber: 0 },
+        ])(
+            'seeks to frame $previousFrameNumber when stepping backward during playback',
+            async ({ frameNumber, step, previousFrameNumber }) => {
+                const selectVideoFrame = rs.fn();
+                const changeCurrentFrameIndex = rs.fn();
+                const videoRef = makeVideoRef({ currentTime: frameNumber / FPS });
+                const { result } = renderControls({
+                    frameNumber,
+                    step,
+                    videoRef,
+                    selectVideoFrame,
+                    changeCurrentFrameIndex,
+                });
 
-            await act(async () => {
-                await result.current.play();
-            });
+                await act(async () => {
+                    await result.current.play();
+                });
 
-            selectVideoFrame.mockClear();
-            changeCurrentFrameIndex.mockClear();
+                selectVideoFrame.mockClear();
+                changeCurrentFrameIndex.mockClear();
 
-            act(() => {
-                result.current.previousFrame();
-            });
+                act(() => {
+                    result.current.previousFrame();
+                });
 
-            expect(videoRef.current.currentTime).toBe(currentTime - ONE_SECOND);
-            expect(changeCurrentFrameIndex).toHaveBeenCalledWith(frameNumber - step);
-            expect(selectVideoFrame).not.toHaveBeenCalled();
-        });
+                expect(videoRef.current.currentTime).toBe(previousFrameNumber / FPS);
+                expect(changeCurrentFrameIndex).toHaveBeenCalledWith(previousFrameNumber);
+                expect(selectVideoFrame).not.toHaveBeenCalled();
+                expect(result.current.isPlaying).toBe(true);
+            }
+        );
 
         it('does nothing when already at the first frame', () => {
             const selectVideoFrame = rs.fn();
