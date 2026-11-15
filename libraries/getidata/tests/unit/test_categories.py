@@ -13,6 +13,7 @@ from getidata.categories import (
     LabelGroup,
     MaskCategories,
     RgbColor,
+    generate_colormap,
 )
 
 
@@ -94,6 +95,18 @@ def test_label_categories_iteration():
 
     names = [cat for cat in categories]
     assert names == ["person", "car"]
+
+
+@pytest.mark.parametrize("include_background", [True, False])
+def test_generate_colormap(include_background):
+    colormap = generate_colormap(3, include_background=include_background)
+    colors = [RgbColor(0, 0, 0), RgbColor(128, 0, 0), RgbColor(0, 128, 0), RgbColor(128, 128, 0)]
+    expected = colors[:3] if include_background else colors[1:]
+
+    assert isinstance(colormap, Colormap)
+    assert list(colormap) == list(enumerate(expected))
+    assert all(isinstance(color, RgbColor) and colormap.inverse_colormap[color] == i for i, color in colormap)
+    assert generate_colormap(0, include_background=include_background) == {}
 
 
 def test_mask_categories_empty_creation():
