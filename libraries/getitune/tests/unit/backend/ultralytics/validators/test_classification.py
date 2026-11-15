@@ -20,6 +20,14 @@ from getitune.types.label import LabelInfo
 class TestClassificationValidatorGetStats:
     """Tests for the multi-class validator's ``get_stats`` override."""
 
+    def test_filesystem_dataset_uses_native_preprocessing(self, mocker) -> None:
+        validator = object.__new__(ClassificationValidator)
+        validator._datamodule = None
+        batch = {"img": torch.ones(1)}
+        native = mocker.patch.object(_UltralyticsClassificationValidator, "preprocess", return_value=batch)
+        assert validator.preprocess(batch) is batch
+        native.assert_called_once_with(validator, batch)
+
     def test_adds_f1_score_and_iter_time_to_upstream_stats(self, mocker) -> None:
         """F1-score and iter_time must be merged alongside upstream top1/top5 accuracy."""
         validator = object.__new__(ClassificationValidator)

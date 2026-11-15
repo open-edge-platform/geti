@@ -188,6 +188,9 @@ class UltralyticsEngine(Engine):
         kwargs.update(explicit)
         yolo = self._model.yolo
         merged = self._build_overrides(self._train_args, **kwargs)
+        default_monitor = merged.pop("monitor", None)
+        if monitor is None:
+            monitor = default_monitor
 
         if self._data_root is not None and "data" not in merged:
             merged["data"] = str(self._data_root)

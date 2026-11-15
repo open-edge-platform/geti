@@ -19,7 +19,6 @@ type useTrainingConfigurationProps = {
 export const useTrainingConfiguration = ({ modelArchitectureId, modelRevisionId }: useTrainingConfigurationProps) => {
     const modelArchitectureTrainingConfigurationQuery = useGetModelArchitectureTrainingConfiguration({
         modelArchitectureId,
-        modelRevisionId,
     });
 
     const modelTrainingConfigurationQuery = useGetModelTrainingConfiguration(modelRevisionId);
@@ -40,5 +39,10 @@ export const useTrainingConfiguration = ({ modelArchitectureId, modelRevisionId 
         setTrainingConfiguration(defaultTrainingConfiguration);
     }
 
-    return [trainingConfiguration, setTrainingConfiguration, defaultTrainingConfiguration] as const;
+    return [
+        trainingConfiguration,
+        setTrainingConfiguration,
+        defaultTrainingConfiguration,
+        modelArchitectureTrainingConfigurationQuery.data,
+    ] as const;
 };

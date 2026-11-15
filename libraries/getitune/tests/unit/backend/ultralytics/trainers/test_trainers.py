@@ -15,6 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
+from ultralytics.engine.trainer import BaseTrainer as UltralyticsBaseTrainer
 from ultralytics.utils import IterableSimpleNamespace
 
 from getitune.backend.ultralytics.trainers.base import GetiTuneBaseTrainer
@@ -48,6 +49,61 @@ def test_selected_metric_controls_fitness_and_best_checkpoint() -> None:
     Trainer._monitor = "val/accuracy"
     with pytest.raises(ValueError, match="unavailable"):
         trainer.validate()
+
+
+def test_selected_fitness_saves_only_the_best_checkpoint(tmp_path: Path) -> None:
+    class UpstreamTrainer:
+        value: float
+
+        def validate(self) -> tuple[dict[str, float], float]:
+            self.best_fitness = 0.99
+            return {"metrics/mAP50(B)": self.value}, 0.99
+
+    class Trainer(GetiTuneBaseTrainer, UpstreamTrainer):
+        _monitor = "val/map_50"
+        _metric_keys: ClassVar[dict[str, str]] = {"metrics/mAP50(B)": "val/map_50"}
+
+    trainer: Any = Trainer()
+    trainer.model = torch.nn.Linear(1, 1)
+    trainer.ema = SimpleNamespace(ema=trainer.model, updates=0)
+    trainer.optimizer = torch.optim.SGD(trainer.model.parameters(), lr=0.1)
+    trainer.scaler = MagicMock()
+    trainer.scaler.state_dict.return_value = {}
+    trainer.args = SimpleNamespace()
+    trainer.metrics = {}
+    trainer.wdir = tmp_path
+    trainer.last = tmp_path / "last.pt"
+    trainer.best = tmp_path / "best.pt"
+    trainer.save_period = -1
+    trainer.read_results_csv = dict
+    trainer.best_fitness = None
+    for epoch, value in enumerate((0.5, 0.8, 0.7)):
+        trainer.epoch = epoch
+        trainer.value = value
+        trainer.metrics, trainer.fitness = trainer.validate()
+        UltralyticsBaseTrainer.save_model(trainer)
+
+    best = torch.load(trainer.best, weights_only=False)
+    last = torch.load(trainer.last, weights_only=False)
+    assert best["epoch"] == 1
+    assert last["epoch"] == 2
+    assert best["best_fitness"] == pytest.approx(0.8)
+
+
+def test_f1_monitor_uses_custom_validator_for_filesystem_data() -> None:
+    class Trainer(ClassificationTrainer):
+        _monitor = "val/f1-score"
+
+    trainer = object.__new__(Trainer)
+    trainer._use_getitune_data = False
+    trainer._datamodule = None
+    trainer.test_loader = MagicMock()
+    trainer.save_dir = Path("save")
+    trainer.args = IterableSimpleNamespace()
+    trainer.callbacks = defaultdict(list)
+    with patch("getitune.backend.ultralytics.trainers.classification.ClassificationValidator") as validator_cls:
+        assert trainer.get_validator() is validator_cls.return_value
+    assert validator_cls.return_value.datamodule is None
 
 
 def test_detection_trainer_fallback_uses_upstream_preprocess() -> None:

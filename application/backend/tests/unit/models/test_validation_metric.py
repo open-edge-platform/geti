@@ -51,3 +51,16 @@ def test_default_preserves_recipe_and_incompatible_metric_is_rejected():
     config["task_level_parameters"]["evaluation"]["validation_metric"] = ValidationMetric.F1
     with pytest.raises(ValueError, match="not supported"):
         GetiConfigConverter._apply_validation_metric(converted, config, "lightning")
+
+
+def test_ultralytics_semantic_segmentation_rejects_dice():
+    config = {
+        "sub_task_type": "SEMANTIC_SEGMENTATION",
+        "task_level_parameters": {"evaluation": {"validation_metric": "dice"}},
+    }
+    with pytest.raises(ValueError, match="not supported"):
+        GetiConfigConverter._apply_validation_metric({}, config, "ultralytics")
+    config["task_level_parameters"]["evaluation"]["validation_metric"] = "miou"
+    converted: dict[str, Any] = {}
+    GetiConfigConverter._apply_validation_metric(converted, config, "ultralytics")
+    assert converted["training"]["monitor"] == "val/mIoU"

@@ -77,6 +77,21 @@ def test_train_args_are_train_only(mocker, tmp_path) -> None:
     assert "lr0" not in test_args[0]
 
 
+@pytest.mark.parametrize(("monitor", "expected"), [(None, "val/map_50"), ("val/map", "val/map")])
+def test_training_monitor_defaults_are_bound_to_trainer(mocker, tmp_path, monitor, expected) -> None:
+    model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+    datamodule = mocker.MagicMock(spec=DataModule)
+    engine = UltralyticsEngine(
+        model=model, data=datamodule, work_dir=tmp_path, device="cpu", train_args={"monitor": "val/map_50"}
+    )
+    yolo = MagicMock()
+    model._yolo = yolo
+    engine.train(monitor=monitor)
+    kwargs = yolo.train.call_args.kwargs
+    assert "monitor" not in kwargs
+    assert kwargs["trainer"]._monitor == expected
+
+
 def test_ultralytics_engine_supports_ultralytics_model_with_datamodule(mocker) -> None:
     model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
     data = mocker.MagicMock(spec=DataModule)

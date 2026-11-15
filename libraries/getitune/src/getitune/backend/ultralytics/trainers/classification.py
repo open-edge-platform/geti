@@ -81,7 +81,7 @@ class ClassificationTrainer(  # pyrefly: ignore[inconsistent-inheritance]
 
     def get_validator(self) -> ClassificationValidator:
         """Return a custom validator that handles pre-normalised images."""
-        if not self._use_getitune_data:
+        if not self._use_getitune_data and self._monitor != "val/f1-score":
             return super().get_validator()  # type: ignore[return-value]
 
         validator = ClassificationValidator(

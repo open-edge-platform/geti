@@ -733,7 +733,9 @@ class GetiConfigConverter:
         }
         task = config["sub_task_type"]
         task = str(getattr(task, "value", task))
-        if metric not in supported.get(task, set()):
+        if metric not in supported.get(task, set()) or (
+            backend == "ultralytics" and task == "SEMANTIC_SEGMENTATION" and metric == ValidationMetric.DICE
+        ):
             raise ValueError(f"Validation metric '{metric}' is not supported for task '{task}'")
         monitor = monitor_names[metric]
         if backend in ("ultralytics", "huggingface"):
