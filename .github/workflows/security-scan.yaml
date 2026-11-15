@@ -41,7 +41,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           egress-policy: audit
 
@@ -52,7 +52,7 @@ jobs:
           persist-credentials: false
 
       - name: Run Zizmor scan
-        uses: open-edge-platform/geti-ci/actions/zizmor@27a17d738348699840c32f98edc9947f21278154 # zizmor/v0.1.5
+        uses: open-edge-platform/geti-ci/actions/zizmor@7472e413816546d70cf1b735225ec6fd2af50418 # zizmor/v0.1.6
         with:
           scan-scope: ${{ github.event_name == 'pull_request' && 'changed' || 'all' }}
           severity-level: "LOW"
@@ -272,15 +272,15 @@ jobs:
         ai-device: [cpu, cuda, xpu]
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           egress-policy: audit
 
       - name: Run Trivy scan diff (${{ matrix.ai-device }})
-        uses: open-edge-platform/geti-ci/actions/trivy-scan-diff@7cb99ede8752d628eb220fc36c86b4eb043ac525 # trivy-scan-diff/v0.1.0
+        uses: open-edge-platform/geti-ci/actions/trivy-scan-diff@f1328ee7c6ad00e90204ff9902491ead4b28c7da # trivy-scan-diff/v0.1.1
         with:
           image: "ghcr.io/open-edge-platform/geti-${{ matrix.ai-device }}:develop"
           # renovate: datasource=docker depName=python
-          base-image: "python:3.15-slim@sha256:e97b88e416c3c01eb427b21fd8cd3ebf006e6ee38afcfcc3cae1c54ee2ab0a75"
+          base-image: "python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928"
           artifact-name: "trivy-scan-diff-${{ matrix.ai-device }}"
           ignore_unfixed: true

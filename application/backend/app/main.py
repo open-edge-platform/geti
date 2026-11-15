@@ -174,8 +174,8 @@ def create_app() -> FastAPI:
         redoc_url=None,
         docs_url=None,
         lifespan=lifespan,
-        # TODO add contact info
-        # TODO add license
+        contact={"name": "Intel Geti", "url": "https://github.com/open-edge-platform/geti"},
+        license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
     )
 
     app.add_middleware(  # TODO restrict settings in production
