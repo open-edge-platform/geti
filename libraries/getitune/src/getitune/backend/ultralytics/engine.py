@@ -140,6 +140,7 @@ class UltralyticsEngine(Engine):
         patience: int | None = None,
         precision: _PRECISION_INPUT | None = "16-mixed",
         callbacks: list[Any] | None = None,
+        monitor: str | None = None,
         **kwargs,
     ) -> METRICS:
         """Train the model via a custom Ultralytics trainer.
@@ -157,6 +158,7 @@ class UltralyticsEngine(Engine):
                 converts the model to BF16 regardless of whether ``"16"`` or
                 ``"bf16"`` was requested.
             callbacks: Accepted for API compatibility; unused by Ultralytics.
+            monitor: Validation metric used to select the best checkpoint.
             **kwargs: Additional overrides forwarded to Ultralytics training.
 
         Returns:
@@ -198,6 +200,7 @@ class UltralyticsEngine(Engine):
             progress_min=progress_min,
             progress_max=progress_max,
             max_grad_norm=max_grad_norm,
+            monitor=monitor,
         )
         train_args = {
             "trainer": trainer_cls,
@@ -1002,6 +1005,7 @@ class UltralyticsEngine(Engine):
         progress_min: float = 0.0,
         progress_max: float = 100.0,
         max_grad_norm: float | None = None,
+        monitor: str | None = None,
     ) -> type:
         """Return a trainer subclass with the DataModule bound as a class attr."""
         base_cls = self._model.trainer_cls
@@ -1009,12 +1013,13 @@ class UltralyticsEngine(Engine):
             msg = f"{type(self._model).__name__} does not define a trainer_cls"
             raise TypeError(msg)
 
-        if self._datamodule is None and max_grad_norm is None and not self._model.metric_keys:
+        if self._datamodule is None and max_grad_norm is None and monitor is None and not self._model.metric_keys:
             return base_cls
 
         attrs: dict[str, Any] = {
             "_datamodule": self._datamodule,
             "_metric_keys": self._model.metric_keys,
+            "_monitor": monitor,
             "_use_getitune_data": self._datamodule is not None,
             "_progress_fn": progress_fn,
             "_progress_min": progress_min,

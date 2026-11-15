@@ -8,8 +8,10 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.models.model_manifest import ModelManifest
+from app.models.task import TaskType
 from app.models.training_configuration import AlgoLevelParameters, TaskLevelParameters, TrainingConfiguration
-from app.repositories import ModelRevisionRepository
+from app.models.training_configuration.evaluation import ValidationMetric, metrics_for_task
+from app.repositories import ModelRevisionRepository, ProjectRepository
 from app.repositories.training_configuration_repo import TrainingConfigurationRepository
 from app.services import BaseSessionManagedService, ModelManifestService, ResourceNotFoundError, ResourceType
 
@@ -35,7 +37,17 @@ class TrainingConfigurationService(BaseSessionManagedService):
         model = ModelRevisionRepository(str(project_id), self.db_session).get_by_id(str(model_revision_id))
         if not model:
             raise ResourceNotFoundError(ResourceType.MODEL, str(model_revision_id))
-        return TrainingConfiguration.model_validate(model.training_configuration)
+        configuration = TrainingConfiguration.model_validate(model.training_configuration)
+        self._set_allowed_metrics(project_id, configuration)
+        return configuration
+
+    def _set_allowed_metrics(self, project_id: UUID, configuration: TrainingConfiguration) -> None:
+        project = ProjectRepository(self.db_session).get_by_id(str(project_id))
+        if project is None:
+            raise ResourceNotFoundError(ResourceType.PROJECT, str(project_id))
+        configuration.task_level_parameters.evaluation._allowed_metrics = metrics_for_task(
+            TaskType(project.task_type), exclusive_labels=project.exclusive_labels
+        )
 
     @staticmethod
     @lru_cache(maxsize=8)
@@ -124,6 +136,7 @@ class TrainingConfigurationService(BaseSessionManagedService):
         # Strip unsupported parameters in case they were persisted (e.g. from a previous manifest version)
         model_manifest = ModelManifestService.get_model_manifest_by_id(model_manifest_id=model_architecture_id)
         self._strip_unsupported_parameters(training_configuration, model_manifest)
+        self._set_allowed_metrics(project_id, training_configuration)
         return training_configuration
 
     def update(
@@ -147,6 +160,13 @@ class TrainingConfigurationService(BaseSessionManagedService):
         """
         # Validate that the specified model architecture exists by loading its manifest
         ModelManifestService.get_model_manifest_by_id(model_manifest_id=model_architecture_id)
+
+        self._set_allowed_metrics(project_id, training_configuration)
+        evaluation = training_configuration.task_level_parameters.evaluation
+        metric = ValidationMetric(evaluation.validation_metric)
+        if metric not in evaluation.allowed_metrics:
+            raise ValueError(f"Validation metric '{metric}' is not supported for this task")
+        evaluation.validation_metric = metric
 
         training_config_repo = TrainingConfigurationRepository(self.db_session)
 

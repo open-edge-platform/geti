@@ -6,6 +6,10 @@ import { Dispatch, SetStateAction } from 'react';
 import type { TrainingConfiguration } from '@/api/types';
 import { View } from '@geti-ui/ui';
 
+import { findGroupByKey } from '../../../model-listing/model-training-parameters/utils';
+import { Accordion } from '../components/accordion/accordion.component';
+import { Parameters } from '../components/parameters.component';
+import { deepReplaceParameters } from '../utils';
 import { LearningParameters } from './learning-parameters/learning-parameters.component';
 import { getLearningParameters } from './learning-parameters/utils';
 
@@ -22,6 +26,7 @@ export const Training = ({
 }: TrainingProps) => {
     const learningParameters = getLearningParameters(trainingConfiguration);
     const defaultLearningParameters = getLearningParameters(defaultTrainingConfiguration);
+    const evaluation = findGroupByKey(trainingConfiguration.parameters, 'evaluation');
 
     return (
         <View>
@@ -31,6 +36,32 @@ export const Training = ({
                     defaultLearningParameters={defaultLearningParameters}
                     onTrainingConfigurationChange={onTrainingConfigurationChange}
                 />
+            )}
+            {evaluation !== undefined && (
+                <Accordion>
+                    <Accordion.Title>{evaluation.name}</Accordion.Title>
+                    <Accordion.Content>
+                        <Accordion.Description>{evaluation.description}</Accordion.Description>
+                        <Accordion.Divider marginY={'size-250'} />
+                        <Parameters
+                            parameters={evaluation.parameters}
+                            onChange={(parameter, groupKeys = []) =>
+                                onTrainingConfigurationChange((config) =>
+                                    config === undefined
+                                        ? undefined
+                                        : {
+                                              ...config,
+                                              parameters: deepReplaceParameters(
+                                                  config.parameters,
+                                                  [parameter],
+                                                  ['evaluation', ...groupKeys]
+                                              ),
+                                          }
+                                )
+                            }
+                        />
+                    </Accordion.Content>
+                </Accordion>
             )}
         </View>
     );

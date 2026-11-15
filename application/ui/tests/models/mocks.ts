@@ -984,7 +984,7 @@ export const MOCKED_TRAINING_CONFIGURATION: TrainingConfiguration = {
                     value_type: 'str',
                     value: 'default',
                     default_value: 'default',
-                    allowed_values: ['default'],
+                    allowed_values: ['default', 'map', 'map_50'],
                 },
             ],
         },

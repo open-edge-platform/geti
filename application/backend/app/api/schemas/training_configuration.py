@@ -1361,7 +1361,7 @@ class TrainingConfigurationView(BaseModel):
                                 "value": "default",
                                 "default_value": "default",
                                 "value_type": "str",
-                                "allowed_values": ["default"],
+                                "allowed_values": ["default", "map", "map_50"],
                             }
                         ],
                     },

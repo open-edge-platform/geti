@@ -10,13 +10,14 @@ import logging
 from collections import defaultdict
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Callable
+from typing import Any, Callable, ClassVar
 from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
 from ultralytics.utils import IterableSimpleNamespace
 
+from getitune.backend.ultralytics.trainers.base import GetiTuneBaseTrainer
 from getitune.backend.ultralytics.trainers.classification import (
     ClassificationTrainer,
     MultiLabelClassificationTrainer,
@@ -25,6 +26,28 @@ from getitune.backend.ultralytics.trainers.detection import DetectionTrainer
 from getitune.backend.ultralytics.trainers.instance_segmentation import SegmentationTrainer
 from getitune.backend.ultralytics.trainers.semantic_segmentation import SemanticSegmentationTrainer
 from getitune.backend.ultralytics.trainers.yolo_detr import YoloDetrTrainer
+
+
+def test_selected_metric_controls_fitness_and_best_checkpoint() -> None:
+    class UpstreamTrainer:
+        def validate(self) -> tuple[dict[str, float], float]:
+            self.best_fitness = 0.99
+            return {"metrics/mAP50(B)": 0.6}, 0.99
+
+    class Trainer(GetiTuneBaseTrainer, UpstreamTrainer):
+        _monitor = "val/map_50"
+        _metric_keys: ClassVar[dict[str, str]] = {"metrics/mAP50(B)": "val/map_50"}
+
+    trainer = Trainer()
+    trainer.best_fitness = 0.7
+    metrics, fitness = trainer.validate()
+    assert metrics == {"metrics/mAP50(B)": 0.6}
+    assert fitness == 0.6
+    assert trainer.best_fitness == 0.7
+
+    Trainer._monitor = "val/accuracy"
+    with pytest.raises(ValueError, match="unavailable"):
+        trainer.validate()
 
 
 def test_detection_trainer_fallback_uses_upstream_preprocess() -> None:
