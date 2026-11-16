@@ -138,3 +138,39 @@ class TestOVInstanceSegmentationModelTiling:
         existing = InstanceSegmentationTiler.__new__(InstanceSegmentationTiler)
         inst_seg_model.model = existing
         assert inst_seg_model._get_tiler() is existing
+
+    def test_get_tiler_merges_with_tile_config_not_ir_settings(self, inst_seg_model):
+        """Cross-tile merge settings come from tile_config, not from the IR the tiler was built from."""
+        from model_api.tilers import InstanceSegmentationTiler
+
+        existing = MagicMock(spec=InstanceSegmentationTiler, iou_threshold=0.8, max_pred_number=100)
+        inst_seg_model.model = existing
+        inst_seg_model.tile_config = TileConfig(enable_tiler=True, iou_threshold=0.37, max_num_instances=37)
+
+        assert inst_seg_model._get_tiler() is existing
+        assert existing.iou_threshold == 0.37
+        assert existing.max_pred_number == 37
+
+    def test_get_tiler_updates_cached_fallback_tiler(self, inst_seg_model):
+        """A fallback tiler cached under an earlier tile_config follows later tile_config changes."""
+        from model_api.tilers import InstanceSegmentationTiler
+
+        fallback = MagicMock(spec=InstanceSegmentationTiler, iou_threshold=0.45, max_pred_number=1500)
+        inst_seg_model._fallback_tiler = fallback
+        inst_seg_model.tile_config = TileConfig(enable_tiler=True, iou_threshold=0.4, max_num_instances=500)
+
+        assert inst_seg_model._get_tiler() is fallback
+        assert fallback.iou_threshold == 0.4
+        assert fallback.max_pred_number == 500
+
+    def test_get_tiler_keeps_ir_settings_when_tiling_is_disabled(self, inst_seg_model):
+        from model_api.tilers import InstanceSegmentationTiler
+
+        existing = MagicMock(spec=InstanceSegmentationTiler, iou_threshold=0.8, max_pred_number=100)
+        inst_seg_model.model = existing
+        inst_seg_model.tile_config = TileConfig(enable_tiler=False, iou_threshold=0.37)
+
+        inst_seg_model._get_tiler()
+
+        assert existing.iou_threshold == 0.8
+        assert existing.max_pred_number == 100

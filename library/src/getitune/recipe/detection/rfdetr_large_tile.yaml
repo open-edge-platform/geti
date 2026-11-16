@@ -88,4 +88,5 @@ overrides:
       batch_size: 4
 
     test_subset:
+      num_workers: 1
       batch_size: 4

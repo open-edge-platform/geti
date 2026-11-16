@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
-from copy import deepcopy
+from copy import copy, deepcopy
 from pathlib import Path
 from typing import TYPE_CHECKING
 from warnings import warn
@@ -16,6 +16,7 @@ from jsonargparse import ArgumentParser, Namespace
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
+from getitune.data.dataset.tile import TileDataset
 from getitune.data.factory import TransformLibFactory
 from getitune.data.module import DataModule
 from getitune.types import PathLike
@@ -357,10 +358,6 @@ class AutoConfigurator:
         # Capture the tiling intent before overwriting the subset augmentations below.
         tiling_enabled = datamodule.tile_config.enable_tiler
 
-        # The OV recipe owns the loading configuration, including `num_workers`. Ensure that it is copied over.
-        if "num_workers" in ov_subset:
-            subset_config.num_workers = ov_subset["num_workers"]
-
         if keep_aspect_ratio:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
@@ -391,32 +388,7 @@ class AutoConfigurator:
             # pipeline prepends its intensity transform independently of Resize).
             self._strip_resize_transforms(subset_config.augmentations_cpu)
 
-            # IMPORTANT: the OV recipe's batch_size (e.g. 64) is tuned for *non-tiled*
-            # evaluation, where one dataset item == one model input. With tiling
-            # enabled, a single original image expands into *every* grid tile inside
-            # the dataset (see DataModule._eval_loader_kwargs), so a loader batch_size
-            # of N images can balloon into N * num_tiles tiles collated into a single
-            # in-memory batch. With tile_size=400/overlap=0.2 on large images this can
-            # produce a batch so large that building/collating it appears to hang
-            # (severe memory pressure / thrashing) rather than raising an error.
-            # The model still groups tiles into TileConfig.tile_inference_batch_size
-            # chunks for the actual forward passes, so the loader batch_size can (and
-            # must) stay small here regardless of what the OV recipe specifies.
-            if subset_config.batch_size != 1:
-                logger.info(
-                    "update_ov_subset_pipeline: tiling is enabled, overriding OV recipe "
-                    "%s_subset.batch_size (%d) -> 1 to avoid collating %d images' worth of "
-                    "tiles (tile_size=%s, overlap=%s) into a single dataloader batch, which "
-                    "can hang/OOM. Tile-level batching for the model forward pass is still "
-                    "controlled independently via tile_config.tile_inference_batch_size=%d.",
-                    subset,
-                    subset_config.batch_size,
-                    subset_config.batch_size,
-                    datamodule.tile_config.tile_size,
-                    datamodule.tile_config.overlap,
-                    datamodule.tile_config.tile_inference_batch_size,
-                )
-                subset_config.batch_size = 1
+            # Tiled loaders are batch-clamped to 1 in DataModule._eval_loader_kwargs.
         else:
             datamodule.tile_config.enable_tiler = False
 
@@ -451,22 +423,37 @@ class AutoConfigurator:
         # This is useful for the quantization pipeline.
         if not datamodule.data_root and datamodule.subsets:
             datamodule.train_subset.input_size = actual_input_size
+            subsets = datamodule.subsets.copy()
 
             if tiling_enabled:
-                existing_dataset = datamodule.subsets[subset_config.subset_name]
-                existing_dataset.transforms = TransformLibFactory.generate(subset_config)
+                # Do not mutate the source dataset used by other model variants.
+                dataset = copy(subsets[subset_config.subset_name])
+                dataset.transforms = TransformLibFactory.generate(subset_config)
+                if isinstance(dataset, TileDataset):
+                    # The Lightning callback that normally runs this deferred pipeline
+                    # is absent during OpenVINO evaluation. Apply the new transforms
+                    # in the dataset instead of returning raw integer pixels.
+                    dataset.device_preprocess = None
+                subsets[subset_config.subset_name] = dataset
 
-            return DataModule.from_vision_datasets(
-                train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
-                val_dataset=datamodule.subsets[datamodule.val_subset.subset_name],
-                test_dataset=datamodule.subsets.get(datamodule.test_subset.subset_name),
+            updated = DataModule.from_vision_datasets(
+                train_dataset=subsets[datamodule.train_subset.subset_name],
+                val_dataset=subsets[datamodule.val_subset.subset_name],
+                test_dataset=subsets.get(datamodule.test_subset.subset_name),
                 train_subset=datamodule.train_subset,
                 val_subset=datamodule.val_subset,
                 test_subset=datamodule.test_subset,
                 auto_num_workers=datamodule.auto_num_workers,
                 device=DeviceType.cpu,  # The rebuilt datamodule must not inherit the training device (cuda/xpu)
             )
+            updated.tile_config = datamodule.tile_config
+            return updated
 
+        # The tile parameters are already final here (adapted during the original DataModule
+        # construction); a rebuilt evaluation module must not re-adapt or it could silently
+        # turn tiling off. Clone so the source datamodule's config is not mutated either.
+        ov_tile_config = datamodule.tile_config.clone()
+        ov_tile_config.enable_adaptive_tiling = False
         return DataModule(
             task=datamodule.task,
             data_root=datamodule.data_root,
@@ -474,7 +461,7 @@ class AutoConfigurator:
             val_subset=datamodule.val_subset,
             test_subset=datamodule.test_subset,
             input_size=actual_input_size,
-            tile_config=datamodule.tile_config,
+            tile_config=ov_tile_config,
             ignore_index=datamodule.ignore_index,
             unannotated_items_ratio=datamodule.unannotated_items_ratio,
             auto_num_workers=datamodule.auto_num_workers,
