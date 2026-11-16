@@ -65,6 +65,18 @@ pub fn spawn_backend(app: &AppHandle) -> std::io::Result<Sidecar> {
     let mut command = Command::new(&backend_path);
     apply_default_env(&mut command, app);
 
+    #[cfg(windows)]
+    {
+        let data_dir = app
+            .path()
+            .local_data_dir()
+            .map_err(std::io::Error::other)?
+            .join("Intel")
+            .join("Geti");
+        std::fs::create_dir_all(&data_dir)?;
+        command.current_dir(data_dir);
+    }
+
     // Release builds suppress the side-car's console window; in dev it stays
     // visible so the backend's logs show up in the terminal.
     #[cfg(all(windows, not(debug_assertions)))]

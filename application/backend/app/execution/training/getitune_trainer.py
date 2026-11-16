@@ -433,7 +433,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(  # noqa: PLR0915, C901 - training orchestration is intentionally centralized here
+    def train_model(  # noqa: PLR0912, PLR0915, C901 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
@@ -492,6 +492,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
         }
+        if is_ultralytics and weights_path is not None:
+            engine_kwargs["weights_dir"] = weights_path.parent
         # timm weights (`weights_path=None`) are loaded in the library
         if weights_path is not None:
             # Route weight loading through checkpoint for Ultralytics and for resume flows.
