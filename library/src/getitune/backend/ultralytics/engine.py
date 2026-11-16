@@ -17,6 +17,7 @@ import torch
 import torch.nn.functional as f
 import yaml
 from torchvision import tv_tensors
+from ultralytics import utils
 from ultralytics.utils.metrics import ClassifyMetrics, DetMetrics, SegmentMetrics
 
 from getitune.backend.ultralytics.data.geometry import scale_boxes_to_letterbox, scale_masks_to_letterbox
@@ -82,6 +83,7 @@ class UltralyticsEngine(Engine):
         checkpoint: PathLike | None = None,
         train_args: Mapping[str, Any] | None = None,
         export_args: Mapping[str, Any] | None = None,
+        weights_dir: PathLike | None = None,
         **kwargs,
     ) -> None:
         """Initialize the engine.
@@ -90,6 +92,7 @@ class UltralyticsEngine(Engine):
             model: Ultralytics model wrapper.
             data: DataModule or filesystem data-root path.
             work_dir: Directory for checkpoints, exports, and logs.
+            weights_dir: Directory for Ultralytics weights.
             device: Device string or :class:`DeviceType` enum
                 (``"auto"``, ``"xpu"``, ``"0"``, ``"cpu"``, ``DeviceType.xpu``, etc.).
             checkpoint: Optional path to a checkpoint (.pt) to load model
@@ -111,6 +114,14 @@ class UltralyticsEngine(Engine):
         self._train_args = dict(train_args or {})
         self._export_args = dict(export_args or {})
         self._last_train_checkpoint = self._load_last_train_checkpoint()
+
+        # Pin Ultralytics weights location.
+        if weights_dir is not None:
+            weights_dir = Path(weights_dir).resolve()
+            weights_dir.mkdir(parents=True, exist_ok=True)
+            logger.info("Using Ultralytics weights directory: %s", weights_dir)
+            utils.SETTINGS.update({"weights_dir": str(weights_dir)})
+            utils.WEIGHTS_DIR = weights_dir
 
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
