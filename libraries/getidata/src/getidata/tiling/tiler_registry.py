@@ -17,7 +17,7 @@ from typing import NamedTuple
 
 import polars as pl
 
-from getidata.fields import ImageInfoField, TileField, TileInfo
+from getidata.fields import BBoxField, ImageInfoField, InstanceMaskField, PolygonField, TileField, TileInfo
 from getidata.schema import AttributeInfo, AttributeSpec, Field, Schema
 from getidata.transform import Transform
 
@@ -320,6 +320,7 @@ class TilingPlan:
     Attributes:
         tilers_filter_group_id: Maps field names to their filter group IDs.
             Fields in the same group are filtered together.
+        instance_mask_group_id: Maps instance mask fields to their annotation group IDs.
         tilers_by_group_id: Maps group IDs to lists of field names in that group.
             Used to coordinate filtering operations.
         tilers_instance_by_name: Maps field names to their tiler instances.
@@ -334,6 +335,7 @@ class TilingPlan:
     """
 
     tilers_filter_group_id: dict[str, int]
+    instance_mask_group_id: dict[str, int]
     tilers_by_group_id: defaultdict[int, list[str]]
     tilers_instance_by_name: dict[str, Tiler]
     image_info_spec: AttributeSpec[ImageInfoField]
@@ -389,15 +391,20 @@ def _create_tiling_plan(schema: Schema, config: TilingConfig, threshold_drop_ann
     tilers = create_tilers(schema, threshold_drop_ann)
 
     tilers_filter_group_id = {}
+    instance_mask_group_id = {}
     tilers_by_group_id = defaultdict(list)
     tilers_instance_by_name = {}
 
     # Group filterable tilers
-    for semantic_tilers in tilers.values():
+    for group_id, semantic_tilers in enumerate(tilers.values()):
         filterable_tilers = [tiler for tiler in semantic_tilers if tiler.tiler.is_filterable()]
 
-        group_id = id(filterable_tilers)
         tilers_filter_group_id.update((tiler.field_name, group_id) for tiler in filterable_tilers)
+        instance_mask_group_id.update(
+            (entry.field_name, group_id)
+            for entry in semantic_tilers
+            if isinstance(schema.attributes[entry.field_name].field, InstanceMaskField)
+        )
         tilers_by_group_id[group_id] = [tiler.field_name for tiler in filterable_tilers]
         tilers_instance_by_name.update((tiler.field_name, tiler.tiler) for tiler in semantic_tilers)
 
@@ -408,6 +415,7 @@ def _create_tiling_plan(schema: Schema, config: TilingConfig, threshold_drop_ann
 
     return TilingPlan(
         tilers_filter_group_id,
+        instance_mask_group_id,
         tilers_by_group_id,
         tilers_instance_by_name,
         image_info_spec,
@@ -422,10 +430,70 @@ def _get_fields_set(fields: set[str], plan: TilingPlan) -> set[str]:
     fields_set = set(fields)
 
     for field in fields:
-        group_id = plan.tilers_filter_group_id.get(field, None)
+        group_id = plan.tilers_filter_group_id.get(field, plan.instance_mask_group_id.get(field))
         if group_id is not None:
             fields_set.update(plan.tilers_by_group_id[group_id])
     return fields_set
+
+
+def _combine_keep_flags(tiled_df: pl.DataFrame, previous: pl.Series) -> pl.Series:
+    """Intersect instance keep flags, preserving truly empty annotation lists."""
+    return tiled_df.with_columns(keep_mask=previous).with_columns(
+        keep_mask=pl.when(pl.col("keep").list.len() == 0)
+        .then(pl.lit([], dtype=pl.List(pl.Boolean())))
+        .otherwise(zip_list(lambda a, b: a & b, "keep", "keep_mask"))
+    )["keep_mask"]
+
+
+def _tile_instance_masks(
+    input_df: pl.DataFrame,
+    output_df: pl.DataFrame,
+    plan: TilingPlan,
+    mask_fields: list[str],
+    keep_masks: dict[int, pl.Series],
+    slice_offset: int,
+) -> list[pl.DataFrame]:
+    """Tile requested masks using their annotation group's final keep flags.
+
+    Masks are tiled after the other fields so they follow the keep flags of their group's boxes and polygons. A group
+    without boxes or polygons has its keep flags derived from the masks themselves; those are stored in
+    ``keep_masks`` (mutated in place) so the caller filters the group's other fields with them.
+    """
+    # ``tilers`` imports this module to register its tilers, so it cannot be imported at module level.
+    from .tilers import InstanceMaskTiler
+
+    mask_results = []
+    for field_name in mask_fields:
+        group_id = plan.instance_mask_group_id[field_name]
+        has_geometry = any(
+            isinstance(plan.target_schema.attributes[name].field, BBoxField | PolygonField)
+            for name in plan.tilers_by_group_id[group_id]
+        )
+        tiler = plan.tilers_instance_by_name[field_name]
+        if not isinstance(tiler, InstanceMaskTiler):
+            raise TypeError(f"Expected instance mask tiler for {field_name}")
+        tiled_df = tiler.tile(
+            input_df,
+            output_df,
+            slice_offset,
+            keep_masks=keep_masks.get(group_id) if has_geometry else None,
+        )
+        mask_keep = tiled_df["keep"]
+        if not has_geometry:
+            if group_id in keep_masks:
+                mask_keep = _combine_keep_flags(tiled_df, keep_masks[group_id])
+            keep_masks[group_id] = mask_keep
+        mask_results.append((tiler, group_id, tiled_df))
+
+    result = []
+    for tiler, group_id, tiled_df in mask_results:
+        keep_mask = keep_masks.get(group_id)
+        if keep_mask is not None and not tiled_df["keep"].equals(keep_mask):
+            filtered_df = tiler.tile(input_df, output_df, slice_offset, keep_masks=keep_mask)
+        else:
+            filtered_df = tiled_df
+        result.append(filtered_df.drop("keep"))
+    return result
 
 
 def _apply_tiling(
@@ -480,9 +548,13 @@ def _apply_tiling(
     tiled_data = []
     keep_mask_by_group_id = {}
     columns_to_filter_by_group_id = defaultdict(set)
+    mask_fields = []
 
     for field_name in fields_set:
         tiler = plan.tilers_instance_by_name[field_name]
+        if field_name in plan.instance_mask_group_id:
+            mask_fields.append(field_name)
+            continue
         tiled_df = tiler.tile(input_df, output_df, slice_offset)
 
         # If tiler provides a keep column, update our mask and track columns
@@ -498,9 +570,7 @@ def _apply_tiling(
             else:
                 # Update keep_mask at list element level
                 keep_mask = keep_mask_by_group_id[group_id]
-                keep_mask = tiled_df.with_columns(keep_mask=keep_mask).with_columns(
-                    keep_mask=zip_list(lambda a, b: a & b, "keep", "keep_mask")
-                )["keep_mask"]
+                keep_mask = _combine_keep_flags(tiled_df, keep_mask)
                 keep_mask_by_group_id[group_id] = keep_mask
 
             tiled_df = tiled_df.drop("keep")
@@ -509,6 +579,10 @@ def _apply_tiling(
             columns_to_filter_by_group_id[group_id].update(tiled_df.columns)
 
         tiled_data.append(tiled_df)
+
+    # Masks may be lazy and expensive to materialize, so never request them merely
+    # because another field in their annotation group is being tiled.
+    tiled_data.extend(_tile_instance_masks(input_df, output_df, plan, mask_fields, keep_mask_by_group_id, slice_offset))
 
     # Combine all tiled data with tile parameters
     for tiled_df in tiled_data:
@@ -596,7 +670,7 @@ class TilingTransform(Transform):
         fields_set -= self._applied_tilers
 
         # Request all required attributes from the parent transform
-        input_df = self._parent.apply(list(fields_set))
+        input_df = self._parent.apply(list(_get_fields_set(fields_set, self._tiling_plan)))
 
         # Apply tiling
         self._df, fields_set = _apply_tiling(input_df, self._df, self._tiling_plan, fields_set, self._slice_offset)
