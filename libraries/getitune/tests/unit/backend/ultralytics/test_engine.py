@@ -86,12 +86,12 @@ def test_ultralytics_engine_supports_ultralytics_model_with_datamodule(mocker) -
 
 
 @pytest.mark.parametrize("relative", [False, True], ids=["absolute", "relative"])
-def test_engine_propagates_aux_weights_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, relative: bool) -> None:
+def test_engine_propagates_weights_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, relative: bool) -> None:
     model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
     datamodule = MagicMock(spec=DataModule)
     monkeypatch.chdir(tmp_path)
-    aux_weights_dir = Path("auxiliary") / "weights" if relative else tmp_path / "auxiliary" / "weights"
-    expected_dir = aux_weights_dir.resolve()
+    weights_dir = Path("auxiliary") / "weights" if relative else tmp_path / "auxiliary" / "weights"
+    expected_dir = weights_dir.resolve()
     settings = {"weights_dir": "weights"}
     monkeypatch.setattr(utils, "SETTINGS", settings)
     monkeypatch.setattr(utils, "WEIGHTS_DIR", Path("weights"))
@@ -101,14 +101,14 @@ def test_engine_propagates_aux_weights_dir(tmp_path: Path, monkeypatch: pytest.M
         data=datamodule,
         work_dir=tmp_path / "work",
         device="cpu",
-        aux_weights_dir=aux_weights_dir,
+        weights_dir=weights_dir,
     )
 
     assert settings["weights_dir"] == str(expected_dir)
     weights_dir = utils.WEIGHTS_DIR
     assert weights_dir == expected_dir
     assert expected_dir.is_dir()
-    assert "aux_weights_dir" not in engine._kwargs
+    assert "weights_dir" not in engine._kwargs
 
 
 def test_engine_preserves_aux_weights_settings_when_omitted(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

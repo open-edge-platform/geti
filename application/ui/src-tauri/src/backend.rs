@@ -146,24 +146,12 @@ fn apply_default_env(command: &mut Command, app: &AppHandle) {
     //   Linux  : ~/.local/share, ~/.local/state, ~/.cache (each /com.intel.geti)
     // On Windows the frozen backend's `uwp.py` hook pins DATA_DIR to
     // %LOCALAPPDATA%\Intel\Geti and LOG_DIR to its `logs` subfolder, ignoring the
-    // environment, so nothing is passed. It also sets YOLO_CONFIG_DIR to the
-    // app data directory's `ultralytics` subfolder.
-
+    // environment, so nothing is passed.
     let resolver = app.path();
     #[cfg(not(windows))]
     {
         set_env_from_dir(command, "DATA_DIR", resolver.app_local_data_dir().ok());
         set_env_from_dir(command, "LOG_DIR", resolver.app_log_dir().ok());
-        // Isolate Ultralytics settings from standalone installations; spawned
-        // training workers inherit this path. This does not set weights_dir.
-        set_env_from_dir(
-            command,
-            "YOLO_CONFIG_DIR",
-            resolver
-                .app_local_data_dir()
-                .ok()
-                .map(|d| d.join("ultralytics")),
-        );
     }
     // Pin matplotlib's font/style cache to a stable per-user dir so it's built
     // once and reused across launches. Without this, matplotlib falls back to

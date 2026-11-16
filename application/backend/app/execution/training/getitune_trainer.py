@@ -80,7 +80,6 @@ class TrainingDependencies:
     training_configuration_service: TrainingConfigurationService
     subset_assigner: SubsetAssigner
     db_session_factory: Callable[[], AbstractContextManager[Session]]
-    ultralytics_aux_weights_dir: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -127,7 +126,6 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
     ):
         super().__init__()
         self._data_dir = training_deps.data_dir
-        self._ultralytics_aux_weights_dir = training_deps.ultralytics_aux_weights_dir
         self._base_weights_service = training_deps.base_weights_service
         self._subset_service = training_deps.subset_service
         self._dataset_service = training_deps.dataset_service
@@ -485,8 +483,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
         }
-        if is_ultralytics and self._ultralytics_aux_weights_dir is not None:
-            engine_kwargs["aux_weights_dir"] = self._ultralytics_aux_weights_dir
+        if is_ultralytics and weights_path is not None:
+            engine_kwargs["weights_dir"] = weights_path.parent
         # timm weights (`weights_path=None`) are loaded in the library
         if weights_path is not None:
             # Route weight loading through checkpoint for Ultralytics and for resume flows.

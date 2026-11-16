@@ -197,11 +197,6 @@ class Settings(BaseSettings):
         return f"sqlite:///{self.data_dir / self.database_file}"
 
     @property
-    def ultralytics_aux_weights_dir(self) -> Path:
-        """Get the absolute directory for auxiliary Ultralytics weights."""
-        return (self.data_dir / "ultralytics" / "weights").resolve()
-
-    @property
     def cors_allowed_origins(self) -> list[str]:
         """Parsed list of allowed CORS origins.
 
@@ -245,7 +240,6 @@ class Settings(BaseSettings):
             self.source_media_dir,
             self.uploads_dir,
             self.sam_ov_cache_path,
-            self.ultralytics_aux_weights_dir,
         ]:
             if d:
                 d.mkdir(parents=True, exist_ok=True)
