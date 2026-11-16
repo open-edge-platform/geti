@@ -155,7 +155,7 @@ class RTMDetHead(ATSSHeadModule):
         """
         cls_scores = []
         bbox_preds = []
-        for x, scale, stride in zip(feats, self.scales, self.prior_generator.strides):
+        for x, scale, (_, stride_w) in zip(feats, self.scales, self.prior_generator.strides):
             cls_feat = x
             reg_feat = x
 
@@ -170,7 +170,7 @@ class RTMDetHead(ATSSHeadModule):
                 objectness = self.rtm_obj(reg_feat)
                 cls_score = inverse_sigmoid(sigmoid_geometric_mean(cls_score, objectness))
 
-            reg_dist = scale(self.rtm_reg(reg_feat).exp()).float() * stride[0]
+            reg_dist = scale(self.rtm_reg(reg_feat).exp()).float() * stride_w
 
             cls_scores.append(cls_score)
             bbox_preds.append(reg_dist)
@@ -516,7 +516,7 @@ class RTMDetInstHead(RTMDetHead):
         cls_scores = []
         bbox_preds = []
         kernel_preds = []
-        for x, scale, stride in zip(feats, self.scales, self.prior_generator.strides):
+        for x, scale, (_, stride_w) in zip(feats, self.scales, self.prior_generator.strides):
             cls_feat = x
             reg_feat = x
             kernel_feat = x
@@ -536,7 +536,7 @@ class RTMDetInstHead(RTMDetHead):
                 objectness = self.rtm_obj(reg_feat)
                 cls_score = inverse_sigmoid(sigmoid_geometric_mean(cls_score, objectness))
 
-            reg_dist = scale(self.rtm_reg(reg_feat)) * stride[0]
+            reg_dist = scale(self.rtm_reg(reg_feat)) * stride_w
 
             cls_scores.append(cls_score)
             bbox_preds.append(reg_dist)
@@ -774,7 +774,7 @@ class RTMDetInstHead(RTMDetHead):
             img_meta = {}
             img_meta["scale_factor"] = [1.0, 1.0]
 
-        stride = self.prior_generator.strides[0][0]
+        _, stride_w = self.prior_generator.strides[0]
         if rescale:
             scale_factor = [1 / s for s in img_meta["scale_factor"]]
             results.bboxes = scale_boxes(results.bboxes, scale_factor)
@@ -805,7 +805,7 @@ class RTMDetInstHead(RTMDetHead):
             mask_logits = self._mask_predict_by_feat_single(mask_feat, results.kernels, results.priors)
             mask_logits = torch.nn.functional.interpolate(
                 mask_logits.unsqueeze(0),
-                scale_factor=stride,
+                scale_factor=stride_w,
                 mode="bilinear",
             )
 
@@ -958,7 +958,8 @@ class RTMDetInstHead(RTMDetHead):
             .item()
         )
 
-        scale = self.prior_generator.strides[0][0] // self.mask_stride
+        _, stride_w = self.prior_generator.strides[0]
+        scale = stride_w // self.mask_stride
         # upsample pred masks
         batch_pos_mask_logits = torch.nn.functional.interpolate(
             batch_pos_mask_logits.unsqueeze(0),
@@ -1336,7 +1337,7 @@ class RTMDetInstSepBNHead(RTMDetInstHead):
         cls_scores = []
         bbox_preds = []
         kernel_preds = []
-        for idx, (x, stride) in enumerate(zip(feats, self.prior_generator.strides)):
+        for idx, (x, (_, stride_w)) in enumerate(zip(feats, self.prior_generator.strides)):
             cls_feat = x
             reg_feat = x
             kernel_feat = x
@@ -1356,7 +1357,7 @@ class RTMDetInstSepBNHead(RTMDetInstHead):
                 objectness = self.rtm_obj[idx](reg_feat)
                 cls_score = inverse_sigmoid(sigmoid_geometric_mean(cls_score, objectness))
 
-            reg_dist = torch.nn.functional.relu(self.rtm_reg[idx](reg_feat)) * stride[0]
+            reg_dist = torch.nn.functional.relu(self.rtm_reg[idx](reg_feat)) * stride_w
 
             cls_scores.append(cls_score)
             bbox_preds.append(reg_dist)
@@ -1483,8 +1484,8 @@ class RTMDetInstSepBNHead(RTMDetInstHead):
         priors = priors.unsqueeze(0).repeat(batch_size, 1, 1)
         priors = priors[batch_inds, inds, :]
         mask_logits = self.export_mask_predict_by_feat_single(mask_feats, kernels, priors)
-        stride = self.prior_generator.strides[0][0]
-        mask_logits = torch.nn.functional.interpolate(mask_logits, scale_factor=stride, mode="bilinear")
+        _, stride_w = self.prior_generator.strides[0]
+        mask_logits = torch.nn.functional.interpolate(mask_logits, scale_factor=stride_w, mode="bilinear")
         masks = mask_logits.sigmoid()
 
         batch_index = (

@@ -9,6 +9,18 @@ from getitune.backend.lightning.models.common.utils.prior_generators import Mlvl
 
 
 class TestMlvlPointGenerator:
+    def test_rectangular_stride(self) -> None:
+        generator = MlvlPointGenerator(strides=[(4, 6)])
+        featmap_size = (2, 2)
+        indices = torch.arange(4)
+        priors = generator.grid_priors([featmap_size], device="cpu", with_stride=True)[0]
+        expected = torch.tensor([[3, 2, 6, 4], [9, 2, 6, 4], [3, 6, 6, 4], [9, 6, 6, 4]], dtype=torch.float32)
+
+        torch.testing.assert_close(priors, expected)
+        torch.testing.assert_close(generator.sparse_priors(indices, featmap_size, 0, device="cpu"), expected[:, :2])
+        flags = generator.valid_flags([featmap_size], (5, 5), device="cpu")[0]
+        torch.testing.assert_close(flags, torch.tensor([True, False, True, False]))
+
     def test_mlvl_point_generator(self) -> None:
         # Square strides
         mlvl_points = MlvlPointGenerator(strides=[4, 10], offset=0)

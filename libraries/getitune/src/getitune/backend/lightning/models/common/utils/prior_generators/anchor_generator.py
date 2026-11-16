@@ -23,11 +23,9 @@ from .base_prior_generator import BasePriorGenerator
 class AnchorGenerator(BasePriorGenerator):
     """Standard anchor generator for 2D anchor-based detectors.
 
-    # TODO (sungchul): change strides format from (w, h) to (h, w)
-
     Args:
-        strides (list[int] | list[tuple[int, int]]): Strides of anchors
-            in multiple feature levels in order (w, h).
+        strides (list[int] | list[tuple[int, int]]): Stride for each feature
+            level, given as an integer for both axes or a tuple in (h, w) order.
         ratios (list[float]): The list of ratios between the height and width
             of anchors in a single level.
         scales (list[int], Optional): Anchor scales for anchors
@@ -247,7 +245,7 @@ class AnchorGenerator(BasePriorGenerator):
         """
         base_anchors = self.base_anchors[level_idx].to(device).to(dtype)
         feat_h, feat_w = featmap_size
-        stride_w, stride_h = self.strides[level_idx]
+        stride_h, stride_w = self.strides[level_idx]
         # First create Range with the default dtype, than convert to
         # target `dtype` for onnx exporting.
         shift_x = torch.arange(0, feat_w, device=device).to(dtype) * stride_w
@@ -289,10 +287,11 @@ class AnchorGenerator(BasePriorGenerator):
                 the length of ``prior_idxs``.
         """
         height, width = featmap_size
+        stride_h, stride_w = self.strides[level_idx]
         num_base_anchors = self.num_base_anchors[level_idx]
         base_anchor_id = prior_idxs % num_base_anchors
-        x = (prior_idxs // num_base_anchors) % width * self.strides[level_idx][0]
-        y = (prior_idxs // width // num_base_anchors) % height * self.strides[level_idx][1]
+        x = (prior_idxs // num_base_anchors) % width * stride_w
+        y = (prior_idxs // width // num_base_anchors) % height * stride_h
         return torch.stack([x, y, x, y], 1).to(dtype).to(device) + self.base_anchors[level_idx][base_anchor_id, :].to(
             device,
         )
@@ -346,7 +345,7 @@ class AnchorGenerator(BasePriorGenerator):
             base_anchors (Tensor): The base anchors of a feature grid.
             featmap_size (tuple[int]): Size of the feature maps.
             stride (tuple[int, int]): Stride of the feature map in order
-                (w, h). Defaults to (16, 16).
+                (h, w). Defaults to (16, 16).
             device (str | torch.device): Device the tensor will be put on.
                 Defaults to 'cuda'.
 
@@ -361,8 +360,9 @@ class AnchorGenerator(BasePriorGenerator):
         # keep featmap_size as Tensor instead of int, so that we
         # can convert to ONNX correctly
         feat_h, feat_w = featmap_size
-        shift_x = torch.arange(0, feat_w, device=device) * stride[0]
-        shift_y = torch.arange(0, feat_h, device=device) * stride[1]
+        stride_h, stride_w = stride
+        shift_x = torch.arange(0, feat_w, device=device) * stride_w
+        shift_y = torch.arange(0, feat_h, device=device) * stride_h
 
         shift_xx, shift_yy = self._meshgrid(shift_x, shift_y)
         shifts = torch.stack([shift_xx, shift_yy, shift_xx, shift_yy], dim=-1)
@@ -396,11 +396,11 @@ class AnchorGenerator(BasePriorGenerator):
         """
         multi_level_flags = []
         for i in range(self.num_levels):
-            anchor_stride = self.strides[i]
+            stride_h, stride_w = self.strides[i]
             feat_h, feat_w = featmap_sizes[i]
             h, w = pad_shape[:2]
-            valid_feat_h = min(int(np.ceil(h / anchor_stride[1])), feat_h)
-            valid_feat_w = min(int(np.ceil(w / anchor_stride[0])), feat_w)
+            valid_feat_h = min(int(np.ceil(h / stride_h)), feat_h)
+            valid_feat_w = min(int(np.ceil(w / stride_w)), feat_w)
             flags = self.single_level_valid_flags(
                 (feat_h, feat_w),
                 (valid_feat_h, valid_feat_w),
