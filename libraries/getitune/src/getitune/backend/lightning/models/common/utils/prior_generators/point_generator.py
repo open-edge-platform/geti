@@ -239,12 +239,10 @@ class MlvlPointGenerator(BasePriorGenerator):
     ) -> Tensor:
         """Generate sparse points according to the ``prior_idxs``.
 
-        # TODO (sungchul): check `featmap_size`
-
         Args:
             prior_idxs (Tensor): The index of corresponding anchors
                 in the feature map.
-            featmap_size (tuple[int]): feature map size arrange as (w, h).
+            featmap_size (tuple[int, int]): Feature map size in (h, w) order.
             level_idx (int): The level index of corresponding feature
                 map.
             dtype (torch.dtype): Date type of points. Defaults to
