@@ -477,11 +477,11 @@ class TrainingConfigurationView(BaseModel):
             type(config.algo_level_parameters).model_fields["training"],
         )
 
-        # Convert evaluation parameters to a parameter group
+        # Metric choices come from the project task, and the default is declared on the field.
         evaluation_group = cls._model_to_parameter_group(
             "evaluation",
             config.task_level_parameters.evaluation,
-            default_config.task_level_parameters.evaluation,
+            None,
             type(config.task_level_parameters).model_fields["evaluation"],
         )
 
@@ -1230,6 +1230,23 @@ class TrainingConfigurationView(BaseModel):
                                                 ),
                                                 "value": 0.2,
                                                 "default_value": 0.2,
+                                                "value_type": "float",
+                                                "min_value": 0.0,
+                                                "max_value": 1.0,
+                                                "allowed_values": None,
+                                            },
+                                            {
+                                                "type": "parameter",
+                                                "key": "min_object_ratio_thr",
+                                                "name": "Object visibility threshold in tile",
+                                                "description": (
+                                                    "Minimum fraction of an annotation's bounding box or polygon "
+                                                    "area that must be visible in a tile. Annotations below this "
+                                                    "threshold are excluded from the tile. A value of 0 keeps "
+                                                    "every intersecting annotation."
+                                                ),
+                                                "value": 0.5,
+                                                "default_value": 0.5,
                                                 "value_type": "float",
                                                 "min_value": 0.0,
                                                 "max_value": 1.0,

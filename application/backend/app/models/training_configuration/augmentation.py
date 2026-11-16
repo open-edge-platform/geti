@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class BaseAugmentationParameter(BaseModel):
@@ -331,6 +331,10 @@ class GaussianNoise(BaseAugmentationParameter):
 
 
 class Tiling(BaseAugmentationParameter):
+    # ``TrainingConfiguration.apply_updates`` assigns values with ``setattr``, so validate on assignment to
+    # reject out-of-range updates such as ``min_object_ratio_thr``.
+    model_config = ConfigDict(validate_assignment=True)
+
     enable_adaptive_tiling: bool = Field(
         default=False, title="Adaptive tiling", description="Whether to use adaptive tiling based on image content"
     )
@@ -352,6 +356,17 @@ class Tiling(BaseAugmentationParameter):
         lt=1.0,
         title="Tile overlap",
         description="Overlap between adjacent tiles as a fraction of tile size",
+    )
+    min_object_ratio_thr: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        title="Object visibility threshold in tile",
+        description=(
+            "Minimum fraction of an annotation's bounding box or polygon area that must be visible in a tile. "
+            "Annotations below this threshold are excluded from the tile. "
+            "A value of 0 keeps every intersecting annotation."
+        ),
     )
 
 

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 import logging as log
 from typing import TYPE_CHECKING, Callable
 
@@ -15,6 +16,7 @@ from getidata.filtering.filter_registry import create_filtering_transform
 from getidata.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
+from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
 from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
@@ -28,6 +30,8 @@ from getitune.data.utils.utils import fill_null_annotation_lists as _fill_null_a
 from getitune.types.task import TaskType
 
 from .base import VisionDataset, _ensure_chw_format
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from getitune.config.data import TileConfig
@@ -65,6 +69,18 @@ class TileDatasetFactory:
             TileDataset: Tile dataset.
         """
         subset = dataset.dm_subset[0].subset  # type: ignore[attr-defined]
+        logger.info(
+            "Tiling %s subset with tile_size=%s overlap=%s min_object_ratio_thr=%s iou_threshold=%s "
+            "max_num_instances=%s sampling_ratio=%s tile_inference_batch_size=%s",
+            getattr(subset, "name", subset),
+            tile_config.tile_size,
+            tile_config.overlap,
+            tile_config.min_object_ratio_thr,
+            tile_config.iou_threshold,
+            tile_config.max_num_instances,
+            tile_config.sampling_ratio,
+            tile_config.tile_inference_batch_size,
+        )
         if subset == Subset.TRAINING:
             dm_dataset = dataset.dm_subset
             dm_dataset = dm_dataset.transform(  # type: ignore[attr-defined]
@@ -75,7 +91,7 @@ class TileDatasetFactory:
                         overlap_x=tile_config.overlap,
                         overlap_y=tile_config.overlap,
                     ),
-                    threshold_drop_ann=0.5,
+                    threshold_drop_ann=tile_config.min_object_ratio_thr,
                 ),
                 dtype=dm_dataset.dtype,  # type: ignore[attr-defined]
             )
@@ -122,7 +138,9 @@ class TileDataset(VisionDataset):
             overlap_x=tile_config.overlap,
             overlap_y=tile_config.overlap,
         )
-        self._tiling_transform = create_tiling_transform(self._tiling_config, threshold_drop_ann=0.5)
+        self._tiling_transform = create_tiling_transform(
+            self._tiling_config, threshold_drop_ann=tile_config.min_object_ratio_thr
+        )
         self._filtering_transform = create_filtering_transform()
 
         # LabelInfo differs from SegLabelInfo, thus we need to update it for semantic segmentation.
@@ -134,8 +152,22 @@ class TileDataset(VisionDataset):
             log.warning(msg)
             self.label_info = dataset.label_info
 
+        # Intensity mapping + Resize can run on the device instead of in the worker, so raw pixels
+        # travel unchanged. The device pipeline is built from the same transforms as the worker one.
+        self.device_preprocess: CPUAugmentationPipeline | None = (
+            self.transforms
+            if isinstance(self.transforms, CPUAugmentationPipeline) and self.transforms.is_intensity_resize_only()
+            else None
+        )
+
     def __len__(self) -> int:
         return len(self._dataset)
+
+    def _apply_transforms(self, entity: BaseSample) -> BaseSample | None:
+        # Only raw integer tiles are deferred; float tiles (e.g. float storage) keep the CPU path.
+        if self.device_preprocess is not None and not entity.image.is_floating_point():
+            return entity
+        return super()._apply_transforms(entity)
 
     @property
     def collate_fn(self) -> Callable:
@@ -217,9 +249,13 @@ class TileDataset(VisionDataset):
                 return tile_entities
 
         tile_entities: list[BaseSample] = []
+        # Decode the source image once and crop every tile from it. Reading `tile.image` lazily would re-decode the
+        # whole source for each tile and keep each decoded copy alive through the tile's transform chain.
+        source_image = _ensure_chw_format(parent_slice_ds[0].image)
         for tile in tile_ds:
-            # Fix datumaro HWC→CHW format issue for tile images
-            tile.image = _ensure_chw_format(tile.image)
+            info = tile.tile
+            # `clone` so the tile does not pin the source image.
+            tile.image = source_image[:, info.y : info.y + info.height, info.x : info.x + info.width].clone()
             # apply the same transforms as the original dataset
             object.__setattr__(tile.tile, "source_sample_idx", parent_idx)
             transformed_tile = self._apply_transforms(tile)
