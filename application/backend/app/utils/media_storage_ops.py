@@ -23,7 +23,15 @@ def media_storage_size(storage: MediaStorageLike) -> int:
 
 
 def move_media_storage(source: MediaStorageLike, target: MediaStorageLike) -> None:
-    """Move a media payload (file or directory) to a new location."""
+    """Move a media payload (file or directory) to a new location.
+
+    Raises:
+        FileExistsError: If the target location already exists, since
+            `shutil.move` would otherwise nest `source.root` inside it
+            instead of placing the payload at the target root.
+    """
+    if target.root.exists():
+        raise FileExistsError(f"Target media storage location already exists: {target.root}")
     target.root.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(source.root), str(target.root))
 

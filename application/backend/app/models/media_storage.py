@@ -29,6 +29,6 @@ class MediaStorage(BaseValueObject):
     @model_validator(mode="after")
     def validate_entrypoint(self) -> "MediaStorage":
         # Keep storage declarative: don't hit filesystem, just enforce shape.
-        if self.entrypoint is not None and self.entrypoint.is_absolute():
-            raise ValueError("entrypoint must be relative to root")
+        if self.entrypoint is not None and (self.entrypoint.is_absolute() or ".." in self.entrypoint.parts):
+            raise ValueError("entrypoint must be a relative path inside root")
         return self

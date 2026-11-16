@@ -3,6 +3,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from app.models import MediaStorage
 from app.utils.media_storage_ops import (
     delete_media_storage,
@@ -60,6 +62,35 @@ class TestMediaStorage:
         assert not source_dir.exists()
         assert (target_dir / "entry.ome").read_bytes() == b"entry"
         assert (target_dir / "planes.bin").read_bytes() == b"planes"
+
+    def test_move_media_storage_raises_when_target_file_exists(self, tmp_path):
+        source = tmp_path / "upload.part"
+        source.write_bytes(b"payload")
+        target = tmp_path / "dataset" / "media.jpg"
+        target.parent.mkdir(parents=True)
+        target.write_bytes(b"existing")
+
+        with pytest.raises(FileExistsError):
+            move_media_storage(MediaStorage(root=source), MediaStorage(root=target))
+
+        assert source.exists()
+        assert target.read_bytes() == b"existing"
+
+    def test_move_media_storage_raises_when_target_directory_exists(self, tmp_path):
+        source_dir = tmp_path / "upload-dir"
+        source_dir.mkdir()
+        (source_dir / "entry.ome").write_bytes(b"entry")
+        target_dir = tmp_path / "dataset" / "media-dir"
+        target_dir.mkdir(parents=True)
+
+        source_storage = MediaStorage(root=source_dir, entrypoint=Path("entry.ome"))
+        target_storage = MediaStorage(root=target_dir, entrypoint=Path("entry.ome"))
+
+        with pytest.raises(FileExistsError):
+            move_media_storage(source_storage, target_storage)
+
+        assert source_dir.exists()
+        assert not (target_dir / "entry.ome").exists()
 
     def test_discard_media_storage_moves_back_to_source(self, tmp_path):
         source = tmp_path / "upload.part"
