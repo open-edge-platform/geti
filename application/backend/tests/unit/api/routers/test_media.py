@@ -925,7 +925,15 @@ class TestMediaEndpoints:
         ],
     )
     def test_invalid_ids(
-        self, request, http_method, http_path, service_name, service_method, fxt_get_project, fxt_client
+        self,
+        request,
+        http_method,
+        http_path,
+        service_name,
+        service_method,
+        fxt_get_project,
+        fxt_project_service,
+        fxt_client,
     ):
         service = request.getfixturevalue(service_name)
         response = getattr(fxt_client, http_method)(http_path)
@@ -1073,7 +1081,7 @@ class TestMediaEndpoints:
         try:
             with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
                 temp_file_path = Path(tmp_file.name)
-                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000, mode="I;16")
+                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000)
                 img.save(temp_file_path)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
                 response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary")
@@ -1108,7 +1116,7 @@ class TestMediaEndpoints:
                 patch("app.api.routers.media.normalize_image_to_png_bytes") as mock_normalize_image,
             ):
                 temp_file_path = Path(tmp_file.name)
-                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000, mode="I;16")
+                img = PILImage.fromarray(np.ones((10, 10), dtype="uint16") * 1000)
                 img.save(temp_file_path)
                 fxt_media_service.get_media_binary_path_by_id.return_value = temp_file_path
                 response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media.id)}/binary?raw=true")

@@ -168,12 +168,12 @@ class AlgoLevelTrainingParameters(BaseModel):
     num_workers: int = Field(
         ge=0,
         le=64,
-        default=4,
+        default=2,
         title="Number of workers",
         description=(
-            "Number of subprocesses used for data loading. 0 means that the data will be loaded in the main "
-            "process. More workers can speed up data loading and augmentation, at the cost of higher CPU and "
-            "memory usage."
+            "Number of subprocesses used for training and validation data loading. 0 loads data in the main process. "
+            "More workers can speed up data loading and augmentation, at the cost of higher CPU and memory usage. "
+            "Testing uses the model recipe's worker count."
         ),
     )
     early_stopping: EarlyStopping = Field(
