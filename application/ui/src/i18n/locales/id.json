@@ -743,6 +743,15 @@
             "annotation": "Anotasi",
             "prediction": "Prediksi"
         },
+        "copyPaste": {
+            "copied_one": "{{count}} anotasi disalin",
+            "copied_other": "{{count}} anotasi disalin",
+            "skippedSummary": "{{pasted}} ditempel, {{skipped}} dilewati: {{reasons}}",
+            "labelMissing_one": "{{count}} label sudah tidak ada",
+            "labelMissing_other": "{{count}} label sudah tidak ada",
+            "outsideImage_one": "{{count}} di luar gambar",
+            "outsideImage_other": "{{count}} di luar gambar"
+        },
         "predictions": {
             "settingsTitle": "Pengaturan prediksi",
             "confirm": "Konfirmasi prediksi"
@@ -758,6 +767,8 @@
             "selectAllAnnotations": "Pilih semua anotasi",
             "deselectAllAnnotations": "Batalkan pilihan semua anotasi",
             "selectNextAnnotation": "Pilih anotasi berikutnya",
+            "copyAnnotations": "Salin anotasi yang dipilih",
+            "pasteAnnotations": "Tempel anotasi",
             "resetZoom": "Atur ulang zoom"
         },
         "tools": {

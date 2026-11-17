@@ -743,6 +743,15 @@
             "annotation": "Anotación",
             "prediction": "Predicción"
         },
+        "copyPaste": {
+            "copied_one": "{{count}} anotación copiada",
+            "copied_other": "{{count}} anotaciones copiadas",
+            "skippedSummary": "{{pasted}} pegadas, {{skipped}} omitidas: {{reasons}}",
+            "labelMissing_one": "{{count}} etiqueta ya no existe",
+            "labelMissing_other": "{{count}} etiquetas ya no existen",
+            "outsideImage_one": "{{count}} anotación fuera de la imagen",
+            "outsideImage_other": "{{count}} anotaciones fuera de la imagen"
+        },
         "predictions": {
             "settingsTitle": "Ajustes de predicción",
             "confirm": "Confirmar predicción"
@@ -758,6 +767,8 @@
             "selectAllAnnotations": "Seleccionar todas las anotaciones",
             "deselectAllAnnotations": "Deseleccionar todas las anotaciones",
             "selectNextAnnotation": "Seleccionar la siguiente anotación",
+            "copyAnnotations": "Copiar anotaciones seleccionadas",
+            "pasteAnnotations": "Pegar anotaciones",
             "resetZoom": "Restablecer el zoom"
         },
         "tools": {

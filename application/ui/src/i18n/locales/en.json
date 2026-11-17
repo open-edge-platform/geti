@@ -743,6 +743,15 @@
             "annotation": "Annotation",
             "prediction": "Prediction"
         },
+        "copyPaste": {
+            "copied_one": "{{count}} annotation copied",
+            "copied_other": "{{count}} annotations copied",
+            "skippedSummary": "{{pasted}} pasted, {{skipped}} skipped: {{reasons}}",
+            "labelMissing_one": "{{count}} label no longer exists",
+            "labelMissing_other": "{{count}} labels no longer exist",
+            "outsideImage_one": "{{count}} annotation outside image",
+            "outsideImage_other": "{{count}} annotations outside image"
+        },
         "predictions": {
             "settingsTitle": "Prediction settings",
             "confirm": "Confirm prediction"
@@ -758,6 +767,8 @@
             "selectAllAnnotations": "Select all annotations",
             "deselectAllAnnotations": "Deselect all annotations",
             "selectNextAnnotation": "Select next annotation",
+            "copyAnnotations": "Copy selected annotations",
+            "pasteAnnotations": "Paste annotations",
             "resetZoom": "Reset zoom"
         },
         "tools": {

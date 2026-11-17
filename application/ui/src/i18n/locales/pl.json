@@ -749,6 +749,15 @@
             "annotation": "Adnotacja",
             "prediction": "Predykcja"
         },
+        "copyPaste": {
+            "copied_one": "Skopiowano {{count}} adnotację",
+            "copied_other": "Skopiowano adnotacje: {{count}}",
+            "skippedSummary": "Wklejono {{pasted}}, pominięto {{skipped}}: {{reasons}}",
+            "labelMissing_one": "{{count}} etykieta już nie istnieje",
+            "labelMissing_other": "Nieistniejące etykiety: {{count}}",
+            "outsideImage_one": "{{count}} adnotacja poza obrazem",
+            "outsideImage_other": "Adnotacje poza obrazem: {{count}}"
+        },
         "predictions": {
             "settingsTitle": "Ustawienia predykcji",
             "confirm": "Potwierdź predykcję"
@@ -764,6 +773,8 @@
             "selectAllAnnotations": "Zaznacz wszystkie adnotacje",
             "deselectAllAnnotations": "Odznacz wszystkie adnotacje",
             "selectNextAnnotation": "Zaznacz następną adnotację",
+            "copyAnnotations": "Kopiuj zaznaczone adnotacje",
+            "pasteAnnotations": "Wklej adnotacje",
             "resetZoom": "Zresetuj powiększenie"
         },
         "tools": {

@@ -743,6 +743,15 @@
             "annotation": "標註",
             "prediction": "預測"
         },
+        "copyPaste": {
+            "copied_one": "已複製 {{count}} 個標註",
+            "copied_other": "已複製 {{count}} 個標註",
+            "skippedSummary": "已貼上 {{pasted}} 個，已略過 {{skipped}} 個：{{reasons}}",
+            "labelMissing_one": "{{count}} 個標籤已不存在",
+            "labelMissing_other": "{{count}} 個標籤已不存在",
+            "outsideImage_one": "{{count}} 個超出影像範圍",
+            "outsideImage_other": "{{count}} 個超出影像範圍"
+        },
         "predictions": {
             "settingsTitle": "預測設定",
             "confirm": "確認預測"
@@ -758,6 +767,8 @@
             "selectAllAnnotations": "選取所有標註",
             "deselectAllAnnotations": "取消選取所有標註",
             "selectNextAnnotation": "選取下一個標註",
+            "copyAnnotations": "複製所選標註",
+            "pasteAnnotations": "貼上標註",
             "resetZoom": "重設縮放"
         },
         "tools": {

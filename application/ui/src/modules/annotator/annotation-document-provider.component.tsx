@@ -23,6 +23,8 @@ type AnnotationsContextValue = {
 type AnnotationCommands = {
     // Adding any annotation replaces an existing full-image annotation.
     addAnnotations: (shapes: Shape[], labels: AnnotationLabelRef[]) => string[];
+    // Like addAnnotations, but each item carries its own labels. One undo step for the whole batch.
+    addLabeledAnnotations: (items: { shape: Shape; labels: AnnotationLabelRef[] }[]) => string[];
     addAnnotationWithEmptyLabel: (label: Label) => void;
     deleteAnnotations: (annotationIds: string[]) => void;
     updateAnnotations: (updatedAnnotations: Annotation[], labels?: AnnotationLabelRef[]) => void;
@@ -80,6 +82,16 @@ export const AnnotationDocumentProvider = ({
         return {
             addAnnotations: (shapes, labels) => {
                 const newAnnotations = createAnnotations(shapes, labels);
+
+                setAnnotations((prevAnnotations) => [
+                    ...prevAnnotations.filter((annotation) => !isFullImageAnnotation(annotation)),
+                    ...newAnnotations,
+                ]);
+
+                return newAnnotations.map((annotation) => annotation.id);
+            },
+            addLabeledAnnotations: (items) => {
+                const newAnnotations = items.map(({ shape, labels }) => ({ shape, labels, id: crypto.randomUUID() }));
 
                 setAnnotations((prevAnnotations) => [
                     ...prevAnnotations.filter((annotation) => !isFullImageAnnotation(annotation)),

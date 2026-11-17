@@ -11,6 +11,7 @@ import { AnnotationVisibilityProvider } from '../annotation-visibility-provider.
 import { AnnotatorLabelsProvider } from '../annotator-labels-provider.component';
 import type { AnnotatorMode } from '../annotator-mode';
 import { AnnotatorProvider } from '../annotator-provider.component';
+import { AnnotationsClipboardProvider } from '../copy-paste/annotations-clipboard-provider.component';
 import { SelectAnnotationProvider } from '../select-annotation-provider.component';
 import { CanvasSettingsProvider } from './primary-toolbar/settings/canvas-settings-provider.component';
 
@@ -35,14 +36,16 @@ export const AnnotatorProviders = ({
                 <AnnotationVisibilityProvider>
                     <CanvasSettingsProvider>
                         <AnnotatorLabelsProvider>
-                            <AnnotationDocumentProvider
-                                initialAnnotationsDTO={initialAnnotationsDTO}
-                                initialPredictionsDTO={initialPredictionsDTO}
-                                mode={mode}
-                                isReadOnly={isReadOnly}
-                            >
-                                <SelectAnnotationProvider>{children}</SelectAnnotationProvider>
-                            </AnnotationDocumentProvider>
+                            <AnnotationsClipboardProvider>
+                                <AnnotationDocumentProvider
+                                    initialAnnotationsDTO={initialAnnotationsDTO}
+                                    initialPredictionsDTO={initialPredictionsDTO}
+                                    mode={mode}
+                                    isReadOnly={isReadOnly}
+                                >
+                                    <SelectAnnotationProvider>{children}</SelectAnnotationProvider>
+                                </AnnotationDocumentProvider>
+                            </AnnotationsClipboardProvider>
                         </AnnotatorLabelsProvider>
                     </CanvasSettingsProvider>
                 </AnnotationVisibilityProvider>
