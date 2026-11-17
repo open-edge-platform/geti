@@ -604,7 +604,7 @@ def _group_samples_by_subset(dataset: Dataset[DType]) -> dict[Subset, list[DType
     """Group dataset samples by their subset."""
     subset_to_samples: dict[Subset, list[DType]] = defaultdict(list)
     for sample in dataset:
-        subset_to_samples[sample.subset].append(sample)
+        subset_to_samples[sample.subset].append(sample)  # type: ignore[attr-defined]
     return subset_to_samples
 
 
