@@ -10,10 +10,8 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { $api } from '../../../../api';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
-import { createQueryClient } from '../../../../query-client/query-client';
 import { ModelVariantsTabs } from './model-variant-tabs.component';
 
 const trainingRevision = getMockedDatasetRevision({ id: 'training-revision' });
@@ -27,12 +25,10 @@ const trainedModel = getMockedModel({
     variants: [getMockedVariant({ format: 'openvino', precision: 'fp16' })],
 });
 
-const openQuantizationDialog = async (queryClient = createQueryClient()) => {
-    const user = userEvent.setup();
-    render(<ModelVariantsTabs model={trainedModel} />, { queryClient });
-    await user.click(screen.getByRole('button', { name: 'Start quantization' }));
+const openQuantizationDialog = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('button', { name: 'Start quantization' }));
 
-    return { user, dialog: within(await screen.findByRole('dialog')) };
+    return within(await screen.findByRole('dialog'));
 };
 
 describe('ModelVariantsTabs', () => {
@@ -67,7 +63,9 @@ describe('ModelVariantsTabs', () => {
             })
         );
 
-        const { user, dialog } = await openQuantizationDialog();
+        const user = userEvent.setup();
+        render(<ModelVariantsTabs model={trainedModel} />);
+        const dialog = await openQuantizationDialog(user);
         const size = dialog.getByRole('textbox', { name: 'Change Max calibration size' });
         await waitFor(() => expect(size).toHaveValue(String(trainingRevision.item_counts.training)));
 
@@ -91,15 +89,18 @@ describe('ModelVariantsTabs', () => {
         { state: 'missing', revisions: [newerRevision] },
         { state: 'deleted', revisions: [{ ...trainingRevision, files_deleted: true }, newerRevision] },
     ])('disables quantization when the training dataset revision is $state', async ({ revisions }) => {
-        const queryClient = createQueryClient();
-        const { queryKey } = $api.queryOptions('get', '/api/projects/{project_id}/dataset_revisions', {
-            params: { path: { project_id: '123' } },
-        });
-        server.use(http.get('/api/projects/{project_id}/dataset_revisions', () => HttpResponse.json(revisions)));
+        let datasetRevisions = [trainingRevision, newerRevision];
+        server.use(http.get('/api/projects/{project_id}/dataset_revisions', () => HttpResponse.json(datasetRevisions)));
 
-        const { dialog } = await openQuantizationDialog(queryClient);
+        const user = userEvent.setup();
+        render(<ModelVariantsTabs model={trainedModel} />);
+        const dialog = await openQuantizationDialog(user);
+        await waitFor(() => expect(dialog.getByRole('button', { name: 'Start quantization' })).toBeEnabled());
+        await user.click(dialog.getByRole('button', { name: 'Cancel' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-        await waitFor(() => expect(queryClient.getQueryData(queryKey)).toEqual(revisions));
-        expect(dialog.getByRole('button', { name: 'Start quantization' })).toBeDisabled();
+        datasetRevisions = revisions;
+        const reopenedDialog = await openQuantizationDialog(user);
+        await waitFor(() => expect(reopenedDialog.getByRole('button', { name: 'Start quantization' })).toBeDisabled());
     });
 });
