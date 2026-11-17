@@ -10,23 +10,24 @@ const annotationsFor = (...labelIds: string[]) =>
 describe('getAnnotationCounts', () => {
     it('counts normalized image annotations and deduplicates labels, including No object', () => {
         expect(getAnnotationCounts([])).toEqual({ annotationCount: 0, labelCount: 0 });
-        expect(getAnnotationCounts([{ annotations: annotationsFor(EMPTY_LABEL_ID), user_reviewed: true }])).toEqual({
+        expect(getAnnotationCounts([{ annotations: annotationsFor(EMPTY_LABEL_ID) }])).toEqual({
             annotationCount: 1,
             labelCount: 1,
         });
-        expect(
-            getAnnotationCounts([{ annotations: annotationsFor('label-1', 'label-1', 'label-2'), user_reviewed: true }])
-        ).toEqual({ annotationCount: 3, labelCount: 2 });
+        expect(getAnnotationCounts([{ annotations: annotationsFor('label-1', 'label-1', 'label-2') }])).toEqual({
+            annotationCount: 3,
+            labelCount: 2,
+        });
     });
 
-    it('aggregates video annotations, counting reviewed empty frames but not unreviewed ones', () => {
+    it('aggregates normalized video annotations and deduplicates labels, including No object', () => {
         expect(
             getAnnotationCounts([
-                { annotations: annotationsFor('label-1', 'label-1'), user_reviewed: true },
-                { annotations: [], user_reviewed: true },
-                { annotations: [], user_reviewed: true },
-                { annotations: [], user_reviewed: false },
-                { annotations: annotationsFor('label-1', 'label-2'), user_reviewed: true },
+                { annotations: annotationsFor('label-1', 'label-1') },
+                { annotations: annotationsFor(EMPTY_LABEL_ID) },
+                { annotations: annotationsFor(EMPTY_LABEL_ID) },
+                { annotations: [] },
+                { annotations: annotationsFor('label-1', 'label-2') },
             ])
         ).toEqual({ annotationCount: 6, labelCount: 3 });
     });
