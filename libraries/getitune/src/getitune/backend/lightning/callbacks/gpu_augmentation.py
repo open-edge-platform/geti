@@ -10,18 +10,57 @@ import typing
 from typing import TYPE_CHECKING
 
 import torch
+from getidata.fields import ImageInfo as DmImageInfo
 from lightning import Callback
 from torchvision import tv_tensors
 
 from getitune.data.augmentation import GPUAugmentationPipeline
+from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
 from getitune.data.augmentation.task_keys import DATA_KEYS_BY_TASK
-from getitune.data.entity.sample import SampleBatch
+from getitune.data.entity.base import ImageInfo
+from getitune.data.entity.sample import DetectionSample, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 
 if TYPE_CHECKING:
     from lightning import LightningModule, Trainer
 
     from getitune.config.data import SubsetConfig
+
+
+def _convert_raw_tiles(pipeline: CPUAugmentationPipeline | None, batch: SampleBatch | TileBatchData) -> None:
+    """Convert raw (integer) evaluation tiles to float on the device, in-place.
+
+    The tile datasets send integer tiles raw and keep float tiles on the CPU path, so a float
+    tile here was already processed and is left unchanged.
+    """
+    if pipeline is None or not isinstance(batch, TileBatchData):
+        return
+    for tiles, infos in zip(batch.batch_tiles, batch.batch_tile_img_infos):
+        for idx, tile in enumerate(tiles):
+            if tile.is_floating_point():
+                continue
+            out = pipeline(_tile_sample(tile, infos[idx]))
+            if out is None:
+                msg = "Device preprocessing dropped a tile, which is not supported."
+                raise RuntimeError(msg)
+            tiles[idx] = tv_tensors.Image(out.image)
+            infos[idx] = out.img_info
+
+
+def _tile_sample(tile: torch.Tensor, img_info: ImageInfo) -> DetectionSample:
+    """Wrap one tile so the CPU pipeline modules (intensity mapping, Resize) can run on it.
+
+    Only image and image info are read by these modules, so the annotation fields are left empty.
+    """
+    height, width = tile.shape[-2:]
+    sample = DetectionSample(
+        image=tv_tensors.Image(tile),
+        dm_image_info=DmImageInfo(height=height, width=width),
+        bboxes=torch.zeros((0, 4), dtype=torch.float32),
+        label=None,
+    )
+    sample.img_info = img_info
+    return sample
 
 
 class GPUAugmentationCallback(Callback):
@@ -54,11 +93,16 @@ class GPUAugmentationCallback(Callback):
         train_config: SubsetConfig | None = None,
         val_config: SubsetConfig | None = None,
         test_config: SubsetConfig | None = None,
+        val_device_pipeline: CPUAugmentationPipeline | None = None,
+        test_device_pipeline: CPUAugmentationPipeline | None = None,
     ) -> None:
         super().__init__()
         self.train_config = train_config
         self.val_config = val_config
         self.test_config = test_config if test_config is not None else val_config
+        # Intensity + resize steps that the tile datasets defer to this callback (see _convert_raw_tiles).
+        self.val_device_pipeline = val_device_pipeline
+        self.test_device_pipeline = test_device_pipeline
 
         self._train_pipeline: GPUAugmentationPipeline | None = None
         self._val_pipeline: GPUAugmentationPipeline | None = None
@@ -261,6 +305,7 @@ class GPUAugmentationCallback(Callback):
         dataloader_idx: int = 0,
     ) -> None:
         """Apply GPU augmentations to validation batch."""
+        _convert_raw_tiles(self.val_device_pipeline, batch)
         if self._val_pipeline is None:
             return
 
@@ -275,7 +320,19 @@ class GPUAugmentationCallback(Callback):
         dataloader_idx: int = 0,
     ) -> None:
         """Apply GPU augmentations to test batch."""
+        _convert_raw_tiles(self.test_device_pipeline, batch)
         if self._test_pipeline is None:
             return
 
         self._apply_pipeline(self._test_pipeline, batch)
+
+    def on_predict_batch_start(
+        self,
+        trainer: Trainer,
+        pl_module: LightningModule,
+        batch: SampleBatch | TileBatchData,
+        batch_idx: int,
+        dataloader_idx: int = 0,
+    ) -> None:
+        """Convert raw evaluation tiles to float on the device for prediction."""
+        _convert_raw_tiles(self.test_device_pipeline, batch)

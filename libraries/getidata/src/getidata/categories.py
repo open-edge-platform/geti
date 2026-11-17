@@ -575,7 +575,7 @@ class Colormap:
         return False
 
 
-def generate_colormap(length: int = 256, *, include_background: bool = True) -> dict[int, tuple[int, int, int]]:
+def generate_colormap(length: int = 256, *, include_background: bool = True) -> Colormap:
     """
     Generate an index -> (R, G, B) mapping using the PASCAL VOC colormap algorithm.
 
@@ -586,7 +586,7 @@ def generate_colormap(length: int = 256, *, include_background: bool = True) -> 
             but (0, 0, 0) is not included.
 
     Returns:
-        Mapping from index to an (R, G, B) tuple.
+        A Colormap mapping indices to RGB colors.
     """
     offset = int(not include_background)
     colormap = {}
@@ -597,8 +597,8 @@ def generate_colormap(length: int = 256, *, include_background: bool = True) -> 
             for channel in range(3):
                 rgb[channel] |= ((value >> channel) & 1) << shift
             value >>= 3
-        colormap[index] = (rgb[0], rgb[1], rgb[2])
-    return colormap
+        colormap[index] = RgbColor(*rgb)
+    return Colormap(data=colormap)
 
 
 @dataclass(frozen=True)
@@ -665,13 +665,7 @@ class MaskCategories(Categories):
         Returns:
             A MaskCategories instance with the generated colormap and optional labels.
         """
-        # TODO: Refactor generate_colormap to return a Colormap.
-        colormap_dict = generate_colormap(size, include_background=include_background)
-        colormap_data = {}
-        for index, color in colormap_dict.items():
-            colormap_data[index] = RgbColor(*(int(x) for x in color)) if isinstance(color, tuple) else color
-
-        colormap = Colormap(data=colormap_data)
+        colormap = generate_colormap(size, include_background=include_background)
         return cls(labels=labels if labels is not None else [], colormap=colormap)
 
     def __getitem__(self, idx: int) -> RgbColor:

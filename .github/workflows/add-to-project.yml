@@ -15,13 +15,13 @@ jobs:
       deployment: false
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           egress-policy: audit
 
       - name: Add issue to project
         id: add-project
-        uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2
+        uses: actions/add-to-project@f2c1f1fa649a891be84948ea89b5dfba1526ef05 # v2
         with:
           project-url: https://github.com/orgs/open-edge-platform/projects/7
           github-token: ${{ secrets.ADD_TO_PROJECT_TOKEN }}

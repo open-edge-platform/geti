@@ -1014,6 +1014,7 @@ class TestGetiTuneTrainerTrainModel:
         mock_create_engine.assert_called_once()
         engine_call_kwargs = mock_create_engine.call_args.kwargs
         assert engine_call_kwargs["checkpoint"] == weights_path
+        assert engine_call_kwargs["weights_dir"] == tmp_path
         mock_engine.train.assert_called_once()
         assert trained_model_path == expected_checkpoint_path
         assert returned_engine == mock_engine
