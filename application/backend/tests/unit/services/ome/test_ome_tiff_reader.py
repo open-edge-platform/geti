@@ -9,6 +9,7 @@ from unittest.mock import PropertyMock, patch
 import numpy as np
 import pytest
 import tifffile
+from defusedxml.common import EntitiesForbidden
 
 from app.models import MediaStorage, Region
 from app.services.media_service import InvalidImageError
@@ -98,6 +99,24 @@ def test_directory_storage(reader, tmp_path):
 def test_reject_invalid_ome(reader, name):
     with pytest.raises(InvalidImageError):
         reader.open(MediaStorage(root=ASSETS / name))
+
+
+@pytest.mark.parametrize(
+    "entity",
+    ['<!ENTITY channel "expanded">', '<!ENTITY channel SYSTEM "file:///nonexistent-ome-entity">'],
+)
+def test_reject_xml_entities(reader, tmp_path, entity):
+    path = tmp_path / "entities.ome.tiff"
+    shutil.copyfile(ASSETS / "xyc.ome.tiff", path)
+    with tifffile.TiffFile(path) as tiff:
+        xml = tiff.ome_metadata
+    assert xml is not None
+    xml = xml.replace("<OME ", f"<!DOCTYPE OME [{entity}]><OME ", 1)
+    xml = xml.replace("<Image ", '<Image Name="&channel;" ', 1)
+    tifffile.tiffcomment(path, xml)
+    with pytest.raises(InvalidImageError) as error:
+        reader.open(MediaStorage(root=path))
+    assert isinstance(error.value.__cause__, EntitiesForbidden)
 
 
 @pytest.mark.parametrize("attribute", ["SizeX", "SizeY", "SizeC", "DimensionOrder", "Type"])
@@ -204,14 +223,31 @@ def test_omitted_z_t_default_to_one(reader, tmp_path):
         assert handle.read_region()[2, 2, 3] == 299
 
 
-@pytest.mark.parametrize("dtype", [np.uint8, np.int16, np.float32])
-def test_pixel_types_and_channel_metadata(reader, tmp_path, dtype):
+@pytest.mark.parametrize(
+    "dtype,pixel_type",
+    [
+        (np.bool_, "bit"),
+        (np.int8, "int8"),
+        (np.int16, "int16"),
+        (np.int32, "int32"),
+        (np.uint8, "uint8"),
+        (np.uint16, "uint16"),
+        (np.uint32, "uint32"),
+        (np.float32, "float"),
+        (np.float64, "double"),
+        (np.complex64, "complex"),
+        (np.complex128, "double-complex"),
+    ],
+)
+@pytest.mark.parametrize("byteorder", ["<", ">"])
+def test_pixel_types_and_channel_metadata(reader, tmp_path, dtype, pixel_type, byteorder):
     path = tmp_path / "typed.ome.tiff"
     data = np.arange(60).reshape(3, 4, 5).astype(dtype)
     tifffile.imwrite(
         path,
         data,
         ome=True,
+        byteorder=byteorder,
         photometric="minisblack",
         metadata={
             "axes": "CYX",
@@ -225,10 +261,41 @@ def test_pixel_types_and_channel_metadata(reader, tmp_path, dtype):
     with reader.open(MediaStorage(root=path)) as handle:
         np.testing.assert_array_equal(handle.read_region(), data)
         assert handle.read_region().dtype == dtype
+        assert handle.info.pixel_type == pixel_type
         assert handle.info.channels[0]["color"] == "#0000ff"
         assert handle.info.channels[2]["color"] == "#ff0000"
         assert handle.info.channels[0]["name"] == "DAPI"
         assert handle.info.channels[0]["emission_wavelength"] == 461
+
+
+@pytest.mark.parametrize(
+    "dtype,pixel_type,declared_type",
+    [
+        (np.uint8, "uint8", "uint16"),
+        (np.uint16, "uint16", "uint8"),
+        (np.uint16, "uint16", "int16"),
+        (np.int32, "int32", "float"),
+        (np.float32, "float", "double"),
+        (np.float64, "double", "float"),
+        (np.complex64, "complex", "double-complex"),
+        (np.bool_, "bit", "uint8"),
+    ],
+)
+def test_reject_mismatched_pixel_type(reader, tmp_path, dtype, pixel_type, declared_type):
+    path = tmp_path / "mismatched.ome.tiff"
+    tifffile.imwrite(path, np.zeros((4, 5), dtype=dtype), ome=True, metadata={"axes": "YX"})
+    _replace_ome_metadata(path, f'Type="{pixel_type}"', f'Type="{declared_type}"')
+    with pytest.raises(InvalidImageError, match="does not match TIFF dtype"):
+        reader.open(MediaStorage(root=path))
+
+
+@pytest.mark.parametrize("pixel_type", ["invalid", "uint64", "float32"])
+def test_reject_unsupported_pixel_type(reader, tmp_path, pixel_type):
+    path = tmp_path / "unsupported.ome.tiff"
+    shutil.copyfile(ASSETS / "xyc.ome.tiff", path)
+    _replace_ome_metadata(path, 'Type="uint16"', f'Type="{pixel_type}"')
+    with pytest.raises(InvalidImageError, match="Unsupported OME pixel type"):
+        reader.open(MediaStorage(root=path))
 
 
 def test_only_first_series_is_read(reader, tmp_path):
@@ -242,7 +309,10 @@ def test_only_first_series_is_read(reader, tmp_path):
         assert not handle.read_region().any()
 
 
-def test_companion_files_are_reopened_and_closed(reader, tmp_path):
+@pytest.fixture
+def companion_storage(tmp_path):
+    root = tmp_path / "storage"
+    root.mkdir()
     identifiers = ["00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"]
     references = "".join(
         f'<TiffData IFD="0" FirstC="{index}" FirstZ="0" FirstT="0" PlaneCount="1">'
@@ -258,14 +328,131 @@ def test_companion_files_are_reopened_and_closed(reader, tmp_path):
             f"{references}</Pixels></Image></OME>"
         )
         tifffile.imwrite(
-            tmp_path / f"part{index}.ome.tiff", np.full((4, 5), index, dtype=np.uint16), description=xml, metadata=None
+            root / f"part{index}.ome.tiff", np.full((4, 5), index, dtype=np.uint16), description=xml, metadata=None
         )
-    storage = MediaStorage(root=tmp_path, entrypoint=Path("part0.ome.tiff"))
-    with reader.open(storage) as handle:
+    return MediaStorage(root=root, entrypoint=Path("part0.ome.tiff"))
+
+
+def _replace_ome_metadata(path: Path, old: str, new: str) -> None:
+    with tifffile.TiffFile(path) as tiff:
+        xml = tiff.ome_metadata
+    assert xml is not None
+    assert old in xml
+    tifffile.tiffcomment(path, xml.replace(old, new))
+
+
+def test_companion_files_are_reopened_and_closed(reader, companion_storage):
+    with reader.open(companion_storage) as handle:
         assert handle.read_region(channels=[1, 0])[:, 0, 0].tolist() == [1, 0]
         files = [tiff.filehandle for tiff in handle._tiff._files.values()]
         assert len(files) == 2
     assert all(file.closed for file in files)
+
+
+@pytest.mark.parametrize("kind", ["relative", "absolute", "symlink", "symlink_directory"])
+@pytest.mark.parametrize("omit_z_t", [False, True])
+def test_companion_paths_cannot_escape_storage(reader, companion_storage, tmp_path, kind, omit_z_t):
+    root = companion_storage.root
+    outside = tmp_path / "outside.ome.tiff"
+    shutil.copyfile(root / "part1.ome.tiff", outside)
+    if kind == "relative":
+        filename = "../outside.ome.tiff"
+    elif kind == "absolute":
+        filename = str(outside)
+    elif kind == "symlink":
+        (root / "link.ome.tiff").symlink_to(outside)
+        filename = "link.ome.tiff"
+    else:
+        (root / "linked").symlink_to(tmp_path, target_is_directory=True)
+        filename = "linked/outside.ome.tiff"
+    path = companion_storage.effective_path
+    _replace_ome_metadata(path, 'FileName="part1.ome.tiff"', f'FileName="{filename}"')
+    if omit_z_t:
+        _replace_ome_metadata(path, ' SizeZ="1" SizeT="1"', "")
+    with (
+        patch("app.services.ome.ome_tiff_reader.tifffile.TiffFile", wraps=tifffile.TiffFile) as open_tiff,
+        patch("app.services.ome.ome_tiff_reader._parse_info", side_effect=AssertionError("series discovery")),
+        pytest.raises(InvalidImageError, match="outside media storage"),
+    ):
+        reader.open(companion_storage)
+    open_tiff.assert_called_once_with(path.resolve())
+
+
+def test_single_file_storage_rejects_sibling_companions(reader, companion_storage):
+    with pytest.raises(InvalidImageError, match="outside media storage"):
+        reader.open(MediaStorage(root=companion_storage.effective_path))
+
+
+def test_single_file_storage_allows_self_references(reader, companion_storage):
+    path = companion_storage.effective_path
+    _replace_ome_metadata(path, "part1.ome.tiff", "part0.ome.tiff")
+    _replace_ome_metadata(path, "000000000002", "000000000001")
+    with reader.open(MediaStorage(root=path)) as handle:
+        actual = handle.read_region()
+        assert actual.shape == (2, 4, 5)
+        assert not actual.any()
+
+
+@pytest.mark.parametrize("absolute", [False, True])
+def test_companion_paths_within_storage_are_allowed(reader, companion_storage, absolute):
+    root = companion_storage.root
+    (root / "nested").mkdir()
+    filename = str(root / "part1.ome.tiff") if absolute else "nested/../part1.ome.tiff"
+    _replace_ome_metadata(companion_storage.effective_path, 'FileName="part1.ome.tiff"', f'FileName="{filename}"')
+    with reader.open(companion_storage) as handle:
+        assert handle.read_region(channels=[1, 0])[:, 0, 0].tolist() == [1, 0]
+
+
+def test_companions_in_subdirectories_are_allowed(reader, companion_storage):
+    root = companion_storage.root
+    (root / "nested").mkdir()
+    companion = root / "nested" / "part1.ome.tiff"
+    (root / "part1.ome.tiff").rename(companion)
+    _replace_ome_metadata(companion, "part0.ome.tiff", "../part0.ome.tiff")
+    _replace_ome_metadata(companion_storage.effective_path, "part1.ome.tiff", "nested/part1.ome.tiff")
+    with reader.open(companion_storage) as handle:
+        assert handle.read_region(channels=[1, 0])[:, 0, 0].tolist() == [1, 0]
+
+
+def test_in_root_companion_symlinks_are_allowed(reader, companion_storage):
+    (companion_storage.root / "link.ome.tiff").symlink_to(companion_storage.root / "part1.ome.tiff")
+    _replace_ome_metadata(companion_storage.effective_path, "part1.ome.tiff", "link.ome.tiff")
+    with reader.open(companion_storage) as handle:
+        assert handle.read_region(channels=[1, 0])[:, 0, 0].tolist() == [1, 0]
+
+
+def test_nested_companion_paths_cannot_escape_storage(reader, companion_storage):
+    _replace_ome_metadata(companion_storage.root / "part1.ome.tiff", "part1.ome.tiff", "../outside.ome.tiff")
+    with pytest.raises(InvalidImageError, match="outside media storage"):
+        reader.open(companion_storage)
+
+
+@pytest.mark.parametrize("tag", ["TiffData", "OtherTiffData"])
+def test_companion_paths_in_other_images_are_validated(reader, companion_storage, tag):
+    reference = (
+        f'<Image ID="Image:1"><Pixels><{tag}><OtherUUID FileName="../outside.ome.tiff">'
+        f"urn:uuid:external</OtherUUID></{tag}></Pixels></Image>"
+    )
+    _replace_ome_metadata(companion_storage.effective_path, "</OME>", f"{reference}</OME>")
+    with pytest.raises(InvalidImageError, match="outside media storage"):
+        reader.open(companion_storage)
+
+
+def test_companion_metadata_can_be_binary_only(reader, companion_storage):
+    xml = '<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06"><BinaryOnly/></OME>'
+    tifffile.tiffcomment(companion_storage.root / "part1.ome.tiff", xml)
+    with reader.open(companion_storage) as handle:
+        assert handle.read_region(channels=[1, 0])[:, 0, 0].tolist() == [1, 0]
+
+
+def test_directory_entrypoint_symlink_cannot_escape_storage(reader, companion_storage, tmp_path):
+    outside = tmp_path / "outside.ome.tiff"
+    shutil.copyfile(ASSETS / "xyc.ome.tiff", outside)
+    (companion_storage.root / "link.ome.tiff").symlink_to(outside)
+    storage = MediaStorage(root=companion_storage.root, entrypoint=Path("link.ome.tiff"))
+    assert not reader.probe(storage)
+    with pytest.raises(InvalidImageError, match="outside media storage"):
+        reader.open(storage)
 
 
 @pytest.mark.parametrize("dtype,minimum,maximum", [(np.uint16, 0, 4095), (np.int16, -2048, 2047)])

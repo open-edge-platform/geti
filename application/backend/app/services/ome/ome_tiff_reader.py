@@ -2,14 +2,32 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections.abc import Sequence
-from xml.etree.ElementTree import Element, tostring
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import tifffile
-from defusedxml.ElementTree import fromstring
+from defusedxml.ElementTree import fromstring, tostring
 
 from app.models import MediaStorage, OmeImageInfo, Region
 from app.services.base import InvalidImageError
+
+if TYPE_CHECKING:
+    from xml.etree.ElementTree import Element
+
+_OME_PIXEL_DTYPES: dict[str, str] = {
+    "bit": "bool",
+    "int8": "int8",
+    "int16": "int16",
+    "int32": "int32",
+    "uint8": "uint8",
+    "uint16": "uint16",
+    "uint32": "uint32",
+    "float": "float32",
+    "double": "float64",
+    "complex": "complex64",
+    "double-complex": "complex128",
+}
 
 
 def _parse_pixels(xml: str | None) -> tuple[Element, Element]:
@@ -26,11 +44,55 @@ def _parse_pixels(xml: str | None) -> tuple[Element, Element]:
     return root, pixels
 
 
+def _resolve_storage_path(path: Path, storage: MediaStorage) -> Path:
+    """Resolve symlinks and reject files outside the authorized media payload."""
+    resolved = path.resolve()
+    root = storage.root.resolve()
+    if not (resolved.is_relative_to(root) if storage.is_directory else resolved == root):
+        raise InvalidImageError("OME-TIFF file is outside media storage.")
+    return resolved
+
+
+def _validate_companion_paths(path: Path, root: Element, storage: MediaStorage) -> None:
+    """Validate all companion metadata before tifffile discovers any series.
+
+    Directory-backed media may reference files within their resolved storage
+    root. Single-file media may reference only themselves. Companion metadata
+    is inspected without series discovery, including cyclic references and
+    companions without Image/Pixels metadata.
+    """
+    pending = [(path, root)]
+    visited = {path}
+    while pending:
+        current_path, metadata = pending.pop()
+        for data in metadata.iter():
+            # Match tifffile's suffix-based recognition, not just OME namespaces.
+            if not data.tag.endswith("TiffData"):
+                continue
+            for uuid in data:
+                if not uuid.tag.endswith("UUID") or (filename := uuid.get("FileName")) is None:
+                    continue
+                companion = _resolve_storage_path(current_path.parent / filename, storage)
+                if companion in visited:
+                    continue
+                visited.add(companion)
+                with tifffile.TiffFile(companion, _multifile=False) as tiff:
+                    xml = tiff.ome_metadata
+                if xml:
+                    pending.append((companion, fromstring(xml)))
+
+
 def _parse_info(tiff: tifffile.TiffFile, xml: str | None, pixels: Element) -> OmeImageInfo:
-    """Parse series-zero metadata without decoding image pixels."""
+    """Validate and parse series-zero metadata without decoding image pixels."""
     sizes = {axis: int(pixels.attrib[f"Size{axis}"]) for axis in "XYC"}
     sizes.update({axis: int(pixels.get(f"Size{axis}", "1")) for axis in "ZT"})
+    pixel_type = pixels.attrib["Type"]
+    dtype = _OME_PIXEL_DTYPES.get(pixel_type)
+    if dtype is None:
+        raise InvalidImageError(f"Unsupported OME pixel type: {pixel_type!r}.")
     series = tiff.series[0]
+    if np.dtype(dtype) != series.dtype.newbyteorder("="):
+        raise InvalidImageError(f"OME pixel type {pixel_type!r} does not match TIFF dtype {series.dtype}.")
     actual = dict(zip(series.axes, series.shape))
     for axis, size in sizes.items():
         stored = actual.get(axis, 1)
@@ -47,7 +109,7 @@ def _parse_info(tiff: tifffile.TiffFile, xml: str | None, pixels: Element) -> Om
         size_z=sizes["Z"],
         size_t=sizes["T"],
         dimension_order=pixels.attrib["DimensionOrder"],
-        pixel_type=pixels.attrib["Type"],
+        pixel_type=pixel_type,
         is_big_tiff=tiff.is_bigtiff,
         raw_metadata=xml,
         channels=_parse_channels(pixels, series.dtype, sizes["C"]),
@@ -101,9 +163,10 @@ class OmeTiffReader:
     def probe(self, storage: MediaStorage) -> bool:
         """Identify OME-TIFF by its contents, not its filename."""
         try:
-            with tifffile.TiffFile(storage.effective_path) as tiff:
+            path = _resolve_storage_path(storage.effective_path, storage)
+            with tifffile.TiffFile(path, _multifile=False) as tiff:
                 return bool(tiff.is_ome)
-        except (OSError, ValueError, IndexError):
+        except (OSError, ValueError, IndexError, InvalidImageError):
             return False
 
     def open(self, storage: MediaStorage, series: int = 0) -> "OmeTiffImageHandle":
@@ -117,15 +180,17 @@ class OmeTiffReader:
             raise ValueError("Only OME series 0 is supported.")
         tiff = None
         try:
-            tiff = tifffile.TiffFile(storage.effective_path)
+            path = _resolve_storage_path(storage.effective_path, storage)
+            tiff = tifffile.TiffFile(path)
             xml = tiff.ome_metadata
             root, pixels = _parse_pixels(xml)
+            _validate_companion_paths(path, root, storage)
             if any(f"Size{axis}" not in pixels.attrib for axis in "ZT"):
                 # tifffile requires these fields even for singleton dimensions.
                 for axis in "ZT":
                     pixels.attrib.setdefault(f"Size{axis}", "1")
                 tiff.close()
-                tiff = tifffile.TiffFile(storage.effective_path, omexml=tostring(root, encoding="unicode"))
+                tiff = tifffile.TiffFile(path, omexml=tostring(root, encoding="unicode"))
             return OmeTiffImageHandle(tiff, _parse_info(tiff, xml, pixels))
         except Exception as error:
             if tiff is not None:
