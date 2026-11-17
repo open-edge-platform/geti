@@ -1,7 +1,6 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { $api } from '@/api';
 import type { Media } from '@/api/types';
 import { formatCompactDuration } from '@/components/media-thumbnail/util';
 import { useTranslation } from '@/i18n';
@@ -11,6 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useNumberFormatter } from 'react-aria';
 
 import { annotationsQueryOptions } from '../../../../modules/annotator/shell/api/use-annotations-query';
+import { useGetVideoFramesAnnotationsQueryOptions } from '../../../../modules/annotator/video-player/api/use-video-frames-annotations';
 import { isVideo } from '../../../../shared/media-item-utils';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 import { formatBytes } from '../../../../shared/util';
@@ -34,20 +34,15 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
         ...annotationsQueryOptions(projectId, item),
         enabled: !isVideoItem && hasAnnotations,
     });
-    const framesQuery = $api.useQuery(
-        'get',
-        '/api/projects/{project_id}/dataset/media/{media_id}/frames',
-        {
-            params: {
-                path: { project_id: projectId, media_id: item.id },
-                // The API defaults to a limited frame range; video totals need every frame, including the last one.
-                query: isVideoItem
-                    ? { frame_index_from: 0, frame_index_to: Math.max(0, item.frame_count - 1) }
-                    : undefined,
-            },
-        },
-        { enabled: isVideoItem && hasAnnotations }
-    );
+    const framesQueryOptions = useGetVideoFramesAnnotationsQueryOptions({
+        mediaId: item.id,
+        startFrameIndex: 0,
+        endFrameIndex: isVideoItem ? Math.max(0, item.frame_count - 1) : 0,
+    });
+    const framesQuery = useQuery({
+        ...framesQueryOptions,
+        enabled: isVideoItem && hasAnnotations,
+    });
     const query = isVideoItem ? framesQuery : annotationsQuery;
     const hasError = hasAnnotations && query.isError;
     const { annotationCount, labelCount } = getAnnotationCounts(
