@@ -2,11 +2,59 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import multiprocessing
+import runpy
+import sys
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 import app.main as main
+
+MAIN_SCRIPT = str(Path(main.__file__))
+
+
+@pytest.fixture
+def frozen_app(monkeypatch):
+    """Run app/main.py as the PyInstaller-frozen executable would, without touching the real multiprocessing setup."""
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr(multiprocessing, "freeze_support", lambda: None)
+
+    def run(*args: str) -> None:
+        monkeypatch.setattr(sys, "argv", ["geti-backend.exe", *args])
+        runpy.run_path(MAIN_SCRIPT, run_name="__main__")
+
+    return run
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        ("-m", "pip", "install", "--no-cache-dir", "onnxruntime"),
+        ("-c", "import sys; print(sys.version)"),
+        ("script.py",),
+    ],
+)
+def test_frozen_executable_refuses_python_interpreter_invocations(frozen_app, args):
+    with pytest.raises(SystemExit) as exc_info:
+        frozen_app(*args)
+
+    assert "not a Python interpreter" in str(exc_info.value.code)
+    assert str(list(args)) in str(exc_info.value.code)
+
+
+def test_frozen_executable_handles_multiprocessing_children_before_refusing_arguments(frozen_app, monkeypatch):
+    def child_freeze_support() -> None:
+        # PyInstaller's freeze_support() runs a spawned child and exits before the argument guard is reached.
+        raise SystemExit(0)
+
+    monkeypatch.setattr(multiprocessing, "freeze_support", child_freeze_support)
+
+    with pytest.raises(SystemExit) as exc_info:
+        frozen_app("--multiprocessing-fork", "parent_pid=1", "pipe_handle=2")
+
+    assert exc_info.value.code == 0
 
 
 def test_openapi_metadata_matches_generated_spec(tmp_path, monkeypatch):
