@@ -95,11 +95,11 @@ describe('ModelVariantsTabs', () => {
         const { queryKey } = $api.queryOptions('get', '/api/projects/{project_id}/dataset_revisions', {
             params: { path: { project_id: '123' } },
         });
-        queryClient.setQueryData(queryKey, revisions);
         server.use(http.get('/api/projects/{project_id}/dataset_revisions', () => HttpResponse.json(revisions)));
 
         const { dialog } = await openQuantizationDialog(queryClient);
 
+        await waitFor(() => expect(queryClient.getQueryData(queryKey)).toEqual(revisions));
         expect(dialog.getByRole('button', { name: 'Start quantization' })).toBeDisabled();
     });
 });
