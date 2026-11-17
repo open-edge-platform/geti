@@ -237,54 +237,68 @@ class OmeTiffImageHandle:
         crop = region or Region(x=0, y=0, width=sizes["X"], height=sizes["Y"])
         if crop.x + crop.width > sizes["X"] or crop.y + crop.height > sizes["Y"]:
             raise ValueError("OME region extends beyond the selected pyramid level.")
-        result = np.empty((len(selected), crop.height, crop.width), dtype=image.dtype)
+        result = np.zeros((len(selected), crop.height, crop.width), dtype=image.dtype)
+        if not selected:
+            return result
         try:
+            pages: dict[tifffile.TiffPage | tifffile.TiffFrame, list[tuple[int, int]]] = {}
             for index, channel in enumerate(selected):
                 coordinates = {"Z": z, "T": t, "C": channel // sizes.get("S", 1), "S": channel % sizes.get("S", 1)}
-                result[index] = self._read_channel(image, coordinates, crop)
+                page = self._get_page(image, coordinates)
+                pages.setdefault(page, []).append((index, coordinates["S"]))
+            for page, selections in pages.items():
+                self._read_page(page, crop, z, selections, result)
         except Exception as error:
             raise InvalidImageError(f"Cannot read OME-TIFF pixels: {error}") from error
         return result
 
     @staticmethod
-    def _read_channel(image: tifffile.TiffPageSeries, coordinates: dict[str, int], crop: Region) -> np.ndarray:
-        """Read one channel's crop, decoding only intersecting TIFF strips or tiles.
-
-        Map the requested coordinates to a TIFF page, then read the segments
-        overlapping the crop and copy their pixels into a channel-only array.
-        Support both planar and interleaved samples, including pages stored in
-        companion TIFF files.
-
-        Args:
-            image: Pyramid-level series to read.
-            coordinates: Selected axis indices (Z, T, C, S). Missing indices
-                default to zero; S selects a sample within a pixel, such as
-                an RGB component.
-            crop: Region in the selected level's pixel coordinates. Bounds must
-                be validated by the caller.
-
-        Returns:
-            Array of shape (crop.height, crop.width) with the series dtype.
-
-        Raises:
-            InvalidImageError: If a required TIFF page or keyframe is missing.
-
-        Notes:
-            Intersecting segments are decoded in full before cropping.
-            All segment positions are inspected, but unrelated pixel data
-            is neither read nor decoded.
-        """
+    def _get_page(
+        image: tifffile.TiffPageSeries, coordinates: dict[str, int]
+    ) -> tifffile.TiffPage | tifffile.TiffFrame:
+        """Locate the page for axis coordinates, excluding axes stored within each page."""
         first_page = image.keyframe
         if first_page is None:
             raise InvalidImageError("OME series has no TIFF keyframe.")
-        page_axes = first_page.axes
-        outer_axes = image.axes[: len(image.axes) - len(page_axes)]
+        outer_axes = image.axes[: len(image.axes) - len(first_page.axes)]
         page_index = 0
         for axis, size in zip(outer_axes, image.shape):
             page_index = page_index * size + coordinates.get(axis, 0)
         page = image.pages[page_index]
         if page is None:
             raise InvalidImageError("OME plane references a missing TIFF page.")
+        return page
+
+    @staticmethod
+    def _read_page(
+        page: tifffile.TiffPage | tifffile.TiffFrame,
+        crop: Region,
+        z: int,
+        selections: Sequence[tuple[int, int]],
+        output: np.ndarray,
+    ) -> None:
+        """Copy requested samples from a page, decoding each intersecting segment once.
+
+        Support planar and interleaved samples, including pages in companion
+        files. Copy duplicate selections into their respective output channels
+        without rereading or decoding their shared pixel data.
+
+        Args:
+            page: TIFF page containing the requested samples.
+            crop: Region in the selected level's pixel coordinates. Bounds must
+                be validated by the caller.
+            z: Selected Z index, used only if depth is stored within the page.
+            selections: Pairs of output channel index and sample index within the page.
+            output: Zero-initialized (C, H, W) array receiving the requested crop.
+
+        Raises:
+            InvalidImageError: If the page's keyframe is missing.
+
+        Notes:
+            Intersecting segments are decoded in full before cropping.
+            All segment positions are inspected, but unrelated pixel data
+            is neither read nor decoded.
+        """
         # tifffile closes companion files after discovering their pages.
         filehandle = page.parent.filehandle
         if filehandle.closed:
@@ -292,27 +306,28 @@ class OmeTiffImageHandle:
         keyframe = page.keyframe
         if keyframe is None:
             raise InvalidImageError("OME plane has no TIFF keyframe.")
-        # tifffile's normalized segment coordinates are (separate sample, Z, Y, X, contiguous sample).
-        sample = coordinates.get("S", 0)
-        separate = sample if keyframe.planarconfig == 2 else 0
-        contiguous = sample if keyframe.planarconfig != 2 else 0
-        depth = coordinates.get("Z", 0) if "Z" in page_axes else 0
-        output = np.zeros((crop.height, crop.width), dtype=image.dtype)
+        depth = z if "Z" in keyframe.axes else 0
+        samples: dict[int, list[tuple[int, int]]] = {}
+        for output_index, sample in selections:
+            separate = sample if keyframe.planarconfig == 2 else 0
+            contiguous = sample if keyframe.planarconfig != 2 else 0
+            samples.setdefault(separate, []).append((output_index, contiguous))
         for index, (offset, count) in enumerate(zip(page.dataoffsets, page.databytecounts)):
             _, position, shape = keyframe.decode(None, index)
+            # Normalized position: (separate sample, depth, row, column, contiguous sample).
             s, d, y, x, c = position
             y0, x0 = max(y, crop.y), max(x, crop.x)
             y1, x1 = min(y + shape[1], crop.y + crop.height), min(x + shape[2], crop.x + crop.width)
-            if s != separate or not d <= depth < d + shape[0] or y0 >= y1 or x0 >= x1:
+            if s not in samples or not d <= depth < d + shape[0] or y0 >= y1 or x0 >= x1:
                 continue
             filehandle.seek(offset)
             data = filehandle.read(count)
             segment, _, _ = keyframe.decode(data, index, jpegtables=page.jpegtables)
             if segment is not None:
-                output[y0 - crop.y : y1 - crop.y, x0 - crop.x : x1 - crop.x] = segment[
-                    depth - d, y0 - y : y1 - y, x0 - x : x1 - x, contiguous - c
-                ]
-        return output
+                for output_index, contiguous in samples[s]:
+                    output[output_index, y0 - crop.y : y1 - crop.y, x0 - crop.x : x1 - crop.x] = segment[
+                        depth - d, y0 - y : y1 - y, x0 - x : x1 - x, contiguous - c
+                    ]
 
     def close(self) -> None:
         """Release all TIFF files, including any opened companion files."""

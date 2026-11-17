@@ -1046,7 +1046,7 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "sse-starlette" },
     { name = "starlette" },
-    { name = "tifffile" },
+    { name = "tifffile", extra = ["codecs"] },
     { name = "tzdata" },
     { name = "uvicorn" },
     { name = "watchdog" },
@@ -1126,7 +1126,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = "~=2.0.44" },
     { name = "sse-starlette", specifier = "~=3.0.3" },
     { name = "starlette", specifier = "~=1.3.1" },
-    { name = "tifffile", specifier = ">=2025.10.16,<2027" },
+    { name = "tifffile", extras = ["codecs"], specifier = ">=2025.10.16,<2027" },
     { name = "tzdata", specifier = ">=2026.6" },
     { name = "uvicorn", specifier = "~=0.38.0" },
     { name = "watchdog", specifier = "==6.0.0" },
@@ -1630,6 +1630,32 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e8/ac/fb4c578f4a3256561548cd825646680edcadb9440f3f68add95ade1eb791/ifaddr-0.2.0.tar.gz", hash = "sha256:cc0cbfcaabf765d44595825fb96a99bb12c79716b73b44330ea38ee2b0c4aed4", size = 10485, upload-time = "2022-06-15T21:40:27.561Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9c/1f/19ebc343cc71a7ffa78f17018535adc5cbdd87afb31d7c34874680148b32/ifaddr-0.2.0-py3-none-any.whl", hash = "sha256:085e0305cfe6f16ab12d72e2024030f5d52674afad6911bb1eee207177b8a748", size = 12314, upload-time = "2022-06-15T21:40:25.756Z" },
+]
+
+[[package]]
+name = "imagecodecs"
+version = "2026.11.11"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b4/a5/f9822d9484b561447bc11e655f13eb3dc690516036ee4d25a57539d0b950/imagecodecs-2026.11.11.tar.gz", hash = "sha256:f3d0762f3676a2e7caca7d50825b06ec5865c00f18c2b367bb02797aec4e10d8", size = 9820594, upload-time = "2026-11-12T01:46:05.808Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6b/0d/e7484677015f47a80896890c430f7bc475d544a64a4cda88b3a781c8761a/imagecodecs-2026.11.11-cp312-abi3-macosx_12_0_arm64.whl", hash = "sha256:6646dc52c1ebd8ae857c49fb112e0058c4a93e38af3eb22e8948fa9f76e521cb", size = 13434437, upload-time = "2026-11-12T01:44:47.174Z" },
+    { url = "https://files.pythonhosted.org/packages/56/52/af674a9e77a3e95185033326faff3fdd4f7e365f42d51e82e5dc5ffa51fa/imagecodecs-2026.11.11-cp312-abi3-macosx_12_0_x86_64.whl", hash = "sha256:25d2f5661a50e0d13eade7127cb0a49ea01e8da49cae0db839da09e8476e0c7c", size = 15099721, upload-time = "2026-11-12T01:44:50.558Z" },
+    { url = "https://files.pythonhosted.org/packages/04/9d/a2dacd23457bf3ac7676c9956d7d0fd45934fa424a9e54866b5f9256e411/imagecodecs-2026.11.11-cp312-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:6966462215f90ea649d3809eb1d0ebf096511320ddb2ca6f7a108102f1da96e3", size = 28121674, upload-time = "2026-11-12T01:44:54.492Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/ec/1de885257979fd92a560f31b9ec2774983d29a204fca05584cc41a211f19/imagecodecs-2026.11.11-cp312-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:5d0869fa162667dbebc38e240dc488d23dd2d59ac2007fa0b002adf658b8fa04", size = 27682801, upload-time = "2026-11-12T01:44:58.857Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/7e/8c1d252daa52ce285dbacaaf2c91aa9b0d8e9a3ac0e1cdfa79aa5c9ab653/imagecodecs-2026.11.11-cp312-abi3-win32.whl", hash = "sha256:9305f5d6f5489576faf5f66d99390d425f51678813e6e269af45252c46ef0229", size = 14129074, upload-time = "2026-11-12T01:45:02.126Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/09/6d51984f6b82ea558489cb7b5ecb6595d15fd384d01752d250cf568c5004/imagecodecs-2026.11.11-cp312-abi3-win_amd64.whl", hash = "sha256:7a46ef92db4f3bffafd46abd14edc214198ce04c1db5f9b80a01e33c71eea455", size = 19281762, upload-time = "2026-11-12T01:45:05.579Z" },
+    { url = "https://files.pythonhosted.org/packages/12/ed/6d2e150fc41099c6135dc240ae5518eb19dc1d4b88f31fc8725c63693517/imagecodecs-2026.11.11-cp312-abi3-win_arm64.whl", hash = "sha256:65169391fe7694c9534d9d228d988c3c6f6dd0dae9a94ee06ea1de91b62de1a0", size = 15617303, upload-time = "2026-11-12T01:45:08.993Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/eb/78da623a78d3209f4a437d0e87aed43ac1cc6b1ad139890734e297a3ef1e/imagecodecs-2026.11.11-cp314-cp314-pyemscripten_2026_0_wasm32.whl", hash = "sha256:0680d363504698c2d034e75c0b70d9718737596bd43c9cf80adcdae1aa5c0811", size = 4355005, upload-time = "2026-11-12T01:45:13.823Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/38/ab2b150be62d00a7dba8f928b4a0185165a9e4f6febd10dd423d0fec5936/imagecodecs-2026.11.11-cp314-cp314t-macosx_12_0_arm64.whl", hash = "sha256:107a87b65c6da222c958ad88a3a3780d285bbc9f740bb56a871825d843a0cb9e", size = 13916800, upload-time = "2026-11-12T01:45:16.056Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/78/1b9c45fd6ceabbba697d9e9476595cc59bf8d7d14f5163b77db3fd16a62a/imagecodecs-2026.11.11-cp314-cp314t-macosx_12_0_x86_64.whl", hash = "sha256:7a8dc2e5e77fccd7f52a2d6de3cc2aec52c289a7c8932f8d499a025cfc5997a3", size = 15548244, upload-time = "2026-11-12T01:45:19.123Z" },
+    { url = "https://files.pythonhosted.org/packages/c2/e3/14ee4e023eb1cfd8efb4096397c706b8b3f8b006d9bdc1eb207edfa69555/imagecodecs-2026.11.11-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:9b43ca6af75eb8b0f5c121e57c7466125ac38623a6c4ab35949989d422d9b8b9", size = 33452565, upload-time = "2026-11-12T01:45:23.455Z" },
+    { url = "https://files.pythonhosted.org/packages/63/88/6d6f46f3a3c30b5e0b4a7a959acc0f24bb61312f3257d327a81dfc0768b0/imagecodecs-2026.11.11-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:929d04191cabd9ab14973b6db320db64df1787531ce097ca61bb5dac70f5c51d", size = 32623619, upload-time = "2026-11-12T01:45:28.388Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/6a/39d8817296b3b87b15f17ae716d0f353653f4cf73e957f6bc9a4e079021a/imagecodecs-2026.11.11-cp314-cp314t-win32.whl", hash = "sha256:e0762c0ffc00ef0012c4af65f22a8e577cd0ae3e8992392a5b82834bc5b17580", size = 14791926, upload-time = "2026-11-12T01:45:31.715Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/ff/fa428991237c22f5432c2f211ea3245d017025036d2aeb2545955a065eb8/imagecodecs-2026.11.11-cp314-cp314t-win_amd64.whl", hash = "sha256:cd4c0d870300e16caa61004c2f193f05d2efcbdb8cd62ab3068b86445810a7ef", size = 20120191, upload-time = "2026-11-12T01:45:35.763Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/37/339ad5efd4ab3f07833ab967f8a5ea4d4263f0ebd17e9bef038118199427/imagecodecs-2026.11.11-cp314-cp314t-win_arm64.whl", hash = "sha256:38c483fbc0ded1e2125bc5da44f2029efc46156373a06ada5900853792bb1883", size = 16430224, upload-time = "2026-11-12T01:45:39.032Z" },
 ]
 
 [[package]]
@@ -4069,6 +4095,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/44/64/075031fb322ad0b0b8f6bb6581e67bc0c0afc5c978f9c183b397f32634a6/tifffile-2026.11.12.tar.gz", hash = "sha256:064e8b3b1a1baf0aed603e383f6efc67564a4340397fb8aff7d58bda1ceb1745", size = 455756, upload-time = "2026-11-13T01:20:09.875Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/d4/6d662a26635f8eaae745437d1f662a455d635a16a5055dba0314d8b30b68/tifffile-2026.11.12-py3-none-any.whl", hash = "sha256:f7d46b81f8e55e607d0ad3d18c82acac6f791828fc0329d9263a664f12b6e32d", size = 277978, upload-time = "2026-11-13T01:20:08.118Z" },
+]
+
+[package.optional-dependencies]
+codecs = [
+    { name = "imagecodecs" },
 ]
 
 [[package]]

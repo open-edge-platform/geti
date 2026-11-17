@@ -76,6 +76,29 @@ def test_samples_bigtiff_and_squeezed_channels(reader, name):
             assert actual[2, 2, 3] == 299
 
 
+@pytest.mark.parametrize("compression", ["lzw", "jpeg"])
+@pytest.mark.parametrize("crop", [None, Region(x=3, y=2, width=17, height=19)])
+def test_compressed_planes_and_regions(reader, compression, crop):
+    path = ASSETS / f"{compression}.ome.tiff"
+    with tifffile.TiffFile(path) as tiff:
+        assert all(page.compression == tifffile.COMPRESSION[compression.upper()] for page in tiff.pages)
+        expected = tiff.asarray()[[2, 0]]
+    if compression == "lzw":
+        y, x = np.indices((32, 48))
+        np.testing.assert_array_equal(expected, np.asarray([c * 100 + y * 48 + x for c in (2, 0)], dtype=np.uint16))
+    if crop is not None:
+        expected = expected[:, crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+    storage = MediaStorage(root=path)
+    assert reader.probe(storage)
+    with (
+        reader.open(storage) as handle,
+        patch.object(tifffile.TiffPageSeries, "asarray", side_effect=AssertionError("eager read")),
+    ):
+        actual = handle.read_region(channels=[2, 0], region=crop)
+    np.testing.assert_array_equal(actual, expected)
+    assert actual.dtype == expected.dtype
+
+
 def test_probe_and_default_registry_use_contents(reader, tmp_path):
     renamed = tmp_path / "image.dat"
     shutil.copyfile(ASSETS / "xyc.ome.tiff", renamed)
@@ -174,6 +197,65 @@ def test_lazy_crop_does_not_decode_whole_series(reader):
         assert read.call_count == 1  # one intersecting tile, not the other five tiles or planes
 
 
+@pytest.mark.parametrize("planar", [False, True])
+@pytest.mark.parametrize("tiled", [False, True])
+@pytest.mark.parametrize("channels", [None, [2, 0], [1, 1], [2, 0, 2, 1], []])
+@pytest.mark.parametrize("crop", [None, Region(x=3, y=2, width=17, height=19)])
+def test_rgb_segments_are_decoded_once(reader, tmp_path, planar, tiled, channels, crop):
+    path = tmp_path / "rgb.ome.tiff"
+    c, y, x = np.indices((3, 32, 48))
+    data = (c * 100 + y * 48 + x).astype(np.uint16)
+    tifffile.imwrite(
+        path,
+        data if planar else data.transpose(1, 2, 0),
+        ome=True,
+        photometric="rgb",
+        planarconfig="separate" if planar else "contig",
+        metadata={"axes": "SYX" if planar else "YXS"},
+        compression="lzw",
+        tile=(16, 16) if tiled else None,
+        rowsperstrip=None if tiled else 8,
+    )
+    selected = list(range(3)) if channels is None else channels
+    expected = data[selected]
+    if crop is not None:
+        expected = expected[:, crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+    segments_per_sample = (6 if crop is None else 4) if tiled else (4 if crop is None else 3)
+    expected_decodes = segments_per_sample * (len(set(selected)) if planar else bool(selected))
+    with reader.open(MediaStorage(root=path)) as handle:
+        keyframe = handle._tiff.series[0].keyframe
+        with (
+            patch.object(keyframe, "decode", wraps=keyframe.decode) as decode,
+            patch.object(tifffile.FileHandle, "read", autospec=True, side_effect=tifffile.FileHandle.read) as read,
+            patch.object(tifffile.TiffPageSeries, "asarray", side_effect=AssertionError("eager read")),
+        ):
+            actual = handle.read_region(channels=channels, region=crop)
+        assert read.call_count == expected_decodes
+        assert sum(call.args[0] is not None for call in decode.call_args_list) == expected_decodes
+    np.testing.assert_array_equal(actual, expected)
+
+
+@pytest.mark.parametrize("z,t", [(0, 0), (1, 0), (0, 1), (1, 1)])
+def test_rgb_selections_are_grouped_across_pages(reader, tmp_path, z, t):
+    path = tmp_path / "multichannel_rgb.ome.tiff"
+    data = np.arange(2 * 2 * 6 * 32 * 48, dtype=np.uint16).reshape(2, 2, 6, 32, 48)
+    tifffile.imwrite(
+        path,
+        data.reshape(2, 2, 2, 3, 32, 48).transpose(0, 1, 2, 4, 5, 3),
+        ome=True,
+        photometric="rgb",
+        metadata={"axes": "TZCYXS"},
+        compression="lzw",
+        tile=(16, 16),
+    )
+    channels = [5, 0, 4, 5, 2]
+    with reader.open(MediaStorage(root=path)) as handle:
+        with patch.object(tifffile.FileHandle, "read", autospec=True, side_effect=tifffile.FileHandle.read) as read:
+            actual = handle.read_region(z=z, t=t, channels=channels, region=Region(x=1, y=2, width=3, height=4))
+        assert read.call_count == 2  # one intersecting tile from each page
+    np.testing.assert_array_equal(actual, data[t, z, channels, 2:6, 1:4])
+
+
 @pytest.mark.parametrize("fail", [False, True])
 def test_context_manager_cleanup(reader, fail):
     handle = reader.open(MediaStorage(root=ASSETS / "xyc.ome.tiff"))
@@ -203,7 +285,7 @@ def test_failed_open_closes_tiff(reader):
 def test_pixel_errors_are_translated(reader):
     with (
         reader.open(MediaStorage(root=ASSETS / "xyc.ome.tiff")) as handle,
-        patch.object(handle, "_read_channel", side_effect=ValueError("broken strip")),
+        patch.object(handle, "_read_page", side_effect=ValueError("broken strip")),
         pytest.raises(InvalidImageError, match="broken strip"),
     ):
         handle.read_region()

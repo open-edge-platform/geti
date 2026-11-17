@@ -149,6 +149,11 @@ persists that metadata before closing the handle. Reader selection uses `probe(s
 region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB mapping, caching,
 thumbnailing and training-set materialization all live _above_ this protocol and are written once.
 
+The backend installs `tifffile[codecs]` to provide `imagecodecs` for compressed pixels, including LZW and JPEG.
+PyInstaller bundles the codec modules and native libraries alongside the reader.
+Region reads group channel selections by TIFF page and decode each intersecting strip or tile once, even when
+multiple interleaved samples or duplicate channels are requested. The output preserves the requested channel order.
+
 The reader checks that the OME pixel type agrees with the TIFF series dtype before exposing metadata or pixels.
 Unsupported OME types and mismatches raise `InvalidImageError`; byte order does not change pixel-type compatibility.
 

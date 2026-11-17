@@ -28,6 +28,24 @@ def generate(destination: Path) -> None:
             rowsperstrip=8,
         )
     tifffile.imwrite(
+        destination / "lzw.ome.tiff",
+        data[0, 0],
+        ome=True,
+        photometric="minisblack",
+        metadata={"axes": "CYX"},
+        compression="lzw",
+        rowsperstrip=8,
+    )
+    tifffile.imwrite(
+        destination / "jpeg.ome.tiff",
+        data[0, 0].astype(np.uint8),
+        ome=True,
+        photometric="minisblack",
+        metadata={"axes": "CYX"},
+        compression="jpeg",
+        tile=(16, 16),
+    )
+    tifffile.imwrite(
         destination / "bigtiff.ome.tiff",
         data[0, 0],
         ome=True,
