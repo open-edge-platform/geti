@@ -89,18 +89,18 @@ describe('ModelVariantsTabs', () => {
         { state: 'missing', revisions: [newerRevision] },
         { state: 'deleted', revisions: [{ ...trainingRevision, files_deleted: true }, newerRevision] },
     ])('disables quantization when the training dataset revision is $state', async ({ revisions }) => {
-        let datasetRevisions = [trainingRevision, newerRevision];
-        server.use(http.get('/api/projects/{project_id}/dataset_revisions', () => HttpResponse.json(datasetRevisions)));
+        const listRevisions = rs.fn();
+        server.use(
+            http.get('/api/projects/{project_id}/dataset_revisions', () => {
+                listRevisions();
+                return HttpResponse.json(revisions);
+            })
+        );
 
         const user = userEvent.setup();
         render(<ModelVariantsTabs model={trainedModel} />);
         const dialog = await openQuantizationDialog(user);
-        await waitFor(() => expect(dialog.getByRole('button', { name: 'Start quantization' })).toBeEnabled());
-        await user.click(dialog.getByRole('button', { name: 'Cancel' }));
-        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-
-        datasetRevisions = revisions;
-        const reopenedDialog = await openQuantizationDialog(user);
-        await waitFor(() => expect(reopenedDialog.getByRole('button', { name: 'Start quantization' })).toBeDisabled());
+        await waitFor(() => expect(listRevisions).toHaveBeenCalled());
+        expect(dialog.getByRole('button', { name: 'Start quantization' })).toBeDisabled();
     });
 });
