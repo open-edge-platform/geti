@@ -1,0 +1,264 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from collections.abc import Sequence
+from xml.etree.ElementTree import Element, tostring
+
+import numpy as np
+import tifffile
+from defusedxml.ElementTree import fromstring
+
+from app.models import MediaStorage, OmeImageInfo, Region
+from app.services.base import InvalidImageError
+
+
+def _parse_pixels(xml: str | None) -> tuple[Element, Element]:
+    """Validate OME-XML and locate the first image's pixel metadata."""
+    if not xml:
+        raise InvalidImageError("The TIFF does not contain OME-XML.")
+    root = fromstring(xml)
+    if root.tag.rsplit("}", 1)[-1] != "OME":
+        raise InvalidImageError("Expected an OME metadata root.")
+    image = root.find("{*}Image")
+    pixels = image.find("{*}Pixels") if image is not None else None
+    if pixels is None:
+        raise InvalidImageError("OME metadata does not contain image pixels.")
+    return root, pixels
+
+
+def _parse_info(tiff: tifffile.TiffFile, xml: str | None, pixels: Element) -> OmeImageInfo:
+    """Parse series-zero metadata without decoding image pixels."""
+    sizes = {axis: int(pixels.attrib[f"Size{axis}"]) for axis in "XYC"}
+    sizes.update({axis: int(pixels.get(f"Size{axis}", "1")) for axis in "ZT"})
+    series = tiff.series[0]
+    actual = dict(zip(series.axes, series.shape))
+    for axis, size in sizes.items():
+        stored = actual.get(axis, 1)
+        if axis == "C":
+            stored *= actual.get("S", 1)
+        if stored != size:
+            raise InvalidImageError(f"OME Size{axis} does not match the TIFF pixels.")
+    if not {"X", "Y"}.issubset(actual):
+        raise InvalidImageError("TIFF pixels must have X and Y axes.")
+    return OmeImageInfo(
+        size_x=sizes["X"],
+        size_y=sizes["Y"],
+        size_c=sizes["C"],
+        size_z=sizes["Z"],
+        size_t=sizes["T"],
+        dimension_order=pixels.attrib["DimensionOrder"],
+        pixel_type=pixels.attrib["Type"],
+        is_big_tiff=tiff.is_bigtiff,
+        raw_metadata=xml,
+        channels=_parse_channels(pixels, series.dtype, sizes["C"]),
+        pyramid_levels=[
+            {
+                "level": index,
+                "width": level.shape[level.axes.index("X")],
+                "height": level.shape[level.axes.index("Y")],
+                "scale": [sizes[axis] / level.shape[level.axes.index(axis)] if axis in "XY" else 1 for axis in "XYCZT"],
+            }
+            for index, level in enumerate(series.levels)
+        ],
+    )
+
+
+def _parse_channels(pixels: Element, dtype: np.dtype, size_c: int) -> list[dict[str, object]]:
+    """Expand logical channels (including RGB samples) and their declared ranges."""
+    minimum, maximum = (0, 1)
+    if np.issubdtype(dtype, np.integer):
+        limits = np.iinfo(dtype)
+        minimum, maximum = int(limits.min), int(limits.max)
+        bits = int(pixels.get("SignificantBits", str(limits.bits)))
+        if not 0 < bits <= limits.bits:
+            raise InvalidImageError("Invalid OME SignificantBits.")
+        if minimum == 0:
+            maximum = (1 << bits) - 1
+        else:
+            minimum, maximum = -(1 << (bits - 1)), (1 << (bits - 1)) - 1
+    channels: list[dict[str, object]] = []
+    for channel in pixels.findall("{*}Channel"):
+        for _ in range(int(channel.get("SamplesPerPixel", "1"))):
+            item: dict[str, object] = {
+                "index": len(channels),
+                "name": channel.get("Name", f"Channel {len(channels)}"),
+                "window": {"min": minimum, "max": maximum, "start": minimum, "end": maximum},
+            }
+            if "Color" in channel.attrib:
+                item["color"] = f"#{(int(channel.attrib['Color']) & 0xFFFFFFFF) >> 8:06x}"
+            if "EmissionWavelength" in channel.attrib:
+                item["emission_wavelength"] = float(channel.attrib["EmissionWavelength"])
+                item["emission_wavelength_unit"] = channel.get("EmissionWavelengthUnit", "nm")
+            channels.append(item)
+    if channels and len(channels) != size_c:
+        raise InvalidImageError("OME channel count does not match SizeC.")
+    return channels
+
+
+class OmeTiffReader:
+    """Identify and open single-file or directory-backed OME-TIFF images."""
+
+    def probe(self, storage: MediaStorage) -> bool:
+        """Identify OME-TIFF by its contents, not its filename."""
+        try:
+            with tifffile.TiffFile(storage.effective_path) as tiff:
+                return bool(tiff.is_ome)
+        except (OSError, ValueError, IndexError):
+            return False
+
+    def open(self, storage: MediaStorage, series: int = 0) -> "OmeTiffImageHandle":
+        """Open series zero, translating invalid containers to InvalidImageError.
+
+        Raises:
+            ValueError: If a non-default series is requested.
+            InvalidImageError: If the file or its OME metadata is invalid.
+        """
+        if series != 0:
+            raise ValueError("Only OME series 0 is supported.")
+        tiff = None
+        try:
+            tiff = tifffile.TiffFile(storage.effective_path)
+            xml = tiff.ome_metadata
+            root, pixels = _parse_pixels(xml)
+            if any(f"Size{axis}" not in pixels.attrib for axis in "ZT"):
+                # tifffile requires these fields even for singleton dimensions.
+                for axis in "ZT":
+                    pixels.attrib.setdefault(f"Size{axis}", "1")
+                tiff.close()
+                tiff = tifffile.TiffFile(storage.effective_path, omexml=tostring(root, encoding="unicode"))
+            return OmeTiffImageHandle(tiff, _parse_info(tiff, xml, pixels))
+        except Exception as error:
+            if tiff is not None:
+                tiff.close()
+            raise InvalidImageError(f"Cannot open OME-TIFF: {error}") from error
+
+
+class OmeTiffImageHandle:
+    """Own TIFF resources and decode only the requested planes and spatial segments.
+
+    Handles are scoped to one caller and are not intended for concurrent reads.
+    """
+
+    def __init__(self, tiff: tifffile.TiffFile, info: OmeImageInfo) -> None:
+        self._tiff = tiff
+        self.info = info
+        self._closed = False
+
+    def read_region(
+        self,
+        *,
+        level: int = 0,
+        region: Region | None = None,
+        z: int = 0,
+        t: int = 0,
+        channels: Sequence[int] | None = None,
+    ) -> np.ndarray:
+        """Return a level-local region as (C, H, W) in the requested channel order.
+
+        Raises:
+            ValueError: If the handle is closed or a selection is out of bounds.
+            InvalidImageError: If the requested TIFF pixels cannot be decoded.
+        """
+        if self._closed:
+            raise ValueError("The OME-TIFF handle is closed.")
+        levels = self._tiff.series[0].levels
+        if not 0 <= level < len(levels) or not 0 <= z < self.info.size_z or not 0 <= t < self.info.size_t:
+            raise ValueError("OME level, z or t selection is out of range.")
+        selected = list(range(self.info.size_c)) if channels is None else list(channels)
+        if any(not 0 <= channel < self.info.size_c for channel in selected):
+            raise ValueError("OME channel selection is out of range.")
+        image = levels[level]
+        sizes = dict(zip(image.axes, image.shape))
+        crop = region or Region(x=0, y=0, width=sizes["X"], height=sizes["Y"])
+        if crop.x + crop.width > sizes["X"] or crop.y + crop.height > sizes["Y"]:
+            raise ValueError("OME region extends beyond the selected pyramid level.")
+        result = np.empty((len(selected), crop.height, crop.width), dtype=image.dtype)
+        try:
+            for index, channel in enumerate(selected):
+                coordinates = {"Z": z, "T": t, "C": channel // sizes.get("S", 1), "S": channel % sizes.get("S", 1)}
+                result[index] = self._read_channel(image, coordinates, crop)
+        except Exception as error:
+            raise InvalidImageError(f"Cannot read OME-TIFF pixels: {error}") from error
+        return result
+
+    @staticmethod
+    def _read_channel(image: tifffile.TiffPageSeries, coordinates: dict[str, int], crop: Region) -> np.ndarray:
+        """Read one channel's crop, decoding only intersecting TIFF strips or tiles.
+
+        Map the requested coordinates to a TIFF page, then read the segments
+        overlapping the crop and copy their pixels into a channel-only array.
+        Support both planar and interleaved samples, including pages stored in
+        companion TIFF files.
+
+        Args:
+            image: Pyramid-level series to read.
+            coordinates: Selected axis indices (Z, T, C, S). Missing indices
+                default to zero; S selects a sample within a pixel, such as
+                an RGB component.
+            crop: Region in the selected level's pixel coordinates. Bounds must
+                be validated by the caller.
+
+        Returns:
+            Array of shape (crop.height, crop.width) with the series dtype.
+
+        Raises:
+            InvalidImageError: If a required TIFF page or keyframe is missing.
+
+        Notes:
+            Intersecting segments are decoded in full before cropping.
+            All segment positions are inspected, but unrelated pixel data
+            is neither read nor decoded.
+        """
+        first_page = image.keyframe
+        if first_page is None:
+            raise InvalidImageError("OME series has no TIFF keyframe.")
+        page_axes = first_page.axes
+        outer_axes = image.axes[: len(image.axes) - len(page_axes)]
+        page_index = 0
+        for axis, size in zip(outer_axes, image.shape):
+            page_index = page_index * size + coordinates.get(axis, 0)
+        page = image.pages[page_index]
+        if page is None:
+            raise InvalidImageError("OME plane references a missing TIFF page.")
+        # tifffile closes companion files after discovering their pages.
+        filehandle = page.parent.filehandle
+        if filehandle.closed:
+            filehandle.open()
+        keyframe = page.keyframe
+        if keyframe is None:
+            raise InvalidImageError("OME plane has no TIFF keyframe.")
+        # tifffile's normalized segment coordinates are (separate sample, Z, Y, X, contiguous sample).
+        sample = coordinates.get("S", 0)
+        separate = sample if keyframe.planarconfig == 2 else 0
+        contiguous = sample if keyframe.planarconfig != 2 else 0
+        depth = coordinates.get("Z", 0) if "Z" in page_axes else 0
+        output = np.zeros((crop.height, crop.width), dtype=image.dtype)
+        for index, (offset, count) in enumerate(zip(page.dataoffsets, page.databytecounts)):
+            _, position, shape = keyframe.decode(None, index)
+            s, d, y, x, c = position
+            y0, x0 = max(y, crop.y), max(x, crop.x)
+            y1, x1 = min(y + shape[1], crop.y + crop.height), min(x + shape[2], crop.x + crop.width)
+            if s != separate or not d <= depth < d + shape[0] or y0 >= y1 or x0 >= x1:
+                continue
+            filehandle.seek(offset)
+            data = filehandle.read(count)
+            segment, _, _ = keyframe.decode(data, index, jpegtables=page.jpegtables)
+            if segment is not None:
+                output[y0 - crop.y : y1 - crop.y, x0 - crop.x : x1 - crop.x] = segment[
+                    depth - d, y0 - y : y1 - y, x0 - x : x1 - x, contiguous - c
+                ]
+        return output
+
+    def close(self) -> None:
+        """Release all TIFF files, including any opened companion files."""
+        if not self._closed:
+            self._tiff.close()
+            self._closed = True
+
+    def __enter__(self) -> "OmeTiffImageHandle":
+        if self._closed:
+            raise ValueError("The OME-TIFF handle is closed.")
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()

@@ -45,19 +45,11 @@ from app.utils.media_storage_ops import (
     move_media_storage,
 )
 
-from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
+from .base import BaseSessionManagedService, InvalidImageError, ResourceNotFoundError, ResourceType
 
 DEFAULT_THUMBNAIL_SIZE = 256
 
 VIDEO_WRITE_CHUNK_SIZE = 100 * 1024 * 1024  # 100 MB
-
-
-class InvalidImageError(Exception):
-    """Exception raised when invalid image is used to create a media."""
-
-    def __init__(self, message: str | None = None):
-        msg = message or "Invalid image has been passed while creating a media."
-        super().__init__(msg)
 
 
 @dataclass(frozen=True)

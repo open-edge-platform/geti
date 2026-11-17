@@ -73,6 +73,11 @@ datas = [
 binaries = [(dll, 'Library/bin/') for dll in glob.glob('.venv/Library/bin/*')]
 hiddenimports = []
 
+# ---- OME-TIFF pixel access ----
+tmp_ret = collect_all('tifffile')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+hiddenimports += ['defusedxml.ElementTree']
+
 # ---- PyTorch core ----
 tmp_ret = collect_all('torch')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
