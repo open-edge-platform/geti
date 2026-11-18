@@ -465,10 +465,13 @@ def test_single_file_storage_rejects_sibling_companions(reader, companion_storag
         reader.open(MediaStorage(root=companion_storage.effective_path))
 
 
-def test_single_file_storage_allows_self_references(reader, companion_storage):
+@pytest.mark.parametrize("renamed", [False, True])
+def test_single_file_storage_allows_self_references(reader, companion_storage, renamed):
     path = companion_storage.effective_path
     _replace_ome_metadata(path, "part1.ome.tiff", "part0.ome.tiff")
     _replace_ome_metadata(path, "000000000002", "000000000001")
+    if renamed:
+        path = path.rename(path.with_name("renamed.ome.tiff"))
     with reader.open(MediaStorage(root=path)) as handle:
         actual = handle.read_region()
         assert actual.shape == (2, 4, 5)
@@ -504,7 +507,21 @@ def test_in_root_companion_symlinks_are_allowed(reader, companion_storage):
 
 
 def test_nested_companion_paths_cannot_escape_storage(reader, companion_storage):
-    _replace_ome_metadata(companion_storage.root / "part1.ome.tiff", "part1.ome.tiff", "../outside.ome.tiff")
+    path = companion_storage.root / "part1.ome.tiff"
+    _replace_ome_metadata(path, "part1.ome.tiff", "../outside.ome.tiff")
+    _replace_ome_metadata(path, ">urn:uuid:00000000-0000-0000-0000-000000000002</UUID>", ">urn:uuid:external</UUID>")
+    with pytest.raises(InvalidImageError, match="outside media storage"):
+        reader.open(companion_storage)
+
+
+def test_missing_uuids_do_not_bypass_companion_path_validation(reader, companion_storage):
+    path = companion_storage.effective_path
+    _replace_ome_metadata(path, ' UUID="urn:uuid:00000000-0000-0000-0000-000000000001"', "")
+    _replace_ome_metadata(
+        path,
+        '<UUID FileName="part1.ome.tiff">urn:uuid:00000000-0000-0000-0000-000000000002</UUID>',
+        '<UUID FileName="../outside.ome.tiff"/>',
+    )
     with pytest.raises(InvalidImageError, match="outside media storage"):
         reader.open(companion_storage)
 

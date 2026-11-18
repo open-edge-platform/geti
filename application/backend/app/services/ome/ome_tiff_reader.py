@@ -59,18 +59,24 @@ def _validate_companion_paths(path: Path, root: Element, storage: MediaStorage) 
     Directory-backed media may reference files within their resolved storage
     root. Single-file media may reference only themselves. Companion metadata
     is inspected without series discovery, including cyclic references and
-    companions without Image/Pixels metadata.
+    companions without Image/Pixels metadata. UUID self-references do not
+    require their recorded filenames to match the current storage path.
     """
     pending = [(path, root)]
     visited = {path}
     while pending:
         current_path, metadata = pending.pop()
+        current_uuid = metadata.get("UUID")
         for data in metadata.iter():
             # Match tifffile's suffix-based recognition, not just OME namespaces.
             if not data.tag.endswith("TiffData"):
                 continue
             for uuid in data:
-                if not uuid.tag.endswith("UUID") or (filename := uuid.get("FileName")) is None:
+                if not uuid.tag.endswith("UUID"):
+                    continue
+                if current_uuid is not None and uuid.text == current_uuid:
+                    continue
+                if (filename := uuid.get("FileName")) is None:
                     continue
                 companion = _resolve_storage_path(current_path.parent / filename, storage)
                 if companion in visited:
