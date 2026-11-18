@@ -392,22 +392,23 @@ def test_only_first_series_is_read(reader, tmp_path):
 
 
 @pytest.fixture
-def companion_storage(tmp_path):
+def companion_storage(tmp_path, request):
     root = tmp_path / "storage"
     root.mkdir()
-    identifiers = ["00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"]
+    channel_count = getattr(request, "param", 2)
+    identifiers = [f"00000000-0000-0000-0000-{index + 1:012d}" for index in range(channel_count)]
     references = "".join(
         f'<TiffData IFD="0" FirstC="{index}" FirstZ="0" FirstT="0" PlaneCount="1">'
         f'<UUID FileName="part{index}.ome.tiff">urn:uuid:{identifier}</UUID></TiffData>'
         for index, identifier in enumerate(identifiers)
     )
+    channels = "".join(f'<Channel ID="Channel:0:{index}" SamplesPerPixel="1"/>' for index in range(channel_count))
     for index, identifier in enumerate(identifiers):
         xml = (
             f'<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" UUID="urn:uuid:{identifier}">'
             '<Image ID="Image:0"><Pixels ID="Pixels:0" DimensionOrder="XYCZT" Type="uint16" '
-            'SizeX="5" SizeY="4" SizeC="2" SizeZ="1" SizeT="1">'
-            '<Channel ID="Channel:0:0" SamplesPerPixel="1"/><Channel ID="Channel:0:1" SamplesPerPixel="1"/>'
-            f"{references}</Pixels></Image></OME>"
+            f'SizeX="5" SizeY="4" SizeC="{channel_count}" SizeZ="1" SizeT="1">'
+            f"{channels}{references}</Pixels></Image></OME>"
         )
         tifffile.imwrite(
             root / f"part{index}.ome.tiff", np.full((4, 5), index, dtype=np.uint16), description=xml, metadata=None
@@ -429,6 +430,57 @@ def test_companion_files_are_reopened_and_closed(reader, companion_storage):
         files = [tiff.filehandle for tiff in handle._tiff._files.values()]
         assert len(files) == 2
     assert all(file.closed for file in files)
+
+
+@pytest.mark.parametrize("companion_storage", [8], indirect=True)
+def test_companion_filehandles_do_not_accumulate(reader, companion_storage):
+    with reader.open(companion_storage) as handle:
+        primary = handle._tiff.filehandle
+        files = [tiff.filehandle for tiff in handle._tiff._files.values()]
+        open_counts = []
+        original_open = tifffile.FileHandle.open
+
+        def track_open(filehandle):
+            original_open(filehandle)
+            open_counts.append(sum(not file.closed for file in files))
+
+        selections = [list(range(8)), list(reversed(range(8))), [3], [6], [3, 3]]
+        with patch.object(tifffile.FileHandle, "open", autospec=True, side_effect=track_open):
+            for channels in selections:
+                actual = handle.read_region(channels=channels, region=Region(x=1, y=1, width=1, height=1))
+                assert actual[:, 0, 0].tolist() == channels
+                assert [file for file in files if not file.closed] == [primary]
+        assert max(open_counts) == 2  # the primary TIFF and at most one reopened companion
+
+
+def test_preopened_companion_remains_open(reader, companion_storage):
+    with reader.open(companion_storage) as handle:
+        companion = handle._tiff.series[0].pages[1].parent.filehandle
+        companion.open()
+        assert handle.read_region(channels=[1])[0, 0, 0] == 1
+        assert not companion.closed
+        assert not handle._tiff.filehandle.closed
+    assert companion.closed
+
+
+@pytest.mark.parametrize("initially_open", [False, True])
+@pytest.mark.parametrize("operation", ["seek", "read", "decode"])
+def test_companion_filehandle_ownership_after_failure(reader, companion_storage, initially_open, operation):
+    with reader.open(companion_storage) as handle:
+        page = handle._tiff.series[0].pages[1]
+        companion = page.parent.filehandle
+        if initially_open:
+            companion.open()
+        target = page.keyframe if operation == "decode" else tifffile.FileHandle
+        with (
+            patch.object(target, operation, side_effect=ValueError("broken segment")),
+            pytest.raises(InvalidImageError, match="broken segment"),
+        ):
+            handle.read_region(channels=[1], region=Region(x=1, y=1, width=1, height=1))
+        assert companion.closed is not initially_open
+        assert not handle._tiff.filehandle.closed
+        assert handle.read_region(channels=[1])[0, 0, 0] == 1
+        assert companion.closed is not initially_open
 
 
 @pytest.mark.parametrize("kind", ["relative", "absolute", "symlink", "symlink_directory"])

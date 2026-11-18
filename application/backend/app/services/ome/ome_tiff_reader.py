@@ -303,37 +303,43 @@ class OmeTiffImageHandle:
         Notes:
             Intersecting segments are decoded in full before cropping.
             All segment positions are inspected, but unrelated pixel data
-            is neither read nor decoded.
+            is neither read nor decoded. Handles reopened for this page are
+            closed on success or failure; already-open handles remain open.
         """
         # tifffile closes companion files after discovering their pages.
         filehandle = page.parent.filehandle
-        if filehandle.closed:
-            filehandle.open()
-        keyframe = page.keyframe
-        if keyframe is None:
-            raise InvalidImageError("OME plane has no TIFF keyframe.")
-        depth = z if "Z" in keyframe.axes else 0
-        samples: dict[int, list[tuple[int, int]]] = {}
-        for output_index, sample in selections:
-            separate = sample if keyframe.planarconfig == 2 else 0
-            contiguous = sample if keyframe.planarconfig != 2 else 0
-            samples.setdefault(separate, []).append((output_index, contiguous))
-        for index, (offset, count) in enumerate(zip(page.dataoffsets, page.databytecounts)):
-            _, position, shape = keyframe.decode(None, index)
-            # Normalized position: (separate sample, depth, row, column, contiguous sample).
-            s, d, y, x, c = position
-            y0, x0 = max(y, crop.y), max(x, crop.x)
-            y1, x1 = min(y + shape[1], crop.y + crop.height), min(x + shape[2], crop.x + crop.width)
-            if s not in samples or not d <= depth < d + shape[0] or y0 >= y1 or x0 >= x1:
-                continue
-            filehandle.seek(offset)
-            data = filehandle.read(count)
-            segment, _, _ = keyframe.decode(data, index, jpegtables=page.jpegtables)
-            if segment is not None:
-                for output_index, contiguous in samples[s]:
-                    output[output_index, y0 - crop.y : y1 - crop.y, x0 - crop.x : x1 - crop.x] = segment[
-                        depth - d, y0 - y : y1 - y, x0 - x : x1 - x, contiguous - c
-                    ]
+        reopened = filehandle.closed
+        try:
+            if reopened:
+                filehandle.open()
+            keyframe = page.keyframe
+            if keyframe is None:
+                raise InvalidImageError("OME plane has no TIFF keyframe.")
+            depth = z if "Z" in keyframe.axes else 0
+            samples: dict[int, list[tuple[int, int]]] = {}
+            for output_index, sample in selections:
+                separate = sample if keyframe.planarconfig == 2 else 0
+                contiguous = sample if keyframe.planarconfig != 2 else 0
+                samples.setdefault(separate, []).append((output_index, contiguous))
+            for index, (offset, count) in enumerate(zip(page.dataoffsets, page.databytecounts)):
+                _, position, shape = keyframe.decode(None, index)
+                # Normalized position: (separate sample, depth, row, column, contiguous sample).
+                s, d, y, x, c = position
+                y0, x0 = max(y, crop.y), max(x, crop.x)
+                y1, x1 = min(y + shape[1], crop.y + crop.height), min(x + shape[2], crop.x + crop.width)
+                if s not in samples or not d <= depth < d + shape[0] or y0 >= y1 or x0 >= x1:
+                    continue
+                filehandle.seek(offset)
+                data = filehandle.read(count)
+                segment, _, _ = keyframe.decode(data, index, jpegtables=page.jpegtables)
+                if segment is not None:
+                    for output_index, contiguous in samples[s]:
+                        output[output_index, y0 - crop.y : y1 - crop.y, x0 - crop.x : x1 - crop.x] = segment[
+                            depth - d, y0 - y : y1 - y, x0 - x : x1 - x, contiguous - c
+                        ]
+        finally:
+            if reopened:
+                filehandle.close()
 
     def close(self) -> None:
         """Release all TIFF files, including any opened companion files."""
