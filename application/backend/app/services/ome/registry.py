@@ -5,6 +5,7 @@ from collections.abc import Sequence
 
 from app.models import MediaStorage
 
+from .ome_tiff_reader import OmeTiffReader
 from .protocols import OmeReader
 
 
@@ -16,7 +17,7 @@ class OmeReaderRegistry:
     """Selects an OME reader implementation by probing a media storage."""
 
     def __init__(self, readers: Sequence[OmeReader] | None = None) -> None:
-        self._readers: list[OmeReader] = list(readers or [])
+        self._readers: list[OmeReader] = [OmeTiffReader()] if readers is None else list(readers)
 
     def register(self, reader: OmeReader) -> None:
         self._readers.append(reader)

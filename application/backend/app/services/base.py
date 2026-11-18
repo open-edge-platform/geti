@@ -8,6 +8,13 @@ from enum import StrEnum
 from sqlalchemy.orm import Session
 
 
+class InvalidImageError(Exception):
+    """Exception raised when invalid image is used to create a media."""
+
+    def __init__(self, message: str | None = None) -> None:
+        super().__init__(message or "Invalid image has been passed while creating a media.")
+
+
 class ResourceType(StrEnum):
     """Enumeration for resource types."""
 
