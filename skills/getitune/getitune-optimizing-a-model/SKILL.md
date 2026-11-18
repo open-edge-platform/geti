@@ -1,6 +1,6 @@
 ---
 name: getitune-optimizing-a-model
-description: Optimize an exported getitune model (the Geti training library) with post-training quantization. Use when a user wants to run `OVEngine.optimize()` / `engine.optimize()` to produce an INT8 model via NNCF, understands calibration-set requirements, or needs to re-validate and run inference with a quantized model versus the original FP32/FP16 model. Covers OpenVINO NNCF post-training quantization and the accuracy/size trade-off.
+description: Optimize an exported getitune model with post-training quantization. Use when a user wants to run `OVEngine.optimize()` / `engine.optimize()` to produce an INT8 model via NNCF, choose a calibration subset, or re-validate and run inference with a quantized model versus the original FP32/FP16 model. This skill is not for training or exporting a model.
 ---
 
 # Optimizing (quantizing) a model with getitune
@@ -10,7 +10,22 @@ description: Optimize an exported getitune model (the Geti training library) wit
 model and speed up inference. Quantization runs on an **OpenVINO** model (an
 exported `.xml`), producing an INT8 version.
 
-Run everything from `libraries/getitune/`.
+Use Python 3.11-3.14 in a dedicated environment. Check `python --version` and
+`python -m pip show getitune` first; use a separate environment if the installed
+version differs from 0.4.0. Installation requires network access.
+Install the package before starting:
+
+```bash
+python -m pip install "getitune[cpu]==0.4.0" --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+For Intel GPUs, use `[xpu]` with the index suffix `/xpu`; for NVIDIA GPUs, use
+`[cuda]` with `/cu130`. Select one hardware extra and check driver compatibility.
+Check `openvino.Core().available_devices` for the intended inference device;
+PyTorch extras alone do not enable OpenVINO devices. Ask for missing XML/BIN
+files or data before optimizing. If calibration fails, verify that the training
+subset is nonempty and matches the model's task and preprocessing; changing
+`max_data_subset_size` cannot repair a missing or incompatible dataset.
 
 ## Workflow
 
@@ -22,29 +37,39 @@ ov_engine = create_engine(
     model="/path/to/exported_model.xml",
     data="/path/to/dataset",
 )
-ov_engine.optimize()                 # INT8 post-training quantization via NNCF
-int8_metrics = ov_engine.test()      # validate the quantized model
-predictions = ov_engine.predict()    # run inference with the quantized model
+baseline_metrics = ov_engine.test()
+optimized_path = ov_engine.optimize(max_data_subset_size=300)
+int8_metrics = ov_engine.test(checkpoint=optimized_path)
+predictions = ov_engine.predict(checkpoint=optimized_path)
 ```
 
 1. **Start from an exported OpenVINO model** (`.xml`). If you only have a
    checkpoint, export it first with the `getitune-exporting-a-model` skill.
    - Done when: `create_engine(model="....xml", data=...)` builds an `OVEngine`.
 2. **Provide a calibration dataset.** Calibration images are taken automatically
-   from the training subset; 200-500 images is the recommended calibration size.
+   from the training subset; around 300 images is the recommended calibration
+   size. `max_data_subset_size=None` does not override the setting stored in the
+   model's optimization metadata. If that metadata does not specify a subset
+   size, NNCF uses its default of 300; `None` does not mean the whole dataset.
+   Pass `max_data_subset_size=300` to `optimize()` to explicitly override the
+   inherited setting. This is a per-optimization argument, not an engine
+   constructor argument.
    - Done when: `optimize()` runs without a "not enough calibration data" issue.
-3. **Run `optimize()`.** This replaces the engine's model in place with the INT8
-   version.
-   - Done when: the call completes and subsequent `test()`/`predict()` use INT8.
-4. **Re-validate accuracy** with `test()` and compare against the FP32/FP16
-   baseline; a small accuracy drop is expected in exchange for size/latency.
+3. **Run `optimize()`.** Retain the returned path to the INT8 artifact; the
+   engine's original model is not replaced.
+   - Done when: the returned XML and its companion BIN exist.
+4. **Re-validate accuracy** with `test(checkpoint=optimized_path)` and run
+   `predict(checkpoint=optimized_path)` on the same evaluation data. Compare
+   against the FP32/FP16 baseline.
    - Done when: the INT8 metric is within your acceptable tolerance of baseline.
 
 ## Comparing against the original model
 
-After `optimize()` the engine holds the INT8 model. To re-check the original
-FP32/FP16 model, either pass the original `.xml` path directly to `.test()` /
-`.predict()`, or create the engine again from the original `.xml`.
+After `optimize()` the engine still holds the original FP32/FP16 model. Calling
+`test()` or `predict()` without `checkpoint=` therefore uses that original
+model, even after a call with `checkpoint=optimized_path`. Pass the optimized
+path to both calls, or create a separate engine with
+`create_engine(model=optimized_path, data=...)` and use its `test()` / `predict()`.
 
 ## Notes
 
@@ -52,17 +77,13 @@ FP32/FP16 model, either pass the original `.xml` path directly to `.test()` /
   not a training-time step.
 - **Only OpenVINO IR (`.xml`) is supported.** An ONNX model must be converted to
   OpenVINO IR first before it can be optimized.
-- In the Geti application this is exposed as the `quantize` job
-  (`application/backend/app/execution/quantization/`); library `optimize()` is
-  the same capability without the job/queue wrapper.
+- The library `optimize()` call is a direct operation; it does not require a
+  running application or job queue.
 
 ## Verify
 
-```bash
-# from libraries/getitune/
-just lint
-just test-unit -- -k optimize      # when you touched optimization code
-```
+Verify the quantized model by checking its output artifact, comparing its
+metrics with the original model, and running `predict()` on representative data.
 
 ## Related skills
 

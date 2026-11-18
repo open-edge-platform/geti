@@ -1,0 +1,34 @@
+{
+  "skill_name": "getitune-exporting-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Export my trained getitune model to OpenVINO IR at FP16 and verify the result. I have not provided the checkpoint, matching model recipe, or evaluation dataset; no task assets are available in this environment.",
+      "expected_output": "The agent asks for the checkpoint, matching model or recipe, and evaluation data. It describes export and XML/BIN existence checks followed by parity evaluation, without claiming to have created or tested an artifact.",
+      "assertions": [
+        "Requests the trained checkpoint, matching model or recipe, and evaluation data.",
+        "Plans XML/BIN artifact checks and parity evaluation against the trained model.",
+        "Does not claim to have exported a model or measured parity."
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Should I export my trained model to OpenVINO IR or ONNX for deployment?",
+      "expected_output": "The agent explains the format trade-off, names the correct enum or CLI options, and does not claim that ONNX can be directly optimized by the OpenVINO quantization workflow.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write Python code only, without executing it, for installed getitune 0.4.0. Export my efficientnet_b0 checkpoint ./weights/classifier.ckpt to OpenVINO FP16 using evaluation data at ./dataset. Check the returned files and compare the exported model with the checkpoint on that same dataset. Do not train a new model.",
+      "expected_output": "Imports ExportFormat and Precision from their concrete submodules, loads the checkpoint, evaluates a baseline, exports OPENVINO with export_precision=Precision.FP16, checks XML/BIN existence, and evaluates a new engine loaded from the returned path. Does not train or claim measured parity.",
+      "assertions": [
+        "Imports ExportFormat from getitune.types.export and Precision from getitune.types.precision, not from getitune.types.",
+        "Loads ./weights/classifier.ckpt with efficientnet_b0 and task=MULTI_CLASS_CLS (or its unambiguous recipe), and does not call train().",
+        "Exports using ExportFormat.OPENVINO and export_precision=Precision.FP16.",
+        "Checks both XML and BIN and evaluates the returned exported model on ./dataset against a checkpoint baseline without fabricating metrics."
+      ],
+      "files": []
+    }
+  ]
+}
