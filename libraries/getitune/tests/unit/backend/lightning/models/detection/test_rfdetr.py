@@ -6,11 +6,14 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import torch
 from torchvision import tv_tensors
 
+from getitune.backend.lightning.models.common.rfdetr_mixin import RFDETRMixin
 from getitune.backend.lightning.models.detection.rfdetr import RFDETR
 from getitune.backend.lightning.models.detection.utils.rfdetr_batch_utils import (
     _cap_per_image,
@@ -413,6 +416,45 @@ class TestRFDETR:
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
+        assert model.reset_pretrained_class_bias is True
+
+    def test_init_can_disable_pretrained_class_bias_reset(self) -> None:
+        """Test the detection constructor exposes the pretrained class-bias reset opt-out."""
+        model = RFDETR(
+            model_name="rfdetr_nano",
+            label_info=3,
+            pretrained=False,
+            reset_pretrained_class_bias=False,
+        )
+        assert model.reset_pretrained_class_bias is False
+
+    @pytest.mark.parametrize("reset_class_bias", [True, False, None])
+    def test_load_pretrained_class_bias_reset(
+        self,
+        reset_class_bias: bool | None,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test the optional reset of pretrained decoder and encoder class biases."""
+        decoder_bias = torch.nn.Parameter(torch.ones(1))
+        encoder_bias = torch.nn.Parameter(torch.ones(1))
+        lwdetr = SimpleNamespace(
+            class_embed=SimpleNamespace(bias=decoder_bias),
+            two_stage=True,
+            transformer=SimpleNamespace(enc_out_class_embed=[SimpleNamespace(bias=encoder_bias)]),
+        )
+        model = SimpleNamespace(model=SimpleNamespace(lwdetr=lwdetr), _model_config=SimpleNamespace())
+        if reset_class_bias is not None:
+            model.reset_pretrained_class_bias = reset_class_bias
+        monkeypatch.setattr(
+            "getitune.backend.lightning.models.common.rfdetr_mixin.load_pretrain_weights",
+            lambda *_: None,
+        )
+
+        RFDETRMixin.load_pretrained(model, weights=Path("weights.pth"))
+
+        expected_bias = torch.zeros(1) if reset_class_bias is not False else torch.ones(1)
+        torch.testing.assert_close(decoder_bias, expected_bias)
+        torch.testing.assert_close(encoder_bias, expected_bias)
 
     def test_create_model(self) -> None:
         """Test RF-DETR model creation."""
