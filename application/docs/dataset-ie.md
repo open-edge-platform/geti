@@ -48,7 +48,9 @@ use cases by composing the necessary intermediate steps in a set of endpoints an
 Two important design choices follow from these observations:
 
 1. All datasets that are uploaded or downloaded by the user (directly or via API), must be zip archives in a standard
-   dataset format (Geti, COCO, YOLO or VOC). Legacy Datumaro v1 archives are not supported.
+   dataset format (Geti, COCO, YOLO or VOC). For classification projects, the Ultralytics YOLO classification format
+   (ImageNet-style folder layout) is also supported, and for instance segmentation projects the Ultralytics YOLO
+   segmentation format (polygon label rows). Legacy Datumaro v1 archives are not supported.
 2. Internally, all processing steps must operate on a common representation of the dataset. In practice, this means
    `getidata.Dataset` objects from getidata.
 
