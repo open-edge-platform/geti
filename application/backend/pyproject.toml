@@ -26,6 +26,7 @@ dependencies = [
     "pydantic-settings~=2.14.2",
     "aiortc~=1.15.0",
     "defusedxml~=0.7.1",
+    "tifffile[codecs]>=2025.10.16,<2027",
     "scikit-learn~=1.7.2",
     "faster-coco-eval~=1.7.0",
     "scikit-multilearn~=0.2.0",

@@ -482,8 +482,8 @@ RUN echo "deb [arch=amd64 trusted=yes] https://ppa.launchpadcontent.net/kobuk-te
 # hadolint ignore=DL3008
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt-get update  \
-    && apt-get install -y --no-install-recommends \
+    apt-get -o Acquire::Retries=5 -o APT::Update::Error-Mode=any update \
+    && apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
         libze-intel-gpu1 libze1 libze-dev intel-metrics-discovery intel-opencl-icd clinfo intel-gsc intel-ocloc \
         intel-media-va-driver-non-free libmfx-gen1 libvpl2 libvpl-tools libva-glx2 va-driver-all vainfo
 
