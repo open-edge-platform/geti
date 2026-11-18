@@ -134,6 +134,7 @@ test.describe('Inference', () => {
                         getMockedPipeline({
                             data_collection: {
                                 max_dataset_size: 500,
+                                save_predictions: false,
                                 policies: [
                                     {
                                         type: 'fixed_rate',
@@ -159,6 +160,7 @@ test.describe('Inference', () => {
                         getMockedPipeline({
                             data_collection: {
                                 max_dataset_size: 700,
+                                save_predictions: false,
                                 policies: [
                                     {
                                         type: 'fixed_rate',
@@ -192,6 +194,7 @@ test.describe('Inference', () => {
                         getMockedPipeline({
                             data_collection: {
                                 max_dataset_size: 500,
+                                save_predictions: false,
                                 policies: [
                                     {
                                         type: 'fixed_rate',
@@ -228,6 +231,7 @@ test.describe('Inference', () => {
                         getMockedPipeline({
                             data_collection: {
                                 max_dataset_size: 500,
+                                save_predictions: false,
                                 policies: [
                                     {
                                         type: 'fixed_rate',
@@ -256,6 +260,7 @@ test.describe('Inference', () => {
                         getMockedPipeline({
                             data_collection: {
                                 max_dataset_size: 500,
+                                save_predictions: false,
                                 policies: [
                                     {
                                         type: 'fixed_rate',

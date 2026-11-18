@@ -111,6 +111,32 @@ may be running at the same time, provided that they don't share an _exclusive_ c
 configured to read from the same camera cannot run together. Exclusivity is a property of the source/sink type: e.g.
 a physical camera requires exclusive access, whereas an IP camera or a topic does not.
 
+## Data collection
+
+The **Data collection policy** panel controls automatic frame capture and the dataset size limit.
+**Save predictions as annotations** is off by default. When enabled, both automatic capture and
+manual **Capture frame** save the original image together with that frame's model predictions as accepted
+annotations. These annotations can be edited, exported, and used for training without another review.
+Confidence scores are removed when predictions are accepted, just as for manually submitted annotations.
+Enabling this option explicitly accepts valid model predictions as ground truth. Review their quality before
+retraining: inaccurate predictions can reinforce model errors in subsequent training runs.
+
+A valid empty prediction is saved as an annotated image with no objects for detection, instance segmentation,
+and multilabel classification. Multiclass classification requires one class. If labels cannot be resolved or
+annotations fail validation, the original frame is saved without annotations and is not marked as reviewed.
+The server logs a warning for that fallback. Predictions are validated before image files are written; if the
+subsequent dataset write fails, the new image and thumbnail are removed. A manual capture requests one attempt,
+not an automatic retry on every following frame.
+
+The setting is stored per project as `data_collection.save_predictions` and applies to future captures
+without restarting inference. Changing it does not modify previously collected images or the capture
+policies. The existing dataset size limit still applies.
+
+When using `PATCH /api/projects/{project_id}/pipeline`, omitting `data_collection` leaves it unchanged.
+Supplying `data_collection` replaces the whole collection configuration, rather than merging its individual
+fields. Include the current `max_dataset_size`, `save_predictions`, and `policies` values that you intend to
+preserve. Omitting `save_predictions` from a supplied configuration resets it to `false`.
+
 ## REST API
 
 See the [API reference](api.md).

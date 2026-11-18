@@ -510,6 +510,7 @@
             }
         },
         "collection": {
+            "savePredictions": "Voorspellingen opslaan als annotaties",
             "sidebarLabel": "Beleid voor gegevensverzameling",
             "maxDatasetSize": {
                 "title": "Maximale datasetgrootte",

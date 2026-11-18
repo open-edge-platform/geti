@@ -510,6 +510,7 @@
             }
         },
         "collection": {
+            "savePredictions": "将预测保存为标注",
             "sidebarLabel": "数据采集策略",
             "maxDatasetSize": {
                 "title": "最大数据集大小",

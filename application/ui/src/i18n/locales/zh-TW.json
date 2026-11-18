@@ -510,6 +510,7 @@
             }
         },
         "collection": {
+            "savePredictions": "將預測儲存為標註",
             "sidebarLabel": "資料擷取原則",
             "maxDatasetSize": {
                 "title": "資料集大小上限",

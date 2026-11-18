@@ -510,6 +510,7 @@
             }
         },
         "collection": {
+            "savePredictions": "Zapisuj predykcje jako adnotacje",
             "sidebarLabel": "Zasady zbierania danych",
             "maxDatasetSize": {
                 "title": "Maksymalny rozmiar zbioru danych",

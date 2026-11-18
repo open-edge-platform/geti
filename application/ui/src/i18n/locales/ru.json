@@ -550,6 +550,7 @@
             }
         },
         "collection": {
+            "savePredictions": "Сохранять предсказания как аннотации",
             "sidebarLabel": "Сбор данных",
             "maxDatasetSize": {
                 "title": "Максимальный размер набора данных",

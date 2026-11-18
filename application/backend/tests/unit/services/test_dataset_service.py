@@ -115,7 +115,9 @@ class TestDatasetServiceUnit:
                 shape=Rectangle(type="rectangle", x=0, y=0, width=10, height=10),
             )
         ]
-        DatasetService._validate_annotations_coordinates(annotations=annotations, media=media)
+        DatasetService._validate_annotations_coordinates(
+            annotations=annotations, media_width=media.width, media_height=media.height
+        )
 
     @pytest.mark.parametrize(
         "x, y, width, height, validation_msg",
@@ -135,7 +137,9 @@ class TestDatasetServiceUnit:
             )
         ]
         with pytest.raises(AnnotationValidationError, match=re.escape(validation_msg)):
-            DatasetService._validate_annotations_coordinates(annotations=annotations, media=media)
+            DatasetService._validate_annotations_coordinates(
+                annotations=annotations, media_width=media.width, media_height=media.height
+            )
 
     def test_validate_annotations_coordinates_polygon(self) -> None:
         media = MediaDB(name="test", format="jpg", width=100, height=50, size=1024)
@@ -145,7 +149,9 @@ class TestDatasetServiceUnit:
                 shape=Polygon(type="polygon", points=[Point(x=0, y=0), Point(x=10, y=10)]),
             )
         ]
-        DatasetService._validate_annotations_coordinates(annotations=annotations, media=media)
+        DatasetService._validate_annotations_coordinates(
+            annotations=annotations, media_width=media.width, media_height=media.height
+        )
 
     @pytest.mark.parametrize(
         "x, y, validation_msg",
@@ -163,7 +169,9 @@ class TestDatasetServiceUnit:
             )
         ]
         with pytest.raises(AnnotationValidationError, match=re.escape(validation_msg)):
-            DatasetService._validate_annotations_coordinates(annotations=annotations, media=media)
+            DatasetService._validate_annotations_coordinates(
+                annotations=annotations, media_width=media.width, media_height=media.height
+            )
 
     def test_validate_annotations_multilabel_classification(self, fxt_multilabel_classification_project) -> None:
         annotations = [
@@ -235,10 +243,15 @@ class TestDatasetServiceUnit:
             annotations=annotations, task=fxt_multiclass_classification_project.task
         )
 
-    def test_validate_annotations_multiclass_classification_empty(self, fxt_multiclass_classification_project) -> None:
+    @pytest.mark.parametrize("annotations", [[], [DatasetItemAnnotation(shape=FullImage(), labels=[])]])
+    def test_validate_annotations_multiclass_classification_empty(
+        self, fxt_multiclass_classification_project, annotations
+    ) -> None:
         # Should raise an exception since multiclass classification requires exactly one label (empty label not allowed)
         with pytest.raises(AnnotationValidationError):
-            DatasetService._validate_annotation_shapes(annotations=[], task=fxt_multiclass_classification_project.task)
+            DatasetService._validate_annotation_shapes(
+                annotations=annotations, task=fxt_multiclass_classification_project.task
+            )
 
     def test_validate_annotations_multiclass_classification_multiple_labels(
         self, fxt_multiclass_classification_project

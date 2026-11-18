@@ -40,6 +40,10 @@ Partial pipeline configuration update. May contain any subset of fields includin
 'inference', 'source_id', 'sink_id', 'model_id', or 'model_variant_id'. Fields not included in the request will remain 
 unchanged.
 
+Supplying 'data_collection' replaces the entire collection configuration. Include the current
+'max_dataset_size', 'save_predictions', and 'policies' values that you intend to preserve.
+Omitting 'save_predictions' from a supplied configuration resets it to false.
+
 When 'model_id' is provided without 'model_variant_id', the default FP16 OpenVINO variant is selected automatically.
 Only OpenVINO model variants can be used for inference. If an INT8 variant is selected, the server validates that the 
 inference device supports INT8.
@@ -78,6 +82,7 @@ UPDATE_PIPELINE_BODY_EXAMPLES = {
         value={
             "data_collection": {
                 "max_dataset_size": 500,
+                "save_predictions": False,
                 "policies": [
                     {
                         "type": "fixed_rate",
@@ -91,7 +96,7 @@ UPDATE_PIPELINE_BODY_EXAMPLES = {
     "disable_data_collection": Example(
         summary="Disable data collection",
         description="Remove all data collection policies of the pipeline",
-        value={"data_collection": {"max_dataset_size": None, "policies": []}},
+        value={"data_collection": {"max_dataset_size": None, "save_predictions": False, "policies": []}},
     ),
     "change_device": Example(
         summary="Change inference device",

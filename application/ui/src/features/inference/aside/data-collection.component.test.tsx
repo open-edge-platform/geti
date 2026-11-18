@@ -11,41 +11,33 @@ import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { DataCollection } from './data-collection.component';
 
-describe('DataCollection capture rate fields', () => {
-    const renderApp = () => {
+describe('DataCollection', () => {
+    const renderApp = (savePredictions = false, maxDatasetSize: number | null = 500) => {
         const pipelinePatchSpy = rs.fn();
+        let pipeline = getMockedPipeline({
+            data_collection: {
+                max_dataset_size: maxDatasetSize,
+                save_predictions: savePredictions,
+                policies: [
+                    { type: 'fixed_rate', rate: 12, enabled: true },
+                    {
+                        type: 'confidence_threshold',
+                        confidence_threshold: 0.5,
+                        min_sampling_interval: 2.5,
+                        enabled: false,
+                    },
+                ],
+            },
+        });
 
         server.use(
-            http.get('/api/projects/{project_id}/pipeline', () => {
-                return HttpResponse.json(
-                    getMockedPipeline({
-                        data_collection: {
-                            max_dataset_size: 500,
-                            policies: [
-                                {
-                                    type: 'fixed_rate',
-                                    rate: 12,
-                                    enabled: true,
-                                },
-                                {
-                                    type: 'confidence_threshold',
-                                    confidence_threshold: 0.5,
-                                    min_sampling_interval: 2.5,
-                                    enabled: false,
-                                },
-                            ],
-                        },
-                    })
-                );
-            }),
+            http.get('/api/projects/{project_id}/pipeline', () => HttpResponse.json(pipeline)),
             http.patch('/api/projects/{project_id}/pipeline', async ({ request }) => {
-                pipelinePatchSpy(await request.json());
+                const update = (await request.json()) as Partial<typeof pipeline>;
+                pipelinePatchSpy(update);
+                pipeline = { ...pipeline, data_collection: update.data_collection ?? pipeline.data_collection };
 
-                return HttpResponse.json({
-                    project_id: '',
-                    status: 'idle',
-                    device: 'cpu',
-                });
+                return HttpResponse.json(pipeline);
             })
         );
 
@@ -58,6 +50,69 @@ describe('DataCollection capture rate fields', () => {
         rs.resetAllMocks();
     });
 
+    it('does not save predictions by default and toggles without changing collection policies', async () => {
+        const user = userEvent.setup();
+        const pipelinePatchSpy = renderApp();
+        const toggle = await screen.findByRole('switch', { name: 'Save predictions as annotations' });
+
+        expect(toggle).not.toBeChecked();
+        await user.click(toggle);
+        await waitFor(() => expect(toggle).toBeChecked());
+        expect(pipelinePatchSpy).toHaveBeenLastCalledWith({
+            data_collection: {
+                max_dataset_size: 500,
+                save_predictions: true,
+                policies: [
+                    { type: 'fixed_rate', rate: 12, enabled: true },
+                    {
+                        type: 'confidence_threshold',
+                        confidence_threshold: 0.5,
+                        min_sampling_interval: 2.5,
+                        enabled: false,
+                    },
+                ],
+            },
+        });
+
+        await user.click(toggle);
+        await waitFor(() => expect(toggle).not.toBeChecked());
+        expect(pipelinePatchSpy).toHaveBeenLastCalledWith({
+            data_collection: expect.objectContaining({ save_predictions: false }),
+        });
+    });
+
+    it('preserves unlimited dataset size when enabling prediction saving', async () => {
+        const user = userEvent.setup();
+        const pipelinePatchSpy = renderApp(false, null);
+
+        await user.click(await screen.findByRole('switch', { name: 'Save predictions as annotations' }));
+
+        await waitFor(() =>
+            expect(pipelinePatchSpy).toHaveBeenCalledWith({
+                data_collection: expect.objectContaining({ save_predictions: true, max_dataset_size: null }),
+            })
+        );
+    });
+
+    it('keeps the previous setting when updating the pipeline fails', async () => {
+        const user = userEvent.setup();
+        renderApp();
+        const request = rs.fn();
+        server.use(
+            http.patch('/api/projects/{project_id}/pipeline', () => {
+                request();
+                return new HttpResponse(null, { status: 500 });
+            })
+        );
+        const toggle = await screen.findByRole('switch', { name: 'Save predictions as annotations' });
+
+        await user.click(toggle);
+
+        await waitFor(() => expect(request).toHaveBeenCalledOnce());
+        await waitFor(() => expect(toggle).not.toBeDisabled());
+        expect(toggle).not.toBeChecked();
+    });
+
     it('renders Frames and Seconds fields for capture rate', async () => {
         renderApp();
 
@@ -66,8 +121,8 @@ describe('DataCollection capture rate fields', () => {
         expect(screen.queryByLabelText('Rate')).not.toBeInTheDocument();
     });
 
-    it('patches fixed_rate using frames divided by seconds on blur', async () => {
-        const pipelinePatchSpy = renderApp();
+    it.each([false, true])('preserves save_predictions=%s when changing capture rate', async (savePredictions) => {
+        const pipelinePatchSpy = renderApp(savePredictions);
 
         const framesInput = await screen.findByLabelText('Frames');
         const secondsInput = screen.getByLabelText('Seconds');
@@ -80,6 +135,7 @@ describe('DataCollection capture rate fields', () => {
             expect(pipelinePatchSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
                     data_collection: expect.objectContaining({
+                        save_predictions: savePredictions,
                         policies: expect.arrayContaining([
                             expect.objectContaining({
                                 type: 'fixed_rate',
@@ -99,6 +155,7 @@ describe('DataCollection capture rate fields', () => {
             expect(pipelinePatchSpy).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     data_collection: expect.objectContaining({
+                        save_predictions: savePredictions,
                         policies: expect.arrayContaining([
                             expect.objectContaining({
                                 type: 'fixed_rate',

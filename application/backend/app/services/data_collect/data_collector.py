@@ -10,7 +10,7 @@ from loguru import logger
 from app.db import get_db_session
 from app.models import ConfidenceThresholdDataCollectionPolicy, FixedRateDataCollectionPolicy, Pipeline, Project
 from app.models.media import ImageFormat
-from app.services.data_collect.prediction_converter import get_confidence_scores
+from app.services.data_collect.prediction_converter import convert_prediction, get_confidence_scores
 from app.services.event.event_bus import EventBus, EventType
 from app.services.media_service import ImageMetadata
 from app.stream.stream_data import InferenceData
@@ -154,8 +154,8 @@ class DataCollector:
         Collects dispatched images to project dataset based on policy checkers.
 
         Evaluates automated collection policies and the manual next-frame trigger to determine if image
-        should be added to dataset. If collection is warranted, stores the image as an unannotated
-        dataset item (predictions are not cached; they can be generated on-the-fly later).
+        should be added to dataset. Stores the image without annotations by default, or with the
+        frame's model predictions as reviewed annotations when save_predictions is enabled.
 
         Args:
             timestamp: Floating-point timestamp of the captured image, used for item naming.
@@ -175,59 +175,96 @@ class DataCollector:
             return
         pipeline, project = self.active_pipeline_data
         from app.services import DatasetService, LabelService, MediaService
+        from app.services.dataset_service import AnnotationValidationError
 
+        manual_capture = self.should_collect_next_frame
+        self.should_collect_next_frame = False
         confidence_scores = get_confidence_scores(prediction=inference_data.prediction)
         should_collect = (
             any(
                 checker.should_collect(timestamp=timestamp, confidence_scores=confidence_scores)
                 for checker in self.policy_checkers
             )
-            or self.should_collect_next_frame
+            or manual_capture
         )
         if not should_collect:
             return
         # Convert only 3-channel BGR images to RGB; pass grayscale / other formats through.
         if frame_data.ndim == 3 and frame_data.shape[2] == 3:
             frame_data = cv2.cvtColor(frame_data, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-        with get_db_session() as session:
-            label_service = LabelService(db_session=session)
-            media_service = MediaService(data_dir=self.data_dir, db_session=session)
-            dataset_service = DatasetService(
-                label_service=label_service, media_service=media_service, db_session=session
-            )
-
-            # Check if max_dataset_size limit has been reached
-            max_dataset_size = pipeline.data_collection.max_dataset_size
-            if max_dataset_size is not None:
-                current_count = dataset_service.count_dataset_items(project=project)
-                if current_count >= max_dataset_size:
-                    logger.debug(
-                        "Dataset has reached max size limit ({}/{}), skipping data collection",
-                        current_count,
-                        max_dataset_size,
-                    )
-                    return
-
-            media = media_service.create_image(
-                ImageMetadata(
-                    project_id=project.id,
-                    data=frame_data,
-                    name=f"{timestamp:.4f}".replace(".", "_"),
-                    image_format=ImageFormat.JPG,
-                    source_id=pipeline.source_id,
+        image_paths: tuple[Path, ...] = ()
+        try:
+            with get_db_session() as session:
+                label_service = LabelService(db_session=session)
+                media_service = MediaService(data_dir=self.data_dir, db_session=session)
+                dataset_service = DatasetService(
+                    label_service=label_service, media_service=media_service, db_session=session
                 )
-            )
-            dataset_service.create_dataset_item(
-                project_id=project.id,
-                task=project.task,
-                media=media,
-                user_reviewed=False,
-                annotations=None,
-            )
-        self.should_collect_next_frame = False
+
+                max_dataset_size = pipeline.data_collection.max_dataset_size
+                if max_dataset_size is not None:
+                    current_count = dataset_service.count_dataset_items(project=project)
+                    if current_count >= max_dataset_size:
+                        logger.debug(
+                            "Dataset has reached max size limit ({}/{}), skipping data collection",
+                            current_count,
+                            max_dataset_size,
+                        )
+                        return
+
+                annotations = None
+                if pipeline.data_collection.save_predictions:
+                    labels = label_service.list_all(project_id=project.id)
+                    try:
+                        annotations = convert_prediction(
+                            labels=labels, frame_data=frame_data, prediction=inference_data.prediction, strict=True
+                        )
+                        dataset_service.validate_annotations(
+                            annotations=annotations,
+                            task=project.task,
+                            labels=labels,
+                            media_width=frame_data.shape[1],
+                            media_height=frame_data.shape[0],
+                        )
+                    except (AnnotationValidationError, ValueError) as error:
+                        logger.warning("Saving captured frame without invalid predictions: {}", error)
+                        annotations = None
+
+                media = media_service.create_image(
+                    ImageMetadata(
+                        project_id=project.id,
+                        data=frame_data,
+                        name=f"{timestamp:.4f}".replace(".", "_"),
+                        image_format=ImageFormat.JPG,
+                        source_id=pipeline.source_id,
+                    )
+                )
+                image_paths = (
+                    media_service.get_media_binary_path(project_id=project.id, media=media),
+                    media_service.get_media_thumbnail_path(project=project, media=media),
+                )
+                dataset_service.create_dataset_item(
+                    project_id=project.id,
+                    task=project.task,
+                    media=media,
+                    user_reviewed=annotations is not None,
+                    prediction_model_id=inference_data.model_id if annotations is not None else None,
+                    annotations=annotations,
+                )
+        except Exception:
+            self._discard_capture_artifacts(image_paths)
+            raise
+
+    @staticmethod
+    def _discard_capture_artifacts(image_paths: tuple[Path, ...]) -> None:
+        for path in image_paths:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                logger.exception("Could not remove failed capture artifact {}", path)
 
     def collect_next_frame(self) -> None:
         """
-        Sets flag to collect the next available frame. This flag will be reset to False upon successful collection.
+        Request one collection attempt for the next available frame, without retrying failures automatically.
         """
         self.should_collect_next_frame = True

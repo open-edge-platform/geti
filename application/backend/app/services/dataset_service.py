@@ -10,7 +10,7 @@ from getidata import Dataset
 from sqlalchemy.orm import Session
 
 from app.datumaro_converter import SampleMode
-from app.db.schema import DatasetItemDB, MediaDB
+from app.db.schema import DatasetItemDB
 from app.models import (
     DatasetItem,
     DatasetItemAnnotation,
@@ -225,11 +225,26 @@ class DatasetService(BaseSessionManagedService):
             # so confidence scores are no longer meaningful
             annotations = [annotation.model_copy(update={"confidences": None}) for annotation in annotations]
 
-        DatasetService._validate_annotations_labels(annotations=annotations, labels=labels)
-        DatasetService._validate_annotation_shapes(annotations=annotations, task=task)
-        DatasetService._validate_annotations_coordinates(annotations=annotations, media=media)
+        DatasetService.validate_annotations(
+            annotations=annotations, task=task, labels=labels, media_width=media.width, media_height=media.height
+        )
 
         return annotations
+
+    @staticmethod
+    def validate_annotations(
+        annotations: list[DatasetItemAnnotation],
+        task: Task,
+        labels: Sequence[Label],
+        media_width: int,
+        media_height: int,
+    ) -> None:
+        """Validate annotations without requiring a persisted media item."""
+        DatasetService._validate_annotations_labels(annotations=annotations, labels=labels)
+        DatasetService._validate_annotation_shapes(annotations=annotations, task=task)
+        DatasetService._validate_annotations_coordinates(
+            annotations=annotations, media_width=media_width, media_height=media_height
+        )
 
     @staticmethod
     def _validate_annotations_labels(annotations: list[DatasetItemAnnotation], labels: Sequence[Label]) -> None:
@@ -253,6 +268,10 @@ class DatasetService(BaseSessionManagedService):
                 annotation = annotations[0]
                 if not isinstance(annotation.shape, FullImage):
                     raise AnnotationValidationError("Classification project supports only full_image shapes.")
+                if task.exclusive_labels and not annotation.labels:
+                    raise AnnotationValidationError(
+                        "Multiclass classification project requires one label per annotation."
+                    )
                 if task.exclusive_labels and len(annotation.labels) > 1:
                     raise AnnotationValidationError(
                         "Multiclass classification project doesn't allow more than one label per annotation."
@@ -275,27 +294,29 @@ class DatasetService(BaseSessionManagedService):
                         )
 
     @staticmethod
-    def _validate_annotations_coordinates(annotations: list[DatasetItemAnnotation], media: Media | MediaDB) -> None:
+    def _validate_annotations_coordinates(
+        annotations: list[DatasetItemAnnotation], media_width: int, media_height: int
+    ) -> None:
         for annotation in annotations:
             if isinstance(annotation.shape, Rectangle):
                 rect = annotation.shape
                 x1, x2 = rect.x, rect.x + rect.width
-                if x1 > media.width or x2 > media.width:
+                if x1 > media_width or x2 > media_width:
                     raise AnnotationValidationError(
-                        f"Rectangle coordinates (x1={x1}, x2={x2}) are out of bounds for media width {media.width}"
+                        f"Rectangle coordinates (x1={x1}, x2={x2}) are out of bounds for media width {media_width}"
                     )
                 y1, y2 = rect.y, rect.y + rect.height
-                if y1 > media.height or y2 > media.height:
+                if y1 > media_height or y2 > media_height:
                     raise AnnotationValidationError(
-                        f"Rectangle coordinates (y1={y1}, y2={y2}) are out of bounds for media height {media.height}"
+                        f"Rectangle coordinates (y1={y1}, y2={y2}) are out of bounds for media height {media_height}"
                     )
             if isinstance(annotation.shape, Polygon):
                 poly = annotation.shape
                 for point in poly.points:
-                    if point.x > media.width or point.y > media.height:
+                    if point.x > media_width or point.y > media_height:
                         raise AnnotationValidationError(
                             f"Polygon points (x={point.x}, y={point.y}) are out of bounds for media "
-                            f"({media.width}, {media.height})"
+                            f"({media_width}, {media_height})"
                         )
 
     def set_dataset_item_annotations(

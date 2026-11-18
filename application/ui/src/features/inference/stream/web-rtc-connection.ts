@@ -70,6 +70,7 @@ export class WebRTCConnection {
 
         try {
             this.setupPeerConnection();
+            this.setupConnectionStateListener();
 
             await this.createAndSetOffer();
             await this.waitForIceGathering();
@@ -85,7 +86,6 @@ export class WebRTCConnection {
             }
 
             await this.updateConfThreshold(0.5); // Initial confidence threshold
-            this.setupConnectionStateListener();
         } catch (err) {
             clearTimeout(this.timeoutId);
             console.error('Error setting up WebRTC:', err);

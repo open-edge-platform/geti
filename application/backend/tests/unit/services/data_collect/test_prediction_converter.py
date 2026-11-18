@@ -12,6 +12,50 @@ from app.models import DatasetItemAnnotation, FullImage, Label, LabelReference, 
 from app.services.data_collect.prediction_converter import convert_prediction, get_confidence_scores
 
 
+@pytest.mark.parametrize("strict", [False, True])
+def test_convert_prediction_empty_classification(strict: bool) -> None:
+    assert (
+        convert_prediction(
+            labels=[], frame_data=np.zeros((20, 20)), prediction=ClassificationResult(top_labels=[]), strict=strict
+        )
+        == []
+    )
+
+
+@pytest.mark.parametrize(
+    "prediction",
+    [
+        ClassificationResult(
+            top_labels=[
+                model_api.models.result.Label(id=0, name="cat", confidence=0.9),
+                model_api.models.result.Label(id=99, name="unknown", confidence=0.8),
+            ]
+        ),
+        DetectionResult(
+            bboxes=np.array([[1, 1, 10, 10], [2, 2, 12, 12]]),
+            labels=np.array([0, 99]),
+            scores=np.array([0.9, 0.8]),
+            label_names=["cat", "unknown"],
+        ),
+        InstanceSegmentationResult(
+            bboxes=np.array([[0, 0, 19, 19], [0, 0, 19, 19]]),
+            labels=np.array([0, 99]),
+            masks=np.ones((2, 20, 20), dtype=np.uint8),
+            scores=np.array([0.9, 0.8]),
+            label_names=["cat", "unknown"],
+        ),
+    ],
+)
+def test_convert_prediction_strict_rejects_partially_unmatched_labels(prediction) -> None:
+    labels = [Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000", hotkey="")]
+    frame_data = np.zeros((20, 20), dtype=np.uint8)
+
+    with pytest.raises(ValueError, match="cannot be resolved"):
+        convert_prediction(labels=labels, frame_data=frame_data, prediction=prediction, strict=True)
+
+    assert len(convert_prediction(labels=labels, frame_data=frame_data, prediction=prediction)) == 1
+
+
 def test_convert_prediction_detection_underscore_label_names() -> None:
     """Labels with spaces should match model predictions where spaces are underscores.
 
@@ -185,9 +229,12 @@ def test_convert_prediction_detection(label_names: list[str], predicted_label_na
         (["black cat", "white dog"], ["cat", "dog"]),
     ],
 )
-def test_convert_prediction_segmentation(label_names: list[str], predicted_label_names: list[str]) -> None:
+@pytest.mark.parametrize("frame_shape", [(100, 200), (100, 200, 3)])
+def test_convert_prediction_segmentation(
+    label_names: list[str], predicted_label_names: list[str], frame_shape: tuple[int, ...]
+) -> None:
     # Arrange
-    frame_data = np.zeros((100, 200, 3), dtype=np.uint8)
+    frame_data = np.zeros(frame_shape, dtype=np.uint8)
 
     # First mask - rectangle in the left portion
     mask1 = np.zeros((100, 200), dtype=np.uint8)

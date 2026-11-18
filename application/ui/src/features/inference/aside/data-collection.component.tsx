@@ -30,6 +30,7 @@ export const DataCollection = () => {
     const confidencePolicy = policies.find((policy) => policy.type === 'confidence_threshold');
 
     const maxDatasetSize = pipelineQuery.data?.data_collection?.max_dataset_size ?? DEFAULTS.MAX_DATASET_SIZE;
+    const savePredictions = pipelineQuery.data?.data_collection?.save_predictions ?? false;
     const serverRate = ratePolicy?.rate ?? DEFAULTS.RATE;
     const serverConfidenceThreshold = confidencePolicy?.confidence_threshold ?? DEFAULTS.CONFIDENCE_THRESHOLD;
 
@@ -49,13 +50,15 @@ export const DataCollection = () => {
 
     const updatePolicies = (updates: {
         maxDatasetSize?: number;
+        savePredictions?: boolean;
         rateEnabled?: boolean;
         rate?: number;
         confidenceEnabled?: boolean;
         confidenceThreshold?: number;
     }) => {
         const newDataCollectionPolicies = {
-            max_dataset_size: updates.maxDatasetSize ?? maxDatasetSize,
+            max_dataset_size: updates.maxDatasetSize ?? pipelineQuery.data?.data_collection?.max_dataset_size ?? null,
+            save_predictions: updates.savePredictions ?? savePredictions,
             policies: [
                 {
                     type: 'fixed_rate' as const,
@@ -105,6 +108,16 @@ export const DataCollection = () => {
                     }}
                     isDisabled={isUpdating}
                 />
+
+                <Switch
+                    isEmphasized
+                    isSelected={savePredictions}
+                    onChange={(enabled) => updatePolicies({ savePredictions: enabled })}
+                    marginTop={'size-200'}
+                    isDisabled={isUpdating}
+                >
+                    {t('inference.collection.savePredictions')}
+                </Switch>
 
                 <Divider marginY={'size-400'} size={'S'} />
 

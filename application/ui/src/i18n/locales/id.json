@@ -510,6 +510,7 @@
             }
         },
         "collection": {
+            "savePredictions": "Simpan prediksi sebagai anotasi",
             "sidebarLabel": "Kebijakan pengumpulan data",
             "maxDatasetSize": {
                 "title": "Ukuran maksimum dataset",

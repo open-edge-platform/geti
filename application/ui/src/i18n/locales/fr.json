@@ -526,6 +526,7 @@
             }
         },
         "collection": {
+            "savePredictions": "Enregistrer les prédictions comme annotations",
             "sidebarLabel": "Politique de collecte de données",
             "maxDatasetSize": {
                 "title": "Taille maximale du jeu de données",
