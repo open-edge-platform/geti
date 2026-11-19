@@ -393,7 +393,7 @@ class RFDETRMixin:
         """Load pretrained weights into the model.
 
         Load & align pretrained weights (handles head resize internally).
-        Reinit classification biases to zero (sigmoid=0.5 neutral prior).
+        Reinit classification biases to zero (sigmoid=0.5 neutral prior) unless reset_pretrained_class_bias flag is set.
 
         Args:
             weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
