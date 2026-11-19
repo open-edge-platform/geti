@@ -72,7 +72,8 @@
             "model": "Modelo",
             "jobs": "Tareas",
             "labels": "Etiquetas",
-            "bytesTransferred": "{{transferred}} de {{total}}"
+            "bytesTransferred": "{{transferred}} de {{total}}",
+            "annotations": "Anotaciones"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -87,7 +88,9 @@
             "uploading": "Cargando",
             "failed": "Fallido",
             "error": "Error",
-            "disconnected": "Desconectado"
+            "disconnected": "Desconectado",
+            "loading": "Cargando...",
+            "unavailable": "No disponible"
         },
         "errors": {
             "unknown": "Se ha producido un error desconocido",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Vídeos / fotogramas anotados",
             "numberOfObjectsPerLabel": "Número de objetos por etiqueta",
             "unannotated": "Sin anotar",
-            "annotated": "Anotado",
-            "annotationsChartTooltip": "Anotaciones"
+            "annotated": "Anotado"
         },
         "delete": {
             "title": "Eliminar elementos",
@@ -229,6 +231,21 @@
             "assignAllFailure": "No se pudieron asignar etiqueta(s) a las {{count}} imagen(es)",
             "assignPartialSuccess": "Etiqueta(s) asignada(s) a {{succeeded}} de {{total}} imagen(es) ({{failed}} fallidas)"
         },
+        "mediaDetails": {
+            "title": "Detalles",
+            "resolution": "Resolución",
+            "fileSize": "Tamaño del archivo",
+            "format": "Formato",
+            "type": "Tipo de medio",
+            "image": "Imagen",
+            "video": "Vídeo",
+            "frameRate": "Frecuencia de fotogramas",
+            "duration": "Duración",
+            "frames": "Fotogramas totales",
+            "annotatedFrames": "Fotogramas anotados",
+            "labels": "Etiquetas únicas",
+            "retry": "Reintentar"
+        },
         "mediaActions": {
             "downloadStarted": "Se ha iniciado la descarga de {{fileName}}"
         },
@@ -244,10 +261,6 @@
             "dropZone": {
                 "title": "Arrastra aquí los archivos multimedia",
                 "description": "Las imágenes y vídeos se cargarán en este dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Número de fotogramas anotados: {{count}}",
-                "totalFrames": "Fotogramas totales: {{count}}"
             }
         },
         "import": {
@@ -399,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Cargando...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconocido (id: {{deviceId}})",
                 "streamUrl": "URL del flujo: {{url}}",
@@ -548,8 +560,7 @@
             },
             "component": {
                 "healthy": "Correcto",
-                "finished": "Finalizado",
-                "unavailable": "No disponible"
+                "finished": "Finalizado"
             }
         },
         "stream": {

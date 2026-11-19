@@ -22,20 +22,21 @@ const withEmptyLabelAnnotation = (frame: AnnotatedVideoFrame): AnnotatedVideoFra
 };
 
 export const useGetVideoFramesAnnotationsQueryOptions = ({
+    mediaId,
     startFrameIndex,
     endFrameIndex,
 }: {
+    mediaId: string;
     startFrameIndex: number;
     endFrameIndex: number;
 }) => {
     const projectId = useProjectIdentifier();
-    const { videoFrame } = useVideoPlayer();
 
     const queryOptions = $api.queryOptions('get', '/api/projects/{project_id}/dataset/media/{media_id}/frames', {
         params: {
             path: {
                 project_id: projectId,
-                media_id: videoFrame.id,
+                media_id: mediaId,
             },
             query: {
                 frame_index_from: startFrameIndex,
@@ -64,7 +65,11 @@ export const usePrefetchVideoFramesAnnotations = ({
     frameNumber: number;
     frameSkip: number;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
+    const { videoFrame } = useVideoPlayer();
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({
+        mediaId: videoFrame.id,
+        ...useVideoFramesRange({ frameNumber, frameSkip }),
+    });
 
     return usePrefetchQuery(queryOptions);
 };
@@ -78,7 +83,11 @@ export const useVideoFramesAnnotations = <T>({
     frameSkip: number;
     selector: (data: AnnotatedVideoFrame[]) => T;
 }) => {
-    const queryOptions = useGetVideoFramesAnnotationsQueryOptions(useVideoFramesRange({ frameNumber, frameSkip }));
+    const { videoFrame } = useVideoPlayer();
+    const queryOptions = useGetVideoFramesAnnotationsQueryOptions({
+        mediaId: videoFrame.id,
+        ...useVideoFramesRange({ frameNumber, frameSkip }),
+    });
 
     return useQuery({
         ...queryOptions,

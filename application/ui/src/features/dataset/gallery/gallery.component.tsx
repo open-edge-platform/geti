@@ -19,9 +19,11 @@ import { BulkLabelsAssignmentDialog } from './bulk-labels-assignment/bulk-labels
 import { DatasetDropZone } from './drop-zone.component';
 import { EmptyDataset } from './empty-dataset.component';
 import { useSelectDatasetItem } from './hooks/use-select-dataset-item.hook';
+import { MediaDetailsButton } from './media-item-actions/media-details.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
-import { MediaItemContextualHelp } from './media-item-contextual-help/media-item-contextual-help.component';
 import { useUploadFiles } from './use-upload-files';
+
+import classes from './gallery.module.scss';
 
 type GalleryProps = {
     items: Media[];
@@ -95,6 +97,7 @@ const GalleryList = ({
 
                 return (
                     <MediaItem
+                        className={classes.galleryItem}
                         contentElement={() => (
                             <MediaThumbnail
                                 item={item}
@@ -122,7 +125,7 @@ const GalleryList = ({
                         )}
                         topRightElement={() => (
                             <Flex alignItems={'center'} gap={'size-50'}>
-                                <MediaItemContextualHelp item={item} />
+                                <MediaDetailsButton item={item} />
 
                                 <MediaItemActions
                                     id={item.id}
