@@ -1,26 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { memo, useState } from 'react';
-
 import type { Media } from '@/api/types';
 import { MediaItem } from '@/components/media-item/media-item.component';
 import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import { useTranslation } from '@/i18n';
-import {
-    ActionButton,
-    Checkbox,
-    DialogContainer,
-    dimensionValue,
-    Flex,
-    Selection,
-    Size,
-    Tooltip,
-    TooltipTrigger,
-    ViewModes,
-} from '@geti-ui/ui';
-import { InfoOutline } from '@geti-ui/ui/icons';
+import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
@@ -34,7 +19,7 @@ import { BulkLabelsAssignmentDialog } from './bulk-labels-assignment/bulk-labels
 import { DatasetDropZone } from './drop-zone.component';
 import { EmptyDataset } from './empty-dataset.component';
 import { useSelectDatasetItem } from './hooks/use-select-dataset-item.hook';
-import { MediaDetails } from './media-item-actions/media-details.component';
+import { MediaDetailsButton } from './media-item-actions/media-details.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
 import { useUploadFiles } from './use-upload-files';
 
@@ -62,19 +47,16 @@ type GalleryListProps = {
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
     onSelectedMediaItemChange: (item: Media) => void;
-    onDetails: (item: Media) => void;
 };
 
-const GalleryList = memo(function GalleryListContent({
+const GalleryList = ({
     items,
     viewMode,
     isPending,
     isFetchingNextPage,
     fetchNextPage,
     onSelectedMediaItemChange,
-    onDetails,
-}: GalleryListProps) {
-    const { t } = useTranslation();
+}: GalleryListProps) => {
     const projectId = useProjectIdentifier();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
 
@@ -143,17 +125,7 @@ const GalleryList = memo(function GalleryListContent({
                         )}
                         topRightElement={() => (
                             <Flex alignItems={'center'} gap={'size-50'}>
-                                <TooltipTrigger>
-                                    <ActionButton
-                                        isQuiet
-                                        aria-label={'Details'}
-                                        aria-haspopup='dialog'
-                                        onPress={() => onDetails(item)}
-                                    >
-                                        <InfoOutline />
-                                    </ActionButton>
-                                    <Tooltip>{t('dataset.mediaDetails.title')}</Tooltip>
-                                </TooltipTrigger>
+                                <MediaDetailsButton item={item} />
 
                                 <MediaItemActions
                                     id={item.id}
@@ -172,7 +144,7 @@ const GalleryList = memo(function GalleryListContent({
             }}
         />
     );
-});
+};
 
 export const Gallery = ({
     items,
@@ -183,7 +155,6 @@ export const Gallery = ({
     fetchNextPage,
 }: GalleryProps) => {
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
-    const [detailsItem, setDetailsItem] = useState<Media | null>(null);
 
     const { isClassification, uploadFiles, clearFilesForLabelAssignment, filesForLabelAssignment } = useUploadFiles();
 
@@ -198,7 +169,6 @@ export const Gallery = ({
                 fetchNextPage={fetchNextPage}
                 onSelectedMediaItemChange={onSelectedMediaItemChange}
                 isFetchingNextPage={isFetchingNextPage}
-                onDetails={setDetailsItem}
             />
         );
 
@@ -216,10 +186,6 @@ export const Gallery = ({
                     )}
                 </DialogContainer>
             </DatasetDropZone>
-
-            <DialogContainer onDismiss={() => setDetailsItem(null)}>
-                {detailsItem !== null && <MediaDetails item={detailsItem} onClose={() => setDetailsItem(null)} />}
-            </DialogContainer>
 
             {isClassification && (
                 <BulkLabelsAssignmentDialog files={filesForLabelAssignment} onClose={clearFilesForLabelAssignment} />

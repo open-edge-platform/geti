@@ -251,7 +251,7 @@ describe('Gallery item deletion and selection', () => {
         ]);
     });
 
-    it('keeps Details open when its gallery card unmounts', async () => {
+    it('closes Details when its gallery card unmounts', async () => {
         server.use(
             http.get('/api/projects/{project_id}', () => HttpResponse.json(getMockedProject({ id: 'project-123' }))),
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () =>
@@ -289,10 +289,6 @@ describe('Gallery item deletion and selection', () => {
 
         expect(originalCard).not.toBeInTheDocument();
         expect(screen.getByLabelText('Selection state of media item another-item')).toBeInTheDocument();
-        const dialog = screen.getByRole('dialog', { name: 'Details' });
-        expect(dialog).toBeVisible();
-        expect(within(dialog).getByRole('heading', { name: `${item.name}.${item.format}`, level: 3 })).toBeVisible();
-        await user.click(screen.getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 

@@ -1,10 +1,24 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useState } from 'react';
+
 import type { Media } from '@/api/types';
 import { formatCompactDuration } from '@/components/media-thumbnail/util';
 import { useTranslation } from '@/i18n';
-import { Button, ButtonGroup, Content, Dialog, Heading, View } from '@geti-ui/ui';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    Heading,
+    Tooltip,
+    TooltipTrigger,
+    View,
+} from '@geti-ui/ui';
+import { InfoOutline } from '@geti-ui/ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useNumberFormatter } from 'react-aria';
@@ -17,6 +31,26 @@ import { formatBytes } from '../../../../shared/util';
 import { getAnnotationCounts } from './media-details.utils';
 
 import classes from './media-details.module.scss';
+
+export const MediaDetailsButton = ({ item }: { item: Media }) => {
+    const { t } = useTranslation();
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <TooltipTrigger>
+                <ActionButton isQuiet aria-label={'Details'} aria-haspopup='dialog' onPress={() => setIsOpen(true)}>
+                    <InfoOutline />
+                </ActionButton>
+                <Tooltip>{t('dataset.mediaDetails.title')}</Tooltip>
+            </TooltipTrigger>
+
+            <DialogContainer onDismiss={() => setIsOpen(false)}>
+                {isOpen && <MediaDetails item={item} onClose={() => setIsOpen(false)} />}
+            </DialogContainer>
+        </>
+    );
+};
 
 type MediaDetailsProps = {
     item: Media;

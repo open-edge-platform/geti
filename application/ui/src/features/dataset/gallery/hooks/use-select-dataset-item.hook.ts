@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { useFilteredDatasetMedia } from 'hooks/use-filtered-dataset-media.hook';
@@ -44,37 +44,34 @@ export const useSelectDatasetItem = () => {
         setPrevSelectedMediaItem(selectedMediaItem);
     }
 
-    const onSelectedMediaItemChange = useCallback(
-        (item: Media | null) => {
-            if (item === null) {
-                navigate({ pathname: paths.project.dataset.index({ projectId }), search });
-                return;
-            }
+    const onSelectedMediaItemChange = (item: Media | null) => {
+        if (item === null) {
+            navigate({ pathname: paths.project.dataset.index({ projectId }), search });
+            return;
+        }
 
-            if (isVideo(item)) {
-                navigate({
-                    pathname: paths.project.dataset.item.frame({ projectId, datasetItemId: item.id, frameNumber: '0' }),
-                    search,
-                });
-                return;
-            }
+        if (isVideo(item)) {
+            navigate({
+                pathname: paths.project.dataset.item.frame({ projectId, datasetItemId: item.id, frameNumber: '0' }),
+                search,
+            });
+            return;
+        }
 
-            if (isVideoFrame(item)) {
-                navigate({
-                    pathname: paths.project.dataset.item.frame({
-                        projectId,
-                        datasetItemId: item.id,
-                        frameNumber: item.frame_number.toString(),
-                    }),
-                    search,
-                });
-                return;
-            }
+        if (isVideoFrame(item)) {
+            navigate({
+                pathname: paths.project.dataset.item.frame({
+                    projectId,
+                    datasetItemId: item.id,
+                    frameNumber: item.frame_number.toString(),
+                }),
+                search,
+            });
+            return;
+        }
 
-            navigate({ pathname: paths.project.dataset.item.index({ projectId, datasetItemId: item.id }), search });
-        },
-        [navigate, projectId, search]
-    );
+        navigate({ pathname: paths.project.dataset.item.index({ projectId, datasetItemId: item.id }), search });
+    };
 
     return { selectedMediaItem, onSelectedMediaItemChange };
 };
