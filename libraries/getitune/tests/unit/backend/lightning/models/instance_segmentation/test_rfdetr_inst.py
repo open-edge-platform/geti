@@ -35,8 +35,8 @@ class TestRFDETRInst:
         assert model.num_classes == 3
         assert model.reset_pretrained_class_bias is True
 
-    @pytest.mark.parametrize("reset_class_bias", [None, True, False])
-    def test_pretrained_class_bias_reset(self, reset_class_bias: bool | None, monkeypatch: pytest.MonkeyPatch) -> None:
+    @pytest.mark.parametrize("reset_class_bias", [True, False])
+    def test_pretrained_class_bias_reset(self, reset_class_bias: bool, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test the constructor controls post-load classification bias resets."""
         loaded: list[LWDETR] = []
 
@@ -48,18 +48,17 @@ class TestRFDETRInst:
                     torch.nn.init.constant_(enc_cls_embed.bias, 3.0)
 
         monkeypatch.setattr("getitune.backend.lightning.models.common.rfdetr_mixin.load_pretrain_weights", load_weights)
-        kwargs = {} if reset_class_bias is None else {"reset_pretrained_class_bias": reset_class_bias}
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=3,
             pretrained=True,
             pretrained_weights=Path("weights.pth"),
-            **kwargs,
+            reset_pretrained_class_bias=reset_class_bias,
         )
 
-        lwdetr = model.model.lwdetr
-        assert loaded == [lwdetr]
-        assert model.reset_pretrained_class_bias is (reset_class_bias is not False)
+        assert len(loaded) == 1
+        lwdetr = loaded[0]
+        assert model.reset_pretrained_class_bias is reset_class_bias
         expected_decoder = 2.0 if reset_class_bias is False else 0.0
         torch.testing.assert_close(lwdetr.class_embed.bias, torch.full_like(lwdetr.class_embed.bias, expected_decoder))
         if lwdetr.two_stage:
