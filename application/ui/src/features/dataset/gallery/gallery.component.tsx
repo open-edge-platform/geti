@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { MediaItem } from '@/components/media-item/media-item.component';
@@ -65,7 +65,7 @@ type GalleryListProps = {
     onDetails: (item: Media) => void;
 };
 
-const GalleryList = ({
+const GalleryList = memo(function GalleryListContent({
     items,
     viewMode,
     isPending,
@@ -73,7 +73,7 @@ const GalleryList = ({
     fetchNextPage,
     onSelectedMediaItemChange,
     onDetails,
-}: GalleryListProps) => {
+}: GalleryListProps) {
     const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
@@ -172,7 +172,7 @@ const GalleryList = ({
             }}
         />
     );
-};
+});
 
 export const Gallery = ({
     items,

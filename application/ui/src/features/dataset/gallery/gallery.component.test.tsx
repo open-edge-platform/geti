@@ -15,11 +15,13 @@ import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
+import * as mediaUrlUtils from '../../../shared/media-url.utils';
 import { MediaUploadProvider } from '../providers/media-upload-provider.component';
 import { SelectedDataProvider, useSelectedData } from '../providers/selected-data-provider.component';
 import { Gallery } from './gallery.component';
 
 const uploadMediaMock = rs.fn();
+const onSelectedMediaItemChangeMock = rs.fn();
 
 let dropFiles: (files: File[]) => void = () => {};
 
@@ -54,7 +56,7 @@ rs.mock('../api/use-media-upload', () => ({
 rs.mock('./hooks/use-select-dataset-item.hook', () => ({
     useSelectDatasetItem: () => ({
         selectedMediaItem: null,
-        onSelectedMediaItemChange: rs.fn(),
+        onSelectedMediaItemChange: onSelectedMediaItemChangeMock,
     }),
 }));
 
@@ -197,6 +199,7 @@ describe('Gallery item deletion and selection', () => {
             getMockedVideo({ annotation_status: { has_annotations: true, annotated_video_frames: 1 } }),
         ].map((media) => ({ media, type: media.type, hasAnnotations: media.annotation_status.has_annotations }))
     )('opens Details from the info button for $type with has_annotations=$hasAnnotations', async ({ media }) => {
+        const downloadUrlSpy = rs.spyOn(mediaUrlUtils, 'getMediaDownloadUrl');
         const request = rs.fn();
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', () => {
@@ -217,9 +220,12 @@ describe('Gallery item deletion and selection', () => {
         act(() => screen.getByRole('option').focus());
         act(() => detailsButton.focus());
         expect(detailsButton).toHaveFocus();
+        const listCallsBeforeDetails = downloadUrlSpy.mock.calls.length;
+        expect(listCallsBeforeDetails).toBeGreaterThan(0);
         await user.keyboard('{Enter}');
 
         const dialog = await screen.findByRole('dialog', { name: 'Details' });
+        expect(downloadUrlSpy).toHaveBeenCalledTimes(listCallsBeforeDetails);
         expect(within(dialog).getByRole('heading', { name: `${media.name}.${media.format}`, level: 3 })).toBeVisible();
         if (media.annotation_status.has_annotations) {
             await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
@@ -229,6 +235,8 @@ describe('Gallery item deletion and selection', () => {
         await user.click(within(dialog).getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
         expect(screen.queryByText(/\d+ selected/)).not.toBeInTheDocument();
+        expect(downloadUrlSpy).toHaveBeenCalledTimes(listCallsBeforeDetails);
+        downloadUrlSpy.mockRestore();
     });
 
     it('offers only Annotate, Download and Delete in the actions menu', async () => {

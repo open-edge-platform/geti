@@ -4,7 +4,7 @@
 import type { Media } from '@/api/types';
 import { formatCompactDuration } from '@/components/media-thumbnail/util';
 import { useTranslation } from '@/i18n';
-import { Button, ButtonGroup, Content, Dialog, Heading } from '@geti-ui/ui';
+import { Button, ButtonGroup, Content, Dialog, Heading, View } from '@geti-ui/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useNumberFormatter } from 'react-aria';
@@ -45,21 +45,22 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
     });
     const query = isVideoItem ? framesQuery : annotationsQuery;
     const hasError = hasAnnotations && query.isError;
-    const { annotationCount, labelCount } = getAnnotationCounts(
-        isVideoItem
-            ? (framesQuery.data?.map((frame) => frame.annotation_data) ?? [])
-            : annotationsQuery.data
-              ? [annotationsQuery.data]
-              : []
-    );
-    const annotationValue = (value: number) =>
-        !hasAnnotations
-            ? number.format(0)
-            : query.isPending
-              ? t('dataset.mediaDetails.loading')
-              : hasError
-                ? t('dataset.mediaDetails.unavailable')
-                : number.format(value);
+    const videoAnnotationGroups = framesQuery.data?.map((frame) => frame.annotation_data) ?? [];
+    const imageAnnotationGroups = annotationsQuery.data ? [annotationsQuery.data] : [];
+    const annotationGroups = isVideoItem ? videoAnnotationGroups : imageAnnotationGroups;
+    const { annotationCount, labelCount } = getAnnotationCounts(annotationGroups);
+    const annotationValue = (value: number) => {
+        if (!hasAnnotations) {
+            return number.format(0);
+        }
+        if (query.isPending) {
+            return t('dataset.mediaDetails.loading');
+        }
+        if (hasError) {
+            return t('dataset.mediaDetails.unavailable');
+        }
+        return number.format(value);
+    };
     const status = t(hasAnnotations ? 'dataset.statistics.annotated' : 'dataset.statistics.unannotated');
     const fields = [
         [t('dataset.mediaDetails.resolution'), `${item.width} × ${item.height} px`],
@@ -85,11 +86,11 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
         <Dialog size={'L'}>
             <Heading>{t('dataset.mediaDetails.title')}</Heading>
             <Content UNSAFE_className={classes.content}>
-                <div className={classes.layout}>
-                    <div className={classes.preview}>
+                <View UNSAFE_className={classes.layout}>
+                    <View UNSAFE_className={classes.preview}>
                         <img src={getThumbnailUrl(projectId, item.id)} alt={item.name} />
-                    </div>
-                    <div className={classes.details}>
+                    </View>
+                    <View UNSAFE_className={classes.details}>
                         <h3 className={classes.name} title={mediaFileName}>
                             {mediaFileName}
                         </h3>
@@ -104,8 +105,8 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
                                 </div>
                             ))}
                         </dl>
-                    </div>
-                </div>
+                    </View>
+                </View>
             </Content>
             <ButtonGroup>
                 {hasError && (
