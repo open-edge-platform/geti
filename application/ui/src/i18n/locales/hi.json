@@ -346,6 +346,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "की भरें",
+            "keyDuplicate": "कुंजी अद्वितीय होनी चाहिए",
             "valueEmpty": "वैल्यू भरें"
         },
         "connection": {
