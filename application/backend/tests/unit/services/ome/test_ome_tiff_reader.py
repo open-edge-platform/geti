@@ -391,31 +391,6 @@ def test_only_first_series_is_read(reader, tmp_path):
         assert not handle.read_region().any()
 
 
-@pytest.fixture
-def companion_storage(tmp_path, request):
-    root = tmp_path / "storage"
-    root.mkdir()
-    channel_count = getattr(request, "param", 2)
-    identifiers = [f"00000000-0000-0000-0000-{index + 1:012d}" for index in range(channel_count)]
-    references = "".join(
-        f'<TiffData IFD="0" FirstC="{index}" FirstZ="0" FirstT="0" PlaneCount="1">'
-        f'<UUID FileName="part{index}.ome.tiff">urn:uuid:{identifier}</UUID></TiffData>'
-        for index, identifier in enumerate(identifiers)
-    )
-    channels = "".join(f'<Channel ID="Channel:0:{index}" SamplesPerPixel="1"/>' for index in range(channel_count))
-    for index, identifier in enumerate(identifiers):
-        xml = (
-            f'<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" UUID="urn:uuid:{identifier}">'
-            '<Image ID="Image:0"><Pixels ID="Pixels:0" DimensionOrder="XYCZT" Type="uint16" '
-            f'SizeX="5" SizeY="4" SizeC="{channel_count}" SizeZ="1" SizeT="1">'
-            f"{channels}{references}</Pixels></Image></OME>"
-        )
-        tifffile.imwrite(
-            root / f"part{index}.ome.tiff", np.full((4, 5), index, dtype=np.uint16), description=xml, metadata=None
-        )
-    return MediaStorage(root=root, entrypoint=Path("part0.ome.tiff"))
-
-
 def _replace_ome_metadata(path: Path, old: str, new: str) -> None:
     with tifffile.TiffFile(path) as tiff:
         xml = tiff.ome_metadata

@@ -22,6 +22,7 @@ from app.api.dependencies import (
     get_media_segment_service,
     get_media_service,
     get_project_service,
+    get_upload_max_size,
 )
 from app.api.schemas.media import (
     ImageView,
@@ -53,11 +54,13 @@ from app.models.media import (
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaSortBy,
+    OmeImage,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
     VideoRange,
 )
+from app.models.ome import OmeImageMetadata, RgbChannelAssignment, RgbProjection
 from app.models.system import DeviceInfo, DeviceType
 from app.services import (
     DatasetService,
@@ -73,6 +76,7 @@ from app.services.inference import InferenceBusyError
 from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
+from app.services.ome.ingest import OmeMediaTooLargeError
 from app.services.sam import MediaSegmentService
 
 
@@ -110,6 +114,190 @@ def fxt_video_media():
 
 
 @pytest.fixture
+def fxt_ome_media():
+    return OmeImage(
+        id=uuid4(),
+        type=MediaType.OME_IMAGE,
+        project_id=uuid4(),
+        name="specimen",
+        format=ImageFormat.OME_TIFF,
+        width=5,
+        height=4,
+        size=1024,
+        source_id=None,
+    )
+
+
+@pytest.mark.parametrize(
+    ("extension", "expected"),
+    [
+        ("a.ome.tiff", ImageFormat.OME_TIFF),
+        ("OME.TIF", ImageFormat.OME_TIF),
+        ("b.tiff", ImageFormat.TIFF),
+        ("tif", ImageFormat.TIF),
+        ("jpeg", ImageFormat.JPEG),
+        ("mp4", VideoFormat.MP4),
+    ],
+)
+def test_parse_compound_media_format(extension, expected):
+    from app.api.routers.media import _parse_media_format
+
+    assert _parse_media_format(extension) == expected
+
+
+@pytest.mark.parametrize("filename", ["specimen.ome.tiff", "specimen.OME.TIF", "specimen.ome.zip"])
+@pytest.mark.parametrize("resumable", [False, True])
+def test_upload_ome(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_create_upload,
+    fxt_upload_service,
+    fxt_client,
+    fxt_upload_max_size,
+    filename,
+    resumable,
+):
+    fxt_media_service.create_ome_image.return_value = fxt_ome_media
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    upload_id = None
+    if resumable:
+        upload_id = fxt_create_upload(filename)
+        response = fxt_client.post(f"{url}:from-upload", json={"upload_id": str(upload_id)})
+    else:
+        response = fxt_client.post(url, files={"file": (filename, b"pixels", "application/octet-stream")})
+    assert response.status_code == 201
+    assert response.json()["type"] == "ome_image"
+    kwargs = fxt_media_service.create_ome_image.call_args.kwargs
+    assert kwargs["name"] == "specimen"
+    assert kwargs["image_format"] == (ImageFormat.OME_TIF if filename.endswith("TIF") else ImageFormat.OME_TIFF)
+    assert kwargs["archive"] == filename.endswith("zip")
+    assert kwargs["max_size"] == fxt_upload_max_size
+    if upload_id is not None:
+        assert kwargs["data"] == fxt_upload_service.path_for(upload_id)
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "consumed"
+    fxt_media_service.create_image.assert_not_called()
+    fxt_dataset_service.create_dataset_item.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("error", "expected"),
+    [(InvalidImageError("bad metadata"), 422), (OmeMediaTooLargeError("too large"), 413)],
+)
+@pytest.mark.parametrize("resumable", [False, True])
+def test_ome_upload_errors(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_create_upload,
+    fxt_client,
+    error,
+    expected,
+    resumable,
+):
+    fxt_media_service.create_ome_image.side_effect = error
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    if resumable:
+        upload_id = fxt_create_upload("bad.ome.tiff")
+        response = fxt_client.post(f"{url}:from-upload", json={"upload_id": str(upload_id)})
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+    else:
+        response = fxt_client.post(url, files={"file": ("bad.ome.tiff", b"invalid")})
+    assert response.status_code == expected
+    fxt_dataset_service.create_dataset_item.assert_not_called()
+
+
+def test_ome_commit_failure_discards_ingest(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_create_upload,
+    fxt_upload_service,
+    fxt_client,
+):
+    upload_id = fxt_create_upload("specimen.ome.tiff")
+    fxt_media_service.create_ome_image.return_value = fxt_ome_media
+    fxt_media_service.db_session.commit.side_effect = RuntimeError("commit failed")
+    storage = fxt_media_service.get_media_storage.return_value
+    with pytest.raises(RuntimeError, match="commit failed"):
+        fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+    fxt_media_service.db_session.rollback.assert_called_once()
+    fxt_media_service.discard_ome_image.assert_called_once_with(
+        fxt_get_project.id, fxt_ome_media.id, storage, fxt_upload_service.path_for(upload_id)
+    )
+    assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+
+
+@pytest.mark.parametrize("filename", [".ome.tiff", ".ome.tif", ".ome.zip"])
+def test_ome_filename_requires_stem(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_client,
+    filename,
+):
+    from fastapi import HTTPException
+
+    from app.api.upload_utils import split_upload_filename
+
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    response = fxt_client.post(url, files={"file": (filename, b"pixels")})
+    assert response.status_code == 422
+    fxt_media_service.create_ome_image.assert_not_called()
+    with pytest.raises(HTTPException) as error:
+        split_upload_filename(filename)
+    assert error.value.status_code == 422
+
+
+@pytest.mark.parametrize("is_directory", [False, True])
+@pytest.mark.parametrize("raw", [False, True])
+def test_ome_binary_rejected(fxt_get_project, fxt_media_service, fxt_ome_media, fxt_client, is_directory, raw):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    fxt_media_service.get_media_storage.return_value.is_directory = is_directory
+    response = fxt_client.get(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/binary", params={"raw": raw}
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "OME images do not support binary retrieval. Use the render endpoint instead."
+    fxt_media_service.get_media_storage.assert_not_called()
+    fxt_media_service.get_media_binary_path_by_id.assert_not_called()
+
+
+def test_get_ome_structure(fxt_get_project, fxt_media_service, fxt_client):
+    media_id = uuid4()
+    info = OmeImageMetadata(
+        size_x=5,
+        size_y=4,
+        size_c=3,
+        dimension_order="XYCZT",
+        pixel_type="uint16",
+        channel_projection=RgbProjection(channels=(RgbChannelAssignment(channel=0, target="red"),)),
+        raw_metadata="<OME/>",
+    )
+    fxt_media_service.get_ome_image_info.return_value = info
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/ome")
+    assert response.status_code == 200
+    assert response.json() == info.model_dump(mode="json")
+    fxt_media_service.get_ome_image_info.assert_called_once_with(fxt_get_project.id, media_id)
+
+
+@pytest.mark.parametrize("expected", [400, 404])
+def test_get_ome_structure_errors(fxt_get_project, fxt_media_service, fxt_client, expected):
+    media_id = uuid4()
+    fxt_media_service.get_ome_image_info.side_effect = (
+        ValueError("Media is not an OME image.")
+        if expected == 400
+        else ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
+    )
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/ome")
+    assert response.status_code == expected
+
+
+@pytest.fixture
 def fxt_video_frame_media():
     return VideoFrame(
         id=uuid4(),
@@ -139,6 +327,13 @@ def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
     fxt_app.dependency_overrides[get_media_service] = lambda: media_service
     return media_service
+
+
+@pytest.fixture(autouse=True)
+def fxt_upload_max_size(fxt_app) -> int:
+    max_size = 10 * 1024 * 1024
+    fxt_app.dependency_overrides[get_upload_max_size] = lambda: max_size
+    return max_size
 
 
 @pytest.fixture

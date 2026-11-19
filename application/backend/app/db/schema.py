@@ -199,7 +199,7 @@ class OmeImageDB(Base):
     series_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_big_tiff: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-    channel_mapping: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    channel_mapping: Mapped[dict] = mapped_column(JSON, nullable=False, default=lambda: {"mode": "rgb", "channels": []})
     pyramid_levels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     entrypoint: Mapped[str | None] = mapped_column(String(255), nullable=True)
     files: Mapped[list] = mapped_column(JSON, nullable=False, default=list)

@@ -149,6 +149,8 @@ class MediaSegmentService(BaseSessionManagedService):
             media_binary = extracted[media.frame_index]
         elif isinstance(media, Video):
             raise ValueError("Video media type is not supported for segmentation")
+        else:
+            raise ValueError("OME plane segmentation is not available yet.")
 
         # Derive the resize metadata from the decoded binary (H, W, ...) before any channel
         # conversion; this is correct for every media type (Image, VideoFrame, extracted frame).

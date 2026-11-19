@@ -12,7 +12,7 @@ from safetensors.numpy import load as safetensors_load
 from sqlalchemy.orm import Session
 
 from app.models import Project, Video
-from app.models.media import Image, MediaType, NotAnnotatedVideoFrame, VideoFrame
+from app.models.media import Image, MediaType, NotAnnotatedVideoFrame, OmeImage, VideoFrame
 from app.models.system import DeviceInfo, DeviceType
 from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_service import MediaService
@@ -36,6 +36,12 @@ def _read_safetensors_metadata(blob: bytes) -> dict[str, str]:
 
 
 class TestMediaSegmentService:
+    def test_ome_container_segmentation_is_not_supported(self, fxt_media_segment_service):
+        with pytest.raises(ValueError, match="OME plane segmentation"):
+            fxt_media_segment_service.encode_media(
+                project=MagicMock(spec=Project), media=MagicMock(spec=OmeImage), device=MagicMock(spec=DeviceInfo)
+            )
+
     @pytest.fixture
     def fxt_media_service(self):
         return MagicMock(spec=MediaService)

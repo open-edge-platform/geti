@@ -1,9 +1,12 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 from collections.abc import Callable
+from pathlib import Path
 from uuid import uuid4
 
+import numpy as np
 import pytest
+import tifffile
 
 from app.core.jobs.models import Job, JobParams, JobType
 from app.models import (
@@ -18,8 +21,35 @@ from app.models import (
     TrainingStatus,
     USBCameraSourceConfig,
 )
+from app.models.media_storage import MediaStorage
 from app.models.sink import MqttConfig
 from app.models.source import USBCameraConfig
+
+
+@pytest.fixture
+def companion_storage(tmp_path: Path, request: pytest.FixtureRequest) -> MediaStorage:
+    """Create a small multi-file OME-TIFF channel set shared by reader and ingest tests."""
+    root = tmp_path / "storage"
+    root.mkdir()
+    channel_count = getattr(request, "param", 2)
+    identifiers = [f"00000000-0000-0000-0000-{index + 1:012d}" for index in range(channel_count)]
+    references = "".join(
+        f'<TiffData IFD="0" FirstC="{index}" FirstZ="0" FirstT="0" PlaneCount="1">'
+        f'<UUID FileName="part{index}.ome.tiff">urn:uuid:{identifier}</UUID></TiffData>'
+        for index, identifier in enumerate(identifiers)
+    )
+    channels = "".join(f'<Channel ID="Channel:0:{index}" SamplesPerPixel="1"/>' for index in range(channel_count))
+    for index, identifier in enumerate(identifiers):
+        xml = (
+            f'<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" UUID="urn:uuid:{identifier}">'
+            '<Image ID="Image:0"><Pixels ID="Pixels:0" DimensionOrder="XYCZT" Type="uint16" '
+            f'SizeX="5" SizeY="4" SizeC="{channel_count}" SizeZ="1" SizeT="1">'
+            f"{channels}{references}</Pixels></Image></OME>"
+        )
+        tifffile.imwrite(
+            root / f"part{index}.ome.tiff", np.full((4, 5), index, dtype=np.uint16), description=xml, metadata=None
+        )
+    return MediaStorage(root=root, entrypoint=Path("part0.ome.tiff"))
 
 
 @pytest.fixture

@@ -23,6 +23,7 @@ from app.api.dependencies import (
     get_project,
     get_project_service,
     get_system_service,
+    get_upload_max_size,
     get_upload_service,
 )
 from app.api.io_utils import write_bytes_to_response, write_file_to_response, write_image_to_response
@@ -41,7 +42,15 @@ from app.api.schemas.upload import MediaFromUploadRequest
 from app.api.upload_utils import FROM_UPLOAD_RESPONSES, consume_upload, split_upload_filename
 from app.api.validators import MediaID, ProjectID, normalize_datetime_to_utc
 from app.core.models import Pagination
-from app.models import BatchInferenceResult, DatasetItemAnnotationStatus, DatasetItemSubset, Media, Project, Video
+from app.models import (
+    BatchInferenceResult,
+    DatasetItemAnnotationStatus,
+    DatasetItemSubset,
+    Media,
+    MediaStorage,
+    Project,
+    Video,
+)
 from app.models.media import (
     ImageFormat,
     MediaListPredictionRequest,
@@ -51,6 +60,7 @@ from app.models.media import (
     SortDirection,
     VideoFormat,
 )
+from app.models.ome import OmeImageMetadata
 from app.services import (
     DatasetService,
     DatasetViewService,
@@ -66,6 +76,7 @@ from app.services.inference import InferenceBusyError
 from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
+from app.services.ome.ingest import OmeMediaTooLargeError
 from app.services.sam import MediaSegmentService
 from app.utils.images import convert_image_to_display_png_bytes, needs_display_conversion
 
@@ -148,11 +159,11 @@ BULK_MEDIA_DELETE_EXAMPLE = {
 
 def _parse_media_format(extension: str) -> ImageFormat | VideoFormat:
     try:
-        return ImageFormat[extension.upper()]
-    except KeyError:
+        return ImageFormat.from_filename(extension)
+    except ValueError:
         try:
-            return VideoFormat[extension.upper()]
-        except KeyError:
+            return VideoFormat(extension.lower())
+        except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Unsupported media extension: {extension}",
@@ -188,6 +199,7 @@ def _get_request_media(
     responses={
         status.HTTP_201_CREATED: {"description": "Media created"},
         status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Invalid media has been uploaded"},
+        status.HTTP_413_CONTENT_TOO_LARGE: {"description": "OME payload exceeds upload or available storage limits"},
         status.HTTP_404_NOT_FOUND: {"description": "Project not found"},
     },
 )
@@ -196,6 +208,7 @@ def add_media(
     media_service: Annotated[MediaService, Depends(get_media_service)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     file_name_and_extension: Annotated[tuple[str, str], Depends(get_file_name_and_extension)],
+    upload_max_size: Annotated[int, Depends(get_upload_max_size)],
     file: Annotated[UploadFile, File()],
 ) -> MediaView:
     """Add a new media to the dataset by uploading an image or a video"""
@@ -207,6 +220,7 @@ def add_media(
         name=name,
         extension=extension,
         data=file.file,
+        max_size=upload_max_size,
     )
 
 
@@ -216,6 +230,7 @@ def add_media(
     response_model=MediaView,
     responses={
         **FROM_UPLOAD_RESPONSES,
+        status.HTTP_413_CONTENT_TOO_LARGE: {"description": "OME payload exceeds upload or available storage limits"},
         status.HTTP_201_CREATED: {"description": "Media created"},
         status.HTTP_404_NOT_FOUND: {"description": "Project or upload not found"},
     },
@@ -225,6 +240,7 @@ async def add_media_from_upload(
     media_service: Annotated[MediaService, Depends(get_media_service)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
     upload_service: Annotated[UploadService, Depends(get_upload_service)],
+    upload_max_size: Annotated[int, Depends(get_upload_max_size)],
     body: MediaFromUploadRequest,
 ) -> MediaView:
     """
@@ -239,6 +255,8 @@ async def add_media_from_upload(
 
         def _create_and_commit() -> MediaView:
             db_session = media_service.db_session
+            storage: MediaStorage | None = None
+            media_view: MediaView | None = None
             try:
                 media_view = _create_media(
                     project=project,
@@ -247,10 +265,16 @@ async def add_media_from_upload(
                     name=body.name if body.name is not None else name,
                     extension=extension,
                     data=claimed.path,  # moved into the dataset, not copied
+                    max_size=upload_max_size,
                 )
+                if media_view.type == MediaType.OME_IMAGE:
+                    media = media_service.get_media_by_id(project.id, media_view.id)
+                    storage = media_service.get_media_storage(project.id, media)
                 db_session.commit()
             except BaseException:
                 db_session.rollback()
+                if storage is not None and media_view is not None:
+                    media_service.discard_ome_image(project.id, media_view.id, storage, claimed.path)
                 raise
             return media_view
 
@@ -264,11 +288,22 @@ def _create_media(
     name: str,
     extension: str,
     data: BinaryIO | Path,
+    max_size: int,
 ) -> MediaView:
     """Create an image or video media (depending on the extension), from a stream or from a file to be moved."""
-    media_format = _parse_media_format(extension)
+    archive = extension.lower() == "ome.zip"
+    media_format = ImageFormat.OME_TIFF if archive else _parse_media_format(extension)
     try:
-        if isinstance(media_format, ImageFormat):
+        if media_format in (ImageFormat.OME_TIFF, ImageFormat.OME_TIF):
+            media = media_service.create_ome_image(
+                project_id=project.id,
+                name=name,
+                image_format=media_format,
+                data=data,
+                max_size=max_size,
+                archive=archive,
+            )
+        elif isinstance(media_format, ImageFormat):
             media = media_service.create_image(
                 ImageMetadata(
                     project_id=project.id,
@@ -292,10 +327,31 @@ def _create_media(
                 video_format=media_format,
             )
         return MediaViewAdapter.validate_python(media, from_attributes=True)
+    except OmeMediaTooLargeError as error:
+        raise HTTPException(status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail=str(error)) from error
     except InvalidImageError:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid image has been uploaded."
         )
+
+
+@router.get(
+    "/{media_id}/ome",
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "Media is not an OME image"},
+        status.HTTP_404_NOT_FOUND: {"description": "Project or media not found"},
+    },
+)
+def get_ome_image_info(
+    project: Annotated[Project, Depends(get_project)],
+    media_id: MediaID,
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+) -> OmeImageMetadata:
+    """Get OME dimensions, channels, pyramid levels, provenance and fixed training mapping."""
+    try:
+        return media_service.get_ome_image_info(project.id, media_id)
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
 
 
 def _normalize_date_range(
@@ -500,7 +556,7 @@ def list_video_frames(
     response_model=None,
     responses={
         status.HTTP_200_OK: {"description": "Media binary found"},
-        status.HTTP_400_BAD_REQUEST: {"description": "Invalid media ID or project ID"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid media ID or project ID, or unsupported OME image"},
         status.HTTP_404_NOT_FOUND: {"description": "Media, media binary or project not found"},
     },
 )
@@ -519,6 +575,12 @@ def get_media_binary(
         )
         return write_image_to_response(
             image=frame_binary, filename=f"{media.video.name}_frame_{media.frame_index}.jpeg"
+        )
+
+    if media.type == MediaType.OME_IMAGE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OME images do not support binary retrieval. Use the render endpoint instead.",
         )
 
     binary_path = media_service.get_media_binary_path_by_id(project_id=project.id, media_id=media.id)

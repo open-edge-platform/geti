@@ -58,7 +58,13 @@ def get_file_name_and_extension(file: UploadFile) -> tuple[str, str]:
     if not full_name:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File name cannot be empty.")
     file_name, file_ext = os.path.splitext(full_name)
+    for extension in ("ome.tiff", "ome.tif", "ome.zip"):
+        if full_name.lower().endswith(f".{extension}"):
+            file_name, file_ext = full_name[: -len(extension) - 1], f".{extension}"
+            break
     file_name = file_name.strip()  # remove whitespace characters between the basename and the extension
+    if not file_name:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File name cannot be empty.")
     file_ext = file_ext[1:]  # remove leading dot in the extension
     if not file_ext:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="File extension cannot be empty.")
@@ -124,6 +130,11 @@ def get_sam_encoder_xml_path(request: Request) -> Path:
 def get_sam_ov_cache_path(request: Request) -> Path | None:
     """Provides the OpenVINO cache directory for the SAM encoder. This path is defined in the app settings."""
     return request.app.state.settings.sam_ov_cache_path
+
+
+def get_upload_max_size(request: Request) -> int:
+    """Provides the maximum upload size in bytes. This value is defined in the app settings."""
+    return request.app.state.settings.upload_max_size
 
 
 def get_event_bus(request: Request) -> EventBus:
