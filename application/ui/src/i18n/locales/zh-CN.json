@@ -72,7 +72,8 @@
             "model": "模型",
             "jobs": "任务",
             "labels": "标签",
-            "bytesTransferred": "{{transferred}} / {{total}}"
+            "bytesTransferred": "{{transferred}} / {{total}}",
+            "annotations": "标注数量"
         },
         "viewModes": {
             "large": "大缩略图",
@@ -87,7 +88,9 @@
             "uploading": "上传中",
             "failed": "失败",
             "error": "错误",
-            "disconnected": "未连接"
+            "disconnected": "未连接",
+            "loading": "加载中……",
+            "unavailable": "不可用"
         },
         "errors": {
             "unknown": "发生未知错误",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "已标注视频 / 视频帧",
             "numberOfObjectsPerLabel": "各标签目标数量",
             "unannotated": "未标注",
-            "annotated": "已标注",
-            "annotationsChartTooltip": "标注数量"
+            "annotated": "已标注"
         },
         "delete": {
             "title": "删除媒体文件",
@@ -241,10 +243,7 @@
             "duration": "时长",
             "frames": "总帧数",
             "annotatedFrames": "已标注帧数",
-            "annotations": "标注数量",
             "labels": "不同标签数",
-            "loading": "加载中...",
-            "unavailable": "不可用",
             "retry": "重试"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "加载中……",
                 "device": "设备：{{name}}",
                 "unknownDevice": "未知设备（id：{{deviceId}}）",
                 "streamUrl": "视频流地址：{{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "健康",
-                "finished": "已完成",
-                "unavailable": "不可用"
+                "finished": "已完成"
             }
         },
         "stream": {

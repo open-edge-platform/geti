@@ -72,7 +72,8 @@
             "model": "Modelo",
             "jobs": "Tareas",
             "labels": "Etiquetas",
-            "bytesTransferred": "{{transferred}} de {{total}}"
+            "bytesTransferred": "{{transferred}} de {{total}}",
+            "annotations": "Anotaciones"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -87,7 +88,9 @@
             "uploading": "Cargando",
             "failed": "Fallido",
             "error": "Error",
-            "disconnected": "Desconectado"
+            "disconnected": "Desconectado",
+            "loading": "Cargando...",
+            "unavailable": "No disponible"
         },
         "errors": {
             "unknown": "Se ha producido un error desconocido",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Vídeos / fotogramas anotados",
             "numberOfObjectsPerLabel": "Número de objetos por etiqueta",
             "unannotated": "Sin anotar",
-            "annotated": "Anotado",
-            "annotationsChartTooltip": "Anotaciones"
+            "annotated": "Anotado"
         },
         "delete": {
             "title": "Eliminar elementos",
@@ -241,10 +243,7 @@
             "duration": "Duración",
             "frames": "Fotogramas totales",
             "annotatedFrames": "Fotogramas anotados",
-            "annotations": "Anotaciones",
             "labels": "Etiquetas únicas",
-            "loading": "Cargando...",
-            "unavailable": "No disponible",
             "retry": "Reintentar"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Cargando...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo desconocido (id: {{deviceId}})",
                 "streamUrl": "URL del flujo: {{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "Correcto",
-                "finished": "Finalizado",
-                "unavailable": "No disponible"
+                "finished": "Finalizado"
             }
         },
         "stream": {

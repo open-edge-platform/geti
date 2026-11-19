@@ -72,7 +72,8 @@
             "model": "Modèle",
             "jobs": "Tâches",
             "labels": "Étiquettes",
-            "bytesTransferred": "{{transferred}} sur {{total}}"
+            "bytesTransferred": "{{transferred}} sur {{total}}",
+            "annotations": "Annotations"
         },
         "viewModes": {
             "large": "Grandes miniatures",
@@ -87,7 +88,9 @@
             "uploading": "Téléversement en cours",
             "failed": "Échec",
             "error": "Erreur",
-            "disconnected": "Déconnecté"
+            "disconnected": "Déconnecté",
+            "loading": "Chargement...",
+            "unavailable": "Indisponible"
         },
         "errors": {
             "unknown": "Une erreur inconnue s’est produite",
@@ -214,8 +217,7 @@
             "annotatedVideosFrames": "Vidéos / trames annotées",
             "numberOfObjectsPerLabel": "Nombre d’objets par étiquette",
             "unannotated": "Non annoté",
-            "annotated": "Annoté",
-            "annotationsChartTooltip": "Annotations"
+            "annotated": "Annoté"
         },
         "delete": {
             "title": "Supprimer des éléments",
@@ -254,10 +256,7 @@
             "duration": "Durée",
             "frames": "Nombre d'images",
             "annotatedFrames": "Images annotées",
-            "annotations": "Annotations",
             "labels": "Étiquettes uniques",
-            "loading": "Chargement...",
-            "unavailable": "Indisponible",
             "retry": "Réessayer"
         },
         "mediaActions": {
@@ -427,7 +426,6 @@
                 }
             },
             "settings": {
-                "loading": "Chargement...",
                 "device": "Périphérique : {{name}}",
                 "unknownDevice": "Périphérique inconnu (id : {{deviceId}})",
                 "streamUrl": "URL du flux : {{url}}",
@@ -578,8 +576,7 @@
             },
             "component": {
                 "healthy": "Opérationnel",
-                "finished": "Terminé",
-                "unavailable": "Indisponible"
+                "finished": "Terminé"
             }
         },
         "stream": {

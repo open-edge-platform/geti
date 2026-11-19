@@ -72,7 +72,8 @@
             "model": "Modello",
             "jobs": "Processi",
             "labels": "Etichette",
-            "bytesTransferred": "{{transferred}} di {{total}}"
+            "bytesTransferred": "{{transferred}} di {{total}}",
+            "annotations": "Annotazioni"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -87,7 +88,9 @@
             "uploading": "Caricamento",
             "failed": "Non riuscito",
             "error": "Errore",
-            "disconnected": "Disconnesso"
+            "disconnected": "Disconnesso",
+            "loading": "Caricamento in corso...",
+            "unavailable": "Non disponibile"
         },
         "errors": {
             "unknown": "Si è verificato un errore sconosciuto",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Video annotati / frame",
             "numberOfObjectsPerLabel": "Numero di oggetti per etichetta",
             "unannotated": "Non annotato",
-            "annotated": "Annotato",
-            "annotationsChartTooltip": "Annotazioni"
+            "annotated": "Annotato"
         },
         "delete": {
             "title": "Elimina elementi",
@@ -241,10 +243,7 @@
             "duration": "Durata",
             "frames": "Fotogrammi totali",
             "annotatedFrames": "Fotogrammi annotati",
-            "annotations": "Annotazioni",
             "labels": "Etichette uniche",
-            "loading": "Caricamento...",
-            "unavailable": "Non disponibile",
             "retry": "Riprova"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Caricamento in corso...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo sconosciuto (id: {{deviceId}})",
                 "streamUrl": "URL stream: {{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "Integro",
-                "finished": "Completato",
-                "unavailable": "Non disponibile"
+                "finished": "Completato"
             }
         },
         "stream": {

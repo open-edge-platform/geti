@@ -72,7 +72,8 @@
             "model": "Модель",
             "jobs": "Задания",
             "labels": "Классы",
-            "bytesTransferred": "{{transferred}} из {{total}}"
+            "bytesTransferred": "{{transferred}} из {{total}}",
+            "annotations": "Разметка"
         },
         "viewModes": {
             "large": "Крупные миниатюры",
@@ -87,7 +88,9 @@
             "uploading": "Загрузка",
             "failed": "Ошибка",
             "error": "Ошибка",
-            "disconnected": "Отключено"
+            "disconnected": "Отключено",
+            "loading": "Загрузка...",
+            "unavailable": "Недоступен"
         },
         "errors": {
             "unknown": "Произошла неизвестная ошибка",
@@ -225,8 +228,7 @@
             "annotatedVideosFrames": "Размеченные видео / кадры",
             "numberOfObjectsPerLabel": "Количество объектов каждого класса",
             "unannotated": "Без разметки",
-            "annotated": "С разметкой",
-            "annotationsChartTooltip": "Разметка"
+            "annotated": "С разметкой"
         },
         "delete": {
             "title": "Удаление элементов",
@@ -275,10 +277,7 @@
             "duration": "Длительность",
             "frames": "Всего кадров",
             "annotatedFrames": "Размечено кадров",
-            "annotations": "Аннотации",
             "labels": "Уникальные классы",
-            "loading": "Загрузка...",
-            "unavailable": "Недоступно",
             "retry": "Повторить"
         },
         "mediaActions": {
@@ -449,7 +448,6 @@
                 }
             },
             "settings": {
-                "loading": "Загрузка...",
                 "device": "Устройство: {{name}}",
                 "unknownDevice": "Неизвестное устройство (ID: {{deviceId}})",
                 "streamUrl": "Адрес видеопотока: {{url}}",
@@ -602,8 +600,7 @@
             },
             "component": {
                 "healthy": "Исправен",
-                "finished": "Завершён",
-                "unavailable": "Недоступен"
+                "finished": "Завершён"
             }
         },
         "stream": {

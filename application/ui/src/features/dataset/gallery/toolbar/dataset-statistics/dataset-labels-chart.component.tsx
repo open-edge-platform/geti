@@ -137,7 +137,7 @@ export const DatasetLabelsChart = ({ totalItems, instancesPerLabel }: DatasetLab
 
                 <Tooltip
                     shared={false}
-                    formatter={(value) => [value, t('dataset.statistics.annotationsChartTooltip')]}
+                    formatter={(value) => [value, t('common.labels.annotations')]}
                     itemStyle={{ color: 'var(--spectrum-global-color-gray-800)' }}
                     contentStyle={{ background: 'var(--spectrum-global-color-gray-50)' }}
                 />

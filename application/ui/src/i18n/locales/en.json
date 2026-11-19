@@ -72,7 +72,8 @@
             "model": "Model",
             "jobs": "Jobs",
             "labels": "Labels",
-            "bytesTransferred": "{{transferred}} of {{total}}"
+            "bytesTransferred": "{{transferred}} of {{total}}",
+            "annotations": "Annotations"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -87,7 +88,9 @@
             "uploading": "Uploading",
             "failed": "Failed",
             "error": "Error",
-            "disconnected": "Disconnected"
+            "disconnected": "Disconnected",
+            "loading": "Loading...",
+            "unavailable": "Unavailable"
         },
         "errors": {
             "unknown": "An unknown error occurred",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
             "unannotated": "Unannotated",
-            "annotated": "Annotated",
-            "annotationsChartTooltip": "Annotations"
+            "annotated": "Annotated"
         },
         "delete": {
             "title": "Delete Items",
@@ -241,10 +243,7 @@
             "duration": "Duration",
             "frames": "Total frames",
             "annotatedFrames": "Annotated frames",
-            "annotations": "Annotations",
             "labels": "Unique labels",
-            "loading": "Loading...",
-            "unavailable": "Unavailable",
             "retry": "Retry"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Loading...",
                 "device": "Device: {{name}}",
                 "unknownDevice": "Unknown device (id: {{deviceId}})",
                 "streamUrl": "Stream url: {{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "Healthy",
-                "finished": "Finished",
-                "unavailable": "Unavailable"
+                "finished": "Finished"
             }
         },
         "stream": {

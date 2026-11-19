@@ -72,7 +72,8 @@
             "model": "Model",
             "jobs": "Zadania",
             "labels": "Etykiety",
-            "bytesTransferred": "{{transferred}} z {{total}}"
+            "bytesTransferred": "{{transferred}} z {{total}}",
+            "annotations": "Adnotacje"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -87,7 +88,9 @@
             "uploading": "Przesyłanie",
             "failed": "Niepowodzenie",
             "error": "Błąd",
-            "disconnected": "Rozłączono"
+            "disconnected": "Rozłączono",
+            "loading": "Wczytywanie...",
+            "unavailable": "Niedostępny"
         },
         "errors": {
             "unknown": "Wystąpił nieznany błąd",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Wideo / klatki z adnotacjami",
             "numberOfObjectsPerLabel": "Liczba obiektów na etykietę",
             "unannotated": "Bez adnotacji",
-            "annotated": "Z adnotacjami",
-            "annotationsChartTooltip": "Adnotacje"
+            "annotated": "Z adnotacjami"
         },
         "delete": {
             "title": "Usuń elementy",
@@ -241,10 +243,7 @@
             "duration": "Czas trwania",
             "frames": "Wszystkie klatki",
             "annotatedFrames": "Klatki z adnotacjami",
-            "annotations": "Adnotacje",
             "labels": "Unikalne etykiety",
-            "loading": "Ładowanie...",
-            "unavailable": "Niedostępne",
             "retry": "Ponów"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Wczytywanie...",
                 "device": "Urządzenie: {{name}}",
                 "unknownDevice": "Nieznane urządzenie (id: {{deviceId}})",
                 "streamUrl": "Adres URL strumienia: {{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "Sprawny",
-                "finished": "Zakończony",
-                "unavailable": "Niedostępny"
+                "finished": "Zakończony"
             }
         },
         "stream": {

@@ -72,7 +72,8 @@
             "model": "Model",
             "jobs": "Tugas",
             "labels": "Label",
-            "bytesTransferred": "{{transferred}} dari {{total}}"
+            "bytesTransferred": "{{transferred}} dari {{total}}",
+            "annotations": "Anotasi"
         },
         "viewModes": {
             "large": "Gambar mini besar",
@@ -87,7 +88,9 @@
             "uploading": "Mengunggah",
             "failed": "Gagal",
             "error": "Kesalahan",
-            "disconnected": "Terputus"
+            "disconnected": "Terputus",
+            "loading": "Memuat...",
+            "unavailable": "Tidak tersedia"
         },
         "errors": {
             "unknown": "Terjadi kesalahan yang tidak diketahui",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Video / bingkai beranotasi",
             "numberOfObjectsPerLabel": "Jumlah objek per label",
             "unannotated": "Tanpa anotasi",
-            "annotated": "Beranotasi",
-            "annotationsChartTooltip": "Anotasi"
+            "annotated": "Beranotasi"
         },
         "delete": {
             "title": "Hapus Item",
@@ -241,10 +243,7 @@
             "duration": "Durasi",
             "frames": "Total bingkai",
             "annotatedFrames": "Bingkai beranotasi",
-            "annotations": "Anotasi",
             "labels": "Label unik",
-            "loading": "Memuat...",
-            "unavailable": "Tidak tersedia",
             "retry": "Coba lagi"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Memuat...",
                 "device": "Perangkat: {{name}}",
                 "unknownDevice": "Perangkat tidak diketahui (id: {{deviceId}})",
                 "streamUrl": "URL stream: {{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "Berfungsi baik",
-                "finished": "Selesai",
-                "unavailable": "Tidak tersedia"
+                "finished": "Selesai"
             }
         },
         "stream": {

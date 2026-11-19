@@ -72,7 +72,8 @@
             "model": "模型",
             "jobs": "工作",
             "labels": "標籤",
-            "bytesTransferred": "{{transferred}} / {{total}}"
+            "bytesTransferred": "{{transferred}} / {{total}}",
+            "annotations": "標註數量"
         },
         "viewModes": {
             "large": "大縮略圖",
@@ -87,7 +88,9 @@
             "uploading": "上載中",
             "failed": "失敗",
             "error": "錯誤",
-            "disconnected": "未連線"
+            "disconnected": "未連線",
+            "loading": "載入中……",
+            "unavailable": "無法使用"
         },
         "errors": {
             "unknown": "發生未知錯誤",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "已標註影片 / 影片幀",
             "numberOfObjectsPerLabel": "各標籤物件數量",
             "unannotated": "未標註",
-            "annotated": "已標註",
-            "annotationsChartTooltip": "標註數量"
+            "annotated": "已標註"
         },
         "delete": {
             "title": "刪除媒體檔案",
@@ -241,10 +243,7 @@
             "duration": "時長",
             "frames": "影格總數",
             "annotatedFrames": "已標註影格",
-            "annotations": "標註數量",
             "labels": "不同標籤數",
-            "loading": "載入中...",
-            "unavailable": "無法取得",
             "retry": "重試"
         },
         "mediaActions": {
@@ -413,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "載入中……",
                 "device": "裝置：{{name}}",
                 "unknownDevice": "未知裝置（id：{{deviceId}}）",
                 "streamUrl": "影片串流位址：{{url}}",
@@ -562,8 +560,7 @@
             },
             "component": {
                 "healthy": "健康",
-                "finished": "已完成",
-                "unavailable": "無法使用"
+                "finished": "已完成"
             }
         },
         "stream": {

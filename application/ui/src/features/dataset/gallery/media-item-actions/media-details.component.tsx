@@ -54,10 +54,10 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
             return number.format(0);
         }
         if (query.isPending) {
-            return t('dataset.mediaDetails.loading');
+            return t('common.status.loading');
         }
         if (hasError) {
-            return t('dataset.mediaDetails.unavailable');
+            return t('common.status.unavailable');
         }
         return number.format(value);
     };
@@ -78,7 +78,7 @@ export const MediaDetails = ({ item, onClose }: MediaDetailsProps) => {
                   ],
               ]
             : []),
-        [t('dataset.mediaDetails.annotations'), annotationValue(annotationCount)],
+        [t('common.labels.annotations'), annotationValue(annotationCount)],
         [t('dataset.mediaDetails.labels'), annotationValue(labelCount)],
     ];
 
