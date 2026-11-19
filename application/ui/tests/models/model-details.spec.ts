@@ -249,6 +249,10 @@ test.describe('Model Details', () => {
 
         test('can start quantization with custom parameters', async ({ network, page, modelsPage }) => {
             let submittedJobBody: Record<string, unknown> | null = null;
+            const calibrationDatasetRevision = {
+                ...mockedDatasetRevision,
+                item_counts: { training: 350, validation: 100, testing: 50, total: 500 },
+            };
 
             network.use(
                 http.post('/api/jobs', async ({ request }) => {
@@ -262,9 +266,9 @@ test.describe('Model Details', () => {
                         { status: 201 }
                     );
                 }),
-                http.get('/api/projects/{project_id}/dataset_revisions', () => {
-                    return HttpResponse.json([mockedDatasetRevision]);
-                })
+                http.get('/api/projects/{project_id}/dataset_revisions', () =>
+                    HttpResponse.json([calibrationDatasetRevision])
+                )
             );
 
             await modelsPage.goto();
