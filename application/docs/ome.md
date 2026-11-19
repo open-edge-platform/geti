@@ -122,6 +122,7 @@ class OmeImageHandle(Protocol):
         z: int = 0,
         t: int = 0,
         channels: Sequence[int] | None = None,  # None means all channels
+        output_size: tuple[int, int] | None = None,  # Optional downsampled (width, height)
     ) -> np.ndarray: ...
 
     def close(self) -> None: ...
@@ -149,10 +150,16 @@ persists that metadata before closing the handle. Reader selection uses `probe(s
 region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB mapping, caching,
 thumbnailing and training-set materialization all live _above_ this protocol and are written once.
 
-The backend installs `tifffile[codecs]` to provide `imagecodecs` for compressed pixels, including LZW and JPEG.
-PyInstaller bundles the codec modules and native libraries alongside the reader.
-Region reads group channel selections by TIFF page and decode each intersecting strip or tile once, even when
-multiple interleaved samples or duplicate channels are requested. The output preserves the requested channel order.
+The backend installs `tifffile[codecs]` for compressed pixels (including LZW and JPEG), and `zarr` for TIFF-backed
+region selection. PyInstaller bundles Zarr, Numcodecs and the TIFF codec modules/native libraries alongside the reader.
+Region reads group channel selections by TIFF page, expose each page through `page.aszarr(maxworkers=1)`, and use
+Zarr orthogonal indexing for crops and sampling. No conversion to OME-Zarr or custom strip/tile traversal is needed.
+Only intersecting strips/tiles are decoded, once per selection even for duplicate channels; requested channel order
+is preserved. With `output_size`, indexing samples an evenly spaced nearest-pixel grid without allocating a full plane.
+Before opening a page's Zarr adapter, its TIFF chunk dimensions and encoded byte counts are checked against a
+64 MiB per-segment limit. Pages containing oversized segments are rejected before pixel access, including single strips
+spanning an otherwise valid image. This bound is independent of the upload-size limit; ingest rejects such images with
+422 and restores the upload. Each page's temporary Zarr store is closed on success or failure.
 
 The reader checks that the OME pixel type agrees with the TIFF series dtype before exposing metadata or pixels.
 Unsupported OME types and mismatches raise `InvalidImageError`; byte order does not change pixel-type compatibility.
@@ -207,17 +214,29 @@ Strategy, in priority order:
 
 The mapping is recorded as `[{"channel": 2, "target": "red"}, …]` - the same shape as `OmeChannelView.settings` minus
 the window/level fields, since training always uses the channel's full declared range rather than a user-tuned
-window. Re-ingesting an image recomputes it the same way, so refining the strategy later never needs a migration of
-its own - only newly-ingested images pick up the change, and each image's revision sidecar still truthfully records
+window. Re-ingesting an image applies the policy configured at that time, so refining the strategy later never needs
+a migration of its own - only newly-ingested images pick up the change, and each image's revision sidecar records
 whichever mapping was used for it.
+
+The RGB policy is isolated behind `RgbChannelMappingStrategy.compute(info)`, injected through the optional
+`MediaService(rgb_channel_mapping_strategy=...)` constructor argument. `MetadataRgbChannelMappingStrategy` implements
+the default rules above; ingest and thumbnail rendering do not choose or implement those rules. A replacement strategy
+must deterministically return unique, in-range channels mapped to unique `red`, `green` or `blue` targets, using only
+immutable image metadata. No runtime setting or strategy registry is needed to replace the policy in Python.
+This contract is specifically an RGB projection; a future single-channel grayscale mapping should have its own
+contract rather than being represented as a mapping to an RGB target.
+
+The strategy runs once for each new image. Its output is both passed to thumbnail rendering and persisted unchanged.
+Existing images, and later dataset revisions, use the stored mapping rather than rerunning whichever strategy is
+currently configured. A revision can therefore contain images ingested under different policies; its sidecar records
+each image's actual mapping, not a single purported strategy version for the entire revision.
 
 Proposed file structure:
 
 ```
 // dataset_revisions/<revision_id>/ome_channel_mappings.json
 {
-  "mapping_strategy_version": 1,          // bump if §3.6.1's algorithm changes; lets readers detect
-                                           // "this revision predates strategy vN" without re-deriving it
+  "format_version": 1,                  // versions the sidecar schema
   "images": [
     {
       "media_id": "3fae2b1e-....-ome_image_1",
@@ -385,13 +404,16 @@ become `MediaDB.parent_id` (repositories, filters, services), but the public `vi
 
 All additive, under the existing `/api/projects/{project_id}/dataset/media` router.
 
+`GET /{media_id}/binary` rejects all `ome_image` containers with 400, including single-file OME-TIFF and
+requests with `raw=true`. OME pixel display belongs to the plane render endpoint described below.
+
 ### 5.1 Upload
 
 Single-file OME-TIFF needs no new endpoint - the existing `POST /media` and `POST /media:from-upload` work once format
 parsing handles compound extensions (`.ome.tiff`). For multi-file layouts:
 
 ```http
-POST /api/projects/{project_id}/media:from-upload
+POST /api/projects/{project_id}/dataset/media:from-upload
 Content-Type: application/json
 
 { "upload_id": "0c2f…", "name": "plate_A01" }
@@ -406,9 +428,27 @@ Accepted uploads now additionally include:
 422 -> unsupported extension, malformed archive, or invalid/unreadable OME metadata
 ```
 
-`source` is a **discriminated object, not a bare array**, so the future variants `{"kind": "archive", "upload_id": "…"}`
-(a zipped Zarr store) and `{"kind": "remote", "url": "s3://…"}` are additive rather than breaking. This is a free
-decision today and an API break if skipped.
+Both multipart upload and `:from-upload` accept the OME formats above (except the future `.zarr.zip` format).
+Compound suffix matching is case-insensitive; `sample.ome.tiff` has the default name `sample`, while a plain
+`sample.tiff` continues to use the ordinary image path. The existing `:from-upload` request object remains unchanged:
+`upload_id` identifies a completed upload and `name` optionally overrides its name. Future remote sources need an
+additive, discriminated source object rather than replacing this request with an array.
+
+An `.ome.zip` archive preserves its directory layout. The first TIFF with embedded OME-XML in lexicographic path
+order is the entrypoint; series 0 is ingested. All referenced companion files must be present inside the extracted
+root. An external XML-only companion entrypoint is not supported. Absolute paths, traversal, links, encrypted
+members and case-insensitive duplicate paths are rejected. Only the extracted payload is retained as media storage;
+the original ZIP is consumed on success.
+
+`UPLOAD_MAX_SIZE` limits both the uploaded bytes and the total expanded archive bytes. Ingest also checks available
+disk space; same-filesystem moves reuse the existing upload bytes. Limit violations return 413. Invalid metadata,
+unreadable pixels and invalid archives return 422. A failed ingest removes partial payloads and thumbnails, rolls back
+its media/metadata rows and restores any moved upload so it can be retried.
+
+The thumbnail uses the lowest pyramid level at `z = size_z // 2`, `t = size_t // 2`, projected through the fixed
+training channel mapping and declared intensity ranges. It is stored as a 256-by-256 JPEG. No mutable channel-view row
+is created during ingest. Large lowest-resolution levels use one downsampled reader call rather than repeated
+row reads or allocating the entire plane; intersecting strips and tiles are decoded once within the segment-size bound.
 
 ### 5.2 Structure
 
@@ -423,7 +463,12 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/ome
   "pixel_type": "uint16",
   "is_big_tiff": true,
   "channels": [{"index": 0, "name": "DAPI", "color": "#0000ff"}, …],
-  "pyramid_levels": [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, …]
+  "pyramid_levels": [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, …],
+  "series_index": 0,
+  "channel_mapping": [{"channel": 2, "target": "red"}, …],
+  "entrypoint": null,
+  "files": [],
+  "raw_metadata": "<?xml …"
 }
 400 -> media is not an OME image
 404 -> media is not found
@@ -587,10 +632,9 @@ What is **deliberately deferred**:
 - Distributed rendering. Rendering is CPU-bound and cacheable; the existing background-task mechanism is sufficient
   until measured otherwise.
 
-What would **block** cloud scaling if we did not do it now, and therefore is in scope: the `MediaStorage` abstraction,
-the `OmeReader` protocol, the discriminated upload `source` body, and the `scale` field + free-form `dimension_order` in
-the pyramid/axis metadata. All four are independently justified by the multi-file OME-TIFF requirement, so none is
-speculative.
+The cloud-scaling boundaries already in place are `MediaStorage`, the reader/handle protocol, object-shaped
+upload requests, and pyramid metadata with `scale` and free-form `dimension_order`. Local companion archives use
+the existing upload-ID request; future remote-source variants must be additive.
 
 ---
 
@@ -638,8 +682,12 @@ propagate a `tifffile` exception.
 
 `ImageFormat` gains `ome.tiff`/`ome.tif`; replace the `ImageFormat[ext.upper()]` lookup with a longest-suffix value
 match in `_parse_media_format` **and** in `dataset_revision_service._parse_revision_item_from_df_row_dict`, which will
-otherwise raise on compound suffixes. Add `MediaService.create_ome_image()`, the `:from-upload` endpoint, and the `/ome`
-endpoint. Thumbnail from the lowest pyramid level at mid-Z/mid-T, mirroring `create_video`.
+otherwise raise on compound suffixes. Add `MediaService.create_ome_image()`, extend the existing `:from-upload`
+endpoint, and add the `/ome` endpoint. Support bounded `.ome.zip` companion-set extraction as well as single files.
+Persist the fixed training channel mapping at ingest; thumbnail from the lowest pyramid level at mid-Z/mid-T,
+mirroring `create_video`. Introduce `MediaType.OME_IMAGE`, the `OmeImage` domain model and its API view here because
+ingest responses and subsequent listing need them before step 6. Regenerate the API contract and UI types in this
+step; the OME annotator UI remains a separate workstream.
 
 _Testing._ Router unit tests for compound-extension parsing, including that `a.ome.tiff` resolves to `OME_TIFF` and
 `b.tiff` still resolves to `TIFF`. Integration tests for upload of each fixture asserting the `MediaDB` + `OmeImageDB`
@@ -721,6 +769,7 @@ migration, no API break.
 - N-channel (C > 3) model input in `getitune`.
 - Remote/lazy store reading and chunk-level caching.
 - Selecting a non-default OME series in v1; series 0 is used.
+- Companion sets whose only OME-XML entrypoint is an external XML file rather than an OME-TIFF.
 - Non-XYCZT axes.
 - UI implementation (separate workstream; this document fixes the contract it consumes).
 - Full-fidelity dataset export/import of OME media — export/import carries materialized PNGs and annotations only.

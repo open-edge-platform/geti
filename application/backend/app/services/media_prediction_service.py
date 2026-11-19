@@ -109,6 +109,8 @@ class MediaPredictionService(BaseSessionManagedService):
             media = media_dict.get(media_request.media_id, None)
             if media is None:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_request.media_id))
+            if media.type == MediaType.OME_IMAGE:
+                raise ValueError("OME plane prediction is not available yet.")
             if media_request.range is None:
                 if media.type == MediaType.VIDEO:
                     raise VideoRangeError(

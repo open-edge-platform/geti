@@ -1,6 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import errno
 import os
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -15,7 +16,7 @@ from loguru import logger
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
-from app.db.schema import MediaDB
+from app.db.schema import MediaDB, OmeImageDB
 from app.models import (
     DatasetItem,
     DatasetItemAnnotationStatus,
@@ -31,11 +32,28 @@ from app.models.media import (
     MediaAdapter,
     MediaAnnotationStatus,
     MediaSortBy,
+    OmeImage,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
 )
+from app.models.ome import OmeImageMetadata
 from app.repositories import DatasetViewRepository, MediaRepository
+from app.repositories.ome_image_repo import OmeImageRepository
+from app.services.ome import (
+    ChannelMappingStrategy,
+    MetadataRgbChannelMappingStrategy,
+    OmeReaderRegistry,
+    UnsupportedOmeStorageError,
+)
+from app.services.ome.ingest import (
+    OmeMediaTooLargeError,
+    check_storage_space,
+    copy_ome_file,
+    create_ingest_thumbnail,
+    extract_ome_archive,
+    ome_payload_size,
+)
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
 from app.utils.media_storage_ops import (
@@ -117,10 +135,15 @@ class MediaService(BaseSessionManagedService):
         data_dir: Path,
         video_service: VideoService | None = None,
         db_session: Session | None = None,
+        *,
+        channel_mapping_strategy: ChannelMappingStrategy | None = None,
     ) -> None:
         super().__init__(db_session)
         self.projects_dir = data_dir / "projects"
         self._video_service = video_service
+        self._channel_mapping_strategy: ChannelMappingStrategy = (
+            channel_mapping_strategy if channel_mapping_strategy is not None else MetadataRgbChannelMappingStrategy()
+        )
 
     def _get_video_service(self) -> VideoService:
         if self._video_service is None:
@@ -301,6 +324,103 @@ class MediaService(BaseSessionManagedService):
             raise e
         return MediaAdapter.validate_python(db_media)
 
+    def create_ome_image(
+        self,
+        project_id: UUID,
+        name: str,
+        image_format: ImageFormat,
+        data: BinaryIO | Path,
+        *,
+        max_size: int,
+        archive: bool = False,
+    ) -> OmeImage:
+        """Ingest OME pixels and structure atomically, restoring moved uploads on failure."""
+        if image_format not in (ImageFormat.OME_TIF, ImageFormat.OME_TIFF):
+            raise InvalidImageError("Expected an OME-TIFF image format.")
+        media_id = uuid4()
+        dataset_dir = self.projects_dir / str(project_id) / "dataset"
+        dataset_dir.mkdir(parents=True, exist_ok=True)
+        size = ome_payload_size(data)
+        if size > max_size:
+            raise OmeMediaTooLargeError(f"OME image exceeds the maximum size of {max_size} bytes.")
+        check_storage_space(dataset_dir, size, source=data if isinstance(data, Path) else None)
+        target = MediaStorage(
+            root=dataset_dir / (str(media_id) if archive else f"{media_id}.{image_format}"),
+            entrypoint=Path(".") if archive else None,
+        )
+        thumbnail_path = dataset_dir / f"{media_id}-thumb.jpg"
+        source = MediaStorage(root=data) if isinstance(data, Path) and not archive else None
+        registry = OmeReaderRegistry()
+        moved = False
+        try:
+            if archive:
+                target = extract_ome_archive(data, target.root, max_size, registry)
+            elif isinstance(data, Path):
+                move_media_storage(MediaStorage(root=data), target)
+                moved = True
+            else:
+                copy_ome_file(data, target.root, max_size)
+            with registry.get_reader(target).open(target) as handle:
+                info = handle.info
+                projection = self._channel_mapping_strategy.compute(info)
+                thumbnail = create_ingest_thumbnail(handle, projection)
+            thumbnail = self._crop_image_to_thumbnail(thumbnail)
+            thumbnail.save(thumbnail_path, format="JPEG")
+            db_media = MediaRepository(str(project_id), self.db_session).save(
+                MediaDB(
+                    id=str(media_id),
+                    project_id=str(project_id),
+                    type=MediaType.OME_IMAGE,
+                    name=name,
+                    format=str(image_format),
+                    width=info.size_x,
+                    height=info.size_y,
+                    size=media_storage_size(target),
+                )
+            )
+            OmeImageRepository(str(project_id), self.db_session).save(
+                OmeImageDB(
+                    media_id=str(media_id),
+                    **info.model_dump(),
+                    channel_mapping=projection.model_dump(mode="json"),
+                    entrypoint=target.entrypoint.as_posix() if target.entrypoint is not None else None,
+                    files=(
+                        sorted(
+                            path.relative_to(target.root).as_posix()
+                            for path in target.root.rglob("*")
+                            if path.is_file()
+                        )
+                        if target.is_directory
+                        else []
+                    ),
+                )
+            )
+            return OmeImage.model_validate(db_media, from_attributes=True)
+        except BaseException as error:
+            thumbnail_path.unlink(missing_ok=True)
+            if target.root.exists():
+                discard_media_storage(target, source if moved else None)
+            if isinstance(error, UnsupportedOmeStorageError):
+                raise InvalidImageError("The uploaded file is not an OME-TIFF image.") from error
+            if isinstance(error, OSError) and error.errno == errno.ENOSPC:
+                raise OmeMediaTooLargeError("Insufficient storage space for the OME image.") from error
+            raise
+
+    def get_ome_image_info(self, project_id: UUID, media_id: UUID) -> OmeImageMetadata:
+        """Get immutable OME structure and training projection for a project's container."""
+        media = self.get_media_by_id(project_id, media_id)
+        if media.type != MediaType.OME_IMAGE:
+            raise ValueError("Media is not an OME image.")
+        row = OmeImageRepository(str(project_id), self.db_session).get_by_id(str(media_id))
+        if row is None:
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id), "OME image metadata was not found.")
+        return OmeImageMetadata.model_validate(row, from_attributes=True)
+
+    def discard_ome_image(self, project_id: UUID, media_id: UUID, storage: MediaStorage, upload_path: Path) -> None:
+        """Undo filesystem ingest after the caller rolls back a failed database commit."""
+        self.get_media_thumbnail_path_by_id(project_id, media_id).unlink(missing_ok=True)
+        discard_media_storage(storage, None if storage.is_directory else MediaStorage(root=upload_path))
+
     def count_media(
         self,
         project: Project,
@@ -398,6 +518,12 @@ class MediaService(BaseSessionManagedService):
     def get_media_storage(self, project_id: UUID, media: MediaDB | Media) -> MediaStorage:
         """Get where a media payload lives on disk."""
         dataset_dir = self.projects_dir / f"{project_id}/dataset"
+        if media.type == MediaType.OME_IMAGE:
+            info = OmeImageRepository(str(project_id), self.db_session).get_by_id(str(media.id))
+            if info is None:
+                raise ResourceNotFoundError(ResourceType.MEDIA, str(media.id), "OME image metadata was not found.")
+            if info.entrypoint is not None:
+                return MediaStorage(root=dataset_dir / str(media.id), entrypoint=Path(info.entrypoint))
         return MediaStorage(root=dataset_dir / f"{media.id}.{media.format}")
 
     def get_media_binary_path_by_id(self, project_id: UUID, media_id: UUID) -> Path:

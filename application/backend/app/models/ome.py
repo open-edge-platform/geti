@@ -1,9 +1,9 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import AliasChoices, Field, computed_field, model_validator
 
 from .base import BaseValueObject
 
@@ -15,6 +15,46 @@ class Region(BaseValueObject):
     y: int = Field(ge=0, description="Top coordinate of the region in pixels.")
     width: int = Field(gt=0, description="Region width in pixels.")
     height: int = Field(gt=0, description="Region height in pixels.")
+
+
+class RgbChannelAssignment(BaseValueObject):
+    """Assign one source channel to one RGB output component."""
+
+    channel: int = Field(ge=0)
+    target: Literal["red", "green", "blue"]
+
+
+class RgbProjection(BaseValueObject):
+    """Project selected source channels to a three-channel RGB image."""
+
+    mode: Literal["rgb"] = "rgb"
+    channels: tuple[RgbChannelAssignment, ...]
+
+    @property
+    def source_channels(self) -> tuple[int, ...]:
+        return tuple(assignment.channel for assignment in self.channels)
+
+    @model_validator(mode="after")
+    def validate_assignments(self) -> "RgbProjection":
+        if len(set(self.source_channels)) != len(self.channels):
+            raise ValueError("RGB projection source channels must be unique.")
+        if len({assignment.target for assignment in self.channels}) != len(self.channels):
+            raise ValueError("RGB projection targets must be unique.")
+        return self
+
+
+class GrayscaleProjection(BaseValueObject):
+    """Select one source channel for a single-channel grayscale image."""
+
+    mode: Literal["grayscale"] = "grayscale"
+    channel: int = Field(ge=0)
+
+    @property
+    def source_channels(self) -> tuple[int, ...]:
+        return (self.channel,)
+
+
+ChannelProjection = Annotated[RgbProjection | GrayscaleProjection, Field(discriminator="mode")]
 
 
 class OmeImageInfo(BaseValueObject):
@@ -49,4 +89,29 @@ class OmeImageInfo(BaseValueObject):
         order = self.dimension_order.upper()
         if not {"X", "Y", "C"}.issubset(set(order)):
             raise ValueError("dimension_order must include X, Y and C axes")
+        return self
+
+
+class OmeImageMetadata(OmeImageInfo):
+    """Persisted OME structure, immutable training projection and constituent files."""
+
+    channel_projection: ChannelProjection = Field(
+        validation_alias=AliasChoices("channel_projection", "channel_mapping"),
+        description="Immutable projection defining RGB or single-channel grayscale output.",
+    )
+    entrypoint: str | None = None
+    files: list[str] = Field(default_factory=list)
+
+    @computed_field(deprecated="Use channel_projection; channel_mapping contains only legacy RGB assignments.")
+    @property
+    def channel_mapping(self) -> list[dict[str, int | str]]:
+        """Return the legacy RGB assignments; grayscale projections have no RGB assignments."""
+        if isinstance(self.channel_projection, RgbProjection):
+            return [assignment.model_dump(mode="json") for assignment in self.channel_projection.channels]
+        return []
+
+    @model_validator(mode="after")
+    def validate_projection_channels(self) -> "OmeImageMetadata":
+        if any(channel >= self.size_c for channel in self.channel_projection.source_channels):
+            raise ValueError("Channel projection references a channel outside SizeC.")
         return self
