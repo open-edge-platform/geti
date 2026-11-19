@@ -76,7 +76,11 @@ def fxt_media_service(
     db_session: Session,
 ) -> MediaService:
     """Fixture to create a MediaService instance."""
-    return MediaService(data_dir=fxt_projects_dir.parent, db_session=db_session, video_service=VideoService())
+    return MediaService(
+        data_dir=fxt_projects_dir.parent,
+        db_session=db_session,
+        video_service=VideoService(),
+    )
 
 
 @pytest.fixture

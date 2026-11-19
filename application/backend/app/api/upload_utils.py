@@ -77,6 +77,15 @@ def split_upload_filename(filename: str) -> tuple[str, str]:
     Raises:
         HTTPException: 422 if the filename has no name or no extension.
     """
+    for extension in ("ome.tiff", "ome.tif", "ome.zip"):
+        if filename.lower().endswith(f".{extension}"):
+            name = filename[: -len(extension) - 1].strip()
+            if not name:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="The uploaded filename must have a name before its OME extension.",
+                )
+            return name, extension
     name, dot, extension = filename.rpartition(".")
     name = name.strip()
     if not dot or not name or not extension:
