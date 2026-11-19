@@ -33,6 +33,7 @@ class OmeImageHandle(Protocol):
         z: int = 0,
         t: int = 0,
         channels: Sequence[int] | None = None,
+        output_size: tuple[int, int] | None = None,
     ) -> np.ndarray: ...
 
     def close(self) -> None: ...

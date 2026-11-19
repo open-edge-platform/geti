@@ -122,6 +122,7 @@ class OmeImageHandle(Protocol):
         z: int = 0,
         t: int = 0,
         channels: Sequence[int] | None = None,  # None means all channels
+        output_size: tuple[int, int] | None = None,  # Optional downsampled (width, height)
     ) -> np.ndarray: ...
 
     def close(self) -> None: ...
@@ -149,10 +150,16 @@ persists that metadata before closing the handle. Reader selection uses `probe(s
 region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB mapping, caching,
 thumbnailing and training-set materialization all live _above_ this protocol and are written once.
 
-The backend installs `tifffile[codecs]` to provide `imagecodecs` for compressed pixels, including LZW and JPEG.
-PyInstaller bundles the codec modules and native libraries alongside the reader.
-Region reads group channel selections by TIFF page and decode each intersecting strip or tile once, even when
-multiple interleaved samples or duplicate channels are requested. The output preserves the requested channel order.
+The backend installs `tifffile[codecs]` for compressed pixels (including LZW and JPEG), and `zarr` for TIFF-backed
+region selection. PyInstaller bundles Zarr, Numcodecs and the TIFF codec modules/native libraries alongside the reader.
+Region reads group channel selections by TIFF page, expose each page through `page.aszarr(maxworkers=1)`, and use
+Zarr orthogonal indexing for crops and sampling. No conversion to OME-Zarr or custom strip/tile traversal is needed.
+Only intersecting strips/tiles are decoded, once per selection even for duplicate channels; requested channel order
+is preserved. With `output_size`, indexing samples an evenly spaced nearest-pixel grid without allocating a full plane.
+Before opening a page's Zarr adapter, its TIFF chunk dimensions and encoded byte counts are checked against a
+64 MiB per-segment limit. Pages containing oversized segments are rejected before pixel access, including single strips
+spanning an otherwise valid image. This bound is independent of the upload-size limit; ingest rejects such images with
+422 and restores the upload. Each page's temporary Zarr store is closed on success or failure.
 
 The reader checks that the OME pixel type agrees with the TIFF series dtype before exposing metadata or pixels.
 Unsupported OME types and mismatches raise `InvalidImageError`; byte order does not change pixel-type compatibility.
@@ -440,8 +447,8 @@ its media/metadata rows and restores any moved upload so it can be retried.
 
 The thumbnail uses the lowest pyramid level at `z = size_z // 2`, `t = size_t // 2`, projected through the fixed
 training channel mapping and declared intensity ranges. It is stored as a 256-by-256 JPEG. No mutable channel-view row
-is created during ingest. Large lowest-resolution levels are sampled through region reads rather than allocating
-the entire plane.
+is created during ingest. Large lowest-resolution levels use one downsampled reader call rather than repeated
+row reads or allocating the entire plane; intersecting strips and tiles are decoded once within the segment-size bound.
 
 ### 5.2 Structure
 

@@ -12,7 +12,7 @@ from zipfile import BadZipFile, ZipFile, ZipInfo
 import numpy as np
 from PIL import Image
 
-from app.models import MediaStorage, Region
+from app.models import MediaStorage
 from app.models.ome import ChannelProjection
 from app.services.base import InvalidImageError
 
@@ -138,7 +138,7 @@ def create_ingest_thumbnail(handle: OmeImageHandle, projection: ChannelProjectio
 
 
 def _read_thumbnail_pixels(handle: OmeImageHandle, channels: list[int]) -> np.ndarray:
-    """Sample large, non-pyramidal planes without allocating a full-resolution plane."""
+    """Sample large planes without allocating a full-resolution plane."""
     info = handle.info
     level = len(info.pyramid_levels) - 1 if info.pyramid_levels else 0
     width = info.pyramid_levels[level]["width"] if info.pyramid_levels else info.size_x
@@ -151,16 +151,10 @@ def _read_thumbnail_pixels(handle: OmeImageHandle, channels: list[int]) -> np.nd
     if max(width, height) <= 1024:
         return handle.read_region(level=level, z=info.size_z // 2, t=info.size_t // 2, channels=channels)
     scale = 256 / max(width, height)
-    xs = np.linspace(0, width - 1, max(1, round(width * scale)), dtype=int)
-    ys = np.linspace(0, height - 1, max(1, round(height * scale)), dtype=int)
-    rows = [
-        handle.read_region(
-            level=level,
-            z=info.size_z // 2,
-            t=info.size_t // 2,
-            channels=channels,
-            region=Region(x=0, y=int(y), width=width, height=1),
-        )[:, 0, xs]
-        for y in ys
-    ]
-    return np.stack(rows, axis=1)
+    return handle.read_region(
+        level=level,
+        z=info.size_z // 2,
+        t=info.size_t // 2,
+        channels=channels,
+        output_size=(max(1, round(width * scale)), max(1, round(height * scale))),
+    )

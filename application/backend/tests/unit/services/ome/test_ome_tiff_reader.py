@@ -4,7 +4,7 @@
 import re
 import shutil
 from pathlib import Path
-from unittest.mock import PropertyMock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -53,15 +53,23 @@ def test_plane_and_region_selection(reader, name, z, t, channels, crop):
 @pytest.mark.parametrize("level", [0, 1, 2])
 @pytest.mark.parametrize("crop", [None, Region(x=2, y=1, width=7, height=5)])
 @pytest.mark.parametrize("z,t", [(0, 0), (1, 1)])
-def test_pyramid_levels(reader, level, crop, z, t):
+@pytest.mark.parametrize("output_size", [None, (3, 2)])
+def test_pyramid_levels(reader, level, crop, z, t, output_size):
     with reader.open(MediaStorage(root=ASSETS / "pyramidal.ome.tiff")) as handle:
-        actual = handle.read_region(level=level, region=crop, z=z, t=t, channels=[2, 0])
+        actual = handle.read_region(level=level, region=crop, z=z, t=t, channels=[2, 0], output_size=output_size)
         assert handle.info.pyramid_levels[level]["scale"] == [2**level, 2**level, 1, 1, 1]
     y, x = np.indices((32, 48))
     expected = np.asarray([t * 10000 + z * 1000 + c * 100 + y * 48 + x for c in (2, 0)], dtype=np.uint16)
     expected = expected[:, :: 2**level, :: 2**level]
     if crop:
         expected = expected[:, crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+    if output_size is not None:
+        width, height = output_size
+        expected = expected[
+            :,
+            np.linspace(0, expected.shape[1] - 1, height, dtype=int)[:, None],
+            np.linspace(0, expected.shape[2] - 1, width, dtype=int),
+        ]
     np.testing.assert_array_equal(actual, expected)
 
 
@@ -167,6 +175,11 @@ def test_required_metadata(reader, tmp_path, attribute):
         {"channels": [3]},
         {"region": Region(x=47, y=0, width=2, height=1)},
         {"region": Region(x=0, y=31, width=1, height=2)},
+        {"output_size": (0, 1)},
+        {"output_size": (1, -1)},
+        {"output_size": (49, 1)},
+        {"output_size": (1, 33)},
+        {"region": Region(x=1, y=1, width=2, height=2), "output_size": (3, 1)},
     ],
 )
 def test_selection_bounds(reader, selection):
@@ -181,7 +194,7 @@ def test_nonzero_series_rejected(reader):
 
 def test_unknown_axes_use_index_zero(reader):
     with reader.open(MediaStorage(root=ASSETS / "xycz.ome.tiff")) as handle:
-        with patch.object(tifffile.TiffPageSeries, "axes", new_callable=PropertyMock, return_value="QCYX"):
+        with patch.object(handle._tiff.series[0], "_axes", "QCYX"):
             actual = handle.read_region(channels=[2])
         assert actual[0, 2, 3] == 299
 
@@ -201,7 +214,8 @@ def test_lazy_crop_does_not_decode_whole_series(reader):
 @pytest.mark.parametrize("tiled", [False, True])
 @pytest.mark.parametrize("channels", [None, [2, 0], [1, 1], [2, 0, 2, 1], []])
 @pytest.mark.parametrize("crop", [None, Region(x=3, y=2, width=17, height=19)])
-def test_rgb_segments_are_decoded_once(reader, tmp_path, planar, tiled, channels, crop):
+@pytest.mark.parametrize("output_size", [None, (7, 5), (2, 2)])
+def test_rgb_segments_are_decoded_once(reader, tmp_path, planar, tiled, channels, crop, output_size):
     path = tmp_path / "rgb.ome.tiff"
     c, y, x = np.indices((3, 32, 48))
     data = (c * 100 + y * 48 + x).astype(np.uint16)
@@ -220,7 +234,14 @@ def test_rgb_segments_are_decoded_once(reader, tmp_path, planar, tiled, channels
     expected = data[selected]
     if crop is not None:
         expected = expected[:, crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+    if output_size is not None:
+        width, height = output_size
+        xs = np.linspace(0, expected.shape[2] - 1, width, dtype=int)
+        ys = np.linspace(0, expected.shape[1] - 1, height, dtype=int)
+        expected = expected[:, ys[:, None], xs]
     segments_per_sample = (6 if crop is None else 4) if tiled else (4 if crop is None else 3)
+    if output_size == (2, 2):
+        segments_per_sample = 4 if tiled else 2
     expected_decodes = segments_per_sample * (len(set(selected)) if planar else bool(selected))
     with reader.open(MediaStorage(root=path)) as handle:
         keyframe = handle._tiff.series[0].keyframe
@@ -229,10 +250,67 @@ def test_rgb_segments_are_decoded_once(reader, tmp_path, planar, tiled, channels
             patch.object(tifffile.FileHandle, "read", autospec=True, side_effect=tifffile.FileHandle.read) as read,
             patch.object(tifffile.TiffPageSeries, "asarray", side_effect=AssertionError("eager read")),
         ):
-            actual = handle.read_region(channels=channels, region=crop)
+            actual = handle.read_region(channels=channels, region=crop, output_size=output_size)
         assert read.call_count == expected_decodes
         assert sum(call.args[0] is not None for call in decode.call_args_list) == expected_decodes
     np.testing.assert_array_equal(actual, expected)
+
+
+@pytest.mark.parametrize("output_size", [None, (1, 1)])
+@pytest.mark.parametrize("over_limit", [False, True])
+def test_segment_decode_size_limit(reader, tmp_path, output_size, over_limit):
+    path = tmp_path / "segment.ome.tiff"
+    pixels = np.zeros((16, 16, 3), dtype=np.uint16)
+    tifffile.imwrite(
+        path, pixels, ome=True, photometric="rgb", metadata={"axes": "YXS"}, compression="lzw", rowsperstrip=16
+    )
+    with reader.open(MediaStorage(root=path)) as handle:
+        keyframe = handle._tiff.series[0].keyframe
+        with (
+            patch("app.services.ome.ome_tiff_reader._MAX_SEGMENT_BYTES", pixels.nbytes - int(over_limit)),
+            patch.object(keyframe, "decode", wraps=keyframe.decode) as decode,
+            patch.object(tifffile.FileHandle, "read", autospec=True, side_effect=tifffile.FileHandle.read) as read,
+        ):
+            if over_limit:
+                with pytest.raises(InvalidImageError, match="read/decode limit"):
+                    handle.read_region(
+                        channels=[0], region=Region(x=0, y=0, width=2, height=2), output_size=output_size
+                    )
+                read.assert_not_called()
+                assert all(call.args[0] is None for call in decode.call_args_list)
+            else:
+                actual = handle.read_region(
+                    channels=[0], region=Region(x=0, y=0, width=2, height=2), output_size=output_size
+                )
+                assert actual.shape == (1, *(output_size or (2, 2))[::-1])
+                assert not actual.any()
+                assert read.call_count == 1
+
+
+def test_gigapixel_strip_is_rejected_before_read_or_decode(reader):
+    with reader.open(MediaStorage(root=ASSETS / "single_channel.ome.tiff")) as handle:
+        keyframe = handle._tiff.series[0].keyframe
+        with (
+            patch.object(keyframe, "chunks", (30000, 40000)),
+            patch.object(keyframe, "decode", side_effect=AssertionError("oversized decode")) as decode,
+            patch.object(tifffile.FileHandle, "read", side_effect=AssertionError("oversized read")) as read,
+            pytest.raises(InvalidImageError, match="67108864-byte read/decode limit"),
+        ):
+            handle.read_region(channels=[0], output_size=(8, 8))
+        read.assert_not_called()
+        decode.assert_not_called()
+
+
+def test_oversized_encoded_segment_is_rejected_before_read(reader):
+    with reader.open(MediaStorage(root=ASSETS / "single_channel.ome.tiff")) as handle:
+        keyframe = handle._tiff.series[0].keyframe
+        with (
+            patch.object(keyframe, "databytecounts", (64 * 1024 * 1024 + 1,)),
+            patch.object(tifffile.FileHandle, "read", side_effect=AssertionError("oversized read")) as read,
+            pytest.raises(InvalidImageError, match="read/decode limit"),
+        ):
+            handle.read_region(channels=[0], output_size=(8, 8))
+        read.assert_not_called()
 
 
 @pytest.mark.parametrize("z,t", [(0, 0), (1, 0), (0, 1), (1, 1)])

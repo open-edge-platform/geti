@@ -409,6 +409,27 @@ def test_insufficient_storage(ome_ingest):
 
 
 @pytest.mark.parametrize("archive", [False, True])
+def test_oversized_decoded_segment_restores_upload(ome_ingest, db_session, tmp_path, archive):
+    service, project_id = ome_ingest
+    upload = tmp_path / "claimed-upload"
+    pixels = (ASSETS / "xyc.ome.tiff").read_bytes()
+    original = _archive([("image.ome.tiff", pixels)]).getvalue() if archive else pixels
+    upload.write_bytes(original)
+    with (
+        patch("app.services.ome.ome_tiff_reader._MAX_SEGMENT_BYTES", 1),
+        pytest.raises(InvalidImageError, match="read/decode limit"),
+    ):
+        service.create_ome_image(
+            project_id, "specimen", ImageFormat.OME_TIFF, upload, max_size=MAX_SIZE, archive=archive
+        )
+
+    assert upload.read_bytes() == original
+    assert list((service.projects_dir / str(project_id) / "dataset").iterdir()) == []
+    assert db_session.scalar(select(func.count()).select_from(MediaDB)) == 0
+    assert db_session.scalar(select(func.count()).select_from(OmeImageDB)) == 0
+
+
+@pytest.mark.parametrize("archive", [False, True])
 def test_discard_after_commit_failure_restores_claimed_upload(ome_ingest, tmp_path, archive):
     service, project_id = ome_ingest
     upload = tmp_path / "claimed-upload"
