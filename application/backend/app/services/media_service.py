@@ -366,37 +366,36 @@ class MediaService(BaseSessionManagedService):
                 thumbnail = create_ingest_thumbnail(handle, projection)
             thumbnail = self._crop_image_to_thumbnail(thumbnail)
             thumbnail.save(thumbnail_path, format="JPEG")
-            with self.db_session.begin_nested():
-                db_media = MediaRepository(str(project_id), self.db_session).save(
-                    MediaDB(
-                        id=str(media_id),
-                        project_id=str(project_id),
-                        type=MediaType.OME_IMAGE,
-                        name=name,
-                        format=str(image_format),
-                        width=info.size_x,
-                        height=info.size_y,
-                        size=media_storage_size(target),
-                    )
+            db_media = MediaRepository(str(project_id), self.db_session).save(
+                MediaDB(
+                    id=str(media_id),
+                    project_id=str(project_id),
+                    type=MediaType.OME_IMAGE,
+                    name=name,
+                    format=str(image_format),
+                    width=info.size_x,
+                    height=info.size_y,
+                    size=media_storage_size(target),
                 )
-                OmeImageRepository(str(project_id), self.db_session).save(
-                    OmeImageDB(
-                        media_id=str(media_id),
-                        **info.model_dump(),
-                        channel_mapping=projection.model_dump(mode="json"),
-                        entrypoint=target.entrypoint.as_posix() if target.entrypoint is not None else None,
-                        files=(
-                            sorted(
-                                path.relative_to(target.root).as_posix()
-                                for path in target.root.rglob("*")
-                                if path.is_file()
-                            )
-                            if target.is_directory
-                            else []
-                        ),
-                    )
+            )
+            OmeImageRepository(str(project_id), self.db_session).save(
+                OmeImageDB(
+                    media_id=str(media_id),
+                    **info.model_dump(),
+                    channel_mapping=projection.model_dump(mode="json"),
+                    entrypoint=target.entrypoint.as_posix() if target.entrypoint is not None else None,
+                    files=(
+                        sorted(
+                            path.relative_to(target.root).as_posix()
+                            for path in target.root.rglob("*")
+                            if path.is_file()
+                        )
+                        if target.is_directory
+                        else []
+                    ),
                 )
-                return OmeImage.model_validate(db_media, from_attributes=True)
+            )
+            return OmeImage.model_validate(db_media, from_attributes=True)
         except BaseException as error:
             thumbnail_path.unlink(missing_ok=True)
             if target.root.exists():

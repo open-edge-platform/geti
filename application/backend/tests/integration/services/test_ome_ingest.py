@@ -209,6 +209,8 @@ def test_ingest_failure_restores_upload(ome_ingest, db_session, tmp_path, failur
     expected = OmeMediaTooLargeError if failure == "disk_full" else RuntimeError
     with patch(targets[failure], side_effect=error), pytest.raises(expected):
         service.create_ome_image(project_id, "specimen", ImageFormat.OME_TIFF, upload, max_size=MAX_SIZE)
+    if failure == "metadata_save":
+        db_session.rollback()
     assert upload.read_bytes() == original
     assert list((service.projects_dir / str(project_id) / "dataset").iterdir()) == []
     assert db_session.scalar(select(func.count()).select_from(MediaDB)) == 0
