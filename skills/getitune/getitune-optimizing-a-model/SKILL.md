@@ -47,8 +47,7 @@ predictions = ov_engine.predict(checkpoint=optimized_path)
    checkpoint, export it first with the `getitune-exporting-a-model` skill.
    - Done when: `create_engine(model="....xml", data=...)` builds an `OVEngine`.
 2. **Provide a calibration dataset.** Calibration images are taken automatically
-   from the training subset; around 300 images is the recommended calibration
-   size. `max_data_subset_size=None` does not override the setting stored in the
+   from the training subset. `max_data_subset_size=None` does not override the setting stored in the
    model's optimization metadata. If that metadata does not specify a subset
    size, NNCF uses its default of 300; `None` does not mean the whole dataset.
    Pass `max_data_subset_size=300` to `optimize()` to explicitly override the

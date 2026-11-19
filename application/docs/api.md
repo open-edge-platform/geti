@@ -282,7 +282,7 @@ Job types:
 - `train`
 - `quantize`
 - `prepare_dataset_for_import`
-- `import_dataset_to_existing_project`
+- `import_dataset_to_project`
 - `import_dataset_as_new_project`
 - `export_dataset`
 - `stage_dataset`

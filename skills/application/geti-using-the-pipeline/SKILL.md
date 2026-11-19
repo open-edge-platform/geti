@@ -80,7 +80,7 @@ flowchart LR
 
 Long-running work runs as **jobs** (`POST /api/jobs`), keeping the API
 responsive. Job types: `train`, `quantize`, `prepare_dataset_for_import`,
-`import_dataset_to_existing_project`, `import_dataset_as_new_project`,
+`import_dataset_to_project`, `import_dataset_as_new_project`,
 `export_dataset`. Poll `GET /api/jobs/<id>` or stream
 `/status` and `/logs`; jobs are cancelable.
 
@@ -89,8 +89,10 @@ responsive. Job types: `train`, `quantize`, `prepare_dataset_for_import`,
 To bring in an existing dataset rather than annotating from scratch:
 
 - Upload an archive to staging: `POST /api/staged_datasets`.
+- Submit a `prepare_dataset_for_import` job and wait until the staged dataset
+  reports `ready_for_import`.
 - Then submit an import job (`import_dataset_as_new_project` or
-  `import_dataset_to_existing_project`) via `POST /api/jobs`.
+  `import_dataset_to_project`) via `POST /api/jobs`.
 - Export a project's dataset with the `export_dataset` job.
 
 ## Notes
