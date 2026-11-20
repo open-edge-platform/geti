@@ -10,7 +10,7 @@ from app.models import MediaStorage, OmeImageInfo, Region
 from app.models.ome import ChannelProjection
 
 
-class ChannelMappingStrategy(Protocol):
+class ChannelProjectionStrategy(Protocol):
     """Deterministic policy selecting an RGB or single-channel grayscale projection.
 
     Ingest persists the typed result, including its output mode. Consumers must

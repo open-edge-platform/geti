@@ -184,8 +184,9 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        # Browser JS can only read the response headers of the resumable upload (TUS) protocol if exposed
+        # Expose render revalidation and resumable-upload headers to browser clients.
         expose_headers=[
+            "ETag",
             "Location",
             "Tus-Resumable",
             "Tus-Version",

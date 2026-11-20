@@ -6,8 +6,8 @@ from pydantic import ValidationError
 
 from app.models.ome import GrayscaleProjection, OmeImageInfo
 from app.services.base import InvalidImageError
-from app.services.ome.grayscale_channel_mapping import SingleChannelGrayscaleMappingStrategy
-from app.services.ome.protocols import ChannelMappingStrategy
+from app.services.ome.grayscale_channel_projection import SingleChannelGrayscaleProjectionStrategy
+from app.services.ome.protocols import ChannelProjectionStrategy
 
 
 def _info(size_c: int) -> OmeImageInfo:
@@ -16,7 +16,7 @@ def _info(size_c: int) -> OmeImageInfo:
 
 @pytest.mark.parametrize("size_c", [1, 3, 5])
 def test_default_selects_first_source_channel(size_c):
-    strategy: ChannelMappingStrategy = SingleChannelGrayscaleMappingStrategy()
+    strategy: ChannelProjectionStrategy = SingleChannelGrayscaleProjectionStrategy()
 
     projection = strategy.compute(_info(size_c))
 
@@ -27,7 +27,7 @@ def test_default_selects_first_source_channel(size_c):
 
 @pytest.mark.parametrize(("channel", "size_c"), [(0, 1), (1, 3), (2, 3), (4, 5)])
 def test_configured_channel_is_preserved_without_rgb_expansion(channel, size_c):
-    projection = SingleChannelGrayscaleMappingStrategy(channel=channel).compute(_info(size_c))
+    projection = SingleChannelGrayscaleProjectionStrategy(channel=channel).compute(_info(size_c))
 
     assert projection == GrayscaleProjection(channel=channel)
     assert projection.source_channels == (channel,)
@@ -36,7 +36,7 @@ def test_configured_channel_is_preserved_without_rgb_expansion(channel, size_c):
 
 @pytest.mark.parametrize(("channel", "size_c"), [(1, 1), (3, 3), (4, 3)])
 def test_rejects_channel_at_or_above_size_c(channel, size_c):
-    strategy = SingleChannelGrayscaleMappingStrategy(channel=channel)
+    strategy = SingleChannelGrayscaleProjectionStrategy(channel=channel)
 
     with pytest.raises(InvalidImageError, match=f"Grayscale source channel {channel} is outside SizeC"):
         strategy.compute(_info(size_c))
@@ -45,7 +45,7 @@ def test_rejects_channel_at_or_above_size_c(channel, size_c):
 @pytest.mark.parametrize("channel", [-1, -3])
 def test_rejects_negative_source_channel(channel):
     with pytest.raises(ValidationError, match="greater than or equal to 0"):
-        SingleChannelGrayscaleMappingStrategy(channel=channel)
+        SingleChannelGrayscaleProjectionStrategy(channel=channel)
 
 
 def test_selection_does_not_depend_on_wavelength_or_display_metadata():
@@ -58,14 +58,14 @@ def test_selection_does_not_depend_on_wavelength_or_display_metadata():
         }
     )
     original = info.model_dump(mode="json")
-    strategy = SingleChannelGrayscaleMappingStrategy(channel=1)
+    strategy = SingleChannelGrayscaleProjectionStrategy(channel=1)
 
     assert strategy.compute(info) == strategy.compute(_info(2)) == GrayscaleProjection(channel=1)
     assert info.model_dump(mode="json") == original
 
 
 def test_reused_strategy_checks_each_images_channel_count():
-    strategy = SingleChannelGrayscaleMappingStrategy(channel=2)
+    strategy = SingleChannelGrayscaleProjectionStrategy(channel=2)
 
     assert strategy.compute(_info(3)) == GrayscaleProjection(channel=2)
     with pytest.raises(InvalidImageError, match="outside SizeC"):

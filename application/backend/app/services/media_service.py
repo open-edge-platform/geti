@@ -41,8 +41,8 @@ from app.models.ome import OmeImageMetadata
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.repositories.ome_image_repo import OmeImageRepository
 from app.services.ome import (
-    ChannelMappingStrategy,
-    MetadataRgbChannelMappingStrategy,
+    ChannelProjectionStrategy,
+    MetadataRgbChannelProjectionStrategy,
     OmeReaderRegistry,
     UnsupportedOmeStorageError,
 )
@@ -136,13 +136,15 @@ class MediaService(BaseSessionManagedService):
         video_service: VideoService | None = None,
         db_session: Session | None = None,
         *,
-        channel_mapping_strategy: ChannelMappingStrategy | None = None,
+        channel_projection_strategy: ChannelProjectionStrategy | None = None,
     ) -> None:
         super().__init__(db_session)
         self.projects_dir = data_dir / "projects"
         self._video_service = video_service
-        self._channel_mapping_strategy: ChannelMappingStrategy = (
-            channel_mapping_strategy if channel_mapping_strategy is not None else MetadataRgbChannelMappingStrategy()
+        self._channel_projection_strategy: ChannelProjectionStrategy = (
+            channel_projection_strategy
+            if channel_projection_strategy is not None
+            else MetadataRgbChannelProjectionStrategy()
         )
 
     def _get_video_service(self) -> VideoService:
@@ -362,7 +364,7 @@ class MediaService(BaseSessionManagedService):
                 copy_ome_file(data, target.root, max_size)
             with registry.get_reader(target).open(target) as handle:
                 info = handle.info
-                projection = self._channel_mapping_strategy.compute(info)
+                projection = self._channel_projection_strategy.compute(info)
                 thumbnail = create_ingest_thumbnail(handle, projection)
             thumbnail = self._crop_image_to_thumbnail(thumbnail)
             thumbnail.save(thumbnail_path, format="JPEG")
@@ -382,7 +384,7 @@ class MediaService(BaseSessionManagedService):
                 OmeImageDB(
                     media_id=str(media_id),
                     **info.model_dump(),
-                    channel_mapping=projection.model_dump(mode="json"),
+                    channel_projection=projection.model_dump(mode="json"),
                     entrypoint=target.entrypoint.as_posix() if target.entrypoint is not None else None,
                     files=(
                         sorted(

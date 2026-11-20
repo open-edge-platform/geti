@@ -147,7 +147,7 @@ manager).
 The reader only identifies and opens a format. `open()` parses metadata once and exposes it as `handle.info`; ingest
 persists that metadata before closing the handle. Reader selection uses `probe(storage)` rather than trusting
 `media.format`, which may only describe the filename extension. `OmeTiffReader` is backed by `tifffile` (with lazy
-region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB mapping, caching,
+region reads); an OME-Zarr reader can implement the same handle contract later. Windowing, RGB projection, caching,
 thumbnailing and training-set materialization all live _above_ this protocol and are written once.
 
 The backend installs `tifffile[codecs]` for compressed pixels (including LZW and JPEG), and `zarr` for TIFF-backed
@@ -177,26 +177,29 @@ Rendering is **server-side**. A plane is rendered by:
 1. Resolving the requested pyramid `level` (an explicit query parameter, §5.4) against `ome_images.pyramid_levels`.
 2. Reading the enabled channels at that level.
 3. Applying per-channel window/level: `v <= min -> 0`, `v >= max -> 255`, linear between.
-4. Compositing enabled channels into their assigned RGB targets.
+4. Compositing enabled channels additively using their assigned hex colors, clamping the RGB result to 0-255.
+
+Display settings are separate from the immutable RGB/grayscale training projection persisted at ingest as
+`channel_projection`.
 
 ### 3.6 Training
 
-Training uses a **fixed, deterministic channel-to-RGB mapping** computed once from immutable OME metadata
+Training uses a **fixed, deterministic RGB or single-channel grayscale projection** computed once from immutable OME metadata
 (§3.6.1), independent of anything the annotator UI does.
 
 A dataset revision materializes **annotated planes only**, rendered to plain PNG into `dataset_revisions/<id>/images/`,
-using that fixed mapping. The mapping actually used is written alongside the revision as a sidecar file,
-`dataset_revisions/<id>/ome_channel_mapping.json` - the revision's on-disk artifacts are the documented source of
+using that fixed projection. The projection actually used is written alongside the revision as a sidecar file,
+`dataset_revisions/<id>/ome_channel_projections.json` - the revision's on-disk artifacts are the documented source of
 truth for "what did training see", exactly as the rendered PNGs themselves already are. This avoids adding a
 revision-scoped settings table or JSON column (§4.4 stays correct: `dataset_revisions` is unchanged), while still
 making the preprocessing fully reproducible from what is stored for that revision.
 
 This is exactly how annotated video frames are already handled, which is why requirements 5–8 need no work in `getitune`.
 
-#### 3.6.1 Fixed training channel mapping
+#### 3.6.1 Fixed training channel projection
 
 Computed once, at ingest time, from `handle.info` (`OmeTiffReader.open` parses the OME metadata), `size_c` and the
-channel metadata, and stored immutably on `OmeImageDB.channel_mapping` (§4.2) - **not** the `OmeChannelView` row, which
+channel metadata, and stored immutably on `OmeImageDB.channel_projection` (§4.2) - **not** the `OmeChannelView` row, which
 only affects rendering for the annotator and can change at any time. Because it's derived solely from already-immutable
 OME metadata and persisted once, it's as reproducible as the pixel data itself.
 
@@ -212,29 +215,30 @@ Strategy, in priority order:
 3. **Fallback, any `size_c` with no wavelength metadata**: first `min(size_c, 3)` channels, in index order, mapped to
    R, G, B; channels beyond index 2 are dropped. `size_c < 3` pads unused targets with zero (black).
 
-The mapping is recorded as `[{"channel": 2, "target": "red"}, …]` - the same shape as `OmeChannelView.settings` minus
-the window/level fields, since training always uses the channel's full declared range rather than a user-tuned
-window. Re-ingesting an image applies the policy configured at that time, so refining the strategy later never needs
+The projection is recorded as `{"mode": "rgb", "channels": [{"channel": 2, "target": "red"}, …]}` or
+`{"mode": "grayscale", "channel": 0}`. Training always uses the channel's full declared range rather than a user-tuned
+display window. Re-ingesting an image applies the policy configured at that time, so refining the strategy later never needs
 a migration of its own - only newly-ingested images pick up the change, and each image's revision sidecar records
-whichever mapping was used for it.
+whichever projection was used for it.
 
-The RGB policy is isolated behind `RgbChannelMappingStrategy.compute(info)`, injected through the optional
-`MediaService(rgb_channel_mapping_strategy=...)` constructor argument. `MetadataRgbChannelMappingStrategy` implements
+The projection policy is isolated behind `ChannelProjectionStrategy.compute(info)`, injected through the optional
+`MediaService(channel_projection_strategy=...)` constructor argument. `MetadataRgbChannelProjectionStrategy` implements
 the default rules above; ingest and thumbnail rendering do not choose or implement those rules. A replacement strategy
-must deterministically return unique, in-range channels mapped to unique `red`, `green` or `blue` targets, using only
-immutable image metadata. No runtime setting or strategy registry is needed to replace the policy in Python.
-This contract is specifically an RGB projection; a future single-channel grayscale mapping should have its own
-contract rather than being represented as a mapping to an RGB target.
+must deterministically select in-range source channels using only immutable image metadata. RGB projections require
+unique source channels and unique `red`, `green` or `blue` targets; grayscale projections select one source channel.
+No runtime setting or strategy registry is needed to replace the policy in Python.
+The contract returns a typed `RgbProjection` or `GrayscaleProjection`; `SingleChannelGrayscaleProjectionStrategy`
+selects one source channel without representing it as an RGB target.
 
 The strategy runs once for each new image. Its output is both passed to thumbnail rendering and persisted unchanged.
-Existing images, and later dataset revisions, use the stored mapping rather than rerunning whichever strategy is
+Existing images, and later dataset revisions, use the stored projection rather than rerunning whichever strategy is
 currently configured. A revision can therefore contain images ingested under different policies; its sidecar records
-each image's actual mapping, not a single purported strategy version for the entire revision.
+each image's actual projection, not a single purported strategy version for the entire revision.
 
 Proposed file structure:
 
 ```
-// dataset_revisions/<revision_id>/ome_channel_mappings.json
+// dataset_revisions/<revision_id>/ome_channel_projections.json
 {
   "format_version": 1,                  // versions the sidecar schema
   "images": [
@@ -242,21 +246,23 @@ Proposed file structure:
       "media_id": "3fae2b1e-....-ome_image_1",
       "container_format": "ome_tiff",
       "size_c": 3,
-      "channel_mapping": [
-        {"channel": 0, "target": "blue"},
-        {"channel": 1, "target": "green"},
-        {"channel": 2, "target": "red"}
-      ]
+      "channel_projection": {
+        "mode": "rgb",
+        "channels": [
+          {"channel": 0, "target": "blue"},
+          {"channel": 1, "target": "green"},
+          {"channel": 2, "target": "red"}
+        ]
+      }
     },
     {
       "media_id": "9b1caa02-....-ome_image_2",
       "container_format": "ome_zarr",
       "size_c": 5,
-      "channel_mapping": [
-        {"channel": 2, "target": "red"},
-        {"channel": 0, "target": "green"},
-        {"channel": 4, "target": "blue"}
-      ]
+      "channel_projection": {
+        "mode": "grayscale",
+        "channel": 4
+      }
     }
   ]
 }
@@ -338,10 +344,12 @@ class OmeImageDB(Base):
     #   "window": { "min": 0, "max": 65535, "start": 0, "end": 40000 }
     #  }, ...]
     channels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-    # Fixed, deterministic channel->RGB projection used for training (see §3.6.1). Computed once at ingest
+    # Fixed, deterministic RGB/grayscale projection used for training (see §3.6.1). Computed once at ingest
     # time and never mutated; independent of OmeChannelView, which is mutable and display-only.
-    # [{"channel": 2, "target": "red"}, ...]
-    channel_mapping: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # {"mode": "rgb", "channels": [{"channel": 2, "target": "red"}, ...]} or {"mode": "grayscale", "channel": 0}
+    channel_projection: Mapped[dict] = mapped_column(
+        JSON, nullable=False, default=lambda: {"mode": "rgb", "channels": []}
+    )
     # [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, ...]; empty if not pyramidal
     pyramid_levels: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     # Multi-file layouts: entrypoint + constituent files, relative to the media root.
@@ -359,7 +367,7 @@ pyramid level and leaving `dimension_order` free-form is what lets OME-Zarr land
 
 ```python
 class OmeChannelViewDB(Base):
-    """Per-image channel-to-RGB mapping and display windows used by the annotator."""
+    """Per-image channel colors, visibility and display windows used by the annotator."""
 
     __tablename__ = "ome_channel_views"
 
@@ -370,12 +378,16 @@ class OmeChannelViewDB(Base):
     settings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 ```
 
-Kept separate from `ome_images` so resetting the view never rewrites structural metadata. An absent row means
-"server-computed default": first one or three channels, auto-contrast from a percentile sample. This shape maps 1:1 onto
+Kept separate from `ome_images` so replacing the view never rewrites structural metadata. An absent row means
+"server-computed default": first `min(size_c, 3)` channels enabled, with 1st/99th-percentile contrast from a
+maximum 256-pixel-side sample of the lowest pyramid level at mid-Z/mid-T. Constant or entirely non-finite samples
+fall back to the declared intensity range. Other channels are returned disabled with their declared ranges.
+Colors use OME metadata when available, otherwise RGB in channel order (white for a single-channel image).
+Defaults are computed on demand in memory without inserting a channel-view row or writing files. This shape maps 1:1 onto
 NGFF `omero.channels[].window` + `.color`, so OME-Zarr reuses it as-is.
 
 **Scope boundary:** this table is display-only (annotator rendering). Training never reads it - see §3.6/§3.6.1 for
-the separate, immutable mapping used for revision materialization.
+the separate, immutable projection used for revision materialization.
 
 ### 4.4 Unchanged
 
@@ -446,7 +458,7 @@ unreadable pixels and invalid archives return 422. A failed ingest removes parti
 its media/metadata rows and restores any moved upload so it can be retried.
 
 The thumbnail uses the lowest pyramid level at `z = size_z // 2`, `t = size_t // 2`, projected through the fixed
-training channel mapping and declared intensity ranges. It is stored as a 256-by-256 JPEG. No mutable channel-view row
+training channel projection and declared intensity ranges. It is stored as a 256-by-256 JPEG. No mutable channel-view row
 is created during ingest. Large lowest-resolution levels use one downsampled reader call rather than repeated
 row reads or allocating the entire plane; intersecting strips and tiles are decoded once within the segment-size bound.
 
@@ -465,7 +477,7 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/ome
   "channels": [{"index": 0, "name": "DAPI", "color": "#0000ff"}, …],
   "pyramid_levels": [{"level": 0, "width": 40000, "height": 30000, "scale": [1,1,1,1,1]}, …],
   "series_index": 0,
-  "channel_mapping": [{"channel": 2, "target": "red"}, …],
+  "channel_projection": {"mode": "rgb", "channels": [{"channel": 2, "target": "red"}, …]},
   "entrypoint": null,
   "files": [],
   "raw_metadata": "<?xml …"
@@ -484,8 +496,14 @@ PUT /api/projects/{project_id}/dataset/media/{media_id}/channel-view
 {"settings": [{"channel": 2, "color": "#3B6CFF", "enabled": true,
                "window_min": 120, "window_max": 4000}, …]}
 200 -> {"settings": [ … ], "is_default": false}
-422 -> channel index out of range, window_min >= window_max, duplicate RGB target
+400 -> media is not an OME image
+404 -> project or media is not found
+422 -> channel index out of range or duplicated, invalid hex color, non-finite window, window_min >= window_max
 ```
+
+`PUT` replaces the complete view; omitted channels are hidden. Multiple channels may use the same color.
+An empty `settings` list hides every channel. Colors are normalized to uppercase `#RRGGBB`.
+Updating this view never changes `channel_projection`, metadata, or the training thumbnail.
 
 ### 5.4 Rendering
 
@@ -496,36 +514,42 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
      -> `c` present:  Cache-Control: private, max-age=31536000, immutable
 304 -> If-None-Match matched
 400 -> malformed `c` (bad index, min >= max, invalid hex color)
-422 -> level out of range for this image's pyramid_levels
+422 -> level, z, t or max_size out of range, or unreadable OME pixels
 ```
 
 **Query parameters**
 
-| Param    | Required                              | Description                                    |
-| -------- | ------------------------------------- | ---------------------------------------------- |
-| `z`, `t` | no (default: stored defaults, else 0) | Plane and time point.                          |
-| `level`  | no (default 0)                        | Pyramid level; 0 = full resolution.            |
-| `c`      | no                                    | Per-request channel view override (see below). |
+| Param      | Required       | Description                                                                                   |
+| ---------- | -------------- | --------------------------------------------------------------------------------------------- |
+| `z`, `t`   | no (default 0) | Plane and time point.                                                                         |
+| `level`    | no (default 0) | Pyramid level; 0 = full resolution.                                                           |
+| `c`        | no             | Per-request channel view override (see below).                                                |
+| `max_size` | no             | Downsample to fit this maximum side (1-16384 pixels), preserving aspect ratio; never upscale. |
 
 **Channel view resolution**
 
 - **`c` omitted:** the render uses the stored channel view (`PUT .../channel-view`). The result is identical to what
-  training will see.
+  the annotator sees on subsequent loads, **not** necessarily what training sees. With no saved view it uses the
+  server-computed display defaults. Training always uses the immutable ingest-time projection and declared ranges.
 - **`c` present:** the render uses the supplied view for this request only. Nothing is persisted. The UI uses this for
   live slider preview, and the same string can be placed in the app's URL to share a view.
 - **Syntax:** `c=<index>|<min>:<max>$<RRGGBB>` entries, comma-separated.
+  - Indices are **zero-based**. This is Geti syntax, not a fully compatible OMERO.web query.
   - A channel that is not listed is hidden.
+  - An explicitly empty `c=` hides every channel and renders black; it does not select the stored view.
+  - Duplicate or out-of-range indices, non-finite windows, and invalid colors return 400.
   - Channels are composited additively and each is clamped to 0–255.
   - Intensity mapping: `value <= min → 0`, `value >= max → 255`, linear in between.
+  - URL-encode the parameter value rather than constructing an unescaped URL.
 - **Optional fields:** `gamma`, `inverted` and the `rgb` slot mode are not in v1 of `c`. They can be added as extra
   `|`-separated fields without breaking existing clients.
 
 **Caching**
 
-- `ETag` is a hash of the _effective_ settings: `media_id`, `z`, `t`, `level`, and the channel view actually used
-  (stored or override), plus the source version.
-- Identical `c` values therefore hit the same cache entry. Clients should avoid sending sub-integer min/max values so
-  the cache is reused.
+- `ETag` is a quoted hash of the _effective_ settings: `media_id`, `z`, `t`, `level`, resolved output size, and
+  enabled channels sorted by index, plus the renderer version and source-file size/mtime/ctime fingerprint.
+- Browsers cache render responses by URL, using ETags for revalidation. Reusing the same URL allows reuse of the
+  browser-cached response; equivalent effective settings produce the same ETag.
 - **`Cache-Control` differs by whether `c` is present:**
   - **`c` omitted** (stored, mutable channel view): `private, no-cache` - always revalidate via `ETag` before use, so
     a `PUT .../channel-view` is picked up on the very next load instead of being masked for up to `max-age`.
@@ -534,9 +558,15 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
     to different bytes, so it's safe to cache indefinitely and skip revalidation entirely (useful during slider
     scrubbing).
 - A `PUT .../channel-view` only affects requests that omit `c`; their `ETag` changes automatically and is caught by
-  the next revalidation.
-- Server-side, decoded pixel data may be cached using format-native tiles/chunks as internal cache units. A new `c`
-  then only reapplies the intensity mapping and color, with no storage read.
+  the next revalidation when effective settings change. Explicit overrides and immutable training data are unaffected.
+- `If-None-Match` supports lists, weak tags, and `*`; matching requests return 304 before full-plane rendering or PNG
+  encoding. Without a saved view or explicit override, resolving the ETag still reads the bounded sample used to
+  compute display defaults. The backend exposes `ETag` to cross-origin browser clients.
+- The server renders and encodes PNGs entirely in memory and returns the bytes directly. Neither rendered PNGs nor
+  computed defaults are written to the filesystem, and there is no server-side render cache. Every 200 response
+  renders the requested plane again.
+- A bounded server-side cache for rendered images or decoded format-native tiles/chunks is deferred until profiling
+  shows it is needed.
 
 **Live preview (client guidance, non-normative)**
 
@@ -684,7 +714,7 @@ propagate a `tifffile` exception.
 match in `_parse_media_format` **and** in `dataset_revision_service._parse_revision_item_from_df_row_dict`, which will
 otherwise raise on compound suffixes. Add `MediaService.create_ome_image()`, extend the existing `:from-upload`
 endpoint, and add the `/ome` endpoint. Support bounded `.ome.zip` companion-set extraction as well as single files.
-Persist the fixed training channel mapping at ingest; thumbnail from the lowest pyramid level at mid-Z/mid-T,
+Persist the fixed training channel projection at ingest; thumbnail from the lowest pyramid level at mid-Z/mid-T,
 mirroring `create_video`. Introduce `MediaType.OME_IMAGE`, the `OmeImage` domain model and its API view here because
 ingest responses and subsequent listing need them before step 6. Regenerate the API contract and UI types in this
 step; the OME annotator UI remains a separate workstream.
@@ -696,12 +726,15 @@ rows, the thumbnail file, and that a failed parse leaves no orphaned bytes on di
 
 ### Step 5 - Rendering and channel view
 
-Default-settings computation, window/level compositing, the `/channel-view` endpoints, `/render`, and the hash-keyed
-disk cache.
+Default-settings computation, window/level compositing, the `/channel-view` endpoints, and in-memory `/render` with
+ETag/browser caching instead of a server-side disk cache. Implemented with additive `max_size` downsampling through
+the reader's existing `output_size` support;
+omitting it preserves full selected-level dimensions. Annotation navigation and plane thumbnails remain step 6.
 
 _Testing._ Unit tests for the window/level transform (boundary values at `min`, `max`, midpoint; clipping; a disabled
-channel contributing zero). Golden-image test for a known fixture + known settings. Cache tests: identical request is
-a cache hit; `PUT /channel-view` invalidates; concurrent renders of the same key do not corrupt the file.
+channel contributing zero). Golden-image test for a known fixture + known settings. Revalidation tests: identical
+effective settings produce the same ETag; `PUT /channel-view` changes the ETag; matching requests return 304 without
+rendering. Concurrent renders return identical complete PNG bytes, and rendering/default computation write no files.
 Validation tests for the 422 cases in §5.3.
 
 ### Step 6 - Annotation
@@ -718,12 +751,12 @@ the parent returns 204 - cascades to planes, items and labels.
 
 ### Step 7 - Training
 
-Materialize annotated planes into the revision `images/` directory using the fixed channel mapping computed at
-ingest time (§3.6.1); write `ome_channel_mapping.json` alongside the revision for provenance.
+Materialize annotated planes into the revision `images/` directory using the fixed channel projection computed at
+ingest time (§3.6.1); write `ome_channel_projections.json` alongside the revision for provenance.
 
 _Testing._ Integration test building a revision from a project containing an OME image with three annotated planes,
-asserting the rendered PNG count, the parquet rows, the subset counts, and the sidecar mapping file content. Add a
-unit test per mapping strategy in §3.6.1 (3-channel identity, wavelength-based, >3-channel fallback, <3-channel
+asserting the rendered PNG count, the parquet rows, the subset counts, and the sidecar projection file content. Add a
+unit test per projection strategy in §3.6.1 (3-channel identity, wavelength-based, >3-channel fallback, <3-channel
 padding). BDD scenario (`behave`) covering upload → annotate → train → quantize → export on a small fixture, which is
 the single end-to-end gate for requirements 5–8.
 

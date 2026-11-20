@@ -13,8 +13,8 @@ _TARGETS: tuple[Literal["red", "green", "blue"], ...] = ("red", "green", "blue")
 _TARGET_COLORS: tuple[tuple[int, int, int], ...] = ((255, 0, 0), (0, 255, 0), (0, 0, 255))
 
 
-class MetadataRgbChannelMappingStrategy:
-    """Map channels to RGB using wavelength metadata, falling back to the first three channels."""
+class MetadataRgbChannelProjectionStrategy:
+    """Choose an RGB projection using wavelength metadata, falling back to the first three channels."""
 
     def compute(self, info: OmeImageInfo) -> RgbProjection:
         """Compute the fixed RGB projection without reading pixels or mutable display settings."""

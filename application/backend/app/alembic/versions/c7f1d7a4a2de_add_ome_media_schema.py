@@ -50,7 +50,7 @@ def upgrade() -> None:
         sa.Column("series_index", sa.Integer(), nullable=False),
         sa.Column("is_big_tiff", sa.Boolean(), nullable=False),
         sa.Column("channels", sa.JSON(), nullable=False),
-        sa.Column("channel_mapping", sa.JSON(), nullable=False),
+        sa.Column("channel_projection", sa.JSON(), nullable=False),
         sa.Column("pyramid_levels", sa.JSON(), nullable=False),
         sa.Column("entrypoint", sa.String(length=255), nullable=True),
         sa.Column("files", sa.JSON(), nullable=False),
