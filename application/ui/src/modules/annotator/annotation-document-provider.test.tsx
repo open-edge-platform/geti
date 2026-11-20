@@ -116,4 +116,57 @@ describe('AnnotationDocumentProvider', () => {
         expect(result.current.annotations).toHaveLength(2);
         expect(result.current.undoRedo.canUndo).toBe(false);
     });
+
+    describe('addLabeledAnnotations', () => {
+        it('adds each item with its own labels and returns the new ids in input order', () => {
+            const { result } = renderDocument();
+            const items = [
+                { shape: getMockedShape({ type: 'rectangle' }), labels: [{ id: 'label-1' }] },
+                { shape: getMockedShape({ type: 'rectangle' }), labels: [{ id: 'label-2' }, { id: 'label-3' }] },
+            ];
+
+            let ids: string[] = [];
+            act(() => {
+                ids = result.current.addLabeledAnnotations(items);
+            });
+
+            expect(ids).toHaveLength(2);
+            expect(result.current.annotations.map(({ id }) => id)).toEqual(ids);
+            expect(result.current.annotations.map(({ labels }) => labels)).toEqual([
+                [{ id: 'label-1' }],
+                [{ id: 'label-2' }, { id: 'label-3' }],
+            ]);
+        });
+
+        it('restores the previous annotations, including a removed full-image one, in a single undo step', () => {
+            const { result } = renderDocument({ initialAnnotationsDTO: [emptyLabelAnnotationDTO] });
+            const initial = result.current.annotations;
+
+            act(() => {
+                result.current.addLabeledAnnotations([
+                    { shape: getMockedShape({ type: 'rectangle' }), labels: [{ id: 'label-1' }] },
+                    { shape: getMockedShape({ type: 'rectangle' }), labels: [{ id: 'label-2' }] },
+                ]);
+            });
+
+            expect(result.current.annotations).toHaveLength(2);
+            expect(result.current.annotations.every(({ shape }) => shape.type === 'rectangle')).toBe(true);
+
+            act(() => result.current.undoRedo.undo());
+
+            expect(result.current.annotations).toEqual(initial);
+            expect(result.current.undoRedo.canUndo).toBe(false);
+        });
+
+        it('returns an empty list when given no items', () => {
+            const { result } = renderDocument({ initialAnnotationsDTO: [annotationDTO] });
+
+            let ids: string[] = ['sentinel'];
+            act(() => {
+                ids = result.current.addLabeledAnnotations([]);
+            });
+
+            expect(ids).toEqual([]);
+        });
+    });
 });

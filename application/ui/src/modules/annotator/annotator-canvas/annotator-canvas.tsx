@@ -12,6 +12,7 @@ import { Annotations } from '../annotations/annotations.component';
 import { VideoAnnotations, VideoPredictions } from '../annotations/video-annotations.component';
 import type { AnnotatorMode } from '../annotator-mode';
 import { useAnnotator } from '../annotator-provider.component';
+import { useCopyPasteAnnotations } from '../copy-paste/use-copy-paste-annotations.hook';
 import { useIsAnnotatorSceneBusy } from '../hooks/use-is-annotator-scene-busy';
 import { useSelectedAnnotations } from '../select-annotation-provider.component';
 import { useTool } from '../tool-provider.component';
@@ -258,6 +259,8 @@ export const AnnotatorCanvas = ({
     isReadOnly = false,
     isLoadingPredictions = false,
 }: AnnotatorCanvasProps) => {
+    useCopyPasteAnnotations();
+
     const isSceneBusy = useIsAnnotatorSceneBusy();
     const { canvasRef } = useAnnotator();
     const { isSingleEditableSelection } = useEditableAnnotationState();

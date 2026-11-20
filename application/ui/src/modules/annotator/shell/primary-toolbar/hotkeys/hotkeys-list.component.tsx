@@ -3,8 +3,10 @@
 
 import { useTranslation } from '@/i18n';
 import { Divider, Grid, Keyboard, Text } from '@geti-ui/ui';
+import { useProjectTask } from 'hooks/use-project-task.hook';
 
 import { formatHotkeyForDisplay, HOTKEYS } from '../../../../../shared/hotkeys-definition';
+import { isClassificationTask } from '../../../../../shared/task-type-guards';
 import { useAvailableTools } from '../../../tools/annotator-tools/use-available-tools';
 
 interface HotkeyItemProps {
@@ -24,6 +26,7 @@ const HotkeyItem = ({ hotkeyName, hotkey }: HotkeyItemProps) => {
 export const HotkeysList = () => {
     const { t } = useTranslation();
     const availableTools = useAvailableTools();
+    const taskType = useProjectTask();
     const submitHotkey = formatHotkeyForDisplay(HOTKEYS.submit);
     const submitAlternativeHotkey = formatHotkeyForDisplay(HOTKEYS.submitAlternative);
 
@@ -62,6 +65,18 @@ export const HotkeysList = () => {
                 hotkeyName={t('annotator.hotkeys.deleteSelectedAnnotation')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.delete)}
             />
+            {!isClassificationTask(taskType) && (
+                <>
+                    <HotkeyItem
+                        hotkeyName={t('annotator.hotkeys.copyAnnotations')}
+                        hotkey={formatHotkeyForDisplay(HOTKEYS.copyAnnotations)}
+                    />
+                    <HotkeyItem
+                        hotkeyName={t('annotator.hotkeys.pasteAnnotations')}
+                        hotkey={formatHotkeyForDisplay(HOTKEYS.pasteAnnotations)}
+                    />
+                </>
+            )}
             <HotkeyItem
                 hotkeyName={t('annotator.hotkeys.toggleAnnotationsVisibility')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.toggleAnnotationsVisibility)}

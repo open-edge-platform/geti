@@ -23,6 +23,8 @@ export const HOTKEYS = {
     ssimTool: 'i',
     selectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+a`,
     deselectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+d`,
+    copyAnnotations: `${CTRL_OR_COMMAND_KEY}+c`,
+    pasteAnnotations: `${CTRL_OR_COMMAND_KEY}+v`,
     selectNextAnnotation: 'tab',
     submitAlternative: 'enter',
     submit: `${CTRL_OR_COMMAND_KEY}+s`,
@@ -52,6 +54,11 @@ const SELECTION_TOOL_HOTKEY = {
     selectionTool: HOTKEYS.selectionTool,
 } as const;
 
+const COPY_PASTE_HOTKEYS = {
+    copyAnnotations: HOTKEYS.copyAnnotations,
+    pasteAnnotations: HOTKEYS.pasteAnnotations,
+} as const;
+
 const AUTO_SEGMENTATION_HOTKEY = {
     autoSegmentation: HOTKEYS.autoSegmentation,
 } as const;
@@ -65,6 +72,7 @@ export const TASK_HOTKEYS = {
         ...COMMON_HOTKEYS,
         ...SELECTION_TOOL_HOTKEY,
         ...AUTO_SEGMENTATION_HOTKEY,
+        ...COPY_PASTE_HOTKEYS,
     },
     instance_segmentation: {
         polygonTool: HOTKEYS.polygonTool,
@@ -73,6 +81,7 @@ export const TASK_HOTKEYS = {
         ...COMMON_HOTKEYS,
         ...SELECTION_TOOL_HOTKEY,
         ...AUTO_SEGMENTATION_HOTKEY,
+        ...COPY_PASTE_HOTKEYS,
     },
     classification: {
         ...COMMON_HOTKEYS,
