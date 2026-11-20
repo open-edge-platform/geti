@@ -9,6 +9,7 @@ import numpy as np
 import pydantic_core
 import pytest
 import time_machine
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models import (
     ConfidenceThresholdDataCollectionPolicy,
@@ -209,8 +210,7 @@ class TestDataCollectorUnit:
         frame_data = np.random.randint(low=0, high=255, size=(100, 100), dtype=np.uint8)
         inference_data = MagicMock()
         labels = [Label(id=uuid4(), project_id=project.id, name="cat", color="#ff0000", hotkey="")]
-        model = MagicMock()
-        model.training_info.label_schema_revision = {"labels": [{"id": str(uuid4())}, {"id": str(labels[0].id)}]}
+        trained_label_ids = {"gone": uuid4(), "old name": labels[0].id}
         annotations = (
             [
                 DatasetItemAnnotation(
@@ -238,7 +238,9 @@ class TestDataCollectorUnit:
             patch.object(MediaService, "create_image") as mock_create_image,
             patch.object(DatasetService, "create_dataset_item") as mock_create_dataset_item,
             patch("app.services.LabelService.list_all", return_value=labels) as mock_list_labels,
-            patch("app.services.ModelService.get_model", return_value=model) as mock_get_model,
+            patch(
+                "app.services.ModelService.get_trained_label_ids", return_value=trained_label_ids
+            ) as mock_get_trained_label_ids,
             patch(
                 "app.services.data_collect.data_collector.convert_prediction", return_value=annotations
             ) as mock_convert_prediction,
@@ -268,18 +270,65 @@ class TestDataCollectorUnit:
         )
         if save_predictions:
             mock_list_labels.assert_called_once_with(project_id=project.id)
-            mock_get_model.assert_called_once_with(project_id=project.id, model_id=inference_data.model_id)
+            mock_get_trained_label_ids.assert_called_once_with(project_id=project.id, model_id=inference_data.model_id)
             mock_convert_prediction.assert_called_once_with(
                 labels=labels,
                 prediction=inference_data.prediction,
                 strict=True,
-                class_labels=[None, labels[0]],
+                trained_labels={"gone": None, "old name": labels[0]},
             )
         else:
             mock_list_labels.assert_not_called()
-            mock_get_model.assert_not_called()
+            mock_get_trained_label_ids.assert_not_called()
             mock_convert_prediction.assert_not_called()
         assert fxt_data_collector.should_collect_next_frame is False
+
+    @pytest.mark.parametrize(
+        "error, frame_saved",
+        [(ValueError("boom"), True), (RuntimeError("boom"), True), (SQLAlchemyError("boom"), False)],
+        ids=["invalid_predictions", "unexpected_failure", "database_failure"],
+    )
+    def test_collect_with_failing_prediction_conversion(self, fxt_data_collector, error, frame_saved):
+        """
+        The frame should still be collected, without annotations, if its predictions cannot be converted
+        """
+        # Arrange
+        pipeline = MagicMock()
+        pipeline.data_collection = DataCollectionConfig(save_predictions=True)
+        project = MagicMock(id=uuid4(), task=Task(task_type=TaskType.DETECTION))
+        frame_data = np.random.randint(low=0, high=255, size=(100, 100), dtype=np.uint8)
+        inference_data = MagicMock()
+        media = MagicMock()
+        fxt_data_collector.active_pipeline_data = pipeline, project
+        fxt_data_collector.should_collect_next_frame = True
+
+        # Act
+        with (
+            patch.object(MediaService, "create_image", return_value=media) as mock_create_image,
+            patch.object(DatasetService, "create_dataset_item") as mock_create_dataset_item,
+            patch("app.services.LabelService.list_all", return_value=[]),
+            patch("app.services.ModelService.get_trained_label_ids", return_value={}),
+            patch("app.services.data_collect.data_collector.convert_prediction", side_effect=error),
+        ):
+            if frame_saved:
+                fxt_data_collector.collect(timestamp=1.0, frame_data=frame_data, inference_data=inference_data)
+            else:
+                with pytest.raises(type(error)):
+                    fxt_data_collector.collect(timestamp=1.0, frame_data=frame_data, inference_data=inference_data)
+
+        # Assert
+        if frame_saved:
+            mock_create_dataset_item.assert_called_once_with(
+                project_id=project.id,
+                task=project.task,
+                media=media,
+                user_reviewed=False,
+                prediction_model_id=None,
+                annotations=None,
+            )
+        else:
+            mock_create_image.assert_not_called()
+            mock_create_dataset_item.assert_not_called()
 
     @pytest.mark.parametrize("manual_capture", [False, True])
     @time_machine.travel("2025-01-01 00:00:01 +0000", tick=False)

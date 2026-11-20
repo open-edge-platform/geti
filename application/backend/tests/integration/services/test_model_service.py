@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import (
     DatasetRevisionDB,
     EvaluationDB,
+    LabelDB,
     MetricScoreDB,
     ModelRevisionDB,
     ModelVariantDB,
@@ -121,6 +122,40 @@ class TestModelServiceIntegration:
         model_id = uuid4()
         with pytest.raises(ResourceNotFoundError) as excinfo:
             fxt_model_service.get_model_revision_architecture(fxt_project_id, model_id)
+
+        assert excinfo.value.resource_type == ResourceType.MODEL
+        assert excinfo.value.resource_id == str(model_id)
+
+    def test_get_trained_label_ids(self, fxt_project_id: UUID, fxt_model_service: ModelService, db_session: Session):
+        """Test reading back the labels recorded when a model revision is created, after one was renamed."""
+        label_db = LabelDB(id=str(uuid4()), project_id=str(fxt_project_id), name="cat", color="#00FF00", hotkey="c")
+        dataset_revision_db = DatasetRevisionDB(project_id=str(fxt_project_id), name="Dataset Revision")
+        db_session.add_all([label_db, dataset_revision_db])
+        db_session.flush()
+        model_id = uuid4()
+        fxt_model_service.create_revision(
+            ModelRevisionMetadata(
+                model_id=model_id,
+                model_name="ATSS-MobileNet-V2",
+                project_id=fxt_project_id,
+                architecture_id="object-detection-atss-mobilenet-v2",
+                parent_revision_id=None,
+                dataset_revision_id=UUID(dataset_revision_db.id),
+                training_status=TrainingStatus.IN_PROGRESS,
+            )
+        )
+        label_db.name = "feline"
+        db_session.flush()
+
+        trained_label_ids = fxt_model_service.get_trained_label_ids(fxt_project_id, model_id)
+
+        assert trained_label_ids == {"cat": UUID(label_db.id)}
+
+    def test_get_trained_label_ids_not_found(self, fxt_project_id: UUID, fxt_model_service: ModelService):
+        """Test retrieving the trained labels of a non-existent model raises error."""
+        model_id = uuid4()
+        with pytest.raises(ResourceNotFoundError) as excinfo:
+            fxt_model_service.get_trained_label_ids(fxt_project_id, model_id)
 
         assert excinfo.value.resource_type == ResourceType.MODEL
         assert excinfo.value.resource_id == str(model_id)

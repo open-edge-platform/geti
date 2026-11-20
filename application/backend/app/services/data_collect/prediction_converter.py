@@ -1,6 +1,6 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, cast
 
 import cv2
@@ -40,62 +40,68 @@ def _simplify_contour(contour: np.ndarray) -> np.ndarray:
     return approx
 
 
-def _build_label_maps(labels: Sequence[Label]) -> tuple[dict[str, Label], dict[str, Label]]:
+# A pair of name → label lookup tables: exact names, and names with spaces mangled to underscores.
+# A ``None`` label marks a name that is known, but whose project label no longer exists.
+_NameMaps = tuple[Mapping[str, Label | None], Mapping[str, Label | None]]
+
+
+def _build_name_maps(labels_by_name: Mapping[str, Label | None]) -> _NameMaps:
     """Precompute name→label and unmangled-name→label dicts for O(1) lookup."""
-    name_map = {label.name: label for label in labels}
-    unmangled_map = {label.name.replace(" ", "_"): label for label in labels if " " in label.name}
-    return name_map, unmangled_map
+    unmangled_map = {name.replace(" ", "_"): label for name, label in labels_by_name.items() if " " in name}
+    return labels_by_name, unmangled_map
+
+
+def _find_by_name(name_maps: Sequence[_NameMaps], label_name: str) -> tuple[bool, Label | None]:
+    """Look a predicted label name up in each pair of lookup tables in turn.
+
+    Returns:
+        Whether a table knows the name, and the label it maps to (``None`` if that label no longer exists).
+    """
+    for name_map, unmangled_map in name_maps:
+        if label_name in name_map:
+            return True, name_map[label_name]
+        # Only attempt unmangled lookup if "_" is present (avoids unnecessary dict lookup noise)
+        if "_" in label_name and label_name in unmangled_map:
+            return True, unmangled_map[label_name]
+    return False, None
 
 
 def _find_project_label(
-    name_map: dict[str, Label],
-    unmangled_map: dict[str, Label],
-    labels: Sequence[Label | None],
+    name_maps: Sequence[_NameMaps],
+    labels: Sequence[Label],
     label_name: str | None,
     predicted_class_index: int | None = None,
     strict: bool = False,
 ) -> Label | None:
-    """Find a project label matching the predicted label using a three-stage fallback strategy.
+    """Find a project label matching the predicted label.
 
     Resolution order:
-    1. **Exact name match** - performs an O(1) lookup of ``label_name`` in ``name_map``.
-    2. **Unmangled name match** - if the exact match fails and ``label_name`` contains underscores, performs an O(1)
-       lookup in ``unmangled_map``. This handles models that serialize label names with underscores instead of spaces
-       (e.g. ``"my_cat"`` → ``"my cat"``). The lookup is skipped entirely when ``label_name`` contains no underscores.
-    3. **Index fallback** - if both name lookups fail, returns ``labels[predicted_class_index]`` when the index is a
-       non-negative integer within the bounds of ``labels``. This handles renamed labels whose in-model
-       name no longer matches any project label.
+    1. **Name match** - looks ``label_name`` up in each entry of ``name_maps`` in turn: first as an exact name, then,
+       if it contains underscores, as an unmangled name. The latter handles models that serialize label names with
+       underscores instead of spaces (e.g. ``"my_cat"`` → ``"my cat"``). The first entry that knows the name decides.
+    2. **Index fallback** - if no entry knows the name, returns ``labels[predicted_class_index]`` when the index is a
+       non-negative integer within the bounds of ``labels``. This is only a guess: it assumes that the model orders
+       its classes like ``labels`` and reports zero-based indices, which does not hold for every model type
+       (instance segmentation models report one-based indices). It is therefore never used in strict mode.
 
     Args:
-        name_map: Mapping of label name → ``Label`` for O(1) exact-name lookup.
-        unmangled_map: Mapping of underscore-mangled label name → ``Label`` for O(1) unmangled-name lookup.
-            Only contains entries for labels whose names include spaces.
-        labels: Labels ordered by model class index, used for the index fallback. ``None`` marks a class whose
-            project label no longer exists.
+        name_maps: Name lookup tables, in order of precedence (see ``_build_name_maps``).
+        labels: Ordered sequence of project labels, used for the index fallback.
         label_name: The label name as reported by the model. May be ``None`` when the model does not provide a name,
-            in which case stages 1 and 2 are skipped.
-        predicted_class_index: Zero-based class index produced by the model. Used only when name-based lookup fails.
+            in which case stage 1 is skipped.
+        predicted_class_index: Class index produced by the model. Used only when name-based lookup fails.
             Defaults to ``None``, which disables the index fallback.
-        strict: Raise ValueError instead of skipping an unresolved label.
+        strict: Raise ValueError instead of guessing by class index or skipping an unresolved label.
 
     Returns:
         The matched ``Label``, or ``None`` if no stage produced a match.
     """
-    if label_name is not None:
-        label = name_map.get(label_name)
-        if label:
-            return label
+    name_known, label = (False, None) if label_name is None else _find_by_name(name_maps, label_name)
+    if label is not None:
+        return label
 
-        # Only attempt unmangled lookup if "_" is present (avoids unnecessary dict lookup noise)
-        if "_" in label_name:
-            label = unmangled_map.get(label_name)
-            if label:
-                return label
-
-    if predicted_class_index is not None and 0 <= predicted_class_index < len(labels):
-        label = labels[predicted_class_index]
-        if label is not None:
-            return label
+    if not strict and not name_known and predicted_class_index is not None and 0 <= predicted_class_index < len(labels):
+        return labels[predicted_class_index]
     if strict:
         raise ValueError(f"Prediction label {label_name!r} (index {predicted_class_index}) cannot be resolved")
     return None
@@ -103,7 +109,7 @@ def _find_project_label(
 
 def _convert_classification_prediction(
     labels: Sequence[Label],
-    class_labels: Sequence[Label | None],
+    name_maps: Sequence[_NameMaps],
     prediction: "ClassificationResult",
     strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
@@ -111,13 +117,11 @@ def _convert_classification_prediction(
     predicted_confidences: list[float] = []
     if prediction.top_labels is None:
         raise RuntimeError("The prediction is malformed because it does not contain labels")
-    name_map, unmangled_map = _build_label_maps(labels)
     for predicted_label in prediction.top_labels:
         label_name = predicted_label.name
         label = _find_project_label(
-            name_map=name_map,
-            unmangled_map=unmangled_map,
-            labels=class_labels,
+            name_maps=name_maps,
+            labels=labels,
             label_name=label_name,
             predicted_class_index=predicted_label.id,
             strict=strict,
@@ -138,20 +142,18 @@ def _convert_classification_prediction(
 
 def _convert_detection_prediction(
     labels: Sequence[Label],
-    class_labels: Sequence[Label | None],
+    name_maps: Sequence[_NameMaps],
     prediction: "DetectionResult",
     strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
-    name_map, unmangled_map = _build_label_maps(labels)
     result = []
     prediction_scores_list = prediction.scores.tolist()
     for idx, box in enumerate(prediction.bboxes):
         label_name = prediction.label_names[idx]
         bbox_confidence = prediction_scores_list[idx]
         label = _find_project_label(
-            name_map=name_map,
-            unmangled_map=unmangled_map,
-            labels=class_labels,
+            name_maps=name_maps,
+            labels=labels,
             label_name=label_name,
             predicted_class_index=int(prediction.labels[idx]),
             strict=strict,
@@ -171,20 +173,18 @@ def _convert_detection_prediction(
 
 def _convert_segmentation_prediction(
     labels: Sequence[Label],
-    class_labels: Sequence[Label | None],
+    name_maps: Sequence[_NameMaps],
     prediction: "InstanceSegmentationResult",
     strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
-    name_map, unmangled_map = _build_label_maps(labels)
     result = []
     prediction_scores_list = prediction.scores.tolist()
     for idx, box in enumerate(prediction.bboxes):
         label_name = prediction.label_names[idx]
         polygon_confidence = prediction_scores_list[idx]
         label = _find_project_label(
-            name_map=name_map,
-            unmangled_map=unmangled_map,
-            labels=class_labels,
+            name_maps=name_maps,
+            labels=labels,
             label_name=label_name,
             predicted_class_index=int(prediction.labels[idx]),
             strict=strict,
@@ -240,7 +240,7 @@ def convert_prediction(
     prediction: "Result",
     *,
     strict: bool = False,
-    class_labels: Sequence[Label | None] | None = None,
+    trained_labels: Mapping[str, Label | None] | None = None,
 ) -> list[DatasetItemAnnotation]:
     """
     Converts model predictions to dataset annotations based on prediction type.
@@ -253,9 +253,11 @@ def convert_prediction(
         prediction: Prediction result object containing model outputs, which can
                    be one of: InstanceSegmentationResult, DetectionResult, or
                    ClassificationResult.
-        strict: Reject unresolved labels and unsupported prediction types instead of skipping them.
-        class_labels: Project labels ordered by model class index, with ``None`` for deleted labels. Used when a
-            predicted label name does not match; defaults to ``labels``.
+        strict: Reject unresolved labels and unsupported prediction types instead of skipping them, and never
+            guess a label from its class index.
+        trained_labels: Project labels keyed by the name they had when the model was trained, with ``None`` for
+            labels deleted since. These names take precedence over the current ones, so that predictions of a
+            label renamed after training still resolve to it.
 
     Returns:
         list[DatasetItemAnnotation]: List of annotations converted from the
@@ -274,19 +276,21 @@ def convert_prediction(
     """
     from model_api.models import ClassificationResult, DetectionResult, InstanceSegmentationResult
 
-    index_labels = labels if class_labels is None else class_labels
+    name_maps = [_build_name_maps({label.name: label for label in labels})]
+    if trained_labels is not None:
+        name_maps.insert(0, _build_name_maps(trained_labels))
     match prediction:
         case InstanceSegmentationResult():
             return _convert_segmentation_prediction(
-                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
+                labels=labels, name_maps=name_maps, prediction=prediction, strict=strict
             )
         case DetectionResult():
             return _convert_detection_prediction(
-                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
+                labels=labels, name_maps=name_maps, prediction=prediction, strict=strict
             )
         case ClassificationResult():
             return _convert_classification_prediction(
-                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
+                labels=labels, name_maps=name_maps, prediction=prediction, strict=strict
             )
     if strict:
         raise ValueError(f"Unsupported prediction type: {type(prediction).__name__}")

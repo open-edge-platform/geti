@@ -57,7 +57,8 @@ export const DataCollection = () => {
         confidenceThreshold?: number;
     }) => {
         const newDataCollectionPolicies = {
-            max_dataset_size: updates.maxDatasetSize ?? pipelineQuery.data?.data_collection?.max_dataset_size ?? null,
+            // Without a limit on the server, the field shows the default one: persist what the user sees.
+            max_dataset_size: updates.maxDatasetSize ?? maxDatasetSize,
             save_predictions: updates.savePredictions ?? savePredictions,
             policies: [
                 {

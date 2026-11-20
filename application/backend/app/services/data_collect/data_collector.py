@@ -6,9 +6,17 @@ from pathlib import Path
 import cv2
 import numpy as np
 from loguru import logger
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from app.db import get_db_session
-from app.models import ConfidenceThresholdDataCollectionPolicy, FixedRateDataCollectionPolicy, Pipeline, Project
+from app.models import (
+    ConfidenceThresholdDataCollectionPolicy,
+    DatasetItemAnnotation,
+    FixedRateDataCollectionPolicy,
+    Pipeline,
+    Project,
+)
 from app.models.media import ImageFormat
 from app.services.data_collect.prediction_converter import convert_prediction, get_confidence_scores
 from app.services.event.event_bus import EventBus, EventType
@@ -174,9 +182,7 @@ class DataCollector:
         if self.active_pipeline_data is None:
             return
         pipeline, project = self.active_pipeline_data
-        from app.services import DatasetService, LabelService, MediaService, ModelService
-        from app.services.base import ResourceNotFoundError
-        from app.services.dataset_service import AnnotationValidationError
+        from app.services import DatasetService, LabelService, MediaService
 
         manual_capture = self.should_collect_next_frame
         self.should_collect_next_frame = False
@@ -215,33 +221,9 @@ class DataCollector:
 
                 annotations = None
                 if pipeline.data_collection.save_predictions:
-                    labels = label_service.list_all(project_id=project.id)
-                    try:
-                        model = ModelService(data_dir=self.data_dir, db_session=session).get_model(
-                            project_id=project.id, model_id=inference_data.model_id
-                        )
-                        labels_by_id = {str(label.id): label for label in labels}
-                        label_schema = model.training_info.label_schema_revision if model.training_info else {}
-                        # Class indices follow the label order snapshotted when the model was trained.
-                        class_labels = [
-                            labels_by_id.get(str(entry.get("id"))) for entry in label_schema.get("labels", [])
-                        ]
-                        annotations = convert_prediction(
-                            labels=labels,
-                            prediction=inference_data.prediction,
-                            strict=True,
-                            class_labels=class_labels,
-                        )
-                        dataset_service.validate_annotations(
-                            annotations=annotations,
-                            task=project.task,
-                            labels=labels,
-                            media_width=frame_data.shape[1],
-                            media_height=frame_data.shape[0],
-                        )
-                    except (AnnotationValidationError, ResourceNotFoundError, ValueError) as error:
-                        logger.warning("Saving captured frame without invalid predictions: {}", error)
-                        annotations = None
+                    annotations = self._convert_predictions(
+                        session=session, project=project, inference_data=inference_data, frame_data=frame_data
+                    )
 
                 media = media_service.create_image(
                     ImageMetadata(
@@ -267,6 +249,53 @@ class DataCollector:
         except Exception:
             self._discard_capture_artifacts(image_paths)
             raise
+
+    def _convert_predictions(
+        self, session: Session, project: Project, inference_data: InferenceData, frame_data: np.ndarray
+    ) -> list[DatasetItemAnnotation] | None:
+        """
+        Converts the predictions of a frame to the annotations to save with it.
+
+        Returns:
+            The annotations, or None if the predictions cannot be saved as annotations: the frame is then
+            collected without them.
+        """
+        from app.services import DatasetService, LabelService, ModelService
+        from app.services.base import ResourceNotFoundError
+        from app.services.dataset_service import AnnotationValidationError
+
+        labels = LabelService(db_session=session).list_all(project_id=project.id)
+        try:
+            trained_label_ids = ModelService(data_dir=self.data_dir, db_session=session).get_trained_label_ids(
+                project_id=project.id, model_id=inference_data.model_id
+            )
+            labels_by_id = {label.id: label for label in labels}
+            annotations = convert_prediction(
+                labels=labels,
+                prediction=inference_data.prediction,
+                strict=True,
+                # The model reports the label names it was trained with: a label renamed since then is
+                # found through its ID, and one deleted since then maps to None (unresolvable).
+                trained_labels={name: labels_by_id.get(label_id) for name, label_id in trained_label_ids.items()},
+            )
+            DatasetService.validate_annotations(
+                annotations=annotations,
+                task=project.task,
+                labels=labels,
+                media_width=frame_data.shape[1],
+                media_height=frame_data.shape[0],
+            )
+        except SQLAlchemyError:
+            # A database failure is not a prediction problem: abort the capture before writing any file.
+            raise
+        except (AnnotationValidationError, ResourceNotFoundError, ValueError) as error:
+            logger.warning("Saving captured frame without invalid predictions: {}", error)
+        except Exception:
+            # Saving the predictions is optional: an unexpected failure must not cost the frame itself.
+            logger.exception("Could not convert predictions; saving captured frame without them")
+        else:
+            return annotations
+        return None
 
     @staticmethod
     def _discard_capture_artifacts(image_paths: tuple[Path, ...]) -> None:

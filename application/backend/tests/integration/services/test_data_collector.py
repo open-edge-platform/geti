@@ -265,15 +265,18 @@ class TestDataCollectorIntegration:
             )
         assert collector.should_collect_next_frame is True
 
-    @pytest.mark.parametrize("class_index, reviewed", [(1, True), (0, False)], ids=["renamed", "deleted"])
-    def test_unmatched_names_use_model_label_schema(
-        self, fxt_capture, db_session: Session, class_index: int, reviewed: bool
+    @pytest.mark.parametrize("label_name, reviewed", [("old_name", True), ("gone", False)], ids=["renamed", "deleted"])
+    def test_names_recorded_at_training_resolve_labels(
+        self, fxt_capture, db_session: Session, label_name: str, reviewed: bool
     ) -> None:
         collector, project, model_id = fxt_capture
         cat = next(label for label in project.task.labels if label.name == "cat")
         db_model = db_session.get(ModelRevisionDB, str(model_id))
         assert db_model is not None
-        db_model.label_schema_revision = {"labels": [{"id": str(uuid4()), "name": "gone"}, {"id": str(cat.id)}]}
+        # The model was trained when "cat" was still called "old name", and with a label that was deleted since.
+        db_model.label_schema_revision = {
+            "labels": [{"id": str(uuid4()), "name": "gone"}, {"id": str(cat.id), "name": "old name"}]
+        }
         db_session.flush()
         frame = np.zeros((20, 20), dtype=np.uint8)
         collector.collect_next_frame()
@@ -283,9 +286,10 @@ class TestDataCollectorIntegration:
             inference_data=InferenceData(
                 prediction=DetectionResult(
                     bboxes=np.array([[0, 0, 10, 10]]),
-                    labels=np.array([class_index]),
+                    # Class indices are not trusted: this one is the position of "dog" in the project.
+                    labels=np.array([1]),
                     scores=np.array([0.9]),
-                    label_names=["old name"],
+                    label_names=[label_name],
                 ),
                 visualized_prediction=frame,
                 model_id=model_id,

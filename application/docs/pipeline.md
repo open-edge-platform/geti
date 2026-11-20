@@ -123,9 +123,10 @@ retraining: inaccurate predictions can reinforce model errors in subsequent trai
 
 A valid empty prediction is saved as an annotated image with no objects for detection, instance segmentation,
 and multilabel classification. Multiclass classification requires one class. Predicted classes are matched to
-project labels by name, or by the label set recorded when the model was trained if a label was renamed. If labels
-cannot be resolved (for example, a label was deleted after training) or annotations fail validation, the original
-frame is saved without annotations and is not marked as reviewed.
+project labels by the label names recorded when the model was trained, so a label that was renamed afterwards is
+still recognized, and otherwise by current label name. The class index reported by the model is never used. If
+labels cannot be resolved (for example, a label was deleted after training), annotations fail validation, or the
+predictions cannot be converted, the original frame is saved without annotations and is not marked as reviewed.
 The server logs a warning for that fallback. Predictions are validated before image files are written; if the
 subsequent dataset write fails, the new image and thumbnail are removed. A manual capture requests one attempt,
 not an automatic retry on every following frame.

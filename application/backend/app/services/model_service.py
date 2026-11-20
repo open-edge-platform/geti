@@ -210,6 +210,27 @@ class ModelService(BaseSessionManagedService):
             raise ResourceNotFoundError(ResourceType.MODEL, str(model_id))
         return model_rev_db.architecture
 
+    def get_trained_label_ids(self, project_id: UUID, model_id: UUID) -> dict[str, UUID]:
+        """
+        Get the labels a model was trained with, as recorded when its revision was created.
+
+        Args:
+            project_id (UUID): The unique identifier of the project.
+            model_id (UUID): The unique identifier of the model.
+
+        Returns:
+            dict[str, UUID]: The label IDs, keyed by the name each label had at training time. The labels may
+                have been renamed or deleted since.
+
+        Raises:
+            ResourceNotFoundError: If no model with the given model_id is found.
+        """
+        model_rev_repo = ModelRevisionRepository(project_id=str(project_id), db=self.db_session)
+        model_rev_db = model_rev_repo.get_by_id(str(model_id))
+        if not model_rev_db:
+            raise ResourceNotFoundError(ResourceType.MODEL, str(model_id))
+        return {label["name"]: UUID(label["id"]) for label in model_rev_db.label_schema_revision.get("labels", [])}
+
     def get_model_license(self, project_id: UUID, model_id: UUID) -> License:
         """
         Get the license of a model by looking up its architecture in the model manifest.

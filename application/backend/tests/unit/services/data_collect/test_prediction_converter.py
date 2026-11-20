@@ -50,25 +50,47 @@ def test_convert_prediction_strict_rejects_partially_unmatched_labels(prediction
     assert len(convert_prediction(labels=labels, prediction=prediction)) == 1
 
 
-def test_convert_prediction_class_labels_resolve_renamed_and_reject_deleted_labels() -> None:
+def test_convert_prediction_trained_labels_resolve_renamed_and_reject_deleted_labels() -> None:
     cat = Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000", hotkey="")
     dog = Label(id=uuid4(), project_id=cat.project_id, name="dog", color="#00ff00", hotkey="")
 
-    def detection(class_index: int) -> DetectionResult:
+    def detection(label_name: str) -> DetectionResult:
         return DetectionResult(
             bboxes=np.array([[1, 1, 10, 10]]),
-            labels=np.array([class_index]),
+            labels=np.array([0]),
             scores=np.array([0.9]),
-            label_names=["old name"],
+            label_names=[label_name],
         )
 
-    # The model was trained with [deleted, dog]; the project now lists [cat, dog].
-    class_labels = [None, dog]
-    renamed = convert_prediction(labels=[cat, dog], prediction=detection(1), strict=True, class_labels=class_labels)
+    # The model was trained when "dog" was still called "old name", and with another "cat" that was deleted since.
+    trained_labels = {"old name": dog, "cat": None}
+    renamed = convert_prediction(
+        labels=[cat, dog], prediction=detection("old_name"), strict=True, trained_labels=trained_labels
+    )
     assert renamed[0].labels == [LabelReference(id=dog.id)]
 
+    # The project label that is called "cat" today is not the one the model was trained with.
     with pytest.raises(ValueError, match="cannot be resolved"):
-        convert_prediction(labels=[cat, dog], prediction=detection(0), strict=True, class_labels=class_labels)
+        convert_prediction(labels=[cat, dog], prediction=detection("cat"), strict=True, trained_labels=trained_labels)
+
+
+def test_convert_prediction_strict_never_guesses_from_class_index() -> None:
+    """Class indices are model specific (instance segmentation models report them one-based), so they may only
+    back a prediction that a user still has to review, never an annotation that is accepted as is."""
+    cat = Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000", hotkey="")
+    dog = Label(id=uuid4(), project_id=cat.project_id, name="dog", color="#00ff00", hotkey="")
+    prediction = InstanceSegmentationResult(
+        bboxes=np.array([[0, 0, 19, 19]]),
+        labels=np.array([1]),
+        masks=np.ones((1, 20, 20), dtype=np.uint8),
+        scores=np.array([0.9]),
+        label_names=["unknown"],
+    )
+
+    with pytest.raises(ValueError, match="cannot be resolved"):
+        convert_prediction(labels=[cat, dog], prediction=prediction, strict=True)
+
+    assert convert_prediction(labels=[cat, dog], prediction=prediction)[0].labels == [LabelReference(id=dog.id)]
 
 
 def test_convert_prediction_detection_underscore_label_names() -> None:

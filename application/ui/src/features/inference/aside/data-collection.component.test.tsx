@@ -81,15 +81,16 @@ describe('DataCollection', () => {
         });
     });
 
-    it('preserves unlimited dataset size when enabling prediction saving', async () => {
+    it('persists the displayed dataset size limit when the server has none', async () => {
         const user = userEvent.setup();
         const pipelinePatchSpy = renderApp(false, null);
 
-        await user.click(await screen.findByRole('switch', { name: 'Save predictions as annotations' }));
+        expect(await screen.findByLabelText('Size')).toHaveValue('500');
+        await user.click(screen.getByRole('switch', { name: 'Save predictions as annotations' }));
 
         await waitFor(() =>
             expect(pipelinePatchSpy).toHaveBeenCalledWith({
-                data_collection: expect.objectContaining({ save_predictions: true, max_dataset_size: null }),
+                data_collection: expect.objectContaining({ save_predictions: true, max_dataset_size: 500 }),
             })
         );
     });
