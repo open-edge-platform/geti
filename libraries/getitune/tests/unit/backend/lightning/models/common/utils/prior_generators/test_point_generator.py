@@ -86,3 +86,11 @@ class TestMlvlPointGenerator:
 
             assert (priors_half_offset[0][0] - priors[0][0]).sum() == 4 * 0.5 * 2
             assert (priors_half_offset[1][0] - priors[1][0]).sum() == 10 * 0.5 * 2
+
+    def test_sparse_priors_feature_map_size(self) -> None:
+        generator = MlvlPointGenerator(strides=[4], offset=0)
+        indices = torch.tensor([2, 3, 5])
+
+        priors = generator.sparse_priors(indices, (2, 3), 0, device="cpu")
+
+        torch.testing.assert_close(priors, torch.tensor([[8.0, 0.0], [0.0, 4.0], [8.0, 4.0]]))
