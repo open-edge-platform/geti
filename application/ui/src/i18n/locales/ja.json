@@ -1,0 +1,1213 @@
+{
+    "common": {
+        "actions": {
+            "cancel": "キャンセル",
+            "close": "閉じる",
+            "delete": "削除",
+            "goBack": "前に戻る",
+            "rename": "名前を変更",
+            "save": "保存",
+            "assign": "割り当て",
+            "back": "戻る",
+            "clear": "クリア",
+            "clearAll": "すべてクリア",
+            "confirm": "確認",
+            "connect": "接続",
+            "continue": "続行",
+            "create": "作成",
+            "disconnect": "切断",
+            "dismiss": "閉じる",
+            "download": "ダウンロード",
+            "edit": "編集",
+            "export": "エクスポート",
+            "hide": "非表示",
+            "next": "次へ",
+            "refresh": "更新",
+            "remove": "削除",
+            "selectAll": "すべて選択",
+            "skip": "スキップ",
+            "start": "開始",
+            "submit": "送信",
+            "train": "学習",
+            "upload": "アップロード",
+            "undo": "元に戻す",
+            "redo": "やり直し",
+            "annotate": "アノテーションする",
+            "addAndUse": "追加して使用",
+            "saveAndConnect": "保存して接続",
+            "testConnection": "接続をテスト"
+        },
+        "labels": {
+            "allUppercase": "すべて",
+            "yes": "はい",
+            "no": "いいえ",
+            "unknown": "不明",
+            "name": "名前",
+            "architecture": "アーキテクチャ",
+            "device": "デバイス",
+            "on": "オン",
+            "off": "オフ",
+            "noMaximum": "上限なし",
+            "active": "アクティブ",
+            "dataset": "データセット",
+            "filters": "フィルター",
+            "images": "画像",
+            "videos": "動画",
+            "size": "サイズ",
+            "sizeUppercase": "サイズ",
+            "statusUppercase": "ステータス",
+            "settings": "設定",
+            "training": "学習",
+            "training_subset": "学習",
+            "validation": "検証",
+            "validation_subset": "検証",
+            "testing": "テスト",
+            "unassigned": "未割り当て",
+            "trainingLowercase": "学習",
+            "validationLowercase": "検証",
+            "testingLowercase": "テスト",
+            "frames": "フレーム",
+            "seconds": "秒",
+            "every": "／",
+            "model": "モデル",
+            "jobs": "ジョブ",
+            "labels": "ラベル",
+            "bytesTransferred": "{{transferred}} / {{total}}",
+            "annotations": "アノテーション"
+        },
+        "viewModes": {
+            "large": "大きいサムネイル",
+            "medium": "中サイズのサムネイル",
+            "small": "小さいサムネイル"
+        },
+        "status": {
+            "pending": "保留中",
+            "running": "実行中",
+            "done": "完了",
+            "cancelled": "キャンセル済み",
+            "uploading": "アップロード中",
+            "failed": "失敗",
+            "error": "エラー",
+            "disconnected": "切断済み",
+            "loading": "読み込み中...",
+            "unavailable": "利用不可"
+        },
+        "errors": {
+            "unknown": "不明なエラーが発生しました。",
+            "unknownDetail": "不明なエラー"
+        }
+    },
+    "navigation": {
+        "logoAlt": "Geti のロゴ",
+        "datasetDescription": "メディアを確認できるデータ収集ページです。",
+        "models": "モデル",
+        "modelsDescription": "モデルを確認できるモデルページです。",
+        "inference": "推論",
+        "inferenceDescription": "プロジェクトのライブ推論を表示する推論ページです。",
+        "help": {
+            "documentation": "ユーザードキュメント",
+            "whatsNew": "新機能",
+            "reportIssue": "問題を報告"
+        }
+    },
+    "dataset": {
+        "validation": {
+            "datasetViewNameExists": "この名前のビューはすでに存在します。",
+            "invalidDateRange": "終了日は開始日より後の日付にしてください。"
+        },
+        "views": {
+            "deleted": "削除されたビュー",
+            "title": "ビュー",
+            "entireDataset": "データセット全体",
+            "assignToExistingView": "既存のビューに割り当て",
+            "assignTo": "割り当て先",
+            "selectView": "ビューを選択",
+            "assignmentNote": "この操作は、すでにこのビューに割り当てられている他のメディアには影響しません。",
+            "mediaAssigned_one": "{{count}} 件のメディアを割り当てました。",
+            "mediaAssigned_other": "{{count}} 件のメディアを割り当てました。",
+            "openView": "{{viewName}} を開く",
+            "saveView": "ビューを保存",
+            "viewNameLabel": "ビュー名",
+            "renameTitle": "データセットビューの名前を変更",
+            "deleteTitle": "削除の確認",
+            "deleteConfirmation": "データセットビュー「{{viewName}}」を削除しますか？",
+            "deleteSuccess": "データセットビュー「{{viewName}}」を削除しました。",
+            "unassignFromView": "このビューから割り当て解除",
+            "selectedMediaCount_one": "{{count}} 件のメディアを選択中",
+            "selectedMediaCount_other": "{{count}} 件のメディアを選択中"
+        },
+        "filters": {
+            "allMedia": "すべてのメディア",
+            "withAnnotations": "アノテーションありのメディア",
+            "missingAnnotations": "アノテーションなしのメディア",
+            "subset": "サブセットでフィルター",
+            "searchLabels": "ラベルを検索",
+            "labelsSelected_one": "{{count}} 個のラベルを選択中",
+            "labelsSelected_other": "{{count}} 個のラベルを選択中",
+            "toggleAll": "すべて切り替え",
+            "more": "その他のフィルター",
+            "dateRange": {
+                "heading": "アップロード日でフィルター",
+                "startDateLabel": "開始日",
+                "endDateLabel": "終了日",
+                "from": "{{date}} から",
+                "to": "{{date}} まで"
+            }
+        },
+        "upload": {
+            "queued": "待機中",
+            "processing": "処理中",
+            "uploaded": "アップロード済み",
+            "errorTitle": "アップロードエラー",
+            "details": "アップロードの詳細",
+            "filename": "ファイル名",
+            "uploadingSummary_one": "{{total}} 件をアップロード中 - {{uploaded}} 件アップロード済み",
+            "uploadingSummary_other": "{{total}} 件をアップロード中 - {{uploaded}} 件アップロード済み",
+            "uploadingFailedSummary_one": "{{total}} 件をアップロード中 - {{uploaded}} 件アップロード済み、{{failed}} 件失敗",
+            "uploadingFailedSummary_other": "{{total}} 件をアップロード中 - {{uploaded}} 件アップロード済み、{{failed}} 件失敗",
+            "uploadedSummary_one": "{{count}} 件をアップロードしました。",
+            "uploadedSummary_other": "{{count}} 件をアップロードしました。",
+            "failedSummary_one": "{{count}} 件のアップロードに失敗しました。",
+            "failedSummary_other": "{{count}} 件のアップロードに失敗しました。",
+            "mixedSummary_one": "{{uploaded}} 件をアップロードしました（{{failed}} 件失敗）。",
+            "mixedSummary_other": "{{uploaded}} 件をアップロードしました（{{failed}} 件失敗）。",
+            "mixedCancelledSummary_one": "{{uploaded}} 件をアップロードしました（{{failed}} 件失敗、{{cancelled}} 件キャンセル）。",
+            "mixedCancelledSummary_other": "{{uploaded}} 件をアップロードしました（{{failed}} 件失敗、{{cancelled}} 件キャンセル）。",
+            "genericError": "メディアのアップロードに失敗しました。",
+            "uploadMedia": "メディアをアップロード",
+            "showDetails": "詳細を表示",
+            "inProgressToast_one": "{{count}} 件をアップロード中...",
+            "inProgressToast_other": "{{count}} 件をアップロード中...",
+            "inProgressSucceededPart": "{{count}} 件成功",
+            "inProgressFailedPart": "{{count}} 件失敗",
+            "cancelAll": "すべてキャンセル",
+            "cancelledSummary_one": "{{count}} 件のアップロードをキャンセルしました。",
+            "cancelledSummary_other": "{{count}} 件のアップロードをキャンセルしました。"
+        },
+        "empty": {
+            "noMatches": "フィルターに一致するメディアはありません。",
+            "changeFilter": "フィルターを解除するか、別のフィルターを選択してください。",
+            "viewEmpty": "このビューにはメディアがありません。",
+            "assignOrBack": "メディアを割り当てるか、データセット全体に戻ってください。",
+            "goToEntireDataset": "{{datasetName}} に移動",
+            "datasetEmpty": "データセットは空です。",
+            "uploadToStart": "最初のメディアをアップロードして始めましょう。"
+        },
+        "review": {
+            "reviewed": "レビュー済み",
+            "forReview": "レビュー待ち",
+            "selectSubsetPlaceholder": "サブセットを選択"
+        },
+        "statistics": {
+            "label": "データセットの統計",
+            "title": "データセットの統計",
+            "numberOfMedia": "メディア数",
+            "annotatedImages": "アノテーション済みの画像",
+            "annotatedVideosFrames": "アノテーション済みの動画 / フレーム",
+            "numberOfObjectsPerLabel": "ラベルごとのオブジェクト数",
+            "unannotated": "アノテーションなし",
+            "annotated": "アノテーション済み"
+        },
+        "delete": {
+            "title": "項目を削除",
+            "mediaItem": "メディアを削除",
+            "confirmation_one": "{{count}} 件を削除しますか？",
+            "confirmation_other": "{{count}} 件を削除しますか？",
+            "deletingItems": "削除中...",
+            "deleteError": "削除に失敗しました。{{detail}}",
+            "deletedSuccess_one": "{{count}} 件を削除しました。",
+            "deletedSuccess_other": "{{count}} 件を削除しました。"
+        },
+        "bulkLabels": {
+            "title": "ラベルの割り当て",
+            "uploadInstructions": "アップロードした画像に割り当てるラベルを選択して、「続行」をクリックしてください。後で画像にアノテーションする場合は、「スキップ」を選択してください。",
+            "selectedInstructions": "選択した画像に割り当てるラベルを選択して、「割り当て」をクリックしてください。",
+            "imageOnlyNote": "選択したラベルは画像にのみ適用されます。動画（ある場合）はアノテーションなしでアップロードされます。",
+            "selectedImagesNote": "選択したラベルは画像にのみ適用されます。動画（ある場合）は変更されません。",
+            "noResults": "結果が見つかりません。別のキーワードで検索してみてください。",
+            "cancelUpload": "アップロードをキャンセル",
+            "assignLabelTooltip": "ラベルを割り当て",
+            "assignAllSuccess": "{{count}} 枚すべての画像にラベルを割り当てました。",
+            "assignAllFailure": "{{count}} 枚すべての画像へのラベルの割り当てに失敗しました。",
+            "assignPartialSuccess": "{{total}} 枚中 {{succeeded}} 枚の画像にラベルを割り当てました（{{failed}} 枚は失敗）。"
+        },
+        "mediaDetails": {
+            "title": "詳細",
+            "resolution": "解像度",
+            "fileSize": "ファイルサイズ",
+            "format": "形式",
+            "type": "メディアの種類",
+            "image": "画像",
+            "video": "動画",
+            "frameRate": "フレームレート",
+            "duration": "再生時間",
+            "frames": "総フレーム数",
+            "annotatedFrames": "アノテーション済みフレーム数",
+            "labels": "ラベルの種類数",
+            "retry": "再試行"
+        },
+        "mediaActions": {
+            "downloadStarted": "{{fileName}} のダウンロードを開始しました。"
+        },
+        "gallery": {
+            "sort": {
+                "label": "メディアの並べ替え：",
+                "uploadDateDescending": "アップロード日（新しい順）",
+                "uploadDateAscending": "アップロード日（古い順）"
+            },
+            "selectedCount": "{{count}} 件選択中",
+            "totalMediaCount_one": "{{count}} 件のメディア",
+            "totalMediaCount_other": "{{count}} 件のメディア",
+            "dropZone": {
+                "title": "メディアファイルをここにドロップ",
+                "description": "画像と動画がこのデータセットにアップロードされます。"
+            }
+        },
+        "import": {
+            "jobTitle": "データセットのインポート - {{fileName}} - {{size}}",
+            "processingMessage": "{{fileName}} ファイルをインポート用に処理しています。",
+            "technicalDetails": "技術的な詳細",
+            "preparingJob": "準備中",
+            "stagedFileReadError": "ステージング済みファイルの読み込み中にエラーが発生しました。",
+            "prepareError": "インポートの準備中にエラーが発生しました。",
+            "genericError": "インポート中にエラーが発生しました。",
+            "importedSuccess": "データセット {{fileName}} {{size}} をインポートしました。",
+            "multipleFilesError": "フォルダーや複数のファイルは追加できません。ファイルを 1 つだけ読み込んでください。",
+            "unsupportedFormatError": "サポートされていないファイル形式です。有効な .zip ファイルをアップロードしてください。",
+            "datasetBeingUploaded": "データセットをアップロード中です",
+            "dropZipHere": "データセットの .zip ファイルをここにドロップ",
+            "learnMoreFormats": "各形式の詳細を見る",
+            "dialogHeading": "データセットのインポート",
+            "scanningMessage": "インポートするデータセットのアーカイブをスキャンして分析しています...",
+            "mapLabelsMessage": "アップロードしたデータセットのラベルをマッピングしてください。",
+            "deleteStagedFile": {
+                "title": "ステージング済みファイルを削除",
+                "confirmation": "データセットファイル「{{stagedDatasetId}}」を削除しますか？"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "インポートしたデータセットはバウンディングボックスのアノテーションを使用していますが、プロジェクトのデータセットはポリゴンを使用しています。互換性を保つため、アノテーションは自動的にポリゴンに変換されます。",
+                "polygonToBoundingBox": "インポートしたデータセットはポリゴンのアノテーションを使用していますが、プロジェクトのデータセットはバウンディングボックスを使用しています。互換性を保つため、アノテーションは自動的にバウンディングボックスに変換されます。"
+            },
+            "labelMapping": {
+                "statisticsHeading": "インポートするデータセットの統計",
+                "heading": "ラベルのマッピング（任意）",
+                "unmappedNote": "マッピングされていない項目は、ラベルなしとしてインポートされます。",
+                "datasetLabelsColumn": "データセットのラベル",
+                "projectLabelsColumn": "プロジェクトのラベル",
+                "selectLabelPlaceholder": "ラベルを選択",
+                "imagesLabel": "画像",
+                "framesLabel": "フレーム"
+            }
+        },
+        "export": {
+            "heading": "{{name}} をエクスポート",
+            "headingDatasetView": "データセットビューをエクスポート",
+            "datasetView": "ビュー：{{name}}",
+            "statisticsHeading": "エクスポートするデータセットの統計",
+            "settingsHeading": "エクスポート設定",
+            "filterByLabel": "ラベルでアノテーションをフィルター",
+            "selectFormat": "データセットのエクスポート形式を選択",
+            "learnMoreFormats": "エクスポート形式の詳細を見る",
+            "processing": "エクスポート用にデータセットを処理中",
+            "readyForDownload": "データセットをダウンロードできます",
+            "downloadStarted": "データセットのダウンロードを開始しました。",
+            "error": "エラー：{{error}}",
+            "itemsLabel": "件",
+            "details": {
+                "defaultName": "データセット",
+                "format": "形式：",
+                "media": "メディア：",
+                "onlyAnnotated": "アノテーションのあるメディアのみ",
+                "labels": "ラベル："
+            },
+            "warnings": {
+                "videos": "このデータセット形式では動画のエクスポートはサポートされていません。動画内のアノテーション済みフレームはすべて画像としてエクスポートされます。",
+                "emptyLabel": "選択した形式は空のラベル（例：「{{emptyLabelName}}」）をサポートしていません。空のラベルを含む画像とフレームは、アノテーションなしとしてエクスポートされます。",
+                "unsupportedItemsEmptyLabels": "空のラベル",
+                "unsupportedItemsVideos": "動画",
+                "unsupportedItems": "{{items}}を保持するには、Geti エクスポート形式を使用してください。",
+                "subsetNotIncluded": "エクスポートされるデータセットには、各メディアに割り当てられたサブセットの情報は含まれません。"
+            }
+        },
+        "importExport": {
+            "trigger": "データセットのインポート/エクスポート",
+            "exportItem": "データセットをエクスポート"
+        },
+        "revisions": {
+            "createdOn": "{{date}} に作成",
+            "unnamedName": "データセット #{{id}}",
+            "notFoundForModel": "このモデルのデータセットリビジョンが見つかりません。",
+            "filesDeleted": "このデータセットリビジョンのファイルは削除されました。",
+            "noItemsInSubset": "このサブセットにメディアはありません",
+            "itemAlt": "{{subset}}のメディア",
+            "trainingSubsets": {
+                "test": "テスト"
+            },
+            "rename": {
+                "title": "データセットリビジョンの名前を変更",
+                "nameLabel": "データセットリビジョン名"
+            },
+            "delete": {
+                "title": "データセットリビジョンを削除",
+                "description": "データセットリビジョン「{{name}}」を削除しますか？モデルの統計は引き続き表示できますが、学習用データセットのファイルにはアクセスできなくなります。"
+            }
+        },
+        "includeUnannotated": "アノテーションのないメディアを含める"
+    },
+    "inference": {
+        "validation": {
+            "keyEmpty": "キーを入力してください。",
+            "keyDuplicate": "キーは重複しないようにしてください。",
+            "valueEmpty": "値を入力してください。"
+        },
+        "connection": {
+            "testing": "接続をテスト中...",
+            "inUse": "使用中",
+            "unreachable": "接続できません",
+            "ready": "準備完了",
+            "saveErrorFallback": "もう一度お試しください。",
+            "removeSuccess": "{{name}} を削除しました。"
+        },
+        "confidenceThreshold": {
+            "label": "信頼度のしきい値"
+        },
+        "devices": {
+            "label": "推論デバイス"
+        },
+        "sources": {
+            "title": "入力元",
+            "uploadError": "動画ファイルのアップロードに失敗しました。",
+            "deleteVideoError": "アップロードした動画ファイルの削除に失敗しました。",
+            "list": {
+                "addSource": "新しい入力元を追加"
+            },
+            "types": {
+                "usbCamera": "USB カメラ",
+                "ipCamera": "IP カメラ",
+                "videoFile": "動画ファイル"
+            },
+            "options": {
+                "usbCamera": "USB カメラ",
+                "ipCamera": "IP カメラ",
+                "videoFile": "動画ファイル"
+            },
+            "add": {
+                "title": "新しい入力元を追加"
+            },
+            "edit": {
+                "title": "入力元を編集"
+            },
+            "form": {
+                "createSuccess": "入力元の設定を作成しました。",
+                "updateSuccess": "入力元の設定を更新しました。",
+                "saveError": "入力元の設定の保存に失敗しました。{{details}}"
+            },
+            "menu": {
+                "connectSuccess": "「{{name}}」に接続しました。",
+                "disconnectSuccess": "「{{name}}」から切断しました。",
+                "disablePipelineAndDisconnectSuccess": "パイプラインを無効にして、「{{name}}」から切断しました。",
+                "disconnectDialog": {
+                    "title": "{{name}} を切断",
+                    "message": "この入力元を切断すると、推論パイプラインも無効になります。続行しますか？"
+                }
+            },
+            "settings": {
+                "device": "デバイス：{{name}}",
+                "unknownDevice": "不明なデバイス（ID：{{deviceId}}）",
+                "streamUrl": "ストリーム URL：{{url}}",
+                "videoPath": "動画のパス：{{path}}"
+            },
+            "fields": {
+                "streamUrl": "ストリーム URL：",
+                "requireAuthentication": "認証を必須にする",
+                "camera": "カメラ",
+                "videoFilePath": "動画ファイルのパス",
+                "selectedFile": "選択済み：{{fileName}}",
+                "loopVideo": "動画をループ再生"
+            },
+            "defaultNames": {
+                "usbCamera": "USB カメラの入力元",
+                "ipCamera": "IP カメラの入力元",
+                "videoFile": "動画ファイルの入力元"
+            }
+        },
+        "sinks": {
+            "title": "出力先",
+            "types": {
+                "folder": "フォルダー",
+                "mqtt": "MQTT",
+                "webhook": "Webhook"
+            },
+            "options": {
+                "folder": "フォルダー",
+                "webhook": "Webhook",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "新しい出力先を追加"
+            },
+            "edit": {
+                "title": "出力先を編集"
+            },
+            "form": {
+                "createSuccess": "出力先の設定を作成しました。",
+                "updateSuccess": "出力先の設定を更新しました。",
+                "saveError": "出力先の設定の保存に失敗しました。{{details}}"
+            },
+            "menu": {
+                "connectSuccess": "「{{name}}」に接続しました。",
+                "disconnectSuccess": "「{{name}}」から切断しました。"
+            },
+            "settings": {
+                "rateLimit": "レート制限：{{value}}",
+                "httpMethod": "HTTP メソッド：{{value}}",
+                "timeout": "タイムアウト：{{value}}",
+                "webhookUrl": "Webhook URL：{{value}}",
+                "topic": "トピック：{{value}}",
+                "brokerHost": "ブローカーホスト：{{value}}",
+                "brokerPort": "ブローカーポート：{{value}}",
+                "outputFormats": "出力形式：",
+                "outputFormatTypes": {
+                    "imageOriginal": "元の画像",
+                    "imageWithPredictions": "予測付きの画像",
+                    "predictions": "予測"
+                }
+            },
+            "rateLimit": {
+                "notSet": "未設定",
+                "samplesPerSecond_one": "1 秒に {{count}} サンプル",
+                "samplesPerSecond_other": "1 秒に {{count}} サンプル",
+                "oneSamplePerSeconds_one": "{{count}} 秒に 1 サンプル",
+                "oneSamplePerSeconds_other": "{{count}} 秒に 1 サンプル"
+            },
+            "fields": {
+                "samples": "サンプル数",
+                "outputFormatsLabel": "出力形式",
+                "outputFormatPredictions": "予測",
+                "outputFormatImageOriginal": "元の画像",
+                "outputFormatImageWithPredictions": "予測付きの画像",
+                "folderPath": "フォルダーのパス",
+                "httpMethod": "HTTP メソッド",
+                "timeout": "タイムアウト",
+                "webhookUrl": "Webhook URL",
+                "headers": "ヘッダー",
+                "topic": "トピック",
+                "brokerHost": "ブローカーホスト",
+                "brokerPort": "ブローカーポート",
+                "authRequired": "認証が必要"
+            },
+            "webhook": {
+                "headersHelp": "必要な数だけキーと値のペアを追加できます。各ペアは「{{title}}」オブジェクトに含まれます。",
+                "keyPlaceholder": "キー",
+                "valuePlaceholder": "値"
+            },
+            "defaultNames": {
+                "localFolder": "ローカルフォルダーの出力先",
+                "webhook": "Webhook の出力先",
+                "mqtt": "MQTT の出力先"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "loading": "モデル：..."
+            },
+            "toggle": {
+                "enabledLabel": "パイプラインは有効です",
+                "disabledLabel": "パイプラインは無効です",
+                "enabledSuccess": "パイプラインを有効にしました。",
+                "disabledSuccess": "パイプラインを無効にしました。"
+            },
+            "configuration": {
+                "sidebarLabel": "パイプラインの設定"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "データ収集ポリシー",
+            "maxDatasetSize": {
+                "title": "データセットの最大サイズ",
+                "description": "収集するメディアの最大数"
+            },
+            "captureRate": {
+                "title": "キャプチャレート",
+                "description": "ストリームの実行中にフレームをキャプチャします",
+                "toggleLabel": "自動キャプチャを切り替え"
+            },
+            "confidenceThreshold": {
+                "description": "信頼度がしきい値を下回ったときにフレームをキャプチャします",
+                "sliderLabel": "しきい値"
+            }
+        },
+        "metrics": {
+            "time": "時間",
+            "sidebarLabel": "パイプラインの指標",
+            "empty": {
+                "title": "利用できる統計がありません",
+                "description": "パイプラインが実行されてデータの処理が始まると、ここにパイプラインの指標が表示されます。"
+            },
+            "throughput": {
+                "title": "スループット",
+                "axisLabel": "リクエスト数/秒"
+            },
+            "latency": {
+                "title": "レイテンシ",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "idle": "アイドル",
+                "problemsDetected": "問題を検出"
+            },
+            "component": {
+                "healthy": "正常",
+                "finished": "終了"
+            }
+        },
+        "stream": {
+            "start": "ストリームを開始",
+            "enablePipelineToStart": "ストリームを開始するには、パイプラインを有効にしてください",
+            "connectError": "ストリームへの接続に失敗しました。",
+            "captureFrame": "フレームをキャプチャ",
+            "captureSuccess": "フレームをキャプチャして、データセットに追加しました。"
+        },
+        "settings": {
+            "folderPath": "フォルダーのパス：{{path}}",
+            "authRequired": "認証が必要：{{value}}"
+        }
+    },
+    "project": {
+        "delete": {
+            "confirmation": "プロジェクト「{{projectName}}」を削除しますか？",
+            "success": "プロジェクトを削除しました。"
+        },
+        "rename": {
+            "title": "プロジェクト名を編集",
+            "success": "プロジェクトを更新しました。"
+        },
+        "validation": {
+            "nameEmpty": "プロジェクト名を入力してください。",
+            "nameExists": "そのプロジェクト名はすでに存在します。"
+        },
+        "panel": {
+            "manageProjects": "プロジェクトを管理",
+            "enablePipelineBlocked": {
+                "title": "パイプラインを有効にできません",
+                "message": "パイプラインを有効にする前に、モデルと入力元を選択してください。"
+            }
+        },
+        "taskTypes": {
+            "detection": "物体検出",
+            "classification": "分類",
+            "instanceSegmentation": "インスタンスセグメンテーション",
+            "multiLabelClassification": "マルチラベル分類",
+            "recommended": "{{taskType}}（推奨）"
+        },
+        "list": {
+            "count_one": "{{count}} 件のプロジェクト",
+            "count_other": "{{count}} 件のプロジェクト",
+            "countFiltered_one": "{{count}} 件中 {{filtered}} 件のプロジェクト",
+            "countFiltered_other": "{{count}} 件中 {{filtered}} 件のプロジェクト",
+            "createNewProject": "新しいプロジェクトを作成",
+            "createProjectFromDataset": "データセットから作成",
+            "card": {
+                "created": "作成日：{{date}}",
+                "models_one": "{{count}} 個のモデル",
+                "models_other": "{{count}} 個のモデル"
+            },
+            "menu": {
+                "enablePipeline": "パイプラインを有効にする",
+                "disablePipeline": "パイプラインを無効にする"
+            },
+            "sort": {
+                "label": "プロジェクトの並べ替え：",
+                "nameAscending": "名前（A-Z）",
+                "nameDescending": "名前（Z-A）",
+                "createdAtDescending": "作成日（新しい順）",
+                "createdAtAscending": "作成日（古い順）"
+            },
+            "filters": {
+                "searchPlaceholder": "プロジェクトを検索",
+                "taskType": "タスクの種類でフィルター",
+                "models": "モデルでフィルター",
+                "withTrainedModels": "学習済みモデルあり"
+            },
+            "noMatches": {
+                "title": "フィルターに一致するプロジェクトがありません",
+                "description": "検索条件やタスクの種類のフィルターを調整して、探しているものを見つけてください。"
+            },
+            "empty": {
+                "intro": "<name>Geti</name> へようこそ。データセットの準備から学習、最適化、デプロイまで、<highlight>モデルのライフサイクル全体</highlight>をサポートするビジョン AI プラットフォームです。"
+            },
+            "workflow": {
+                "addData": "データを追加",
+                "optimize": "最適化",
+                "runInference": "推論を実行",
+                "loop": "予測を監視し、さらにデータを収集して、モデルを繰り返しファインチューニングします"
+            }
+        },
+        "create": {
+            "taskQuestion": "モデルにどの種類のタスクを実行させますか？",
+            "labelsQuestion": "どのオブジェクトを{{verb}}できるようにモデルを学習させますか？",
+            "submit": "プロジェクトを作成",
+            "tasks": {
+                "detection": {
+                    "title": "物体検出",
+                    "description": "画像内のオブジェクトを識別し、位置を特定します",
+                    "advice": "適した用途：カウント、トラッキング",
+                    "verb": "検出"
+                },
+                "instanceSegmentation": {
+                    "title": "インスタンスセグメンテーション",
+                    "description": "特定の領域や形状を検出して、輪郭を描きます",
+                    "advice": "適した用途：計測、不規則な形状",
+                    "verb": "セグメンテーション"
+                },
+                "classification": {
+                    "title": "画像分類",
+                    "description": "内容に基づいて画像全体を分類します",
+                    "advice": "適した用途：フィルタリング、コンテンツのモデレーション",
+                    "verb": "分類"
+                }
+            },
+            "classificationType": {
+                "title": "モデルにはどの分類タイプを使用しますか？",
+                "singleLabel": {
+                    "label": "シングルラベル",
+                    "description": "相互に排他的なラベルから 1 つのラベルを割り当てます",
+                    "warning": "ラベルが 2 つ以上必要です"
+                },
+                "multiLabel": {
+                    "label": "マルチラベル",
+                    "description": "相互に排他的でないラベルから 1 つ以上のラベルを割り当てます"
+                }
+            },
+            "labels": {
+                "atLeastOneRequired": "オブジェクトが 1 つ以上必要です。"
+            },
+            "defaultName": "プロジェクト #{{number}}"
+        },
+        "import": {
+            "title": "データセットからプロジェクトを作成 - インポート",
+            "labelMapping": {
+                "title": "ラベルのマッピング"
+            },
+            "preparingMessage": "データセットを新しいプロジェクトとしてインポートする準備",
+            "taskSelection": {
+                "projectName": "プロジェクト名",
+                "selectTaskPlaceholder": "タスクを選択",
+                "recommendationHint": "推奨は、データセットで検出されたアノテーションの種類に基づいています。別の種類を選択した場合、アノテーションはインポート時に選択した種類に合わせて自動的に変換されます。"
+            },
+            "jobsList": {
+                "selectTaskType": "タスクの種類を選択",
+                "mapLabelsButton": "ラベルをマッピング"
+            }
+        },
+        "taskType": "タスクの種類"
+    },
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "ショートカットキー",
+            "nameExists": "そのラベル名はすでに存在します。",
+            "hotkeyExists": "そのショートカットキーはすでに使用されています。"
+        },
+        "editor": {
+            "namePlaceholder": "ラベル名",
+            "pin": "ラベルを固定",
+            "unpin": "ラベルの固定を解除",
+            "editTrigger": "ラベルを編集",
+            "createTrigger": "ラベルを作成",
+            "delete": {
+                "title": "ラベルを削除",
+                "message": "{{labelName}} ラベルを削除すると、データセット内でこのラベルが付いたすべてのアノテーションが削除されます。ただし、過去に学習したモデルには影響しません。"
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "ショートカットキー：{{hotkey}}",
+            "overflowCount": "+ 他 {{count}} 個"
+        },
+        "empty": {
+            "noLabel": "ラベルなし",
+            "noObject": "オブジェクトなし"
+        }
+    },
+    "annotator": {
+        "canvas": {
+            "hideLabels": "ラベルを非表示",
+            "pixelView": "ピクセル表示",
+            "annotationFillOpacity": "アノテーションの塗りつぶしの不透明度",
+            "annotationBorderOpacity": "アノテーションの枠線の不透明度",
+            "imageBrightness": "画像の明るさ",
+            "imageContrast": "画像のコントラスト",
+            "imageSaturation": "画像の彩度"
+        },
+        "actions": {
+            "zoomIn": "拡大",
+            "zoomOut": "縮小",
+            "fitToScreen": "画面に合わせる（{{hotkey}}）",
+            "undo": "元に戻す（{{hotkey}}）",
+            "redo": "やり直し（{{hotkeys}}）",
+            "toggleFocus": "フォーカスを切り替え",
+            "showAnnotations": "アノテーションを表示（{{hotkey}}）",
+            "hideAnnotations": "アノテーションを非表示（{{hotkey}}）"
+        },
+        "modes": {
+            "annotation": "アノテーション",
+            "prediction": "予測"
+        },
+        "predictions": {
+            "settingsTitle": "予測の設定",
+            "confirm": "予測を確定"
+        },
+        "hotkeys": {
+            "alternatives": "{{primary}} または {{alternative}}",
+            "title": "ショートカットキー",
+            "submitAnnotationsPredictions": "アノテーション/予測を送信",
+            "previousMedia": "前のメディア",
+            "nextMedia": "次のメディア",
+            "deleteSelectedAnnotation": "選択したアノテーションを削除",
+            "toggleAnnotationsVisibility": "すべてのアノテーションを表示/非表示",
+            "selectAllAnnotations": "すべてのアノテーションを選択",
+            "deselectAllAnnotations": "すべてのアノテーションの選択を解除",
+            "selectNextAnnotation": "次のアノテーションを選択",
+            "resetZoom": "ズームをリセット"
+        },
+        "tools": {
+            "selection": {
+                "label": "選択"
+            },
+            "boundingBox": {
+                "label": "バウンディングボックス",
+                "description": "画像内のオブジェクトを囲む長方形または正方形を描画します。"
+            },
+            "autoSegmentation": {
+                "label": "自動セグメンテーション",
+                "detectionDescription": "カーソルをオブジェクトの上に移動すると、提案された長方形がプレビューされます。クリックするとアノテーションが作成されます。",
+                "segmentationDescription": "カーソルをオブジェクトの上に移動すると、提案されたポリゴンがプレビューされます。クリックするとアノテーションが作成されます。",
+                "loading": "画像を処理しています。しばらくお待ちください...",
+                "error": "Segment Anything ツールでエラーが発生しました：{{message}}",
+                "unknownError": "不明なエラーです。ページを更新してみてください。",
+                "timeoutError": "{{operation}} が {{timeoutMs}} ms 後にタイムアウトしました。ページを更新してみてください。",
+                "embeddingError": "画像の埋め込みを取得できませんでした（{{status}}{{statusText}}）。",
+                "hint": "Shift + クリックで領域を含め、Alt + クリックで除外します。クリックでアノテーションを作成し、Esc でポイントをクリアします。",
+                "operations": {
+                    "workerBuild": "SAM ワーカーのビルド",
+                    "workerInit": "SAM ワーカーの初期化",
+                    "decoder": "SAM デコーダー"
+                }
+            },
+            "polygon": {
+                "label": "ポリゴン",
+                "description": "クリックして点を 1 つずつ配置するか、押したままドラッグしてフリーハンドで描画します。ピクセル単位の精度が必要な不規則な形状に最適です。"
+            },
+            "magneticLasso": {
+                "label": "マグネティックラッソ",
+                "description": "オブジェクトの縁に沿ってカーソルを動かし、ときどきクリックして、輪郭を境界にスナップさせます。",
+                "error": "図形の境界を選択できませんでした。もう一度お試しください。"
+            },
+            "ssim": {
+                "label": "検出アシスタント",
+                "description": "オブジェクトの周囲にボックスを描くと、画像内の似たオブジェクトを自動的に見つけてアノテーションします。",
+                "loading": "検出アシスタントを読み込んでいます。しばらくお待ちください...",
+                "error": "検出アシスタントツールでエラーが発生しました：{{message}}",
+                "operations": {
+                    "workerBuild": "検出アシスタントのワーカーのビルド"
+                },
+                "options": {
+                    "accept": "承認",
+                    "reject": "却下",
+                    "numberOfItems": "項目数",
+                    "autoMergeDuplicates": "重複を自動的にマージ"
+                }
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "さらに遅く",
+                "slow": "遅い",
+                "normal": "標準",
+                "speed": "再生速度",
+                "showAllFrames": "すべてのフレームを表示",
+                "showOneFramePerSecond": "1 秒あたり 1 フレームを表示"
+            },
+            "frames": {
+                "currentTotal": "現在のフレーム：{{currentFrame}} / 総フレーム数：{{totalFrames}}",
+                "thumbnailAlt": "フレーム {{frameNumber}} のサムネイル"
+            },
+            "errors": {
+                "network": "ネットワークエラーのため動画を再生できません。ページを更新して、もう一度お試しください。",
+                "unableToPlay": "動画を再生できません。もう一度お試しください。",
+                "unsupportedFormat": "動画を再生できません。別の動画形式（mp4/webm）をお試しください。"
+            }
+        }
+    },
+    "models": {
+        "jobs": {
+            "error": "ジョブが失敗しました。ログで詳細を確認して、もう一度お試しください。",
+            "pending": "保留中...",
+            "running": "実行中...",
+            "stopDialog": {
+                "title": "ジョブを停止",
+                "confirmation": "このジョブを停止しますか？"
+            },
+            "logs": "ログ",
+            "startedAt": "開始：{{time}}",
+            "waitingToStart": "開始を待機中...",
+            "device": "デバイス：{{device}}"
+        },
+        "detail": {
+            "loadError": "モデルの詳細を読み込めませんでした。",
+            "tabs": {
+                "variants": "モデルバリアント",
+                "metrics": "モデルの指標",
+                "parameters": "学習パラメーター",
+                "datasets": "学習用データセット"
+            }
+        },
+        "metrics": {
+            "noMetrics": "利用できる指標がありません",
+            "loadError": "学習の指標を読み込めませんでした。",
+            "evaluationsTitle": "評価",
+            "noEvaluations": "テストの評価指標は利用できません"
+        },
+        "training": {
+            "logs": {
+                "copySuccess": "コピーしました。",
+                "copyError": "コピーに失敗しました。",
+                "copyPathTooltip": "クリックしてパスをコピー",
+                "showTraceback": "トレースバックを表示",
+                "levelLabel": "レベル",
+                "levelHelpTitle": "最小ログレベル",
+                "levelHelpDescription": "選択したレベル以上のログエントリを表示します。たとえば WARNING を選択すると、WARNING、ERROR、CRITICAL のエントリが表示され、DEBUG と INFO は非表示になります。",
+                "searchPlaceholder": "ログを検索...",
+                "connectionStatus": {
+                    "connecting": "接続中...",
+                    "connected": "ライブ",
+                    "error": "接続エラー"
+                },
+                "entriesCount": "{{filtered}} / {{total}} 件のエントリ",
+                "noEntries": "ログエントリがありません",
+                "noMatchingEntries": "一致するログエントリがありません",
+                "scrollToBottom": "一番下までスクロール",
+                "dialogTitle": "学習ログ",
+                "loadError": "ログを読み込めませんでした：{{message}}",
+                "noJobOrModel": "ジョブまたはモデルが指定されていません",
+                "downloadStarted": "学習ログのダウンロードを開始しました。"
+            },
+            "parameters": {
+                "noParameters": "パラメーターはありません。",
+                "learningParameters": "学習パラメーター",
+                "filters": "フィルター",
+                "augmentations": "データ拡張",
+                "intensityMapping": "強度マッピング"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "ImageNet での Top-1 精度",
+                    "mapOnCoco": "COCO での mAP",
+                    "map50OnCoco": "COCO での mAP50"
+                },
+                "card": {
+                    "numberOfParameters": "パラメーター数：{{count}}M",
+                    "gigaflops": "ギガフロップス：{{value}}"
+                },
+                "sort": {
+                    "label": "モデルの並べ替え：",
+                    "recommended": "推奨順",
+                    "nameAsc": "名前（A〜Z）",
+                    "nameDesc": "名前（Z〜A）",
+                    "speedAsc": "速度（速い順）",
+                    "speedDesc": "速度（遅い順）",
+                    "accuracyAsc": "精度（低い順）",
+                    "accuracyDesc": "精度（高い順）"
+                },
+                "timm": {
+                    "heading": "TIMM モデルの設定",
+                    "architectureFamilyLabel": "アーキテクチャファミリー",
+                    "selectArchitecturePlaceholder": "アーキテクチャを選択",
+                    "modelVariantLabel": "モデルバリアント",
+                    "selectVariantPlaceholder": "バリアントを選択",
+                    "pretrainedWeightsLabel": "事前学習済みの重み",
+                    "selectWeightsPlaceholder": "重みを選択",
+                    "parameters": "パラメーター数：{{count}}M",
+                    "gigaflops": "ギガフロップス：{{value}}"
+                }
+            },
+            "devices": {
+                "selectLabel": "学習デバイスを選択"
+            },
+            "setup": {
+                "trigger": "モデルを学習",
+                "dialog": {
+                    "title": "学習するモデルを選択",
+                    "disabledReasonTitle": "学習を開始できないのはなぜですか？",
+                    "advancedSettings": "詳細設定"
+                },
+                "toast": {
+                    "trainingStarted": "モデルの学習を開始しました。",
+                    "trainingStartedWithLink": "モデルの学習を開始しました。<modelsLink>モデル画面を開いて進捗を確認してください。</modelsLink>"
+                },
+                "selectDataset": {
+                    "label": "データセットを選択",
+                    "useEntireDataset": "データセット全体を使用",
+                    "helpTitle": "データセットの選択",
+                    "helpDescription": "学習に使用するデータを選択します。「データセット全体を使用」を選択すると、すべてのデータの最新バージョン（「データセット」ページに表示される内容）で学習します。データセットビューを選択すると、そのビューに割り当てられたメディアのみで学習します。データセットリビジョンを選択すると、別のモデルとまったく同じデータ（メディアとアノテーション）で学習します。",
+                    "sections": {
+                        "views": "データセットビュー",
+                        "revisions": "データセットリビジョン"
+                    }
+                },
+                "selectModel": {
+                    "label": "入力の重みを選択",
+                    "defaultPretrainedWeights": "デフォルトの事前学習済みの重み",
+                    "helpTitle": "入力の重みの選択",
+                    "helpDescription": "既存のモデルを選択してファインチューニングを続けるか、「デフォルトの事前学習済みの重み」を選択して、大規模な公開データセットで事前学習された公開済みの重みから、新しいモデルのファインチューニングを開始します。"
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "モデルを学習するには、データセット内の 3 件以上のメディアにアノテーションを付ける必要があります。より良い結果を得るために、さらに多くのメディアにアノテーションを付けることをおすすめします。",
+                "notEnoughAnnotationsInView": "モデルを学習するには、選択したデータセットビュー内の 3 件以上のメディアにアノテーションを付ける必要があります。より良い結果を得るために、さらに多くのメディアにアノテーションを付けることをおすすめします。",
+                "emptySubsetsReason": "モデルを学習するには、各サブセット（学習、検証、テスト）に少なくとも 1 件のメディアが必要です。現在この条件を満たせないのは、{{subsetClause}}、{{assignmentDetail}}ためです。",
+                "emptySubsetClause_one": "{{list}}のサブセットが空で",
+                "emptySubsetClause_other": "{{list}}のサブセットが空で",
+                "reviewedOnly_one": "割り当て待ちのレビュー済みメディアが {{count}} 件残っている",
+                "reviewedOnly_other": "割り当て待ちのレビュー済みメディアが {{count}} 件残っている",
+                "unannotatedOnly_one": "割り当てる前にアノテーションが必要なメディアが {{count}} 件ある",
+                "unannotatedOnly_other": "割り当てる前にアノテーションが必要なメディアが {{count}} 件ある",
+                "mixedReviewedClause_one": "割り当て可能なレビュー済みメディアが {{count}} 件あり",
+                "mixedReviewedClause_other": "割り当て可能なレビュー済みメディアが {{count}} 件あり",
+                "mixedUnannotatedClause_one": "割り当てる前にアノテーションが必要なメディアが {{count}} 件ある",
+                "mixedUnannotatedClause_other": "割り当てる前にアノテーションが必要なメディアが {{count}} 件ある",
+                "mixedAssignmentDetail": "{{reviewedClause}}、{{unannotatedClause}}",
+                "noUnassignedItems": "再配分できる未割り当てのメディアがない"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "データ管理"
+                },
+                "notAvailable": "学習の設定は利用できません。"
+            },
+            "learning": {
+                "title": "学習パラメーター",
+                "tagDefault": "デフォルト",
+                "tagModified": "変更済み",
+                "inputSize": "入力サイズ"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "学習サブセット",
+                    "description": "まだサブセットに割り当てられていない、アノテーション済みサンプルの配分を指定します。過去の学習で使用されたサンプルはすでにサブセットが決まっており、データ汚染や評価バイアスを避けるため、変更されません。",
+                    "unavailableTitle": "学習サブセットの設定が無効です",
+                    "unavailableDescription": "学習サブセットに含まれるメディアが少なく、学習・検証・テストの各サブセットを設定どおりに分割できません。",
+                    "unavailableHint": "各サブセットに少なくとも 1 件のメディアが含まれるよう、メディアを追加してください。",
+                    "datasetSamples": "データセット：{{count}} サンプル",
+                    "assignedSamples": "割り当て済み：{{count}}",
+                    "unassignedSamples": "未割り当て：{{count}}",
+                    "distributionLabel": "新しいサンプルの配分",
+                    "resultingDistribution": "結果として得られるデータセットの配分：",
+                    "totalLabel": "合計：",
+                    "mediaItemsLabel": "件のメディア"
+                },
+                "filters": {
+                    "noMinimum": "最小値なし",
+                    "unlimited": "無制限"
+                },
+                "augmentation": {
+                    "title": "データ拡張"
+                },
+                "tiling": {
+                    "title": "タイリング",
+                    "description": "タイリングは、高解像度の画像を小さなタイルに分割する手法で、小さな物体の検出タスクの精度向上に役立つ場合があります。",
+                    "modeLabel": "タイリングモード",
+                    "modes": {
+                        "automatic": "自動",
+                        "custom": "カスタム"
+                    },
+                    "offDescription": "モデルは画像を小さなタイルに分割せず、画像全体を 1 つの単位として処理します。この方法はシンプルですが、モデルが細部を見逃す可能性があるため、高解像度の画像内の小さなオブジェクトの検出が苦手な場合があります。",
+                    "automaticDescription": "システムが画像の解像度とアノテーションのサイズに基づいて、パラメーターを自動的に設定します。"
+                },
+                "intensityMapping": {
+                    "title": "強度マッピング"
+                }
+            }
+        },
+        "list": {
+            "groupByPlaceholder": "グループ化",
+            "groupByDataset": "グループ化：データセット",
+            "groupByArchitecture": "グループ化：アーキテクチャ",
+            "hideFailedModels": "失敗したモデルを非表示",
+            "showFailedModels": "失敗したモデルを表示",
+            "searchPlaceholder": "モデルを検索...",
+            "noModelsFound": "モデルが見つかりません",
+            "empty": {
+                "title": "まだモデルがありません。",
+                "description": "最初のモデルを学習して始めましょう。"
+            },
+            "deletedWeightsBadge": "重みを削除済み",
+            "fineTunedFrom": "ファインチューニング元",
+            "columns": {
+                "trained": "学習日時",
+                "totalSize": "合計サイズ"
+            }
+        },
+        "performance": {
+            "metrics": {
+                "accuracy": "精度",
+                "precision": "適合率",
+                "recall": "再現率",
+                "fMeasure": "F 値"
+            },
+            "categories": {
+                "balance": "バランス",
+                "speed": "速度",
+                "accuracy": "精度"
+            }
+        },
+        "variants": {
+            "empty": "利用できるモデルバリアントがありません。",
+            "columns": {
+                "precision": "数値精度"
+            },
+            "quantizedInfo": {
+                "title": "NNCF PTQ で量子化済み",
+                "maxAccuracyDrop": "最大精度低下：{{value}}",
+                "calibrationDatasetSize": "キャリブレーションデータセットのサイズ：{{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "モデルのダウンロードを開始しました。"
+        },
+        "optimize": {
+            "description": "OpenVINO NNCF を使用して FP16 モデルを最適化します（INT8 量子化）",
+            "contextualHelp": "OpenVINO NNCF（Neural Network Compression Framework）による INT8 量子化は、精度への影響を最小限に抑えながら、モデルサイズを削減し、推論を高速化します。",
+            "start": "量子化を開始",
+            "dialogTitle": "量子化",
+            "subheading": "モデルを INT8 に量子化",
+            "jobStarted": "量子化ジョブを開始しました。",
+            "recommendedCalibrationSize": "推奨のキャリブレーションデータセットサイズ：200〜500 件のメディア",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "最大精度低下（%）",
+                    "help": {
+                        "paragraph1": "検証精度の許容される最大低下幅です。",
+                        "paragraph2": "最大許容低下幅が小さい場合、精度を考慮した量子化には長い時間がかかることがあります。",
+                        "paragraph3": "また、特に比較的小さなデータセットでは、最終的なテスト精度が、指定した検証精度のしきい値を下回る場合があります。"
+                    }
+                },
+                "maxIterations": {
+                    "label": "最大反復回数",
+                    "help": {
+                        "paragraph1": "精度を考慮した量子化の最大反復回数です。",
+                        "paragraph2": "精度を考慮した量子化では、最大精度低下の基準を満たすまで、量子化の対象からモデルのレイヤーを反復的に除外していきます。反復回数を制限すると、レイヤー数の多いモデルの量子化にかかる時間を大幅に短縮できます。",
+                        "paragraph3": "このパラメーターは、最大精度低下を設定した場合にのみ使用されます。"
+                    }
+                },
+                "calibrationSize": {
+                    "label": "最大キャリブレーションサイズ",
+                    "help": "キャリブレーションサンプルは、データセットからランダムに選択されます。",
+                    "useFullDataset": "データセット全体を使用"
+                }
+            }
+        },
+        "actions": {
+            "deleteWeights": "重みを削除",
+            "deleteModel": "モデルを削除",
+            "viewLogs": "学習ログを表示",
+            "deleteWeightsDescription": "モデル「{{modelName}}」の重みを削除しますか？",
+            "deleteModelDescription": "モデル「{{modelName}}」を削除しますか？この操作は元に戻せません。",
+            "renameDialog": {
+                "title": "モデル名を変更",
+                "nameLabel": "モデル名"
+            }
+        },
+        "columns": {
+            "modelName": "モデル名"
+        }
+    },
+    "jobs": {
+        "allProjects": "すべてのプロジェクト",
+        "currentProjectLabel": "{{name}}（現在）",
+        "projectsSection": "プロジェクト",
+        "tabs": {
+            "all": "すべて",
+            "finished": "完了済み"
+        },
+        "status": {
+            "pending": "待機中",
+            "cancelling": "キャンセル中",
+            "done": "完了"
+        },
+        "type": {
+            "quantize": "最適化"
+        },
+        "columns": {
+            "type": "種類"
+        },
+        "cancel": {
+            "title": "ジョブをキャンセル",
+            "confirmation": "ジョブ {{jobId}} をキャンセルしますか？"
+        },
+        "meta": {
+            "started": "開始：{{time}}",
+            "elapsed": "経過：{{time}}",
+            "duration": "所要時間：{{time}}",
+            "finished": "終了：{{time}}",
+            "failed": "失敗：{{time}}",
+            "cancelled": "キャンセル：{{time}}"
+        },
+        "emptyState": {
+            "all": "ジョブはありません",
+            "running": "実行中のジョブはありません",
+            "finished": "完了したジョブはありません",
+            "scheduled": "待機中のジョブはありません",
+            "cancelled": "キャンセルされたジョブはありません",
+            "failed": "失敗したジョブはありません"
+        },
+        "actions": {
+            "viewLogs": "ログを表示"
+        }
+    },
+    "license": {
+        "label": "ライセンス：",
+        "agreement": {
+            "title": "ライセンス契約",
+            "intro": "Geti を引き続き使用するには、以下のライセンスを確認し、同意してください。",
+            "progress": "{{current}} / {{total}}",
+            "required": "必須",
+            "optional": "任意",
+            "fullLicense": "ライセンス全文を読む",
+            "previous": "前へ",
+            "accept": "同意して続行"
+        }
+    },
+    "application": {
+        "startup": {
+            "loading": "読み込み中です。しばらくお待ちください。"
+        },
+        "serverError": {
+            "heading": "サーバーエラー"
+        },
+        "errorPage": {
+            "badRequest": "サーバーは現在のリクエストを処理できないか、処理しません。",
+            "forbidden": "このページにアクセスする権限がありません。",
+            "notFound": "このページは存在しません。",
+            "unauthorized": "この内容を表示する権限がありません。",
+            "serverError": "サーバーでエラーが発生したため、リクエストを完了できませんでした。",
+            "serviceUnavailable": "API が停止しているようです。",
+            "goHome": "ホームページに戻る"
+        },
+        "notifications": {
+            "unexpectedError": "予期しないエラーが発生しました。もう一度お試しください。",
+            "networkError": "ネットワークエラーです。接続を確認して、もう一度お試しください。",
+            "uploadTransferError": "ファイルの転送に失敗しました。もう一度お試しください。"
+        }
+    },
+    "downloads": {
+        "failure": {
+            "genericError": "ファイルのダウンロードに失敗しました。"
+        },
+        "saveDialog": {
+            "allFiles": "すべてのファイル",
+            "fileTypeFilter": "{{extension}} ファイル"
+        }
+    }
+}
