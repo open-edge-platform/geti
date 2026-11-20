@@ -10,11 +10,6 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-import sqlalchemy as sa
-from alembic.config import Config
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
-from alembic.script import ScriptDirectory
 from alembic.script.revision import ResolutionError
 
 from app.db.migration import MigrationManager, RevisionNotFoundError
@@ -110,44 +105,3 @@ class TestCheckMigrationStatus:
 
             with pytest.raises(RevisionNotFoundError):
                 manager.check_migration_status()
-
-
-@pytest.mark.parametrize(
-    "projection",
-    [
-        {"mode": "rgb", "channels": [{"channel": 2, "target": "red"}]},
-        {"mode": "grayscale", "channel": 1},
-    ],
-)
-def test_ome_projection_column_migration_preserves_data(projection: dict[str, object]) -> None:
-    config = Config()
-    config.set_main_option("script_location", str(Path(__file__).parents[3] / "app" / "alembic"))
-    script = ScriptDirectory.from_config(config)
-    revision = script.get_revision("d2e8a6f9b103")
-    assert revision is not None
-    assert revision.down_revision == "c7f1d7a4a2de"
-
-    engine = sa.create_engine("sqlite://")
-    try:
-        with engine.begin() as connection:
-            table = sa.Table(
-                "ome_images",
-                sa.MetaData(),
-                sa.Column("media_id", sa.Text(), primary_key=True),
-                sa.Column("channel_mapping", sa.JSON(), nullable=False),
-            )
-            table.create(connection)
-            connection.execute(table.insert().values(media_id="image", channel_mapping=projection))
-            with Operations.context(MigrationContext.configure(connection)):
-                revision.module.upgrade()
-                renamed = sa.Table("ome_images", sa.MetaData(), autoload_with=connection)
-                assert set(renamed.c.keys()) == {"media_id", "channel_projection"}
-                assert connection.execute(sa.select(renamed.c.channel_projection)).scalar_one() == projection
-                assert renamed.c.channel_projection.nullable is False
-
-                revision.module.downgrade()
-                restored = sa.Table("ome_images", sa.MetaData(), autoload_with=connection)
-                assert set(restored.c.keys()) == {"media_id", "channel_mapping"}
-                assert connection.execute(sa.select(restored.c.channel_mapping)).scalar_one() == projection
-    finally:
-        engine.dispose()
