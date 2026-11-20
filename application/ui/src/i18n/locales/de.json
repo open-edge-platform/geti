@@ -74,7 +74,8 @@
             "model": "Modell",
             "jobs": "Vorgänge",
             "labels": "Klassen",
-            "bytesTransferred": "{{transferred}} von {{total}}"
+            "bytesTransferred": "{{transferred}} von {{total}}",
+            "annotations": "Annotationen"
         },
         "viewModes": {
             "large": "Große Miniaturansichten",
@@ -89,7 +90,9 @@
             "uploading": "Wird hochgeladen",
             "failed": "Fehlgeschlagen",
             "error": "Fehler",
-            "disconnected": "Getrennt"
+            "disconnected": "Getrennt",
+            "loading": "Wird geladen …",
+            "unavailable": "Nicht verfügbar"
         },
         "errors": {
             "unknown": "Ein unbekannter Fehler ist aufgetreten",
@@ -231,6 +234,21 @@
             "assignAllFailure": "Die Klassen konnten keinem der ausgewählten Bilder zugewiesen werden ({{count}}).",
             "assignPartialSuccess": "Die Klassen wurden {{succeeded}} von {{total}} Bildern zugewiesen. Bei {{failed}} ist die Zuweisung fehlgeschlagen."
         },
+        "mediaDetails": {
+            "title": "Details",
+            "resolution": "Auflösung",
+            "fileSize": "Dateigröße",
+            "format": "Format",
+            "type": "Medientyp",
+            "image": "Bild",
+            "video": "Video",
+            "frameRate": "Einzelbildrate",
+            "duration": "Dauer",
+            "frames": "Einzelbilder insgesamt",
+            "annotatedFrames": "Annotierte Einzelbilder",
+            "labels": "Eindeutige Klassen",
+            "retry": "Erneut versuchen"
+        },
         "mediaActions": {
             "downloadStarted": "Download von „{{fileName}}“ gestartet"
         },
@@ -346,6 +364,7 @@
     "inference": {
         "validation": {
             "keyEmpty": "Der Schlüssel darf nicht leer sein",
+            "keyDuplicate": "Der Schlüssel muss eindeutig sein",
             "valueEmpty": "Der Wert darf nicht leer sein"
         },
         "connection": {
@@ -363,6 +382,7 @@
             "label": "Gerät für die Modellanwendung"
         },
         "sources": {
+            "title": "Quelle",
             "uploadError": "Die Videodatei konnte nicht hochgeladen werden.",
             "deleteVideoError": "Die hochgeladene Videodatei konnte nicht gelöscht werden.",
             "list": {
@@ -425,6 +445,7 @@
             }
         },
         "sinks": {
+            "title": "Ausgabeziel",
             "types": {
                 "folder": "Ordner",
                 "mqtt": "MQTT",
@@ -788,6 +809,7 @@
                 "unknownError": "Die automatische Segmentierung ist fehlgeschlagen. Laden Sie die Seite neu und versuchen Sie es erneut.",
                 "timeoutError": "„{{operation}}“ hat das Zeitlimit von {{timeoutMs}} ms überschritten. Laden Sie die Seite neu und versuchen Sie es erneut.",
                 "embeddingError": "Die für die Segmentierung berechneten Bildmerkmale konnten nicht geladen werden ({{status}}{{statusText}}).",
+                "hint": "Umschalttaste + Klick schließt einen Bereich ein, Alt + Klick schließt ihn aus. Klicken Sie, um die Annotation zu erstellen, und drücken Sie Esc, um die Punkte zu löschen.",
                 "operations": {
                     "workerBuild": "Vorbereiten der automatischen Segmentierung",
                     "workerInit": "Starten der automatischen Segmentierung",
@@ -912,6 +934,7 @@
                 },
                 "sort": {
                     "label": "Modelle sortieren nach:",
+                    "recommended": "Empfohlene zuerst",
                     "nameAsc": "Name (A bis Z)",
                     "nameDesc": "Name (Z bis A)",
                     "speedAsc": "Geschwindigkeit (schnellste zuerst)",
