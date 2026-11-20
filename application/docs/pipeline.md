@@ -122,8 +122,10 @@ Enabling this option explicitly accepts valid model predictions as ground truth.
 retraining: inaccurate predictions can reinforce model errors in subsequent training runs.
 
 A valid empty prediction is saved as an annotated image with no objects for detection, instance segmentation,
-and multilabel classification. Multiclass classification requires one class. If labels cannot be resolved or
-annotations fail validation, the original frame is saved without annotations and is not marked as reviewed.
+and multilabel classification. Multiclass classification requires one class. Predicted classes are matched to
+project labels by name, or by the label set recorded when the model was trained if a label was renamed. If labels
+cannot be resolved (for example, a label was deleted after training) or annotations fail validation, the original
+frame is saved without annotations and is not marked as reviewed.
 The server logs a warning for that fallback. Predictions are validated before image files are written; if the
 subsequent dataset write fails, the new image and thumbnail are removed. A manual capture requests one attempt,
 not an automatic retry on every following frame.

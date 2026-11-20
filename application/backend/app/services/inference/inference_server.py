@@ -552,9 +552,7 @@ class InferenceServer:
             self._release(entry)
 
         return {
-            (input.media_id, input.frame_index): convert_prediction(
-                labels=labels, frame_data=input_data[idx], prediction=inference_result[idx]
-            )
+            (input.media_id, input.frame_index): convert_prediction(labels=labels, prediction=inference_result[idx])
             for idx, input in enumerate(inputs)
         }
 

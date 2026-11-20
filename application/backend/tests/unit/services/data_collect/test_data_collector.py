@@ -209,6 +209,8 @@ class TestDataCollectorUnit:
         frame_data = np.random.randint(low=0, high=255, size=(100, 100), dtype=np.uint8)
         inference_data = MagicMock()
         labels = [Label(id=uuid4(), project_id=project.id, name="cat", color="#ff0000", hotkey="")]
+        model = MagicMock()
+        model.training_info.label_schema_revision = {"labels": [{"id": str(uuid4())}, {"id": str(labels[0].id)}]}
         annotations = (
             [
                 DatasetItemAnnotation(
@@ -236,6 +238,7 @@ class TestDataCollectorUnit:
             patch.object(MediaService, "create_image") as mock_create_image,
             patch.object(DatasetService, "create_dataset_item") as mock_create_dataset_item,
             patch("app.services.LabelService.list_all", return_value=labels) as mock_list_labels,
+            patch("app.services.ModelService.get_model", return_value=model) as mock_get_model,
             patch(
                 "app.services.data_collect.data_collector.convert_prediction", return_value=annotations
             ) as mock_convert_prediction,
@@ -265,11 +268,16 @@ class TestDataCollectorUnit:
         )
         if save_predictions:
             mock_list_labels.assert_called_once_with(project_id=project.id)
+            mock_get_model.assert_called_once_with(project_id=project.id, model_id=inference_data.model_id)
             mock_convert_prediction.assert_called_once_with(
-                labels=labels, frame_data=frame_data, prediction=inference_data.prediction, strict=True
+                labels=labels,
+                prediction=inference_data.prediction,
+                strict=True,
+                class_labels=[None, labels[0]],
             )
         else:
             mock_list_labels.assert_not_called()
+            mock_get_model.assert_not_called()
             mock_convert_prediction.assert_not_called()
         assert fxt_data_collector.should_collect_next_frame is False
 

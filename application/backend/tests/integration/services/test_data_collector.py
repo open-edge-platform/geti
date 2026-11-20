@@ -3,7 +3,7 @@
 
 from pathlib import Path
 from unittest.mock import patch
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import numpy as np
 import pytest
@@ -15,7 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.datumaro_converter import SampleMode
-from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
+from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB, ModelRevisionDB
 from app.models import (
     DataCollectionConfig,
     DatasetItemAnnotationStatus,
@@ -264,3 +264,38 @@ class TestDataCollectorIntegration:
                 ),
             )
         assert collector.should_collect_next_frame is True
+
+    @pytest.mark.parametrize("class_index, reviewed", [(1, True), (0, False)], ids=["renamed", "deleted"])
+    def test_unmatched_names_use_model_label_schema(
+        self, fxt_capture, db_session: Session, class_index: int, reviewed: bool
+    ) -> None:
+        collector, project, model_id = fxt_capture
+        cat = next(label for label in project.task.labels if label.name == "cat")
+        db_model = db_session.get(ModelRevisionDB, str(model_id))
+        assert db_model is not None
+        db_model.label_schema_revision = {"labels": [{"id": str(uuid4()), "name": "gone"}, {"id": str(cat.id)}]}
+        db_session.flush()
+        frame = np.zeros((20, 20), dtype=np.uint8)
+        collector.collect_next_frame()
+        collector.collect(
+            timestamp=1,
+            frame_data=frame,
+            inference_data=InferenceData(
+                prediction=DetectionResult(
+                    bboxes=np.array([[0, 0, 10, 10]]),
+                    labels=np.array([class_index]),
+                    scores=np.array([0.9]),
+                    label_names=["old name"],
+                ),
+                visualized_prediction=frame,
+                model_id=model_id,
+            ),
+        )
+
+        item = db_session.scalars(select(DatasetItemDB).where(DatasetItemDB.project_id == str(project.id))).one()
+        assert item.user_reviewed is reviewed
+        if reviewed:
+            assert item.annotation_data is not None
+            assert item.annotation_data[0]["labels"] == [{"id": str(cat.id)}]
+        else:
+            assert item.annotation_data is None

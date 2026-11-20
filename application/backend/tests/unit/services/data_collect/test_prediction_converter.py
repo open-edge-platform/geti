@@ -14,12 +14,7 @@ from app.services.data_collect.prediction_converter import convert_prediction, g
 
 @pytest.mark.parametrize("strict", [False, True])
 def test_convert_prediction_empty_classification(strict: bool) -> None:
-    assert (
-        convert_prediction(
-            labels=[], frame_data=np.zeros((20, 20)), prediction=ClassificationResult(top_labels=[]), strict=strict
-        )
-        == []
-    )
+    assert convert_prediction(labels=[], prediction=ClassificationResult(top_labels=[]), strict=strict) == []
 
 
 @pytest.mark.parametrize(
@@ -48,12 +43,32 @@ def test_convert_prediction_empty_classification(strict: bool) -> None:
 )
 def test_convert_prediction_strict_rejects_partially_unmatched_labels(prediction) -> None:
     labels = [Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000", hotkey="")]
-    frame_data = np.zeros((20, 20), dtype=np.uint8)
 
     with pytest.raises(ValueError, match="cannot be resolved"):
-        convert_prediction(labels=labels, frame_data=frame_data, prediction=prediction, strict=True)
+        convert_prediction(labels=labels, prediction=prediction, strict=True)
 
-    assert len(convert_prediction(labels=labels, frame_data=frame_data, prediction=prediction)) == 1
+    assert len(convert_prediction(labels=labels, prediction=prediction)) == 1
+
+
+def test_convert_prediction_class_labels_resolve_renamed_and_reject_deleted_labels() -> None:
+    cat = Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000", hotkey="")
+    dog = Label(id=uuid4(), project_id=cat.project_id, name="dog", color="#00ff00", hotkey="")
+
+    def detection(class_index: int) -> DetectionResult:
+        return DetectionResult(
+            bboxes=np.array([[1, 1, 10, 10]]),
+            labels=np.array([class_index]),
+            scores=np.array([0.9]),
+            label_names=["old name"],
+        )
+
+    # The model was trained with [deleted, dog]; the project now lists [cat, dog].
+    class_labels = [None, dog]
+    renamed = convert_prediction(labels=[cat, dog], prediction=detection(1), strict=True, class_labels=class_labels)
+    assert renamed[0].labels == [LabelReference(id=dog.id)]
+
+    with pytest.raises(ValueError, match="cannot be resolved"):
+        convert_prediction(labels=[cat, dog], prediction=detection(0), strict=True, class_labels=class_labels)
 
 
 def test_convert_prediction_detection_underscore_label_names() -> None:
@@ -63,7 +78,6 @@ def test_convert_prediction_detection_underscore_label_names() -> None:
     spaces within a label name are replaced with underscores during export.
     The prediction converter must normalise the name before matching.
     """
-    frame_data = np.random.rand(100, 100, 3)
     project_id = uuid4()
     labels = [
         Label(id=uuid4(), project_id=project_id, name="Cabernet Franc", color="#ff0000", hotkey=""),
@@ -77,7 +91,7 @@ def test_convert_prediction_detection_underscore_label_names() -> None:
         label_names=["Cabernet_Franc", "Sauvignon_Blanc"],  # underscores from model
     )
 
-    annotations = convert_prediction(labels=labels, frame_data=frame_data, prediction=raw_prediction)
+    annotations = convert_prediction(labels=labels, prediction=raw_prediction)
 
     assert len(annotations) == 2
     assert annotations[0].labels == [LabelReference(id=labels[0].id)]
@@ -153,7 +167,6 @@ def test_get_confidence_scores_segmentation() -> None:
 )
 def test_convert_prediction_classification(label_names: list[str], predicted_label_names: list[str]) -> None:
     # Arrange
-    frame_data = np.random.rand(100, 100, 3)
     project_id, label_1_id, label_2_id = uuid4(), uuid4(), uuid4()
     labels = [
         Label(id=label_1_id, project_id=project_id, name=label_names[0], color="#00ff00", hotkey="d"),
@@ -167,7 +180,7 @@ def test_convert_prediction_classification(label_names: list[str], predicted_lab
     )
 
     # Act
-    annotations = convert_prediction(labels=labels, frame_data=frame_data, prediction=raw_prediction)
+    annotations = convert_prediction(labels=labels, prediction=raw_prediction)
 
     # Assert
     assert annotations == [
@@ -189,7 +202,6 @@ def test_convert_prediction_classification(label_names: list[str], predicted_lab
 )
 def test_convert_prediction_detection(label_names: list[str], predicted_label_names: list[str]) -> None:
     # Arrange
-    frame_data = np.random.rand(100, 100, 3)
     project_id, label_1_id, label_2_id = uuid4(), uuid4(), uuid4()
     labels = [
         Label(id=label_1_id, project_id=project_id, name=label_names[0], color="#ff0000", hotkey="c"),
@@ -204,7 +216,7 @@ def test_convert_prediction_detection(label_names: list[str], predicted_label_na
     )
 
     # Act
-    annotations = convert_prediction(labels=labels, frame_data=frame_data, prediction=raw_prediction)
+    annotations = convert_prediction(labels=labels, prediction=raw_prediction)
 
     # Assert
     assert annotations == [
@@ -229,13 +241,8 @@ def test_convert_prediction_detection(label_names: list[str], predicted_label_na
         (["black cat", "white dog"], ["cat", "dog"]),
     ],
 )
-@pytest.mark.parametrize("frame_shape", [(100, 200), (100, 200, 3)])
-def test_convert_prediction_segmentation(
-    label_names: list[str], predicted_label_names: list[str], frame_shape: tuple[int, ...]
-) -> None:
+def test_convert_prediction_segmentation(label_names: list[str], predicted_label_names: list[str]) -> None:
     # Arrange
-    frame_data = np.zeros(frame_shape, dtype=np.uint8)
-
     # First mask - rectangle in the left portion
     mask1 = np.zeros((100, 200), dtype=np.uint8)
     cv2.rectangle(mask1, (10, 20), (50, 70), 255, -1)
@@ -258,7 +265,7 @@ def test_convert_prediction_segmentation(
     )
 
     # Act
-    annotations = convert_prediction(labels=[label_cat, label_dog], frame_data=frame_data, prediction=raw_prediction)
+    annotations = convert_prediction(labels=[label_cat, label_dog], prediction=raw_prediction)
 
     # Assert
     assert annotations == [
@@ -277,7 +284,6 @@ def test_convert_prediction_segmentation(
 
 def test_convert_prediction_segmentation_reduces_polygon_points() -> None:
     # Arrange: a large filled circle produces a contour with many points before simplification.
-    frame_data = np.zeros((400, 400, 3), dtype=np.uint8)
     mask = np.zeros((400, 400), dtype=np.uint8)
     cv2.circle(mask, (200, 200), 150, 255, -1)
 
@@ -299,7 +305,7 @@ def test_convert_prediction_segmentation_reduces_polygon_points() -> None:
     )
 
     # Act
-    annotations = convert_prediction(labels=[label], frame_data=frame_data, prediction=raw_prediction)
+    annotations = convert_prediction(labels=[label], prediction=raw_prediction)
 
     # Assert
     assert len(annotations) == 1

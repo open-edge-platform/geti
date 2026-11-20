@@ -174,7 +174,8 @@ class DataCollector:
         if self.active_pipeline_data is None:
             return
         pipeline, project = self.active_pipeline_data
-        from app.services import DatasetService, LabelService, MediaService
+        from app.services import DatasetService, LabelService, MediaService, ModelService
+        from app.services.base import ResourceNotFoundError
         from app.services.dataset_service import AnnotationValidationError
 
         manual_capture = self.should_collect_next_frame
@@ -216,8 +217,20 @@ class DataCollector:
                 if pipeline.data_collection.save_predictions:
                     labels = label_service.list_all(project_id=project.id)
                     try:
+                        model = ModelService(data_dir=self.data_dir, db_session=session).get_model(
+                            project_id=project.id, model_id=inference_data.model_id
+                        )
+                        labels_by_id = {str(label.id): label for label in labels}
+                        label_schema = model.training_info.label_schema_revision if model.training_info else {}
+                        # Class indices follow the label order snapshotted when the model was trained.
+                        class_labels = [
+                            labels_by_id.get(str(entry.get("id"))) for entry in label_schema.get("labels", [])
+                        ]
                         annotations = convert_prediction(
-                            labels=labels, frame_data=frame_data, prediction=inference_data.prediction, strict=True
+                            labels=labels,
+                            prediction=inference_data.prediction,
+                            strict=True,
+                            class_labels=class_labels,
                         )
                         dataset_service.validate_annotations(
                             annotations=annotations,
@@ -226,7 +239,7 @@ class DataCollector:
                             media_width=frame_data.shape[1],
                             media_height=frame_data.shape[0],
                         )
-                    except (AnnotationValidationError, ValueError) as error:
+                    except (AnnotationValidationError, ResourceNotFoundError, ValueError) as error:
                         logger.warning("Saving captured frame without invalid predictions: {}", error)
                         annotations = None
 

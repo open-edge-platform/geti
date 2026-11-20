@@ -50,7 +50,7 @@ def _build_label_maps(labels: Sequence[Label]) -> tuple[dict[str, Label], dict[s
 def _find_project_label(
     name_map: dict[str, Label],
     unmangled_map: dict[str, Label],
-    labels: Sequence[Label],
+    labels: Sequence[Label | None],
     label_name: str | None,
     predicted_class_index: int | None = None,
     strict: bool = False,
@@ -70,7 +70,8 @@ def _find_project_label(
         name_map: Mapping of label name → ``Label`` for O(1) exact-name lookup.
         unmangled_map: Mapping of underscore-mangled label name → ``Label`` for O(1) unmangled-name lookup.
             Only contains entries for labels whose names include spaces.
-        labels: Ordered sequence of project labels to search.
+        labels: Labels ordered by model class index, used for the index fallback. ``None`` marks a class whose
+            project label no longer exists.
         label_name: The label name as reported by the model. May be ``None`` when the model does not provide a name,
             in which case stages 1 and 2 are skipped.
         predicted_class_index: Zero-based class index produced by the model. Used only when name-based lookup fails.
@@ -92,14 +93,19 @@ def _find_project_label(
                 return label
 
     if predicted_class_index is not None and 0 <= predicted_class_index < len(labels):
-        return labels[predicted_class_index]
+        label = labels[predicted_class_index]
+        if label is not None:
+            return label
     if strict:
         raise ValueError(f"Prediction label {label_name!r} (index {predicted_class_index}) cannot be resolved")
     return None
 
 
 def _convert_classification_prediction(
-    labels: Sequence[Label], prediction: "ClassificationResult", strict: bool = False
+    labels: Sequence[Label],
+    class_labels: Sequence[Label | None],
+    prediction: "ClassificationResult",
+    strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
     predicted_labels: list[LabelReference] = []
     predicted_confidences: list[float] = []
@@ -111,7 +117,7 @@ def _convert_classification_prediction(
         label = _find_project_label(
             name_map=name_map,
             unmangled_map=unmangled_map,
-            labels=labels,
+            labels=class_labels,
             label_name=label_name,
             predicted_class_index=predicted_label.id,
             strict=strict,
@@ -131,7 +137,10 @@ def _convert_classification_prediction(
 
 
 def _convert_detection_prediction(
-    labels: Sequence[Label], prediction: "DetectionResult", strict: bool = False
+    labels: Sequence[Label],
+    class_labels: Sequence[Label | None],
+    prediction: "DetectionResult",
+    strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
     name_map, unmangled_map = _build_label_maps(labels)
     result = []
@@ -142,7 +151,7 @@ def _convert_detection_prediction(
         label = _find_project_label(
             name_map=name_map,
             unmangled_map=unmangled_map,
-            labels=labels,
+            labels=class_labels,
             label_name=label_name,
             predicted_class_index=int(prediction.labels[idx]),
             strict=strict,
@@ -162,7 +171,7 @@ def _convert_detection_prediction(
 
 def _convert_segmentation_prediction(
     labels: Sequence[Label],
-    _frame_data: np.ndarray,
+    class_labels: Sequence[Label | None],
     prediction: "InstanceSegmentationResult",
     strict: bool = False,
 ) -> list[DatasetItemAnnotation]:
@@ -175,7 +184,7 @@ def _convert_segmentation_prediction(
         label = _find_project_label(
             name_map=name_map,
             unmangled_map=unmangled_map,
-            labels=labels,
+            labels=class_labels,
             label_name=label_name,
             predicted_class_index=int(prediction.labels[idx]),
             strict=strict,
@@ -227,7 +236,11 @@ def get_confidence_scores(prediction: "Result") -> list[float]:
 
 
 def convert_prediction(
-    labels: Sequence[Label], frame_data: np.ndarray, prediction: "Result", *, strict: bool = False
+    labels: Sequence[Label],
+    prediction: "Result",
+    *,
+    strict: bool = False,
+    class_labels: Sequence[Label | None] | None = None,
 ) -> list[DatasetItemAnnotation]:
     """
     Converts model predictions to dataset annotations based on prediction type.
@@ -237,12 +250,12 @@ def convert_prediction(
 
     Args:
         labels: List of Label objects available in the project for annotation.
-        frame_data: Image data in numpy ndarray format, used for segmentation
-                   annotations that may require image dimensions.
         prediction: Prediction result object containing model outputs, which can
                    be one of: InstanceSegmentationResult, DetectionResult, or
                    ClassificationResult.
         strict: Reject unresolved labels and unsupported prediction types instead of skipping them.
+        class_labels: Project labels ordered by model class index, with ``None`` for deleted labels. Used when a
+            predicted label name does not match; defaults to ``labels``.
 
     Returns:
         list[DatasetItemAnnotation]: List of annotations converted from the
@@ -256,21 +269,25 @@ def convert_prediction(
     Example:
         >>> annotations = convert_prediction(
         ...     labels=project_labels,
-        ...     frame_data=image_array,
         ...     prediction=detection_result
         ... )
     """
     from model_api.models import ClassificationResult, DetectionResult, InstanceSegmentationResult
 
+    index_labels = labels if class_labels is None else class_labels
     match prediction:
         case InstanceSegmentationResult():
             return _convert_segmentation_prediction(
-                labels=labels, _frame_data=frame_data, prediction=prediction, strict=strict
+                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
             )
         case DetectionResult():
-            return _convert_detection_prediction(labels=labels, prediction=prediction, strict=strict)
+            return _convert_detection_prediction(
+                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
+            )
         case ClassificationResult():
-            return _convert_classification_prediction(labels=labels, prediction=prediction, strict=strict)
+            return _convert_classification_prediction(
+                labels=labels, class_labels=index_labels, prediction=prediction, strict=strict
+            )
     if strict:
         raise ValueError(f"Unsupported prediction type: {type(prediction).__name__}")
     return []
