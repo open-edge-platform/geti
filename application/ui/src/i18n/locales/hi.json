@@ -74,7 +74,8 @@
             "model": "मॉडल",
             "jobs": "जॉब",
             "labels": "लेबल",
-            "bytesTransferred": "{{total}} में से {{transferred}}"
+            "bytesTransferred": "{{total}} में से {{transferred}}",
+            "annotations": "एनोटेशन"
         },
         "viewModes": {
             "large": "बड़े थंबनेल",
@@ -89,7 +90,9 @@
             "uploading": "अपलोड हो रहा है",
             "failed": "विफल",
             "error": "त्रुटि",
-            "disconnected": "कनेक्शन नहीं"
+            "disconnected": "कनेक्शन नहीं",
+            "loading": "लोड हो रहा है...",
+            "unavailable": "उपलब्ध नहीं"
         },
         "errors": {
             "unknown": "कुछ गड़बड़ हुई",
@@ -230,6 +233,21 @@
             "assignAllSuccess": "सभी {{count}} छवियों पर लेबल लगा दिए गए",
             "assignAllFailure": "{{count}} छवियों में से किसी पर भी लेबल नहीं लग सके",
             "assignPartialSuccess": "{{total}} में से {{succeeded}} छवियों पर लेबल लग गए ({{failed}} पर नहीं लग सके)"
+        },
+        "mediaDetails": {
+            "title": "विवरण",
+            "resolution": "रिज़ॉल्यूशन",
+            "fileSize": "फ़ाइल का आकार",
+            "format": "फ़ॉर्मैट",
+            "type": "मीडिया प्रकार",
+            "image": "छवि",
+            "video": "वीडियो",
+            "frameRate": "फ़्रेम दर",
+            "duration": "अवधि",
+            "frames": "कुल फ़्रेम",
+            "annotatedFrames": "एनोटेशन वाले फ़्रेम",
+            "labels": "विशिष्ट लेबल",
+            "retry": "फिर से प्रयास करें"
         },
         "mediaActions": {
             "downloadStarted": "{{fileName}} का डाउनलोड शुरू हो गया है"
