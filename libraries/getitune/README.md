@@ -278,7 +278,8 @@ Export a trained model to OpenVINO IR or ONNX format:
 
 ```python
 from getitune.engine import create_engine
-from getitune.types import ExportFormat, ExportPrecision
+from getitune.types.export import ExportFormat
+from getitune.types.precision import Precision
 
 engine = create_engine(
     model="efficientnet_b0",
@@ -294,7 +295,7 @@ ov_ir_path = engine.export()
 onnx_path = engine.export(export_format=ExportFormat.ONNX)
 
 # Export to FP16 ONNX. Same for OpenVINO IR.
-onnx_path = engine.export(export_format=ExportFormat.ONNX, precision=ExportPrecision.FP16)
+onnx_path = engine.export(export_format=ExportFormat.ONNX, export_precision=Precision.FP16)
 ```
 
 NMS-based detection and instance-segmentation models are exported without NMS in the graph by default; ModelAPI applies NMS using the embedded metadata. `MaskRCNN`, `MaskRCNNTV`, and `RTMDetInst` always embed NMS because their export paths do not support raw outputs, regardless of `export_nms`. To embed NMS in the exported graph for models that support the option, pass `export_nms=True` explicitly:

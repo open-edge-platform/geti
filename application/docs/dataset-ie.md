@@ -205,9 +205,8 @@ involved in dataset import and export.
 
 - **prepare_dataset_for_import**: extracts a compressed dataset archive, saving it to getidata format while determining
   its characteristics (task type, labels, number of media and annotations).
-- **import_dataset_to_existing_project**: loads a getidata dataset and inserts its items into the dataset of a project,
+- **import_dataset_to_project**: loads a getidata dataset and inserts its items into an existing project's dataset,
   applying optional filtering, annotation conversion and label remapping.
-  If the target is a new project, this job also creates the project.
 - **import_dataset_as_new_project**: creates a new project, then loads a getidata dataset and inserts its items into
   the dataset of the newly created project, applying optional filtering and annotation conversion.
 - **stage_dataset**: loads a project's dataset (or dataset revision) as a getidata dataset, applying optional filtering,

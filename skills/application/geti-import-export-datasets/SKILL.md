@@ -54,7 +54,7 @@ flowchart LR
     B --> C[Review detected task/labels]
     C --> D{Destination}
     D -->|new project| E[import_dataset_as_new_project]
-    D -->|existing project| F[import_dataset_to_existing_project]
+    D -->|existing project| F[import_dataset_to_project]
 ```
 
 1. **Upload the archive to staging.**
@@ -73,7 +73,7 @@ flowchart LR
 4. **Import to a destination** via `POST /api/jobs`:
    - New project: `import_dataset_as_new_project` (`staged_dataset_id`,
      `project.name`, `project.task_type`, optional `filters`).
-   - Existing project: `import_dataset_to_existing_project` (`staged_dataset_id`,
+   - Existing project: `import_dataset_to_project` (`staged_dataset_id`,
      `project_id`, `labels_mapping`, `include_unannotated`).
    - Done when: the job finishes and the target project's dataset lists the new
      items (`GET /api/projects/<id>/dataset/items`).
