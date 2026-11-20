@@ -42,6 +42,12 @@ def render_channel_projection(pixels: np.ndarray, info: OmeImageInfo, projection
 
 
 def _window_channel(plane: np.ndarray, info: OmeImageInfo, channel_index: int) -> np.ndarray:
+    minimum, maximum = channel_intensity_range(plane.dtype, info, channel_index)
+    return window_channel(plane, minimum, maximum)
+
+
+def channel_intensity_range(dtype: np.dtype, info: OmeImageInfo, channel_index: int) -> tuple[float, float]:
+    """Resolve a channel's declared range, falling back to its pixel dtype."""
     channel = next((channel for channel in info.channels if channel["index"] == channel_index), None)
     window = channel.get("window") if channel else None
     if isinstance(window, dict):
@@ -54,10 +60,20 @@ def _window_channel(plane: np.ndarray, info: OmeImageInfo, channel_index: int) -
             or minimum >= maximum
         ):
             raise InvalidImageError("Invalid OME channel intensity window.")
-    elif np.issubdtype(plane.dtype, np.integer):
-        limits = np.iinfo(plane.dtype)
+    elif np.issubdtype(dtype, np.integer):
+        limits = np.iinfo(dtype)
         minimum, maximum = limits.min, limits.max
     else:
         minimum, maximum = 0, 1
-    scaled = (plane.astype(np.float64) - minimum) * (255.0 / (maximum - minimum))
+    return float(minimum), float(maximum)
+
+
+def window_channel(plane: np.ndarray, minimum: float, maximum: float) -> np.ndarray:
+    """Map a valid intensity window to uint8, clipping endpoints and non-finite pixels."""
+    values = plane.astype(np.float64).clip(minimum, maximum)
+    if math.isfinite(maximum - minimum):
+        scaled = (values - minimum) / (maximum - minimum)
+    else:
+        scaled = (values / 2 - minimum / 2) / (maximum / 2 - minimum / 2)
+    scaled *= 255
     return np.nan_to_num(scaled).clip(0, 255).astype(np.uint8)

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 
 from app.core.models import BaseRequiredIDNameModel, Pagination
 from app.models import DatasetItemAnnotation, DatasetItemSubset, MediaFormat, MediaType
+from app.models.ome import OmeChannelView
 
 
 class MediaAnnotationStatusView(BaseModel):
@@ -139,6 +140,10 @@ class OmeImageView(BaseRequiredIDNameModel):
     size: int
     source_id: UUID | None = None
     annotation_status: MediaAnnotationStatusView
+
+
+class OmeChannelViewResponse(OmeChannelView):
+    """API response containing resolved channel settings and their default/saved status."""
 
 
 MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView, Field(discriminator="type")]

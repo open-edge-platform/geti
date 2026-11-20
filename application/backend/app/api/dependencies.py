@@ -42,6 +42,7 @@ from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
 from app.services.inference_status_service import InferenceStatusService
 from app.services.license_service import LicenseService
+from app.services.ome.rendering import OmeRenderingService
 from app.services.sink_status_service import SinkStatusService
 from app.services.source_status_service import SourceStatusService
 from app.services.training_configuration_service import TrainingConfigurationService
@@ -293,6 +294,13 @@ def get_media_numpy_loader(
 ) -> MediaNumpyLoader:
     """Provides a MediaNumpyLoader instance."""
     return MediaNumpyLoader(media_service=media_service)
+
+
+def get_ome_rendering_service(
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+) -> OmeRenderingService:
+    """Provide OME display rendering."""
+    return OmeRenderingService(media_service)
 
 
 def get_dataset_service(

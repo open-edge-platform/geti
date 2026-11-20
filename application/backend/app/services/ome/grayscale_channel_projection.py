@@ -6,7 +6,7 @@ from app.models.ome import GrayscaleProjection
 from app.services.base import InvalidImageError
 
 
-class SingleChannelGrayscaleMappingStrategy:
+class SingleChannelGrayscaleProjectionStrategy:
     """Select a configured source channel without expanding it to RGB."""
 
     def __init__(self, channel: int = 0) -> None:
