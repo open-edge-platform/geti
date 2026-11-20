@@ -491,7 +491,7 @@
                 "notSet": "Nicht festgelegt",
                 "samplesPerSecond_one": "{{count}} Ergebnis pro Sekunde",
                 "samplesPerSecond_other": "{{count}} Ergebnisse pro Sekunde",
-                "oneSamplePerSeconds_one": "1 Ergebnis pro Sekunde",
+                "oneSamplePerSeconds_one": "1 Ergebnis jede Sekunde",
                 "oneSamplePerSeconds_other": "1 Ergebnis alle {{count}} Sekunden"
             },
             "fields": {
