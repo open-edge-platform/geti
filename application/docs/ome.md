@@ -414,7 +414,9 @@ become `MediaDB.parent_id` (repositories, filters, services), but the public `vi
 
 ## 5. API contract
 
-All additive, under the existing `/api/projects/{project_id}/dataset/media` router.
+All additive, under the existing `/api/projects/{project_id}/dataset/media` URL prefix.
+OME structure, channel-view and render endpoints live in `app/api/routers/ome.py`; generic media operations,
+including upload, remain in `app/api/routers/media.py`. Both routers retain the `Media` OpenAPI tag.
 
 `GET /{media_id}/binary` rejects all `ome_image` containers with 400, including single-file OME-TIFF and
 requests with `raw=true`. OME pixel display belongs to the plane render endpoint described below.
