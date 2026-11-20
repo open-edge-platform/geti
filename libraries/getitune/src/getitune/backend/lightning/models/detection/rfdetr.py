@@ -69,6 +69,8 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
         pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
+        reset_pretrained_class_bias: Whether to reset the pretrained decoder and two-stage encoder
+            classification biases to zero after loading pretrained weights. Defaults to True.
 
     Note:
         RF-DETR uses different patch sizes for different model variants:
@@ -114,10 +116,12 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
         export_nms: bool = False,
+        reset_pretrained_class_bias: bool = True,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
         self.gradient_checkpointing = gradient_checkpointing
+        self.reset_pretrained_class_bias = reset_pretrained_class_bias
         super().__init__(
             label_info=label_info,
             data_input_params=data_input_params,

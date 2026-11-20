@@ -6,11 +6,14 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import torch
 from torchvision import tv_tensors
 
+from getitune.backend.lightning.models.common.rfdetr_mixin import RFDETRMixin
 from getitune.backend.lightning.models.detection.rfdetr import RFDETR
 from getitune.backend.lightning.models.detection.utils.rfdetr_batch_utils import (
     _cap_per_image,
@@ -413,6 +416,69 @@ class TestRFDETR:
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
+        assert model.reset_pretrained_class_bias is True
+
+    @pytest.mark.parametrize("reset_class_bias", [True, False])
+    def test_init_sets_class_bias_reset_before_loading(
+        self, reset_class_bias: bool, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test the class-bias reset option is available during pretrained loading."""
+        seen_options: list[bool] = []
+
+        def record_option(model: RFDETR, weights: Path | None = None) -> None:
+            seen_options.append(model.reset_pretrained_class_bias)
+
+        monkeypatch.setattr(RFDETR, "load_pretrained", record_option)
+        model = RFDETR(
+            model_name="rfdetr_nano",
+            label_info=3,
+            pretrained=True,
+            reset_pretrained_class_bias=reset_class_bias,
+        )
+        assert model.reset_pretrained_class_bias is reset_class_bias
+        assert seen_options == [reset_class_bias]
+
+    @pytest.mark.parametrize("reset_class_bias", [True, False, None])
+    @pytest.mark.parametrize("two_stage", [True, False])
+    def test_load_pretrained_class_bias_reset(
+        self,
+        reset_class_bias: bool | None,
+        two_stage: bool,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test the optional reset of pretrained decoder and encoder class biases."""
+        decoder_bias = torch.nn.Parameter(torch.ones(1))
+        encoder_bias = torch.nn.Parameter(torch.ones(1))
+        lwdetr = SimpleNamespace(
+            class_embed=SimpleNamespace(bias=decoder_bias),
+            two_stage=two_stage,
+            transformer=SimpleNamespace(enc_out_class_embed=[SimpleNamespace(bias=encoder_bias)]),
+        )
+
+        class FakeRFDETR(RFDETRMixin):
+            reset_pretrained_class_bias: bool
+
+            def __init__(self) -> None:
+                self.model = SimpleNamespace(lwdetr=lwdetr)
+                self._model_config = SimpleNamespace()
+
+        model = FakeRFDETR()
+        if reset_class_bias is not None:
+            model.reset_pretrained_class_bias = reset_class_bias
+        loaded: list[tuple[object, object]] = []
+
+        def load_weights(loaded_model: object, config: object) -> None:
+            loaded.append((loaded_model, config))
+
+        monkeypatch.setattr("getitune.backend.lightning.models.common.rfdetr_mixin.load_pretrain_weights", load_weights)
+
+        model.load_pretrained(weights=Path("weights.pth"))
+
+        expected_bias = torch.zeros(1) if reset_class_bias is not False else torch.ones(1)
+        torch.testing.assert_close(decoder_bias, expected_bias)
+        torch.testing.assert_close(encoder_bias, expected_bias if two_stage else torch.ones(1))
+        assert loaded == [(lwdetr, model._model_config)]
+        assert model._model_config.pretrain_weights == "weights.pth"
 
     def test_create_model(self) -> None:
         """Test RF-DETR model creation."""
