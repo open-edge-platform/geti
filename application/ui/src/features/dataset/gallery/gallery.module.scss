@@ -1,0 +1,14 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+.galleryItem:focus-within {
+    [data-floating-container] {
+        opacity: 1;
+    }
+}
+
+@media (hover: none) {
+    .galleryItem [data-floating-container] {
+        opacity: 1;
+    }
+}

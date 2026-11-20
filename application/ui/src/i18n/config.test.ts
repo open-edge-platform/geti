@@ -49,16 +49,31 @@ describe('createI18nInstance', () => {
         expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('en');
     });
 
-    it.each(['de-DE', 'not a language', '---', ''])(
-        'renders English for unsupported browser language %s',
-        (language) => {
-            setNavigatorLanguage(language);
-            const instance = createI18nInstance();
+    it.each(['not a language', '---', ''])('renders English for unsupported browser language %s', (language) => {
+        setNavigatorLanguage(language);
+        const instance = createI18nInstance();
 
-            expect(instance.resolvedLanguage).toBe('en');
-            expect(instance.t('common.labels.dataset')).toBe('Dataset');
-        }
-    );
+        expect(instance.resolvedLanguage).toBe('en');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
+    });
+
+    it.each(['de', 'de-DE', 'de-AT', 'de-CH'])('renders German for browser language %s', (language) => {
+        setNavigatorLanguage(language);
+        const instance = createI18nInstance();
+
+        expect(instance.resolvedLanguage).toBe('de');
+        expect(instance.t('common.labels.dataset')).toBe('Datensatz');
+        expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('de');
+    });
+
+    it.each([
+        [1, '1 Ergebnis jede Sekunde'],
+        [2, '1 Ergebnis alle 2 Sekunden'],
+    ])('interpolates German rate-limit interval %i', (count, expected) => {
+        const instance = createI18nInstance({ lng: 'de' });
+
+        expect(instance.t('inference.sinks.rateLimit.oneSamplePerSeconds', { count })).toBe(expected);
+    });
 
     it.each(['fr', 'fr-FR', 'fr-BE', 'fr-CA', 'fr-CH'])('renders French for browser language %s', (language) => {
         setNavigatorLanguage(language);
@@ -145,8 +160,15 @@ describe('createI18nInstance', () => {
         expect(instance.t('common.labels.dataset')).toBe('数据集');
     });
 
-    it('renders English for a pinned unsupported language', () => {
+    it('renders German for a pinned regional language', () => {
         const instance = createI18nInstance({ lng: 'de-DE' });
+
+        expect(instance.resolvedLanguage).toBe('de');
+        expect(instance.t('common.labels.dataset')).toBe('Datensatz');
+    });
+
+    it('renders English for a pinned unsupported language', () => {
+        const instance = createI18nInstance({ lng: 'klingon' });
 
         expect(instance.resolvedLanguage).toBe('en');
         expect(instance.t('common.labels.dataset')).toBe('Dataset');

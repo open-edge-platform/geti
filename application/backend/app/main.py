@@ -18,6 +18,14 @@ if getattr(sys, "frozen", False) and __name__ == "__main__":
     # https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html#multi-processing
     multiprocessing.freeze_support()
 
+    # The frozen executable is the Geti server, not a Python interpreter, and it takes no command-line arguments.
+    # freeze_support() has already handled (and exited for) multiprocessing children, so any remaining arguments
+    # come from code that treats `sys.executable` as Python, e.g. Ultralytics running
+    # `sys.executable -m pip install onnxruntime` during ONNX export. Starting a server here would spawn a second
+    # backend that never exits and blocks the caller forever, so fail fast instead.
+    if len(sys.argv) > 1:
+        sys.exit(f"{sys.argv[0]} is the Geti server, not a Python interpreter; refusing arguments: {sys.argv[1:]}")
+
 import asyncio
 import logging
 import re
@@ -174,8 +182,8 @@ def create_app() -> FastAPI:
         redoc_url=None,
         docs_url=None,
         lifespan=lifespan,
-        # TODO add contact info
-        # TODO add license
+        contact={"name": "Intel Geti", "url": "https://github.com/open-edge-platform/geti"},
+        license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
     )
 
     app.add_middleware(  # TODO restrict settings in production

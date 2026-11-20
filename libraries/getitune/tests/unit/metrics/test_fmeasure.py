@@ -57,10 +57,21 @@ class TestFMeasure:
         assert metric.preds == []
         assert metric.targets == []
 
-        # TODO(jaegukhyun): Add the following scenario
-        # 1. Prepare preds and targets which can produce f1-score < 0.5
-        # 2. Execute metric.compute()
-        # 3. Assert best_confidence_threshold == metric.best_confidence_threshold
+        low_f1_preds = [
+            {
+                "boxes": torch.Tensor([[0.0, 0.0, 0.1, 0.1]]),
+                "labels": torch.IntTensor([0]),
+                "scores": torch.Tensor([0.9]),
+            },
+        ]
+        low_f1_targets = [
+            {"boxes": torch.Tensor([[0.8, 0.8, 0.9, 0.9]]), "labels": torch.IntTensor([0])},
+        ]
+        metric.update(low_f1_preds, low_f1_targets)
+        result = metric.compute()
+        assert result["f1-score"] < 0.5
+        assert metric.current_confidence_threshold != best_confidence_threshold
+        assert metric.best_confidence_threshold == best_confidence_threshold
 
     def test_fmeasure_with_fixed_threshold(self, fxt_preds, fxt_targets) -> None:
         """Check fmeasure can compute f1 score given confidence threshold."""

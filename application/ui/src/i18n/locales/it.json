@@ -72,7 +72,8 @@
             "model": "Modello",
             "jobs": "Processi",
             "labels": "Etichette",
-            "bytesTransferred": "{{transferred}} di {{total}}"
+            "bytesTransferred": "{{transferred}} di {{total}}",
+            "annotations": "Annotazioni"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -87,7 +88,9 @@
             "uploading": "Caricamento",
             "failed": "Non riuscito",
             "error": "Errore",
-            "disconnected": "Disconnesso"
+            "disconnected": "Disconnesso",
+            "loading": "Caricamento in corso...",
+            "unavailable": "Non disponibile"
         },
         "errors": {
             "unknown": "Si è verificato un errore sconosciuto",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Video annotati / frame",
             "numberOfObjectsPerLabel": "Numero di oggetti per etichetta",
             "unannotated": "Non annotato",
-            "annotated": "Annotato",
-            "annotationsChartTooltip": "Annotazioni"
+            "annotated": "Annotato"
         },
         "delete": {
             "title": "Elimina elementi",
@@ -229,6 +231,21 @@
             "assignAllFailure": "Impossibile assegnare etichetta/e a tutte le {{count}} immagine/i",
             "assignPartialSuccess": "Etichetta/e assegnata/e a {{succeeded}} di {{total}} immagine/i ({{failed}} non riusciti)"
         },
+        "mediaDetails": {
+            "title": "Dettagli",
+            "resolution": "Risoluzione",
+            "fileSize": "Dimensione file",
+            "format": "Formato",
+            "type": "Tipo di media",
+            "image": "Immagine",
+            "video": "Video",
+            "frameRate": "Frequenza fotogrammi",
+            "duration": "Durata",
+            "frames": "Fotogrammi totali",
+            "annotatedFrames": "Fotogrammi annotati",
+            "labels": "Etichette uniche",
+            "retry": "Riprova"
+        },
         "mediaActions": {
             "downloadStarted": "Il download di {{fileName}} è iniziato"
         },
@@ -244,10 +261,6 @@
             "dropZone": {
                 "title": "Trascina qui i file multimediali",
                 "description": "Le immagini e i video verranno caricati in questo dataset."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Numero di frame annotati: {{count}}",
-                "totalFrames": "Frame totali: {{count}}"
             }
         },
         "import": {
@@ -399,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Caricamento in corso...",
                 "device": "Dispositivo: {{name}}",
                 "unknownDevice": "Dispositivo sconosciuto (id: {{deviceId}})",
                 "streamUrl": "URL stream: {{url}}",
@@ -548,8 +560,7 @@
             },
             "component": {
                 "healthy": "Integro",
-                "finished": "Completato",
-                "unavailable": "Non disponibile"
+                "finished": "Completato"
             }
         },
         "stream": {

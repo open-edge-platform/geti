@@ -5,6 +5,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import pytest
 import torch
 
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -12,6 +16,9 @@ from getitune.backend.lightning.models.base import DataInputParams
 from getitune.backend.lightning.models.common.rfdetr_mixin import RFDETRMixin
 from getitune.backend.lightning.models.instance_segmentation.rfdetr_inst import RFDETRInst
 from getitune.data.entity import PredictionBatch
+
+if TYPE_CHECKING:
+    from rfdetr.models.lwdetr import LWDETR
 
 
 class TestRFDETRInst:
@@ -26,6 +33,38 @@ class TestRFDETRInst:
         )
         assert model.model_name == "rfdetr_seg_n"
         assert model.num_classes == 3
+        assert model.reset_pretrained_class_bias is True
+
+    @pytest.mark.parametrize("reset_class_bias", [True, False])
+    def test_pretrained_class_bias_reset(self, reset_class_bias: bool, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Test the constructor controls post-load classification bias resets."""
+        loaded: list[LWDETR] = []
+
+        def load_weights(lwdetr: LWDETR, config: object) -> None:
+            loaded.append(lwdetr)
+            torch.nn.init.constant_(lwdetr.class_embed.bias, 2.0)
+            if lwdetr.two_stage:
+                for enc_cls_embed in lwdetr.transformer.enc_out_class_embed:
+                    torch.nn.init.constant_(enc_cls_embed.bias, 3.0)
+
+        monkeypatch.setattr("getitune.backend.lightning.models.common.rfdetr_mixin.load_pretrain_weights", load_weights)
+        model = RFDETRInst(
+            model_name="rfdetr_seg_n",
+            label_info=3,
+            pretrained=True,
+            pretrained_weights=Path("weights.pth"),
+            reset_pretrained_class_bias=reset_class_bias,
+        )
+
+        assert len(loaded) == 1
+        lwdetr = loaded[0]
+        assert model.reset_pretrained_class_bias is reset_class_bias
+        expected_decoder = 2.0 if reset_class_bias is False else 0.0
+        torch.testing.assert_close(lwdetr.class_embed.bias, torch.full_like(lwdetr.class_embed.bias, expected_decoder))
+        if lwdetr.two_stage:
+            expected_encoder = 3.0 if reset_class_bias is False else 0.0
+            for enc_cls_embed in lwdetr.transformer.enc_out_class_embed:
+                torch.testing.assert_close(enc_cls_embed.bias, torch.full_like(enc_cls_embed.bias, expected_encoder))
 
     def test_create_model(self) -> None:
         """Test RF-DETR instance segmentation model creation."""

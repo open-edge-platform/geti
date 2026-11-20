@@ -72,7 +72,8 @@
             "model": "Model",
             "jobs": "Taken",
             "labels": "Labels",
-            "bytesTransferred": "{{transferred}} van {{total}}"
+            "bytesTransferred": "{{transferred}} van {{total}}",
+            "annotations": "Annotaties"
         },
         "viewModes": {
             "large": "Grote miniaturen",
@@ -87,7 +88,9 @@
             "uploading": "Bezig met uploaden",
             "failed": "Mislukt",
             "error": "Fout",
-            "disconnected": "Verbinding verbroken"
+            "disconnected": "Verbinding verbroken",
+            "loading": "Laden...",
+            "unavailable": "Niet beschikbaar"
         },
         "errors": {
             "unknown": "Er is een onbekende fout opgetreden",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Geannoteerde video's / frames",
             "numberOfObjectsPerLabel": "Aantal objecten per label",
             "unannotated": "Niet geannoteerd",
-            "annotated": "Geannoteerd",
-            "annotationsChartTooltip": "Annotaties"
+            "annotated": "Geannoteerd"
         },
         "delete": {
             "title": "Items verwijderen",
@@ -229,6 +231,21 @@
             "assignAllFailure": "Toewijzen van label(s) aan alle {{count}} afbeelding(en) mislukt",
             "assignPartialSuccess": "Label(s) toegewezen aan {{succeeded}} van {{total}} afbeelding(en) ({{failed}} mislukt)"
         },
+        "mediaDetails": {
+            "title": "Details",
+            "resolution": "Resolutie",
+            "fileSize": "Bestandsgrootte",
+            "format": "Formaat",
+            "type": "Mediatype",
+            "image": "Afbeelding",
+            "video": "Video",
+            "frameRate": "Framesnelheid",
+            "duration": "Duur",
+            "frames": "Totaal frames",
+            "annotatedFrames": "Geannoteerde frames",
+            "labels": "Unieke labels",
+            "retry": "Opnieuw proberen"
+        },
         "mediaActions": {
             "downloadStarted": "Download van {{fileName}} is gestart"
         },
@@ -244,10 +261,6 @@
             "dropZone": {
                 "title": "Zet mediabestanden hier neer",
                 "description": "Afbeeldingen en video's worden naar deze dataset geüpload."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Aantal geannoteerde frames: {{count}}",
-                "totalFrames": "Totaal aantal frames: {{count}}"
             }
         },
         "import": {
@@ -399,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Laden...",
                 "device": "Apparaat: {{name}}",
                 "unknownDevice": "Onbekend apparaat (id: {{deviceId}})",
                 "streamUrl": "Stream-URL: {{url}}",
@@ -548,8 +560,7 @@
             },
             "component": {
                 "healthy": "In orde",
-                "finished": "Afgerond",
-                "unavailable": "Niet beschikbaar"
+                "finished": "Afgerond"
             }
         },
         "stream": {

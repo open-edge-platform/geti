@@ -40,7 +40,7 @@ export const getComponentStatusMeta = (component: PipelineStatus, t: TranslateFn
             return { label: t('inference.health.component.finished'), variant: 'info', message: component.message };
         case 'unavailable':
             return {
-                label: t('inference.health.component.unavailable'),
+                label: t('common.status.unavailable'),
                 variant: 'neutral',
                 message: component.message,
             };

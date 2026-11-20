@@ -30,3 +30,7 @@ allow-dependencies-licenses:
   # see https://pypi.org/pypi/lxml/json
   # The GPL-1.0-or-later entry in the SBOM is a scanner false positive
   - pkg:pypi/lxml
+  # See https://github.com/open-edge-platform/geti/pull/7720/
+  - pkg:pypi/ultralytics
+  - pkg:pypi/ultralytics-thop
+  - pkg:pypi/ultralytics-platform

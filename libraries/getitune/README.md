@@ -56,6 +56,9 @@ Each supported task ships with curated "recipes": YAML files that bundle the mod
 
 All recipes live under `src/getitune/recipe/<task>/`. Pass any of these YAMLs directly to the API as `model=...`. Recipes whose name ends in `_tile` enable the tiling pipeline for large images.
 
+Recipes default to two data-loading workers for training and validation, and one for testing. Override `num_workers`
+in the relevant subset configuration when needed; `0` loads data in the main process.
+
 | Task                                       | Recipe directory                                                                                                                               | Example recipes                                                                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Classification (multi-class / multi-label) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/) | `dino_v2`, `dinov3_{vits,vitb16,vitl16}`, `dinov3_convnext_{tiny,small,base,large}`, `convnextv2_{atto,base,large}`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`, `yolo26_{n,s,m,l,x}_cls`, `timm_generic` (any [timm](https://github.com/huggingface/pytorch-image-models) backbone by name, e.g. `resnet50.a1_in1k`, `convnext_tiny.in12k`) |
@@ -275,7 +278,8 @@ Export a trained model to OpenVINO IR or ONNX format:
 
 ```python
 from getitune.engine import create_engine
-from getitune.types import ExportFormat, ExportPrecision
+from getitune.types.export import ExportFormat
+from getitune.types.precision import Precision
 
 engine = create_engine(
     model="efficientnet_b0",
@@ -291,7 +295,7 @@ ov_ir_path = engine.export()
 onnx_path = engine.export(export_format=ExportFormat.ONNX)
 
 # Export to FP16 ONNX. Same for OpenVINO IR.
-onnx_path = engine.export(export_format=ExportFormat.ONNX, precision=ExportPrecision.FP16)
+onnx_path = engine.export(export_format=ExportFormat.ONNX, export_precision=Precision.FP16)
 ```
 
 NMS-based detection and instance-segmentation models are exported without NMS in the graph by default; ModelAPI applies NMS using the embedded metadata. `MaskRCNN`, `MaskRCNNTV`, and `RTMDetInst` always embed NMS because their export paths do not support raw outputs, regardless of `export_nms`. To embed NMS in the exported graph for models that support the option, pass `export_nms=True` explicitly:

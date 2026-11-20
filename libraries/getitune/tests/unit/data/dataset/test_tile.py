@@ -6,6 +6,7 @@ from unittest.mock import Mock
 
 from getidata.fields import Subset
 
+from getitune.config.data import TileConfig
 from getitune.data.dataset.tile import (
     TileDatasetFactory,
     TileDetTestDataset,
@@ -13,12 +14,6 @@ from getitune.data.dataset.tile import (
     TileSemanticSegTestDataset,
 )
 from getitune.types import TaskType
-
-
-class DummyTileConfig:
-    def __init__(self):
-        self.tile_size = (128, 128)
-        self.overlap = 0
 
 
 class TestTileDatasetFactory:
@@ -47,7 +42,7 @@ class TestTileDatasetFactory:
 
     def test_create_returns_training_wrapped_dataset(self):
         dataset = self._make_mock_dataset(TaskType.DETECTION, Subset.TRAINING)
-        cfg = DummyTileConfig()
+        cfg = TileConfig(tile_size=(128, 128), overlap=0)
 
         out = TileDatasetFactory.create(dataset, cfg)
 
@@ -58,21 +53,21 @@ class TestTileDatasetFactory:
 
     def test_create_returns_det_tile_dataset_for_validation(self):
         dataset = self._make_mock_dataset(TaskType.DETECTION, Subset.VALIDATION)
-        cfg = DummyTileConfig()
+        cfg = TileConfig(tile_size=(128, 128), overlap=0)
 
         out = TileDatasetFactory.create(dataset, cfg)
         assert isinstance(out, TileDetTestDataset)
 
     def test_create_returns_inst_seg_tile_dataset_for_test(self):
         dataset = self._make_mock_dataset(TaskType.INSTANCE_SEGMENTATION, Subset.TESTING)
-        cfg = DummyTileConfig()
+        cfg = TileConfig(tile_size=(128, 128), overlap=0)
 
         out = TileDatasetFactory.create(dataset, cfg)
         assert isinstance(out, TileInstSegTestDataset)
 
     def test_create_returns_sem_seg_tile_dataset_for_validation(self):
         dataset = self._make_mock_dataset(TaskType.SEMANTIC_SEGMENTATION, Subset.VALIDATION)
-        cfg = DummyTileConfig()
+        cfg = TileConfig(tile_size=(128, 128), overlap=0)
 
         out = TileDatasetFactory.create(dataset, cfg)
         assert isinstance(out, TileSemanticSegTestDataset)
