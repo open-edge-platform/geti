@@ -11,8 +11,8 @@
             "back": "वापस",
             "clear": "साफ़ करें",
             "clearAll": "सब साफ़ करें",
-            "confirm": "पुष्टि करें",
-            "connect": "कनेक्ट करें",
+            "confirm": "पक्का करें",
+            "connect": "जोड़ें",
             "continue": "जारी रखें",
             "create": "बनाएँ",
             "disconnect": "डिस्कनेक्ट करें",
@@ -56,16 +56,16 @@
             "images": "छवियाँ",
             "videos": "वीडियो",
             "size": "आकार",
-            "sizeUppercase": "आकार",
-            "statusUppercase": "स्थिति",
+            "sizeUppercase": "अपरकेस आकार",
+            "statusUppercase": "अपरकेस स्थिति",
             "settings": "सेटिंग्स",
             "training": "प्रशिक्षण",
-            "training_subset": "प्रशिक्षण",
+            "training_subset": "प्रशिक्षण सबसेट",
             "validation": "सत्यापन",
-            "validation_subset": "सत्यापन",
+            "validation_subset": "सत्यापन सबसेट",
             "testing": "परीक्षण",
             "unassigned": "किसी समूह में नहीं",
-            "trainingLowercase": "प्रशिक्षण",
+            "trainingLowercase": "लोअरकेस प्रशिक्षण",
             "validationLowercase": "सत्यापन",
             "testingLowercase": "परीक्षण",
             "frames": "फ़्रेम",
@@ -364,6 +364,7 @@
             "label": "मॉडल चलाने का डिवाइस"
         },
         "sources": {
+            "title": "स्रोत",
             "uploadError": "वीडियो फ़ाइल अपलोड नहीं हो सकी।",
             "deleteVideoError": "अपलोड की गई वीडियो फ़ाइल हटाई नहीं जा सकी।",
             "list": {
@@ -426,6 +427,7 @@
             }
         },
         "sinks": {
+            "title": "सिंक",
             "types": {
                 "folder": "फ़ोल्डर",
                 "mqtt": "MQTT",
@@ -789,6 +791,7 @@
                 "unknownError": "कुछ गड़बड़ हुई। पेज रीफ़्रेश करके देखें।",
                 "timeoutError": "{{operation}} के लिए तय {{timeoutMs}} मि.से. का समय खत्म हो गया। पेज रीफ़्रेश करके देखें।",
                 "embeddingError": "छवि की एम्बेडिंग (मॉडल के लिए तैयार डेटा) नहीं मिल सकी ({{status}}{{statusText}})।",
+                "hint": "किसी क्षेत्र को शामिल करने के लिए Shift + क्लिक करें और बाहर रखने के लिए Alt + क्लिक करें। एनोटेशन बनाने के लिए क्लिक करें और बिंदु साफ़ करने के लिए Esc दबाएँ।",
                 "operations": {
                     "workerBuild": "SAM वर्कर तैयार करने",
                     "workerInit": "SAM वर्कर शुरू करने",
@@ -913,6 +916,7 @@
                 },
                 "sort": {
                     "label": "मॉडल का क्रम:",
+                    "recommended": "अनुशंसित पहले",
                     "nameAsc": "नाम (A से Z)",
                     "nameDesc": "नाम (Z से A)",
                     "speedAsc": "गति (सबसे तेज़ पहले)",
