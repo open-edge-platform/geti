@@ -31,6 +31,7 @@ const DEFAULT_STATE: Partial<TrainModelContextProps> = {
     isAdvancedSettingsMode: false,
     trainingConfiguration: mockedTrainingConfiguration,
     defaultTrainingConfiguration: mockedTrainingConfiguration,
+    projectTrainingConfiguration: mockedTrainingConfiguration,
     datasetSources: [{ id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null }],
     modelRevisions: [
         { id: 'default-pre-trained-weights', name: 'Default pre-trained weights', architecture: '', value: null },
@@ -428,5 +429,57 @@ describe('useTrainModel', () => {
 
             expect(capturedConfigBody).toEqual(getTrainingConfigurationUpdatePayload(changedConfiguration));
         });
+    });
+
+    it('applies the displayed revision metric and restores the project metric if job creation fails', async () => {
+        const evaluation = findGroupByKey(mockedTrainingConfiguration.parameters, 'evaluation');
+        const metric = evaluation?.parameters[0] as ConfigurableParameter;
+        const revisionConfiguration = {
+            parameters: deepReplaceParameters(
+                mockedTrainingConfiguration.parameters,
+                [{ ...metric, value: 'map_50' } as ConfigurableParameter],
+                ['evaluation']
+            ),
+        };
+        mockTrainModelState.mockReturnValue({
+            ...DEFAULT_STATE,
+            isAdvancedSettingsMode: true,
+            selectedModelRevisionId: 'revision-1',
+            modelRevisions: [{ id: 'revision-1', name: 'Revision', architecture: 'arch-1', value: 'revision-1' }],
+            trainingConfiguration: revisionConfiguration,
+            defaultTrainingConfiguration: revisionConfiguration,
+        });
+        const patches: unknown[] = [];
+        server.use(
+            http.patch('/api/projects/{project_id}/training_configuration', async ({ request }) => {
+                patches.push(await request.json());
+                return HttpResponse.json({}, { status: 200 });
+            }),
+            // @ts-expect-error: Only detail is needed for this error response.
+            http.post('/api/jobs', () => HttpResponse.json({ detail: 'failed' }, { status: 500 }))
+        );
+        const { result } = renderHook(() => useTrainModel());
+        act(() => result.current.trainModel({ onSuccess: rs.fn() }));
+        await waitFor(() => expect(patches).toHaveLength(2));
+        expect(patches).toEqual([
+            { 'evaluation.validation_metric': 'map_50' },
+            { 'evaluation.validation_metric': 'default' },
+        ]);
+    });
+
+    it('waits for the project configuration before applying a revision metric', () => {
+        mockTrainModelState.mockReturnValue({
+            ...DEFAULT_STATE,
+            isAdvancedSettingsMode: true,
+            selectedModelRevisionId: 'revision-1',
+            modelRevisions: [{ id: 'revision-1', name: 'Revision', architecture: 'arch-1', value: 'revision-1' }],
+            projectTrainingConfiguration: undefined,
+        });
+        const trainSpy = rs.fn();
+        registerSuccessfulTrainHandler(trainSpy);
+        const { result } = renderHook(() => useTrainModel());
+        expect(result.current.isPending).toBe(true);
+        act(() => result.current.trainModel({ onSuccess: rs.fn() }));
+        expect(trainSpy).not.toHaveBeenCalled();
     });
 });

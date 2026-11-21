@@ -90,6 +90,21 @@ class GetiTuneBaseTrainer:
     _progress_max: float = 100.0
     # Native Ultralytics metric name -> standard getitune name (bound from the model's ``metric_keys``).
     _metric_keys: ClassVar[dict[str, str]] = {}
+    _monitor: ClassVar[str | None] = None
+
+    def validate(self) -> tuple[dict | None, float | None]:
+        """Select checkpoint fitness from the requested validation metric."""
+        previous_best = getattr(self, "best_fitness", None)
+        metrics, fitness = super().validate()  # type: ignore[misc]
+        if self._monitor is None or metrics is None:
+            return metrics, fitness
+        native_key = next((key for key, name in self._metric_keys.items() if name == self._monitor), None)
+        if native_key is None or native_key not in metrics:
+            msg = f"Validation metric '{self._monitor}' is unavailable"
+            raise ValueError(msg)
+        fitness = float(metrics[native_key])
+        self.best_fitness = fitness if previous_best is None else max(previous_best, fitness)
+        return metrics, fitness
 
     def __init__(self, *args, **kwargs) -> None:
         """Initialize the trainer and disable bundled third-party loggers.

@@ -477,11 +477,11 @@ class TrainingConfigurationView(BaseModel):
             type(config.algo_level_parameters).model_fields["training"],
         )
 
-        # Convert evaluation parameters to a parameter group
+        # Metric choices come from the project task, and the default is declared on the field.
         evaluation_group = cls._model_to_parameter_group(
             "evaluation",
             config.task_level_parameters.evaluation,
-            default_config.task_level_parameters.evaluation,
+            None,
             type(config.task_level_parameters).model_fields["evaluation"],
         )
 
@@ -1378,7 +1378,7 @@ class TrainingConfigurationView(BaseModel):
                                 "value": "default",
                                 "default_value": "default",
                                 "value_type": "str",
-                                "allowed_values": ["default"],
+                                "allowed_values": ["default", "map", "map_50"],
                             }
                         ],
                     },

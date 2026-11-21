@@ -30,6 +30,12 @@ class ClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClassification
 
     _task_kind: ClassVar[str] = "classify"
 
+    def preprocess(self, batch: dict[str, Any]) -> dict[str, Any]:
+        """Use native preprocessing when validating a filesystem dataset."""
+        if self._datamodule is None:
+            return _UltralyticsClassificationValidator.preprocess(self, batch)
+        return super().preprocess(batch)
+
     def get_stats(self) -> dict[str, float]:
         """Add macro F1-score and iteration time to the upstream accuracy stats.
 

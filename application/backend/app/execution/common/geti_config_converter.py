@@ -14,6 +14,7 @@ import yaml
 from loguru import logger
 
 from app.execution.common.recipe_resolver import RecipeResolver
+from app.models.training_configuration.evaluation import ValidationMetric
 from app.supported_models.timm import TimmManifestProvider, id_to_model_name
 
 
@@ -692,11 +693,60 @@ class GetiConfigConverter:
 
         backend = GetiConfigConverter._get_recipe_backend(recipe_path)
         if backend == "ultralytics":
-            return GetiConfigConverter._convert_ultralytics(recipe_path, config, hyper_parameters)
-        if backend == "huggingface":
-            return GetiConfigConverter._convert_huggingface(recipe_path, config, hyper_parameters)
+            converted = GetiConfigConverter._convert_ultralytics(recipe_path, config, hyper_parameters)
+        elif backend == "huggingface":
+            converted = GetiConfigConverter._convert_huggingface(recipe_path, config, hyper_parameters)
+        else:
+            converted = GetiConfigConverter._convert_lightning(recipe_path, config, hyper_parameters)
+        GetiConfigConverter._apply_validation_metric(converted, config, backend)
+        return converted
 
-        return GetiConfigConverter._convert_lightning(recipe_path, config, hyper_parameters)
+    @staticmethod
+    def _apply_validation_metric(converted: dict, config: dict, backend: str) -> None:
+        metric = ValidationMetric(
+            config.get("task_level_parameters", {}).get("evaluation", {}).get("validation_metric", "default")
+        )
+        if metric == ValidationMetric.DEFAULT:
+            return
+
+        monitor_names = {
+            ValidationMetric.F1: "val/f1-score",
+            ValidationMetric.ACCURACY: "val/accuracy",
+            ValidationMetric.MAP: "val/map",
+            ValidationMetric.MAP_50: "val/map_50",
+            ValidationMetric.MIOU: "val/mIoU",
+            ValidationMetric.DICE: "val/Dice",
+        }
+        supported = {
+            "MULTI_CLASS_CLS": {ValidationMetric.F1, ValidationMetric.ACCURACY},
+            "MULTI_LABEL_CLS": {ValidationMetric.MAP, ValidationMetric.ACCURACY},
+            "DETECTION": {ValidationMetric.MAP, ValidationMetric.MAP_50},
+            "INSTANCE_SEGMENTATION": {ValidationMetric.MAP, ValidationMetric.MAP_50},
+            "SEMANTIC_SEGMENTATION": {ValidationMetric.MIOU, ValidationMetric.DICE},
+        }
+        task = config["sub_task_type"]
+        task = str(getattr(task, "value", task))
+        if metric not in supported.get(task, set()) or (
+            backend == "ultralytics" and task == "SEMANTIC_SEGMENTATION" and metric == ValidationMetric.DICE
+        ):
+            raise ValueError(f"Validation metric '{metric}' is not supported for task '{task}'")
+        monitor = monitor_names[metric]
+        if backend in ("ultralytics", "huggingface"):
+            converted.setdefault("training", {})["monitor"] = monitor
+            return
+
+        def update_monitors(value: object) -> None:
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    if key in ("monitor", "callback_monitor") and isinstance(child, str) and child.startswith("val/"):
+                        value[key] = monitor
+                    else:
+                        update_monitors(child)
+            elif isinstance(value, list):
+                for child in value:
+                    update_monitors(child)
+
+        update_monitors(converted)
 
     @staticmethod
     def _get_recipe_backend(recipe_path: Path) -> str:

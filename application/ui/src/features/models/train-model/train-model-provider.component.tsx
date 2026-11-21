@@ -72,6 +72,7 @@ export type TrainModelContextProps = TimmModelSelection & {
 
     trainingConfiguration: TrainingConfiguration | undefined;
     defaultTrainingConfiguration: TrainingConfiguration | undefined;
+    projectTrainingConfiguration: TrainingConfiguration | undefined;
     onTrainingConfigurationChange: Dispatch<SetStateAction<TrainingConfiguration | undefined>>;
 };
 
@@ -209,7 +210,12 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const selectedModelRevision = modelRevisions.find((modelRevision) => modelRevision.id === selectedModelRevisionId);
 
-    const [trainingConfiguration, setTrainingConfiguration, defaultTrainingConfiguration] = useTrainingConfiguration({
+    const [
+        trainingConfiguration,
+        setTrainingConfiguration,
+        defaultTrainingConfiguration,
+        projectTrainingConfiguration,
+    ] = useTrainingConfiguration({
         modelArchitectureId: resolvedModelArchitectureId,
         modelRevisionId: selectedModelRevision?.value ?? null,
     });
@@ -249,6 +255,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
             trainingConfiguration,
             defaultTrainingConfiguration,
+            projectTrainingConfiguration,
             onTrainingConfigurationChange: setTrainingConfiguration,
         }),
         [
@@ -266,6 +273,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
             isAdvancedSettingsMode,
             trainingConfiguration,
             defaultTrainingConfiguration,
+            projectTrainingConfiguration,
             setTrainingConfiguration,
         ]
     );

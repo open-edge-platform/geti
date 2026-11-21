@@ -71,6 +71,31 @@ def fxt_training_configuration_service(db_session: Session) -> TrainingConfigura
 class TestTrainingConfigurationService:
     """Tests for TrainingConfigurationService."""
 
+    def test_validation_metric_rejects_incompatible_task(
+        self, fxt_training_configuration_service, fxt_project, fxt_training_configuration
+    ):
+        evaluation = fxt_training_configuration.task_level_parameters.evaluation
+        evaluation.validation_metric = "f1"
+        with pytest.raises(ValueError, match="not supported"):
+            fxt_training_configuration_service.update(
+                UUID(fxt_project.id), "object-detection-yolox-s", fxt_training_configuration
+            )
+        evaluation.validation_metric = "map_50"
+        fxt_training_configuration_service.update(
+            UUID(fxt_project.id), "object-detection-yolox-s", fxt_training_configuration
+        )
+        saved = fxt_training_configuration_service.get_by_model_architecture(
+            UUID(fxt_project.id), "object-detection-yolox-s"
+        )
+        assert saved.task_level_parameters.evaluation.validation_metric == "map_50"
+        default = TrainingConfigurationService.get_default_by_model_architecture("object-detection-yolox-s")
+        view = TrainingConfigurationView.from_training_configuration(saved, default)
+        evaluation_group = next(group for group in view.model_dump()["parameters"] if group["key"] == "evaluation")
+        metric = evaluation_group["parameters"][0]
+        assert metric["allowed_values"] == ["default", "map", "map_50"]
+        assert metric["value"] == "map_50"
+        assert metric["default_value"] == "default"
+
     @pytest.mark.parametrize(
         ("architecture", "task", "tiling"),
         [
@@ -233,7 +258,8 @@ class TestTrainingConfigurationService:
         )
 
         assert isinstance(result, TrainingConfiguration)
-        assert result == fxt_training_configuration
+        assert result.model_dump() == fxt_training_configuration.model_dump()
+        assert result.task_level_parameters.evaluation.allowed_metrics == ["default", "map", "map_50"]
 
     def test_get_by_model_revision_with_missing_revision(
         self,

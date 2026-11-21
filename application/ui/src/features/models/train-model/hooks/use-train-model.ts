@@ -22,22 +22,24 @@ export const useTrainModel = () => {
         trainingConfiguration,
         selectedModelRevisionId,
         defaultTrainingConfiguration,
+        projectTrainingConfiguration,
         datasetSources,
         modelRevisions,
     } = useTrainModelState();
+    const parentModelRevisionId =
+        modelRevisions.find((revision) => revision.id === selectedModelRevisionId)?.value ?? null;
 
     /**
      * Triggers model training with the following workflow:
      *
-     * 1. Direct training — if the user is NOT in advanced settings mode, or IS in advanced
-     *    mode but has not changed anything from the defaults, training is started immediately
-     *    without touching the configuration.
+     * 1. Direct training — if advanced settings are off, or the displayed configuration
+     *    and revision metric match the current project configuration, start immediately.
      *
-     * 2. Configuration update + training — if the user IS in advanced mode AND has modified
-     *    the configuration:
+     * 2. Configuration update + training — persist changed settings or the displayed
+     *    revision metric before starting training:
      *      a. Persist the updated configuration first.
      *      b. On success, start the training job.
-     *      c. If the training job itself fails, roll the configuration back to the default
+     *      c. If the training job itself fails, roll the configuration back to the previous
      *         values so the project is not left in an inconsistent state.
      */
     const trainModel = ({ onSuccess }: { onSuccess: () => void }) => {
@@ -46,8 +48,6 @@ export const useTrainModel = () => {
         }
 
         const datasetSource = datasetSources.find((source) => source.id === selectedDatasetSourceId);
-        const parentModelRevisionId =
-            modelRevisions.find((revision) => revision.id === selectedModelRevisionId)?.value ?? null;
 
         const trainModelMutationBody = {
             body: {
@@ -64,8 +64,18 @@ export const useTrainModel = () => {
         } as const;
 
         const hasConfigurationChanged = !isEqual(defaultTrainingConfiguration, trainingConfiguration);
+        const configurationPayload = getTrainingConfigurationUpdatePayload(trainingConfiguration);
+        const projectPayload = getTrainingConfigurationUpdatePayload(projectTrainingConfiguration);
+        const revisionMetricChanged =
+            parentModelRevisionId !== null &&
+            configurationPayload['evaluation.validation_metric'] !== undefined &&
+            configurationPayload['evaluation.validation_metric'] !== projectPayload['evaluation.validation_metric'];
 
-        if (!isAdvancedSettingsMode || !hasConfigurationChanged) {
+        if (isAdvancedSettingsMode && parentModelRevisionId !== null && projectTrainingConfiguration === undefined) {
+            return;
+        }
+
+        if (!isAdvancedSettingsMode || (!hasConfigurationChanged && !revisionMetricChanged)) {
             trainModelMutation.mutate(trainModelMutationBody, { onSuccess });
 
             return;
@@ -85,7 +95,9 @@ export const useTrainModel = () => {
         updateTrainingConfigurationMutation.mutate(
             {
                 ...configurationParams,
-                body: getTrainingConfigurationUpdatePayload(trainingConfiguration),
+                body: hasConfigurationChanged
+                    ? configurationPayload
+                    : { 'evaluation.validation_metric': configurationPayload['evaluation.validation_metric'] },
             },
             {
                 onSuccess: () => {
@@ -94,7 +106,14 @@ export const useTrainModel = () => {
                         onError: () => {
                             updateTrainingConfigurationMutation.mutate({
                                 ...configurationParams,
-                                body: getTrainingConfigurationUpdatePayload(defaultTrainingConfiguration),
+                                body: hasConfigurationChanged
+                                    ? getTrainingConfigurationUpdatePayload(
+                                          projectTrainingConfiguration ?? defaultTrainingConfiguration
+                                      )
+                                    : {
+                                          'evaluation.validation_metric':
+                                              projectPayload['evaluation.validation_metric'],
+                                      },
                             });
                         },
                     });
@@ -103,5 +122,11 @@ export const useTrainModel = () => {
         );
     };
 
-    return { trainModel, isPending: trainModelMutation.isPending || updateTrainingConfigurationMutation.isPending };
+    return {
+        trainModel,
+        isPending:
+            trainModelMutation.isPending ||
+            updateTrainingConfigurationMutation.isPending ||
+            (isAdvancedSettingsMode && parentModelRevisionId !== null && projectTrainingConfiguration === undefined),
+    };
 };
