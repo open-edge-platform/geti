@@ -23,8 +23,6 @@ from .base_prior_generator import BasePriorGenerator
 class AnchorGenerator(BasePriorGenerator):
     """Standard anchor generator for 2D anchor-based detectors.
 
-    # TODO (sungchul): change strides format from (w, h) to (h, w)
-
     Args:
         strides (list[int] | list[tuple[int, int]]): Strides of anchors
             in multiple feature levels in order (w, h).

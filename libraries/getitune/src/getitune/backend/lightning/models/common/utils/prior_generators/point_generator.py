@@ -25,8 +25,6 @@ DeviceType = Union[str, torch.device]
 class MlvlPointGenerator(BasePriorGenerator):
     """Standard points generator for multi-level (Mlvl) feature maps in 2D points-based detectors.
 
-    # TODO (sungchul): change strides format from (w, h) to (h, w)
-
     Args:
         strides (list[int] | list[tuple[int, int]]): Strides of anchors
             in multiple feature levels in order (w, h).
