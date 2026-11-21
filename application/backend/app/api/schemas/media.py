@@ -129,7 +129,19 @@ class VideoView(BaseRequiredIDNameModel):
     }
 
 
-MediaView = Annotated[ImageView | VideoView | VideoFrameView, Field(discriminator="type")]
+class OmeImageView(BaseRequiredIDNameModel):
+    """OME container; annotations belong to its planes rather than the container."""
+
+    type: Literal[MediaType.OME_IMAGE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    source_id: UUID | None = None
+    annotation_status: MediaAnnotationStatusView
+
+
+MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView, Field(discriminator="type")]
 
 MediaViewAdapter: TypeAdapter[MediaView] = TypeAdapter(MediaView)
 

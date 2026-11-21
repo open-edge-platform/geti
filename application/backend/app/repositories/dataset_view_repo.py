@@ -88,7 +88,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             select(DatasetViewItemDB.dataset_view_id)
             .join(
                 MediaDB,
-                (MediaDB.id == DatasetViewItemDB.media_id) | (MediaDB.video_id == DatasetViewItemDB.media_id),
+                (MediaDB.id == DatasetViewItemDB.media_id) | (MediaDB.parent_id == DatasetViewItemDB.media_id),
             )
             .where(MediaDB.id == media_id)
         )
@@ -122,7 +122,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         return exists(
             select(DatasetViewItemDB.media_id).where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
-                (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.video_id),
+                (DatasetViewItemDB.media_id == MediaDB.id) | (DatasetViewItemDB.media_id == MediaDB.parent_id),
             )
         ).correlate(MediaDB)
 
@@ -322,7 +322,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         """List label rows of unassigned dataset items of a view, each paired with the parent
         video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB, MediaDB.video_id)
+            select(DatasetItemLabelDB, MediaDB.parent_id)
             .join(DatasetItemDB, DatasetItemDB.id == DatasetItemLabelDB.dataset_item_id)
             .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
@@ -385,7 +385,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
 
         # Annotation Counts (annotated videos assigned to the view)
         annotated_video_stmt = (
-            select(func.count(func.distinct(MediaDB.video_id)))
+            select(func.count(func.distinct(MediaDB.parent_id)))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,

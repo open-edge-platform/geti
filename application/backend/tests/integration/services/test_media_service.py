@@ -108,7 +108,7 @@ def fxt_project_with_media(fxt_project_with_pipeline, fxt_media_factory, db_sess
         "frame_count": 100,
     }
     video_frame_config = {
-        "video_id": video_config["id"],
+        "parent_id": video_config["id"],
         "type": "video_frame",
         "name": "test4_10",
         "format": "jpg",
@@ -145,7 +145,7 @@ def fxt_video_frame(
             size=1024,
             width=1024,
             height=768,
-            video_id=media.id,
+            parent_id=media.id,
             frame_index=frame_index,
         )
         db_media.project_id = str(project.id)
@@ -387,7 +387,7 @@ def fxt_project_with_labeled_video(fxt_project_with_pipeline, db_session) -> tup
             size=1024,
             width=1024,
             height=768,
-            video_id=video.id,
+            parent_id=video.id,
             frame_index=frame_index,
             project_id=str(project.id),
             created_at=created_at,
@@ -1223,7 +1223,7 @@ class TestMediaServiceIntegration:
             "frame_count": 1,
         }
         video_frame_config = {
-            "video_id": video_config["id"],
+            "parent_id": video_config["id"],
             "type": "video_frame",
             "name": "test",
             "format": "jpg",
@@ -2041,6 +2041,7 @@ class TestMediaServiceIntegration:
         video_frame = fxt_media_service.save_video_frame(
             project=project, video=media, frame_index=50, frame_image=frame_image
         )
+        assert video_frame.video_id == media.id
 
         video_frame_binary_path = dataset_dir / f"{video_frame.id}.jpg"
         assert os.path.exists(video_frame_binary_path)
@@ -2058,7 +2059,7 @@ class TestMediaServiceIntegration:
             and db_video_frame.format == "jpg"
             and db_video_frame.width == 640
             and db_video_frame.height == 480
-            and db_video_frame.video_id == str(media.id)
+            and db_video_frame.parent_id == str(media.id)
             and db_video_frame.frame_index == 50
         )
 
@@ -2077,6 +2078,7 @@ class TestMediaServiceIntegration:
             project=project, video_id=UUID(media.id), frame_index=250
         )
         assert video_frame is not None
+        assert video_frame.video_id == UUID(media.id)
 
     def test_get_non_existing_video_frame_by_video_id_and_index(
         self,

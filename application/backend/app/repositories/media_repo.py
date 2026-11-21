@@ -157,11 +157,11 @@ class MediaRepository:
         return result.rowcount > 0
 
     def get_video_frame_by_video_id_and_index(self, video_id: str, frame_index: int) -> MediaDB | None:
-        stmt = self._base_select().where(MediaDB.video_id == video_id, MediaDB.frame_index == frame_index)
+        stmt = self._base_select().where(MediaDB.parent_id == video_id, MediaDB.frame_index == frame_index)
         return self.db.scalar(stmt)
 
     def search_video_frames_by_video_id_and_indexes(self, video_id: str, frame_indexes: list[int]) -> list[MediaDB]:
-        stmt = self._base_select().where(MediaDB.video_id == video_id, MediaDB.frame_index.in_(frame_indexes))
+        stmt = self._base_select().where(MediaDB.parent_id == video_id, MediaDB.frame_index.in_(frame_indexes))
         return list(self.db.scalars(stmt).all())
 
     def list_annotated_video_frames_by_video_id(
@@ -178,7 +178,7 @@ class MediaRepository:
             .where(
                 MediaDB.id == DatasetItemDB.id,
                 MediaDB.project_id == DatasetItemDB.project_id,
-                MediaDB.video_id == video_id,
+                MediaDB.parent_id == video_id,
                 MediaDB.frame_index >= frame_index_from,
                 MediaDB.frame_index <= frame_index_to,
             )
@@ -201,13 +201,13 @@ class MediaRepository:
         if not video_ids:
             return {}
         stmt = (
-            select(MediaDB.video_id, func.count(MediaDB.id))
+            select(MediaDB.parent_id, func.count(MediaDB.id))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 MediaDB.project_id == self.project_id,
-                MediaDB.video_id.in_(video_ids),
+                MediaDB.parent_id.in_(video_ids),
                 DatasetItemDB.annotation_data.is_not(None),
             )
-            .group_by(MediaDB.video_id)
+            .group_by(MediaDB.parent_id)
         )
         return {video_id: count for video_id, count in self.db.execute(stmt).tuples() if video_id is not None}

@@ -18,8 +18,19 @@ class ImageFormat(StrEnum):
     JFIF = "jfif"
     TIF = "tif"
     TIFF = "tiff"
+    OME_TIFF = "ome.tiff"
+    OME_TIF = "ome.tif"
     BMP = "bmp"
     WEBP = "webp"
+
+    @classmethod
+    def from_filename(cls, filename: str) -> "ImageFormat":
+        """Resolve the longest supported suffix, including compound OME suffixes."""
+        name = f".{filename.lower()}"
+        for image_format in sorted(cls, key=lambda item: len(item.value), reverse=True):
+            if name.endswith(f".{image_format.value}"):
+                return image_format
+        raise ValueError(f"Unsupported image filename: {filename}")
 
 
 class VideoFormat(StrEnum):
@@ -42,6 +53,7 @@ class MediaType(StrEnum):
     IMAGE = "image"
     VIDEO = "video"
     VIDEO_FRAME = "video_frame"
+    OME_IMAGE = "ome_image"
 
 
 class MediaSortBy(StrEnum):
@@ -128,6 +140,13 @@ class Image(BaseMedia):
     annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
 
 
+class OmeImage(BaseMedia):
+    """An OME container whose individual planes can be annotated."""
+
+    type: Literal[MediaType.OME_IMAGE]
+    annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
+
+
 class VideoFrame(BaseMedia):
     """
     Attributes:
@@ -140,6 +159,31 @@ class VideoFrame(BaseMedia):
     video_id: UUID
     frame_index: int
     annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _map_parent_id(cls, value: object) -> object:
+        """Accept ORM payloads using `parent_id` while keeping `video_id` on the public model."""
+        if isinstance(value, dict):
+            if value.get("video_id") is None and value.get("parent_id") is not None:
+                return {**value, "video_id": str(value["parent_id"])}
+            return value
+
+        if getattr(value, "video_id", None) is None and (parent_id := getattr(value, "parent_id", None)) is not None:
+            return {
+                "id": getattr(value, "id"),
+                "project_id": getattr(value, "project_id"),
+                "type": getattr(value, "type"),
+                "name": getattr(value, "name"),
+                "format": getattr(value, "format"),
+                "width": getattr(value, "width"),
+                "height": getattr(value, "height"),
+                "size": getattr(value, "size"),
+                "source_id": getattr(value, "source_id"),
+                "video_id": str(parent_id),
+                "frame_index": getattr(value, "frame_index"),
+            }
+        return value
 
 
 class Video(BaseMedia):
@@ -183,7 +227,7 @@ class NotAnnotatedVideoFrame(BaseModel):
         return self.video.id
 
 
-Media = Annotated[Image | Video | VideoFrame, Field(discriminator="type")]
+Media = Annotated[Image | Video | VideoFrame | OmeImage, Field(discriminator="type")]
 
 MediaAdapter: TypeAdapter[Media] = TypeAdapter(Media)
 

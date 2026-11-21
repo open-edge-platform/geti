@@ -361,7 +361,7 @@ class DatasetRevisionService(BaseSessionManagedService):
 
             return DatasetRevisionItem(
                 id=UUID(df_revision_item["id"]),
-                format=ImageFormat(image_path.suffix.lstrip(".").lower()),
+                format=ImageFormat.from_filename(image_path.name),
                 image_path=image_path,
                 width=df_revision_item["image_info"]["width"],
                 height=df_revision_item["image_info"]["height"],

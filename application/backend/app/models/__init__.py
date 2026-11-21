@@ -33,9 +33,11 @@ from .jobs import (
     TrainingJobParams,
 )
 from .label import Label, LabelReference, LabelUpdateInfo
-from .media import Image, Media, MediaFormat, MediaType, Video, VideoFrame
+from .media import Image, Media, MediaFormat, MediaType, OmeImage, Video, VideoFrame
+from .media_storage import MediaStorage
 from .model_manifest import ModelManifest
 from .model_revision import ModelRevision, ModelVariant, TrainingInfo, TrainingStatus
+from .ome import OmeImageInfo, OmeImageMetadata, Region
 from .pipeline import Pipeline, PipelineStatus
 from .project import Project
 from .shape import FullImage, Point, Polygon, Rectangle, Shape
@@ -105,11 +107,15 @@ __all__ = [
     "LabelUpdateInfo",
     "Media",
     "MediaFormat",
+    "MediaStorage",
     "MediaType",
     "ModelManifest",
     "ModelRevision",
     "ModelVariant",
     "MqttSinkConfig",
+    "OmeImage",
+    "OmeImageInfo",
+    "OmeImageMetadata",
     "OutputFormat",
     "Pipeline",
     "PipelineStatus",
@@ -119,6 +125,7 @@ __all__ = [
     "QuantizationJob",
     "QuantizationJobParams",
     "Rectangle",
+    "Region",
     "RosSinkConfig",
     "Shape",
     "Sink",
