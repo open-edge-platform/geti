@@ -36,19 +36,9 @@ pub async fn download_file(
 ) -> Result<(), String> {
     let url = backend_url(&url)?;
     let cert = backend_certificate(window.app_handle())?;
-    let extensions: Vec<&str> = filter.extensions.iter().map(String::as_str).collect();
-    // Blocking is fine here: async commands do not run on the main thread.
-    let Some(path) = window
-        .dialog()
-        .file()
-        .set_parent(&window)
-        .set_file_name(file_name)
-        .add_filter(filter.name, &extensions)
-        .blocking_save_file()
-    else {
+    let Some(path) = ask_destination(&window, file_name, &filter)? else {
         return Ok(());
     };
-    let path = path.into_path().map_err(|e| e.to_string())?;
     let _ = on_started.send(());
 
     let client = client_builder()
@@ -58,6 +48,43 @@ pub async fn download_file(
     save(&client, url, &path)
         .await
         .inspect_err(|e| log::error!("Download to {} failed: {e}", path.display()))
+}
+
+/// Like [`download_file`], for content the webview already has (e.g. a chart from a `data:` URL).
+#[tauri::command]
+pub async fn save_file(
+    window: WebviewWindow,
+    contents: Vec<u8>,
+    file_name: String,
+    filter: SaveFilter,
+    on_started: Channel<()>,
+) -> Result<(), String> {
+    let Some(path) = ask_destination(&window, file_name, &filter)? else {
+        return Ok(());
+    };
+    let _ = on_started.send(());
+    let written = std::fs::write(part_path(&path), contents).map_err(|e| e.to_string());
+    replace_with_part(&path, written)
+        .inspect_err(|e| log::error!("Saving {} failed: {e}", path.display()))
+}
+
+/// Show the "Save as" dialog; `None` when the user cancels.
+fn ask_destination(
+    window: &WebviewWindow,
+    file_name: String,
+    filter: &SaveFilter,
+) -> Result<Option<PathBuf>, String> {
+    let extensions: Vec<&str> = filter.extensions.iter().map(String::as_str).collect();
+    // Blocking is fine here: async commands do not run on the main thread.
+    window
+        .dialog()
+        .file()
+        .set_parent(window)
+        .set_file_name(file_name)
+        .add_filter(&filter.name, &extensions)
+        .blocking_save_file()
+        .map(|path| path.into_path().map_err(|e| e.to_string()))
+        .transpose()
 }
 
 /// Only allow the backend, so the webview cannot use this to fetch other URLs.
@@ -96,10 +123,14 @@ async fn save(client: &Client, url: Url, path: &Path) -> Result<(), String> {
         return Err(format!("backend responded with {}", response.status()));
     }
 
+    let written = write_body(&mut response, &part_path(path)).await;
+    replace_with_part(path, written)
+}
+
+/// Move the `written` `<path>.part` over `path`, or remove it if writing failed.
+fn replace_with_part(path: &Path, written: Result<(), String>) -> Result<(), String> {
     let part = part_path(path);
-    let saved = write_body(&mut response, &part)
-        .await
-        .and_then(|()| std::fs::rename(&part, path).map_err(|e| e.to_string()));
+    let saved = written.and_then(|()| std::fs::rename(&part, path).map_err(|e| e.to_string()));
     if saved.is_err() {
         let _ = std::fs::remove_file(&part);
     }
