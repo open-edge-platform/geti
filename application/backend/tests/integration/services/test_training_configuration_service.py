@@ -4,9 +4,12 @@
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from app.api.schemas import TrainingConfigurationView
 from app.db.schema import ModelRevisionDB, ProjectDB, TrainingConfigurationDB
+from app.execution.common.geti_config_converter import GetiConfigConverter
 from app.models import TaskType
 from app.models.training_configuration.configuration import (
     AlgoLevelParameters,
@@ -52,9 +55,9 @@ def fxt_training_configuration() -> TrainingConfiguration:
                 max_epochs=100,
                 early_stopping=EarlyStopping(enable=True, patience=5),
                 learning_rate=0.001,
-                input_size_width=256,
-                input_size_height=256,
-                allowed_values_input_size=[128, 256, 512],
+                input_size_width=640,
+                input_size_height=640,
+                allowed_values_input_size=[640],
             ),
         ),
     )
@@ -67,6 +70,141 @@ def fxt_training_configuration_service(db_session: Session) -> TrainingConfigura
 
 class TestTrainingConfigurationService:
     """Tests for TrainingConfigurationService."""
+
+    @pytest.mark.parametrize(
+        ("architecture", "task", "tiling"),
+        [
+            ("image-classification-efficientnet-b0", "MULTI_CLASS_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_CLASS_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_CLASS_CLS", False),
+            ("image-classification-efficientnet-b0", "MULTI_LABEL_CLS", False),
+            ("image-classification-dinov3-vits", "MULTI_LABEL_CLS", False),
+            ("image-classification-yolo26-n", "MULTI_LABEL_CLS", False),
+            ("object-detection-dfine-x", "DETECTION", False),
+            ("object-detection-dfine-x", "DETECTION", True),
+            ("object-detection-rtdetrv2-r18", "DETECTION", False),
+            ("object-detection-yolo26-n", "DETECTION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-mask-rcnn-resnet50", "INSTANCE_SEGMENTATION", True),
+            ("instance-segmentation-mask2former-swin-s", "INSTANCE_SEGMENTATION", False),
+            ("instance-segmentation-yolo26-n", "INSTANCE_SEGMENTATION", False),
+        ],
+    )
+    @pytest.mark.parametrize("workers", [0, 2, 6])
+    def test_worker_settings_follow_application_and_recipe(
+        self, architecture: str, task: str, tiling: bool, workers: int
+    ) -> None:
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture).model_copy(deep=True)
+        assert config.algo_level_parameters.training.num_workers == 2
+        config.apply_updates({"training.num_workers": workers})
+        if tiling:
+            config.apply_updates({"dataset_preparation.augmentation.tiling.enable": True})
+        serialized = config.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=task)
+        resolved = GetiConfigConverter.convert(serialized)["data"]
+        assert [resolved[f"{subset}_subset"]["num_workers"] for subset in ("train", "val", "test")] == [
+            workers,
+            workers,
+            1,
+        ]
+
+    @pytest.mark.parametrize("workers", [0, 4, 6])
+    def test_existing_worker_setting_is_preserved(
+        self,
+        workers: int,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ) -> None:
+        architecture = "object-detection-yolox-s"
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        config.apply_updates({"training.num_workers": workers})
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        assert loaded.algo_level_parameters.training.num_workers == workers
+
+    def test_object_threshold_round_trip(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        config = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
+        config.apply_updates(
+            {
+                "dataset_preparation.augmentation.tiling.enable": True,
+                "dataset_preparation.augmentation.tiling.min_object_ratio_thr": 0.25,
+            }
+        )
+        fxt_training_configuration_service.update(UUID(fxt_project.id), architecture, config)
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        loaded_tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert loaded_tiling is not None
+        assert loaded_tiling.min_object_ratio_thr == 0.25
+        view = TrainingConfigurationView.from_training_configuration(loaded, default).model_dump()
+
+        def find_parameter(nodes):
+            for node in nodes:
+                if node["key"] == "min_object_ratio_thr":
+                    return node
+                if "parameters" in node:
+                    result = find_parameter(node["parameters"])
+                    if result is not None:
+                        return result
+            return None
+
+        parameter = find_parameter(view["parameters"])
+        assert parameter is not None
+        assert (parameter["value"], parameter["default_value"], parameter["min_value"], parameter["max_value"]) == (
+            0.25,
+            0.5,
+            0.0,
+            1.0,
+        )
+        serialized = loaded.model_dump(exclude_none=True)
+        serialized["hyper_parameters"] = serialized.pop("algo_level_parameters")
+        serialized.update(model_manifest_id=architecture, sub_task_type=None)
+        converted = GetiConfigConverter.convert(serialized)
+        assert converted["data"]["tile_config"]["min_object_ratio_thr"] == 0.25
+
+        for invalid in (-0.01, 1.01):
+            with pytest.raises(ValidationError):
+                loaded.apply_updates({"dataset_preparation.augmentation.tiling.min_object_ratio_thr": invalid})
+
+    @pytest.mark.parametrize("architecture", ["object-detection-yolox-s", "instance-segmentation-mask-rcnn-resnet50"])
+    def test_object_threshold_default_for_tiling_architectures(self, architecture: str):
+        config = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        tiling = config.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
+
+    def test_existing_tiling_configuration_uses_threshold_default(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+        db_session: Session,
+    ):
+        architecture = "object-detection-yolox-s"
+        default = TrainingConfigurationService.get_default_by_model_architecture(architecture)
+        legacy = default.algo_level_parameters.model_dump()
+        legacy["dataset_preparation"]["augmentation"]["tiling"].pop("min_object_ratio_thr")
+        db_session.add(
+            TrainingConfigurationDB(
+                id=str(uuid4()),
+                project_id=fxt_project.id,
+                model_architecture_id=architecture,
+                configuration_data=legacy,
+            )
+        )
+        db_session.flush()
+        loaded = fxt_training_configuration_service.get_by_model_architecture(UUID(fxt_project.id), architecture)
+        tiling = loaded.algo_level_parameters.dataset_preparation.augmentation.tiling
+        assert tiling is not None
+        assert tiling.min_object_ratio_thr == 0.5
 
     def test_get_by_model_revision(
         self,
@@ -448,3 +586,39 @@ class TestTrainingConfigurationService:
             .all()
         )
         assert len(task_level_configs) == 1
+
+    def test_stale_persisted_allowed_values_input_size_does_not_break_loading(
+        self,
+        fxt_training_configuration_service,  # adjust to the actual fixture name used in this file
+        fxt_project,
+    ):
+        """Regression test: a previously-persisted training configuration whose `allowed_values_input_size` predates a
+        manifest update (e.g. it only contained [640]) must not break loading, and the resynced value must reflect
+        the *current* manifest rather than the stale persisted one.
+        """
+        model_architecture_id = "object-detection-dfine-x"
+        project_id = UUID(fxt_project.id)
+        # Simulate a stale persisted config: narrower allowed_values_input_size,
+        # as if it was saved before the manifest was widened to 5 values.
+        stale_config = fxt_training_configuration_service.get_default_by_model_architecture(model_architecture_id)
+        stale_config = stale_config.model_copy(deep=True)
+        stale_config.algo_level_parameters.training.allowed_values_input_size = [640]
+        fxt_training_configuration_service.update(
+            project_id=project_id,
+            model_architecture_id=model_architecture_id,
+            training_configuration=stale_config,
+        )
+
+        # Loading must not raise, and must resync allowed values to the live manifest.
+        loaded = fxt_training_configuration_service.get_by_model_architecture(
+            project_id=project_id, model_architecture_id=model_architecture_id
+        )
+        assert loaded.algo_level_parameters.training.allowed_values_input_size == [
+            384,
+            512,
+            640,
+            800,
+            960,
+            1024,
+            1280,
+        ]

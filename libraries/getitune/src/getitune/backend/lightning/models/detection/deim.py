@@ -116,7 +116,7 @@ class DEIMDFine(RTDETR):
             msg = "input_size should not be None."
             raise ValueError(msg)
         backbone = HGNetv2(model_name=self.model_name)
-        encoder = HybridEncoder(model_name=self.model_name)
+        encoder = HybridEncoder(model_name=self.model_name, eval_spatial_size=self.data_input_params.input_size)
         decoder = DFINETransformer(
             model_name=self.model_name,
             num_classes=num_classes,

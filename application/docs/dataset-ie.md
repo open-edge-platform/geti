@@ -48,7 +48,9 @@ use cases by composing the necessary intermediate steps in a set of endpoints an
 Two important design choices follow from these observations:
 
 1. All datasets that are uploaded or downloaded by the user (directly or via API), must be zip archives in a standard
-   dataset format (Geti, COCO, YOLO or VOC). Legacy Datumaro v1 archives are not supported.
+   dataset format (Geti, COCO, YOLO or VOC). For classification projects, the Ultralytics YOLO classification format
+   (ImageNet-style folder layout) is also supported, and for instance segmentation projects the Ultralytics YOLO
+   segmentation format (polygon label rows). Legacy Datumaro v1 archives are not supported.
 2. Internally, all processing steps must operate on a common representation of the dataset. In practice, this means
    `getidata.Dataset` objects from getidata.
 
@@ -203,9 +205,8 @@ involved in dataset import and export.
 
 - **prepare_dataset_for_import**: extracts a compressed dataset archive, saving it to getidata format while determining
   its characteristics (task type, labels, number of media and annotations).
-- **import_dataset_to_existing_project**: loads a getidata dataset and inserts its items into the dataset of a project,
+- **import_dataset_to_project**: loads a getidata dataset and inserts its items into an existing project's dataset,
   applying optional filtering, annotation conversion and label remapping.
-  If the target is a new project, this job also creates the project.
 - **import_dataset_as_new_project**: creates a new project, then loads a getidata dataset and inserts its items into
   the dataset of the newly created project, applying optional filtering and annotation conversion.
 - **stage_dataset**: loads a project's dataset (or dataset revision) as a getidata dataset, applying optional filtering,

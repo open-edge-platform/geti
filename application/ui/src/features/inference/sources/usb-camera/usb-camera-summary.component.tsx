@@ -15,7 +15,7 @@ export const UsbCameraSummary = ({ source }: UsbCameraSummaryProps) => {
     const device = cameraDevices.find(({ index }) => index === source.device_id);
 
     if (isLoading) {
-        return <li>{t('inference.sources.settings.loading')}</li>;
+        return <li>{t('common.status.loading')}</li>;
     }
 
     const deviceLabel = device

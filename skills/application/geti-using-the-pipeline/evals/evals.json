@@ -1,0 +1,39 @@
+{
+  "skill_name": "geti-using-the-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a Geti project, annotate my images, train a model and enable live inference. I have not supplied an instance URL, task, labels, images, annotations, source or sink; no task assets or instance connection are available in this environment.",
+      "expected_output": "Asks for the running instance URL and task inputs, then waits before mutations. Does not assume localhost, require a source checkout, invent annotations, or claim a completed job.",
+      "assertions": [
+        "Requests the instance URL and missing project/dataset/pipeline inputs.",
+        "Does not assume localhost or invent endpoint payloads, IDs, annotations or successful jobs.",
+        "Does not require a Geti source checkout or unavailable development skills."
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My Geti training job has stopped and its returned status says failed. Can I consider the model trained and enable inference? Give advice only; you have no instance access or logs.",
+      "expected_output": "Distinguishes terminal failure from successful training, requests failure details/logs, and requires a successful model artifact and readiness checks before enabling inference. Does not claim to inspect the instance.",
+      "assertions": [
+        "States that a stopped or terminal failed job is not successful training.",
+        "Requests error details or logs and does not enable inference on an unverified model.",
+        "Does not invent a root cause or claim instance access."
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Give a plan only; do not contact any service or execute requests. I operate Geti at https://geti.example.test:8443 with a configured trusted certificate. I have project p1, trained model m1, camera source s1 and sink k1. Explain how to discover this instance's API contract, bind and enable the pipeline, and verify actual inference. The API schema is not supplied, so do not invent request bodies or assume backend source files are present.",
+      "expected_output": "Plans to obtain /api/openapi.json from the supplied URL, derive methods and payloads from it, verify resource readiness, configure and enable inference, then observe active state and progressing metrics or sink output. Does not require a checkout, disable TLS verification, or claim execution.",
+      "assertions": [
+        "Uses the supplied base URL and identifies /api/openapi.json as the contract source, not HTML /api/docs or repository files.",
+        "Defers exact request bodies to the instance schema and checks the supplied resource IDs before mutation.",
+        "Plans to verify active inference and progressing metrics or sink output rather than treating an enable response alone as success.",
+        "Does not disable TLS verification, require unavailable developer skills, or claim requests were executed."
+      ],
+      "files": []
+    }
+  ]
+}

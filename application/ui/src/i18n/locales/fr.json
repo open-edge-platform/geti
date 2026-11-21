@@ -72,7 +72,8 @@
             "model": "Modèle",
             "jobs": "Tâches",
             "labels": "Étiquettes",
-            "bytesTransferred": "{{transferred}} sur {{total}}"
+            "bytesTransferred": "{{transferred}} sur {{total}}",
+            "annotations": "Annotations"
         },
         "viewModes": {
             "large": "Grandes miniatures",
@@ -87,7 +88,9 @@
             "uploading": "Téléversement en cours",
             "failed": "Échec",
             "error": "Erreur",
-            "disconnected": "Déconnecté"
+            "disconnected": "Déconnecté",
+            "loading": "Chargement...",
+            "unavailable": "Indisponible"
         },
         "errors": {
             "unknown": "Une erreur inconnue s’est produite",
@@ -214,8 +217,7 @@
             "annotatedVideosFrames": "Vidéos / trames annotées",
             "numberOfObjectsPerLabel": "Nombre d’objets par étiquette",
             "unannotated": "Non annoté",
-            "annotated": "Annoté",
-            "annotationsChartTooltip": "Annotations"
+            "annotated": "Annoté"
         },
         "delete": {
             "title": "Supprimer des éléments",
@@ -242,6 +244,21 @@
             "assignAllFailure": "Échec de l’attribution des étiquettes aux {{count}} image(s)",
             "assignPartialSuccess": "Étiquette(s) attribuée(s) à {{succeeded}} image(s) sur {{total}} ({{failed}} en échec)"
         },
+        "mediaDetails": {
+            "title": "Détails",
+            "resolution": "Résolution",
+            "fileSize": "Taille du fichier",
+            "format": "Format",
+            "type": "Type de média",
+            "image": "Image",
+            "video": "Vidéo",
+            "frameRate": "Fréquence d'images",
+            "duration": "Durée",
+            "frames": "Nombre d'images",
+            "annotatedFrames": "Images annotées",
+            "labels": "Étiquettes uniques",
+            "retry": "Réessayer"
+        },
         "mediaActions": {
             "downloadStarted": "Le téléchargement de {{fileName}} a commencé"
         },
@@ -258,10 +275,6 @@
             "dropZone": {
                 "title": "Déposez les fichiers multimédias ici",
                 "description": "Les images et vidéos seront téléversées dans ce jeu de données."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Nombre de trames annotées : {{count}}",
-                "totalFrames": "Nombre total de trames : {{count}}"
             }
         },
         "import": {
@@ -413,7 +426,6 @@
                 }
             },
             "settings": {
-                "loading": "Chargement...",
                 "device": "Périphérique : {{name}}",
                 "unknownDevice": "Périphérique inconnu (id : {{deviceId}})",
                 "streamUrl": "URL du flux : {{url}}",
@@ -564,8 +576,7 @@
             },
             "component": {
                 "healthy": "Opérationnel",
-                "finished": "Terminé",
-                "unavailable": "Indisponible"
+                "finished": "Terminé"
             }
         },
         "stream": {

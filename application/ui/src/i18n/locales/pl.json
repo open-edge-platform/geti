@@ -72,7 +72,8 @@
             "model": "Model",
             "jobs": "Zadania",
             "labels": "Etykiety",
-            "bytesTransferred": "{{transferred}} z {{total}}"
+            "bytesTransferred": "{{transferred}} z {{total}}",
+            "annotations": "Adnotacje"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -87,7 +88,9 @@
             "uploading": "Przesyłanie",
             "failed": "Niepowodzenie",
             "error": "Błąd",
-            "disconnected": "Rozłączono"
+            "disconnected": "Rozłączono",
+            "loading": "Wczytywanie...",
+            "unavailable": "Niedostępny"
         },
         "errors": {
             "unknown": "Wystąpił nieznany błąd",
@@ -203,8 +206,7 @@
             "annotatedVideosFrames": "Wideo / klatki z adnotacjami",
             "numberOfObjectsPerLabel": "Liczba obiektów na etykietę",
             "unannotated": "Bez adnotacji",
-            "annotated": "Z adnotacjami",
-            "annotationsChartTooltip": "Adnotacje"
+            "annotated": "Z adnotacjami"
         },
         "delete": {
             "title": "Usuń elementy",
@@ -229,6 +231,21 @@
             "assignAllFailure": "Nie udało się przypisać etykietę(-y) do wszystkich {{count}} obrazów",
             "assignPartialSuccess": "Przypisano etykietę(-y) do {{succeeded}} z {{total}} obrazów ({{failed}} nieudanych)"
         },
+        "mediaDetails": {
+            "title": "Szczegóły",
+            "resolution": "Rozdzielczość",
+            "fileSize": "Rozmiar pliku",
+            "format": "Format",
+            "type": "Typ mediów",
+            "image": "Obraz",
+            "video": "Wideo",
+            "frameRate": "Liczba klatek na sekundę",
+            "duration": "Czas trwania",
+            "frames": "Wszystkie klatki",
+            "annotatedFrames": "Klatki z adnotacjami",
+            "labels": "Unikalne etykiety",
+            "retry": "Ponów"
+        },
         "mediaActions": {
             "downloadStarted": "Rozpoczęto pobieranie {{fileName}}"
         },
@@ -244,10 +261,6 @@
             "dropZone": {
                 "title": "Upuść tutaj pliki multimedialne",
                 "description": "Obrazy i filmy zostaną przesłane do tego zbioru danych."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Liczba klatek z adnotacjami: {{count}}",
-                "totalFrames": "Łączna liczba klatek: {{count}}"
             }
         },
         "import": {
@@ -399,7 +412,6 @@
                 }
             },
             "settings": {
-                "loading": "Wczytywanie...",
                 "device": "Urządzenie: {{name}}",
                 "unknownDevice": "Nieznane urządzenie (id: {{deviceId}})",
                 "streamUrl": "Adres URL strumienia: {{url}}",
@@ -548,8 +560,7 @@
             },
             "component": {
                 "healthy": "Sprawny",
-                "finished": "Zakończony",
-                "unavailable": "Niedostępny"
+                "finished": "Zakończony"
             }
         },
         "stream": {

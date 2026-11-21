@@ -15,6 +15,7 @@ import {
     getAdaptiveTilingParameter,
     getCustomTilingParameters,
     getEnableTilingParameter,
+    getObjectThresholdParameter,
     getTilingAutomaticDescription,
     getTilingMode,
     getTilingModeLabel,
@@ -48,6 +49,7 @@ export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: Tili
     const { t } = useTranslation();
     const selectedTilingMode = getTilingMode(tilingParameters.parameters);
     const customTilingParameters = getCustomTilingParameters(tilingParameters.parameters);
+    const objectThreshold = getObjectThresholdParameter(tilingParameters.parameters);
 
     const handleTilingParametersChange = (newParameters: ConfigurableParameter[]) => {
         onTrainingConfigurationChange((config) => {
@@ -89,9 +91,19 @@ export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: Tili
         ),
 
         [TILING_MODES.AUTOMATIC]: (
-            <Text UNSAFE_className={classes.tilingModeDescription} gridColumn={'2/3'}>
-                {getTilingAutomaticDescription(t)}
-            </Text>
+            <>
+                <Text UNSAFE_className={classes.tilingModeDescription} gridColumn={'2/3'}>
+                    {getTilingAutomaticDescription(t)}
+                </Text>
+                {objectThreshold !== undefined && (
+                    <View gridColumn={'1/-1'}>
+                        <Parameters
+                            parameters={[objectThreshold]}
+                            onChange={(parameter) => handleTilingParametersChange([parameter])}
+                        />
+                    </View>
+                )}
+            </>
         ),
         [TILING_MODES.CUSTOM]: (
             <View gridColumn={'1/-1'}>

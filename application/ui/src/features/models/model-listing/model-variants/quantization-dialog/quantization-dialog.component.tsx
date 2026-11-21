@@ -3,13 +3,13 @@
 
 import { useState } from 'react';
 
-import { $api } from '@/api';
 import type { Model } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Content, Dialog, dimensionValue, Divider, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
+import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import {
@@ -18,22 +18,6 @@ import {
     MaxAccuracyDropField,
     MaxNumIterationsField,
 } from './quantization-fields.component';
-
-const useDatasetItemsCount = () => {
-    const project_id = useProjectIdentifier();
-
-    const { data: datasetRevisions, isPending } = $api.useQuery('get', '/api/projects/{project_id}/dataset_revisions', {
-        params: {
-            path: { project_id },
-        },
-    });
-
-    // Get the latest dataset revision's total item count
-    const latestRevision = datasetRevisions?.at(-1);
-    const totalCount = latestRevision?.item_counts?.total ?? 0;
-
-    return { totalCount, isPending };
-};
 
 type QuantizationDialogProps = {
     model: Model;
@@ -52,12 +36,16 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
         DEFAULT_QUANTIZATION_PARAMETERS.usesFullCalibrationDataset
     );
 
-    const { totalCount, isPending: isLoadingCount } = useDatasetItemsCount();
+    const { data: datasetRevisions, isPending: isLoadingCount } = useGetDatasetRevisions();
+    const trainingRevision = datasetRevisions?.find(
+        ({ id, files_deleted }) => id === model.training_info.dataset_revision_id && !files_deleted
+    );
+    const trainingCount = trainingRevision?.item_counts.training ?? 0;
     const submitJob = useSubmitJob();
 
-    const maxCalibrationSize = Math.max(totalCount, 1);
+    const maxCalibrationSize = Math.max(trainingCount, 1);
     const effectiveCalibrationSize = Math.min(calibrationSize, maxCalibrationSize);
-    const hasNoDatasetItems = !isLoadingCount && totalCount === 0;
+    const hasNoDatasetItems = !isLoadingCount && trainingCount === 0;
 
     const projectId = useProjectIdentifier();
 
@@ -72,7 +60,9 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                         model_architecture_id: model.architecture,
                         max_drop: hasNoMaxAccuracyDrop ? null : accuracyDrop / 100,
                         max_num_iterations: hasNoMaxAccuracyDrop ? null : maxNumIterations,
-                        max_calibration_subset_size: usesFullCalibrationDataset ? totalCount : effectiveCalibrationSize,
+                        max_calibration_subset_size: usesFullCalibrationDataset
+                            ? trainingCount
+                            : effectiveCalibrationSize,
                     },
                 },
             },

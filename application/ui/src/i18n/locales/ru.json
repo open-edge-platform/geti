@@ -72,7 +72,8 @@
             "model": "Модель",
             "jobs": "Задания",
             "labels": "Классы",
-            "bytesTransferred": "{{transferred}} из {{total}}"
+            "bytesTransferred": "{{transferred}} из {{total}}",
+            "annotations": "Разметка"
         },
         "viewModes": {
             "large": "Крупные миниатюры",
@@ -87,7 +88,9 @@
             "uploading": "Загрузка",
             "failed": "Ошибка",
             "error": "Ошибка",
-            "disconnected": "Отключено"
+            "disconnected": "Отключено",
+            "loading": "Загрузка...",
+            "unavailable": "Недоступен"
         },
         "errors": {
             "unknown": "Произошла неизвестная ошибка",
@@ -225,8 +228,7 @@
             "annotatedVideosFrames": "Размеченные видео / кадры",
             "numberOfObjectsPerLabel": "Количество объектов каждого класса",
             "unannotated": "Без разметки",
-            "annotated": "С разметкой",
-            "annotationsChartTooltip": "Разметка"
+            "annotated": "С разметкой"
         },
         "delete": {
             "title": "Удаление элементов",
@@ -263,6 +265,21 @@
             "assignAllFailure_other": "Не удалось назначить классы {{count}} изображениям.",
             "assignPartialSuccess": "Классы назначены не всем изображениям ({{succeeded}} из {{total}}). Не удалось обработать {{failed}}."
         },
+        "mediaDetails": {
+            "title": "Сведения",
+            "resolution": "Разрешение",
+            "fileSize": "Размер файла",
+            "format": "Формат",
+            "type": "Тип медиа",
+            "image": "Изображение",
+            "video": "Видео",
+            "frameRate": "Частота кадров",
+            "duration": "Длительность",
+            "frames": "Всего кадров",
+            "annotatedFrames": "Размечено кадров",
+            "labels": "Уникальные классы",
+            "retry": "Повторить"
+        },
         "mediaActions": {
             "downloadStarted": "Началось скачивание {{fileName}}"
         },
@@ -280,10 +297,6 @@
             "dropZone": {
                 "title": "Перетащите сюда изображения и видео",
                 "description": "Изображения и видео будут загружены в этот набор данных."
-            },
-            "mediaInfo": {
-                "annotatedFrames": "Количество размеченных кадров: {{count}}",
-                "totalFrames": "Всего кадров: {{count}}"
             }
         },
         "import": {
@@ -435,7 +448,6 @@
                 }
             },
             "settings": {
-                "loading": "Загрузка...",
                 "device": "Устройство: {{name}}",
                 "unknownDevice": "Неизвестное устройство (ID: {{deviceId}})",
                 "streamUrl": "Адрес видеопотока: {{url}}",
@@ -588,8 +600,7 @@
             },
             "component": {
                 "healthy": "Исправен",
-                "finished": "Завершён",
-                "unavailable": "Недоступен"
+                "finished": "Завершён"
             }
         },
         "stream": {

@@ -409,7 +409,7 @@ class TransformsUpdater:
         """Update tiling parameters in the config.
 
         Args:
-            tiling_dict: Dict with keys: enable, enable_adaptive_tiling, tile_size, tile_overlap.
+            tiling_dict: Tiling settings, including the object visibility threshold in tile.
             config: The full getitune config dictionary.
         """
         if tiling_dict is None:
@@ -425,6 +425,8 @@ class TransformsUpdater:
                 tiling_dict["tile_size"],
             )
             tile_config["overlap"] = tiling_dict["tile_overlap"]
+            if "min_object_ratio_thr" in tiling_dict:
+                tile_config["min_object_ratio_thr"] = tiling_dict["min_object_ratio_thr"]
 
 
 class HyperparametersUpdater:
@@ -493,11 +495,15 @@ class HyperparametersUpdater:
 
     @staticmethod
     def _update_num_workers(param_value: int | None, config: dict) -> None:
-        """Update the number of dataloader workers for all subsets."""
+        """Update the number of dataloader workers for train and val subsets.
+
+        The test subset keeps the recipe value: tiled test loaders are memory-heavy
+        and the recipe sets their worker count explicitly.
+        """
         if param_value is None:
             logger.info("Number of workers is not provided, skipping update.")
             return
-        for subset in ("train_subset", "val_subset", "test_subset"):
+        for subset in ("train_subset", "val_subset"):
             config["data"][subset]["num_workers"] = param_value
 
     @staticmethod
@@ -528,19 +534,6 @@ class HyperparametersUpdater:
 
         if patience is not None:
             config["callbacks"][idx]["init_args"]["patience"] = patience
-
-    @staticmethod
-    def update_tiling(tiling_dict: dict | None, config: dict) -> None:
-        """Update tiling parameters in the config."""
-        if tiling_dict is None:
-            logger.info("Tiling parameters are not provided, skipping update.")
-            return
-
-        config["data"]["tile_config"]["enable_tiler"] = tiling_dict["enable"]
-        if tiling_dict["enable"]:
-            config["data"]["tile_config"]["enable_adaptive_tiling"] = tiling_dict["enable_adaptive_tiling"]
-            config["data"]["tile_config"]["tile_size"] = (tiling_dict["tile_size"], tiling_dict["tile_size"])
-            config["data"]["tile_config"]["overlap"] = tiling_dict["tile_overlap"]
 
     @staticmethod
     def _update_input_size(size_value: tuple[int, int] | None, config: dict) -> None:
@@ -753,7 +746,8 @@ class GetiConfigConverter:
                         config_dict["data"][subset_name]["batch_size"] = value
 
         if (num_workers := training_parameters.get("num_workers")) is not None:
-            for subset_name in ("train_subset", "val_subset", "test_subset"):
+            # The test subset keeps the recipe worker count (see HyperparametersUpdater._update_num_workers).
+            for subset_name in ("train_subset", "val_subset"):
                 config_dict["data"][subset_name]["num_workers"] = num_workers
 
         early_stopping = training_parameters.get("early_stopping")

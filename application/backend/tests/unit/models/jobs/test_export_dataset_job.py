@@ -20,6 +20,7 @@ class TestExportDatasetJobParams:
             (TaskType.DETECTION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.GETI),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.COCO),
+            (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO),
         ],
     )
     def test_validate_format_valid(self, task_type: TaskType, export_format: DatasetFormat):
@@ -33,13 +34,29 @@ class TestExportDatasetJobParams:
         except ValidationError:
             pytest.fail("Validation failed for a valid combination.")
 
+    def test_validate_format_yolo_valid_for_multiclass_classification(self):
+        """Test that the YOLO format is accepted for single-label classification."""
+        params = ExportDatasetJobParams(
+            project_id=uuid4(),
+            task=Task(task_type=TaskType.CLASSIFICATION, exclusive_labels=True),
+            export_format=DatasetFormat.YOLO,
+        )
+        assert params.export_format is DatasetFormat.YOLO
+
+    def test_validate_format_yolo_invalid_for_multilabel_classification(self):
+        """Test that the YOLO format is rejected for multi-label classification."""
+        with pytest.raises(ValidationError, match="Export format 'yolo' is only supported for single-label"):
+            ExportDatasetJobParams(
+                project_id=uuid4(),
+                task=Task(task_type=TaskType.CLASSIFICATION, exclusive_labels=False),
+                export_format=DatasetFormat.YOLO,
+            )
+
     @pytest.mark.parametrize(
         ("task_type", "export_format"),
         [
             (TaskType.CLASSIFICATION, DatasetFormat.COCO),
-            (TaskType.CLASSIFICATION, DatasetFormat.YOLO),
             (TaskType.DETECTION, DatasetFormat.VOC),
-            (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.YOLO),
             (TaskType.INSTANCE_SEGMENTATION, DatasetFormat.VOC),
         ],
     )

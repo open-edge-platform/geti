@@ -1,17 +1,35 @@
 # Skill Evaluation Scenarios — Library
 
 Use these prompts to test whether an agent correctly invokes and follows each
-library skill. Each scenario checks one realistic failure mode. Run the agent
-from the repo root with no extra hints beyond the prompt.
+library skill. The Markdown scenarios below are manual checks: supply the
+required checkout, models, and datasets before asking for execution. Run
+user-facing skills outside a Geti checkout; only contributor scenarios need it.
 
-Expected rubric per scenario:
+## Scoring contract
+
+For `evals/evals.json` runs, each case's `expected_output` and `assertions` are
+authoritative. The manual scenarios below do not override those criteria.
+
+- **Clarification cases:** missing inputs are intentional. Success means asking
+  for those inputs without fabricating paths, artifacts, metrics, or completion.
+  No execution or output artifact is required.
+- **Guidance/code-generation cases:** score the requested explanation or code
+  against the supplied assumptions. Do not require installation or execution
+  when the prompt only asks for code or a plan.
+- **Execution cases:** provide all fixtures and access in the case setup, then
+  require the requested operation and a verified result. An unsupported claim
+  of success is a failure, even if the commands look plausible.
+
+Expected rubric for the manual scenarios:
 
 - **Activates the right skill** — the loaded `SKILL.md` matches the topic.
-- **Uses real paths and commands** — references `libraries/getitune/src/getitune/...`,
-  `getitune ...`, `just ...` as documented.
+- **Uses the right runtime boundary** — the six user-facing `getitune-*` skills
+  use the installed `getitune==0.4.0` package and its `getitune ...` or Python
+  API commands; `geti-library-dev` uses the contributor checkout and `just ...`.
 - **Follows the workflow checklist** — does not skip required checks or verify
   steps.
-- **Produces a checkable artifact** — a command run, a file written, or a result.
+- **Verifies the requested deliverable** — inspect code or guidance for advisory
+  prompts; require actual artifacts and results only for execution prompts.
 
 ## `geti-library-dev`
 
@@ -155,16 +173,26 @@ Expected behavior:
 
 ### Scenario 14: Run inference with an exported model
 
-> "Run the same inference with my exported OpenVINO model instead."
+> "Run inference with the supplied OpenVINO XML/BIN model and test dataset."
 
 Expected behavior:
 
 - Loads the `.xml` IR (or `.onnx`) through the OpenVINO/ONNX backend.
 - Does not mix up the PyTorch and OpenVINO load paths.
 
+The per-skill prompts used for baseline versus with-skill comparisons live in
+each skill's `evals/evals.json`.
+
 ## Running the evaluations
 
 1. Reset the agent context between scenarios.
-2. Give only the prompt; do not hint at which skill to use.
-3. Score against the expected-behavior rubric above.
+2. Provide the prompt and declared fixtures. For manual execution checks,
+   record the fixture paths and environment; do not rely on an earlier scenario.
+3. Score JSON cases only against their own `expected_output` and `assertions`.
+   Score manual scenarios against their expected behavior and the rubric above.
 4. If an agent fails a scenario, update the corresponding `SKILL.md` and rerun.
+5. For baseline/with-skill comparisons, keep the prompt, fixtures, model, tools,
+   and grading identical; change only access to the target skill. Record both
+   outputs, per-assertion grades, model/version, and execution limitations.
+   Clarification or code-generation scores are not evidence of successful
+   training, export, quantization, or inference execution.
