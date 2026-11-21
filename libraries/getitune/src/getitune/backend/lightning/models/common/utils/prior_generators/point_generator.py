@@ -26,8 +26,8 @@ class MlvlPointGenerator(BasePriorGenerator):
     """Standard points generator for multi-level (Mlvl) feature maps in 2D points-based detectors.
 
     Args:
-        strides (list[int] | list[tuple[int, int]]): Stride for each feature
-            level, given as an integer for both axes or a tuple in (h, w) order.
+        strides (list[int] | list[tuple[int, int]]): Strides of anchors
+            in multiple feature levels in order (w, h).
         offset (float): The offset of points, the value is normalized with
             corresponding stride. Defaults to 0.5.
     """
@@ -135,7 +135,7 @@ class MlvlPointGenerator(BasePriorGenerator):
             (coord_x, coord_y, stride_w, stride_h).
         """
         feat_h, feat_w = featmap_size
-        stride_h, stride_w = self.strides[level_idx]
+        stride_w, stride_h = self.strides[level_idx]
         shift_x = (torch.arange(0, feat_w, device=device) + self.offset) * stride_w
         # keep featmap_size as Tensor instead of int, so that we
         # can convert to ONNX correctly
@@ -183,11 +183,11 @@ class MlvlPointGenerator(BasePriorGenerator):
             raise ValueError(msg)
         multi_level_flags = []
         for i in range(self.num_levels):
-            stride_h, stride_w = self.strides[i]
+            point_stride = self.strides[i]
             feat_h, feat_w = featmap_sizes[i]
             h, w = pad_shape[:2]
-            valid_feat_h = min(int(np.ceil(h / stride_h)), feat_h)
-            valid_feat_w = min(int(np.ceil(w / stride_w)), feat_w)
+            valid_feat_h = min(int(np.ceil(h / point_stride[1])), feat_h)
+            valid_feat_w = min(int(np.ceil(w / point_stride[0])), feat_w)
             flags = self.single_level_valid_flags((feat_h, feat_w), (valid_feat_h, valid_feat_w), device=device)
             multi_level_flags.append(flags)
         return multi_level_flags
@@ -256,8 +256,7 @@ class MlvlPointGenerator(BasePriorGenerator):
             2 represent (coord_x, coord_y).
         """
         height, width = featmap_size
-        stride_h, stride_w = self.strides[level_idx]
-        x = (prior_idxs % width + self.offset) * stride_w
-        y = ((prior_idxs // width) % height + self.offset) * stride_h
+        x = (prior_idxs % width + self.offset) * self.strides[level_idx][0]
+        y = ((prior_idxs // width) % height + self.offset) * self.strides[level_idx][1]
         prioris = torch.stack([x, y], 1).to(dtype)
         return prioris.to(device)
