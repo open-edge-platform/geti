@@ -255,7 +255,8 @@ def get_project_thumbnail(
     """Get the project's thumbnail image"""
     thumbnail_path = project_service.get_project_thumbnail_path(project_id)
     if thumbnail_path:
-        return FileResponse(path=thumbnail_path)
+        # Revalidate on every use: it is the earliest media's thumbnail, which changes when that media is deleted.
+        return FileResponse(path=thumbnail_path, headers={"Cache-Control": "no-cache"})
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 
