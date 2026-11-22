@@ -10,6 +10,7 @@ from uuid import uuid4
 
 import pytest
 
+from app.core.jobs.completion import complete_training_job
 from app.core.jobs.control_plane import JobController, JobQueue
 from app.core.jobs.exec import ProcessRun, ProcessRunnerFactory
 from app.core.jobs.models import JobStatus, JobType
@@ -61,9 +62,14 @@ async def test_force_killed_cancelled_training_runs_completion_hook(tmp_path, mo
     runnables = RunnableFactory()
     runnables.register(JobType.TRAIN, UnresponsiveTraining)
     queue = JobQueue()
-    controller = JobController(queue, ProcessRunnerFactory(runnables), max_parallel_jobs=1)
+    controller = JobController(
+        queue,
+        ProcessRunnerFactory(runnables),
+        max_parallel_jobs=1,
+        completion_hooks={JobType.TRAIN: complete_training_job},
+    )
 
-    with patch.object(TrainingJob, "_reconcile_stuck_training_status") as reconcile:
+    with patch("app.core.jobs.completion._reconcile_stuck_training_status") as reconcile:
         await controller.start()
         try:
             await queue.submit(job)

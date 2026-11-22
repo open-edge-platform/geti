@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from loguru import logger
 
 from app.core.jobs import JobController, JobQueue, ProcessRunnerFactory
+from app.core.jobs.completion import complete_training_job
 from app.core.jobs.models import JobType
 from app.core.logging import LogConfig, setup_logging
 from app.core.run import Runnable, RunnableFactory
@@ -226,7 +227,10 @@ def setup_job_controller(
     )
     process_runner_factory = ProcessRunnerFactory(job_runnable_factory)
     job_controller = JobController(
-        jobs_queue=q, runner_factory=process_runner_factory, max_parallel_jobs=max_parallel_jobs
+        jobs_queue=q,
+        runner_factory=process_runner_factory,
+        max_parallel_jobs=max_parallel_jobs,
+        completion_hooks={JobType.TRAIN: complete_training_job},
     )
     return q, job_controller
 
