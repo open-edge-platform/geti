@@ -66,6 +66,15 @@ describe('createI18nInstance', () => {
         expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('de');
     });
 
+    it.each(['bn', 'bn-BD', 'bn-IN'])('renders Bengali for browser language %s', (language) => {
+        setNavigatorLanguage(language);
+        const instance = createI18nInstance();
+
+        expect(instance.resolvedLanguage).toBe('bn');
+        expect(instance.t('common.labels.dataset')).toBe('ডেটাসেট');
+        expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('bn');
+    });
+
     it.each([
         [1, '1 Ergebnis jede Sekunde'],
         [2, '1 Ergebnis alle 2 Sekunden'],
