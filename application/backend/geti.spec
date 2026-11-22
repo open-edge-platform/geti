@@ -202,7 +202,6 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 # these modules must be discoverable by the child even though they are only imported
 # dynamically inside the training / export code paths.
 hiddenimports += [
-    'app.core.jobs.completion',
     # Lightning internals used by Trainer
     'lightning.pytorch.callbacks',
     'lightning.pytorch.loggers',
@@ -242,6 +241,7 @@ hiddenimports += [
 # Ensure cryptography is bundled so the runtime cert-generation hook (windows/certs.py)
 # can create a self-signed TLS certificate on first launch.
 hiddenimports += collect_submodules('cryptography')
+hiddenimports += ['app.services.training_completion']
 
 # Runtime hook to patch importlib.metadata must execute before torch is imported
 # in every process (including multiprocessing-spawned children).

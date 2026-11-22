@@ -237,13 +237,16 @@ class TestJobController:
         controller = JobController(queue, fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
         fxt_runner_factory.for_job.return_value = MockRunner([event])
         job = fxt_job()
-        observed_statuses = []
-        hook.side_effect = lambda completed: observed_statuses.append(completed.status)
+        event_loop_thread = threading.get_ident()
+        observations = []
+        hook.side_effect = lambda completed: observations.append((completed.status, threading.get_ident()))
 
         await controller._run_job(job)
 
         hook.assert_called_once_with(job)
-        assert observed_statuses == [job.status]
+        [(status_at_completion, hook_thread)] = observations
+        assert status_at_completion == job.status
+        assert hook_thread != event_loop_thread
         assert job.status in (JobStatus.DONE, JobStatus.FAILED, JobStatus.CANCELLED)
         assert job.id not in queue._cancellation_events
 

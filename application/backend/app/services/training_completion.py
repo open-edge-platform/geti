@@ -9,7 +9,9 @@ from loguru import logger
 from app.core.jobs.models import Job, JobStatus
 from app.db.engine import get_db_session
 from app.models import TrainingJob, TrainingStatus
-from app.services import ModelService, ResourceNotFoundError
+
+from .base import ResourceNotFoundError
+from .model_service import ModelService
 
 
 def complete_training_job(job: Job) -> None:
@@ -21,14 +23,16 @@ def complete_training_job(job: Job) -> None:
     if job.status == JobStatus.CANCELLED:
         # The trainer deletes a cancelled model; copying the log would recreate its directory.
         logger.info("Training job {} was cancelled, not keeping its log", job.id)
-    elif not log_path.exists():
-        logger.warning("Log file {} does not exist", log_path)
     else:
-        new_path = (
-            job.data_dir / "projects" / str(job.project_id) / "models" / str(job.params.model_id) / "training.log"
-        )
-        new_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(log_path, new_path)
+        try:
+            if log_path.exists():
+                model_dir = job.data_dir / "projects" / str(job.project_id) / "models" / str(job.params.model_id)
+                model_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(log_path, model_dir / "training.log")
+            else:
+                logger.warning("Log file {} does not exist", log_path)
+        except OSError as exc:
+            logger.error("Failed to save training log {}: {}", log_path, exc)
 
     # Remove the workspace parent, including any timestamped subdirectories.
     workspace_dir = job.data_dir / f"getitune-workspace-{job.params.model_id}"

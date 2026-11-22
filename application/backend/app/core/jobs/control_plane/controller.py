@@ -40,7 +40,7 @@ class JobController:
         jobs_queue: Source of jobs to execute and cancellation state tracker
         runner_factory: Creates appropriate runner contexts for different job types
         max_parallel_jobs: Maximum number of capacity-managed jobs that can execute simultaneously
-        completion_hooks: Completion handlers selected by job type after a started job reaches a terminal state
+        completion_hooks: Synchronous completion handlers run in a thread after a started job reaches a terminal state
     """
 
     def __init__(
@@ -128,7 +128,7 @@ class JobController:
             except Exception as exc:
                 logger.exception("Failed to start the runner for job {}", job.id)
                 job.fail(msg=f"Failed to start the job: {exc}")
-                self._complete_job(job)
+                await self._complete_job(job)
                 return
             # Set up event pumping and cancellation monitoring
             cancel_task = self._setup_job_execution(job, job_run, event_q)
@@ -141,7 +141,7 @@ class JobController:
                 with contextlib.suppress(asyncio.CancelledError):
                     await cancel_task
                 self._jobs_q.cleanup_cancellation_event(job.id)
-                self._complete_job(job)
+                await self._complete_job(job)
 
             # Log when the job has reached its final status
             final_status: JobStatus = job.status
@@ -155,13 +155,13 @@ class JobController:
                 case _:
                     logger.warning("Job ended in unexpected status {}, job_id: {}", final_status.name, job.id)
 
-    def _complete_job(self, job: Job) -> None:
+    async def _complete_job(self, job: Job) -> None:
         if job.started_at is None or job.status not in (JobStatus.DONE, JobStatus.FAILED, JobStatus.CANCELLED):
             return
         hook = self._completion_hooks.get(job.job_type)
         if hook is not None:
             try:
-                hook(job)
+                await asyncio.to_thread(hook, job)
             except Exception:
                 logger.exception("Completion hook failed for job {}", job.id)
 

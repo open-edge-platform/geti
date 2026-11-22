@@ -19,7 +19,6 @@ from fastapi import FastAPI
 from loguru import logger
 
 from app.core.jobs import JobController, JobQueue, ProcessRunnerFactory
-from app.core.jobs.completion import complete_training_job
 from app.core.jobs.models import JobType
 from app.core.logging import LogConfig, setup_logging
 from app.core.run import Runnable, RunnableFactory
@@ -48,6 +47,7 @@ from app.services.data_collect import DataCollector
 from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
 from app.services.subset_assignment import SubsetAssigner, SubsetService
+from app.services.training_completion import complete_training_job
 from app.services.upload_service import UploadService
 from app.services.video import CacheConfig, VideoService
 from app.settings import get_settings
