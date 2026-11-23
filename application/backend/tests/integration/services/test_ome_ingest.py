@@ -19,19 +19,11 @@ from app.models.media import ImageFormat, MediaType
 from app.models.ome import GrayscaleProjection, RgbChannelAssignment, RgbProjection
 from app.services.base import InvalidImageError, ResourceNotFoundError
 from app.services.media_service import MediaService
-from app.services.ome import ChannelMappingStrategy
+from app.services.ome import ChannelProjectionStrategy
 from app.services.ome.ingest import OmeMediaTooLargeError, create_ingest_thumbnail
 
 ASSETS = Path(__file__).parents[2] / "assets" / "ome"
 MAX_SIZE = 10 * 1024 * 1024
-
-
-@pytest.fixture
-def ome_ingest(db_session, fxt_db_projects, tmp_path):
-    project = fxt_db_projects[0]
-    db_session.add(project)
-    db_session.flush()
-    return MediaService(tmp_path, db_session=db_session), UUID(project.id)
 
 
 @pytest.mark.parametrize(
@@ -73,7 +65,7 @@ def test_ingest_ome_fixture(ome_ingest, db_session, tmp_path, filename, stream):
     assert row.type == "ome_image"
     assert (row.width, row.height) == (info.size_x, info.size_y)
     assert info.raw_metadata.startswith("<?xml")
-    assert info.channel_mapping
+    assert info.channel_projection
     assert info.is_big_tiff == (filename == "bigtiff.ome.tiff")
     assert db_session.scalar(select(func.count()).select_from(DatasetItemDB)) == 0
     with Image.open(service.get_media_thumbnail_path_by_id(project_id, media.id)) as thumbnail:
@@ -83,7 +75,7 @@ def test_ingest_ome_fixture(ome_ingest, db_session, tmp_path, filename, stream):
     assert service.list_media(project_id)[0] == media
     assert (
         service.get_ome_image_info(project_id, media.id).channel_projection.model_dump(mode="json")
-        == info.channel_mapping
+        == info.channel_projection
     )
     with pytest.raises(ResourceNotFoundError):
         service.get_ome_image_info(uuid4(), media.id)
@@ -125,12 +117,12 @@ def test_get_ome_image_info_reloads_persisted_metadata(ome_ingest, db_session):
     expected = service.get_ome_image_info(project_id, media.id)
     db_session.flush()
     db_session.expunge_all()
-    strategy = Mock(spec=ChannelMappingStrategy)
+    strategy = Mock(spec=ChannelProjectionStrategy)
     strategy.compute.side_effect = AssertionError("Retrieving metadata must not recompute the projection.")
     reloaded_service = MediaService(
         service.projects_dir.parent,
         db_session=db_session,
-        channel_mapping_strategy=strategy,
+        channel_projection_strategy=strategy,
     )
 
     assert reloaded_service.get_ome_image_info(project_id, media.id) == expected
@@ -193,7 +185,7 @@ def test_invalid_ome_has_no_orphans(ome_ingest, db_session, tmp_path, filename, 
     assert db_session.scalar(select(func.count()).select_from(OmeImageDB)) == 0
 
 
-@pytest.mark.parametrize("failure", ["metadata_save", "thumbnail", "disk_full", "mapping"])
+@pytest.mark.parametrize("failure", ["metadata_save", "thumbnail", "disk_full", "projection"])
 def test_ingest_failure_restores_upload(ome_ingest, db_session, tmp_path, failure):
     service, project_id = ome_ingest
     upload = tmp_path / "upload"
@@ -203,7 +195,7 @@ def test_ingest_failure_restores_upload(ome_ingest, db_session, tmp_path, failur
         "metadata_save": "app.repositories.ome_image_repo.OmeImageRepository.save",
         "thumbnail": "PIL.Image.Image.save",
         "disk_full": "PIL.Image.Image.save",
-        "mapping": "app.services.ome.rgb_channel_mapping.MetadataRgbChannelMappingStrategy.compute",
+        "projection": "app.services.ome.rgb_channel_projection.MetadataRgbChannelProjectionStrategy.compute",
     }
     error = OSError(errno.ENOSPC, "disk full") if failure == "disk_full" else RuntimeError("failed")
     expected = OmeMediaTooLargeError if failure == "disk_full" else RuntimeError
@@ -221,19 +213,19 @@ def test_ingest_failure_restores_upload(ome_ingest, db_session, tmp_path, failur
     "projection",
     [RgbProjection(channels=(RgbChannelAssignment(channel=0, target="blue"),)), GrayscaleProjection(channel=1)],
 )
-def test_injected_channel_mapping_strategy(ome_ingest, projection):
+def test_injected_channel_projection_strategy(ome_ingest, projection):
     service, project_id = ome_ingest
     pixels = (ASSETS / "xyc.ome.tiff").read_bytes()
     existing_media = service.create_ome_image(
         project_id, "existing", ImageFormat.OME_TIFF, BytesIO(pixels), max_size=MAX_SIZE
     )
-    existing_mapping = service.get_ome_image_info(project_id, existing_media.id).channel_projection
-    strategy = Mock(spec=ChannelMappingStrategy)
+    existing_projection = service.get_ome_image_info(project_id, existing_media.id).channel_projection
+    strategy = Mock(spec=ChannelProjectionStrategy)
     strategy.compute.return_value = projection
     custom_service = MediaService(
         service.projects_dir.parent,
         db_session=service.db_session,
-        channel_mapping_strategy=strategy,
+        channel_projection_strategy=strategy,
     )
     with patch("app.services.media_service.create_ingest_thumbnail", wraps=create_ingest_thumbnail) as create_thumbnail:
         media = custom_service.create_ome_image(
@@ -243,9 +235,9 @@ def test_injected_channel_mapping_strategy(ome_ingest, projection):
     assert strategy.compute.call_args.args[0].size_c == 3
     assert create_thumbnail.call_args.args[1] == projection
     assert custom_service.get_ome_image_info(project_id, media.id).channel_projection == projection
-    assert custom_service.get_ome_image_info(project_id, existing_media.id).channel_projection == existing_mapping
-    assert existing_mapping != projection
-    # Reading either image uses persisted mappings rather than rerunning the current strategy.
+    assert custom_service.get_ome_image_info(project_id, existing_media.id).channel_projection == existing_projection
+    assert existing_projection != projection
+    # Reading either image uses persisted projections rather than rerunning the current strategy.
     strategy.compute.assert_called_once()
 
 

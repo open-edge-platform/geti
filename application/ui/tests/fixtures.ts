@@ -11,6 +11,7 @@ import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
+import { omeHandlers } from 'mocks/mock-ome';
 import { tusUploadHandlers } from 'mocks/mock-tus-upload';
 import { HttpResponse } from 'msw';
 
@@ -81,6 +82,7 @@ const test = testBase.extend<Fixtures>({
                 // responses generated from the OpenAPI spec (mirrors `src/msw-node-setup.ts`).
                 handlers: [
                     ...tusUploadHandlers,
+                    ...omeHandlers,
                     ...handlers,
                     http.get('/health', ({ response }) => {
                         return response(200).json({
