@@ -3,6 +3,7 @@
 
 import builtins
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from io import BytesIO
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
@@ -250,6 +251,104 @@ def test_downsample_uses_reader_output_size_and_distinct_key(rendering):
     with Image.open(BytesIO(service.render(sampled))) as image:
         assert max(image.size) == 2
     assert service.resolve_render(project_id, media_id, override=view, max_size=100).etag == full.etag
+
+
+@pytest.mark.parametrize("max_size", [None, 16384, 40000])
+@pytest.mark.parametrize("override", [None, "", "0|0:100$FFFFFF"])
+@pytest.mark.parametrize("dimensions", [(40000, 30000), (16384, 16384)])
+def test_oversized_output_is_rejected_before_reading_pixels(rendering, max_size, override, dimensions):
+    service, project_id, media_id, info = rendering
+    service.media_service.get_ome_image_info.return_value = info.model_copy(
+        update={"size_x": dimensions[0], "size_y": dimensions[1], "pyramid_levels": []}
+    )
+    view = None if override is None else parse_channel_override(override)
+    with (
+        patch.object(service, "_open_image") as open_image,
+        patch.object(service, "_get_channel_view") as get_view,
+        pytest.raises(InvalidRenderSelectionError, match="256 MiB.*Use a smaller max_size"),
+    ):
+        service.resolve_render(project_id, media_id, override=view, max_size=max_size)
+    open_image.assert_not_called()
+    get_view.assert_not_called()
+
+
+@pytest.mark.parametrize("channel_count", [0, 1, 3, 64])
+def test_render_budget_accepts_boundary_and_rejects_next_pixel(rendering, channel_count):
+    service, project_id, media_id, info = rendering
+    max_pixels = (256 * 1024 * 1024 - 128 * 1024 * 1024) // (128 + 32 * channel_count)
+    view = parse_channel_override(",".join(f"{index}|0:100$FFFFFF" for index in range(channel_count)))
+    info = info.model_copy(
+        update={"size_x": max_pixels, "size_y": 1, "size_c": max(1, channel_count), "pyramid_levels": []}
+    )
+    service.media_service.get_ome_image_info.return_value = info
+    with patch.object(service, "_open_image") as open_image:
+        selection = service.resolve_render(project_id, media_id, override=view)
+        assert selection.output_size is None
+        service.media_service.get_ome_image_info.return_value = info.model_copy(update={"size_x": max_pixels + 1})
+        with pytest.raises(InvalidRenderSelectionError, match="working-memory budget"):
+            service.resolve_render(project_id, media_id, override=view)
+    open_image.assert_not_called()
+
+
+def test_disabled_channels_do_not_consume_source_buffer_budget(rendering):
+    service, project_id, media_id, info = rendering
+    service.media_service.get_ome_image_info.return_value = info.model_copy(
+        update={"size_x": 512, "size_y": 512, "size_c": 64, "pyramid_levels": []}
+    )
+    view = parse_channel_override(",".join(f"{index}|0:100$FFFFFF" for index in range(64)))
+    with pytest.raises(InvalidRenderSelectionError, match="64 enabled channels"):
+        service.resolve_render(project_id, media_id, override=view)
+    view = OmeChannelSettings(
+        settings=[setting.model_copy(update={"enabled": setting.channel == 0}) for setting in view.settings]
+    )
+    selection = service.resolve_render(project_id, media_id, override=view)
+    assert len(selection.settings.settings) == 1
+
+
+@pytest.mark.parametrize("use_level", [False, True])
+def test_large_image_can_render_with_safe_downsampling_or_pyramid_level(rendering, use_level):
+    service, project_id, media_id, info = rendering
+    service.media_service.get_ome_image_info.return_value = info.model_copy(
+        update={
+            "size_x": 40000,
+            "size_y": 30000,
+            "pyramid_levels": [{"width": 40000, "height": 30000}, {"width": 512, "height": 384}],
+        }
+    )
+    selection = service.resolve_render(
+        project_id,
+        media_id,
+        override=parse_channel_override("0|0:100$FFFFFF"),
+        level=1 if use_level else 0,
+        max_size=None if use_level else 512,
+    )
+    handle = MagicMock()
+    handle.__enter__.return_value = handle
+    handle.read_region.return_value = np.zeros((1, 384, 512), dtype=np.uint16)
+    with patch.object(service, "_open_image", return_value=handle):
+        content = service.render(selection)
+    handle.read_region.assert_called_once_with(
+        z=0, t=0, level=1 if use_level else 0, channels=[0], output_size=None if use_level else (512, 384)
+    )
+    with Image.open(BytesIO(content)) as image:
+        assert image.size == (512, 384)
+
+
+@pytest.mark.parametrize("output_size", [None, (16384, 16384)])
+def test_direct_render_rechecks_budget_before_opening_image(rendering, output_size):
+    service, project_id, media_id, info = rendering
+    selection = service.resolve_render(project_id, media_id, override=parse_channel_override("0|0:100$FFFFFF"))
+    selection = replace(
+        selection,
+        info=info.model_copy(update={"size_x": 40000, "size_y": 30000, "pyramid_levels": []}),
+        output_size=output_size,
+    )
+    with (
+        patch.object(service, "_open_image") as open_image,
+        pytest.raises(InvalidRenderSelectionError, match="working-memory budget"),
+    ):
+        service.render(selection)
+    open_image.assert_not_called()
 
 
 def test_concurrent_renders_return_identical_complete_pngs(rendering):

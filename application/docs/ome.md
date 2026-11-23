@@ -516,7 +516,7 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
      -> `c` present:  Cache-Control: private, max-age=31536000, immutable
 304 -> If-None-Match matched
 400 -> malformed `c` (bad index, min >= max, invalid hex color)
-422 -> level, z, t or max_size out of range, or unreadable OME pixels
+422 -> level, z, t or max_size out of range, render memory budget exceeded, or unreadable OME pixels
 ```
 
 **Query parameters**
@@ -527,6 +527,18 @@ GET /api/projects/{project_id}/dataset/media/{media_id}/render?z=12&t=0&level=2&
 | `level`    | no (default 0) | Pyramid level; 0 = full resolution.                                                           |
 | `c`        | no             | Per-request channel view override (see below).                                                |
 | `max_size` | no             | Downsample to fit this maximum side (1-16384 pixels), preserving aspect ratio; never upscale. |
+
+**Render memory budget**
+
+Every render must fit a **256 MiB estimated working-memory budget**, whether `max_size` is omitted or supplied.
+The estimate reserves 128 MiB for encoded/decoded TIFF segments, plus 128 bytes per output pixel for RGB
+compositing, temporary arrays and PNG encoding, and 32 bytes per output pixel per enabled source channel.
+The source allowance conservatively covers two arrays at the largest supported OME pixel size.
+Checks run before full-plane pixel decoding; outputs that exceed the budget return 422 with guidance to reduce
+`max_size` or choose a lower-resolution pyramid level. Oversized dimensions are rejected before sampling defaults,
+and direct service rendering rechecks the budget before reading pixels. There is no automatic downsampling.
+The 16384-pixel side limit alone does not guarantee acceptance; area and enabled channel count also matter.
+This is a conservative per-render estimate, not a process-wide or concurrent-request memory limit.
 
 **Channel view resolution**
 

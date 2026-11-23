@@ -21,6 +21,10 @@ from app.services.ome.registry import OmeReaderRegistry, UnsupportedOmeStorageEr
 
 _DEFAULT_COLORS: tuple[str, ...] = ("#FF0000", "#00FF00", "#0000FF")
 _RENDER_VERSION: int = 1
+_RENDER_MEMORY_BUDGET_BYTES: int = 256 * 1024 * 1024
+_RENDER_DECODE_RESERVE_BYTES: int = 128 * 1024 * 1024
+_RENDER_BASE_BYTES_PER_PIXEL: int = 128
+_RENDER_SOURCE_BYTES_PER_PIXEL: int = 32
 
 
 class InvalidChannelViewError(ValueError):
@@ -28,7 +32,7 @@ class InvalidChannelViewError(ValueError):
 
 
 class InvalidRenderSelectionError(ValueError):
-    """A pyramid level or plane selection is out of bounds."""
+    """A render selection is out of bounds or exceeds the working-memory budget."""
 
 
 def parse_channel_override(value: str) -> OmeChannelSettings:
@@ -211,6 +215,28 @@ class OmeRenderingService:
             raise InvalidImageError("Invalid OME pyramid dimensions.")
         return width, height
 
+    @staticmethod
+    def _validate_render_budget(output_size: tuple[int, int], channel_count: int) -> None:
+        """Conservatively budget decoding, source arrays, float64 RGB and temporary buffers.
+
+        Reserve 128 MiB for encoded/decoded segments (each capped at 64 MiB by
+        the TIFF reader), 128 bytes per output pixel for compositing/encoding,
+        and two source arrays of up to 16 bytes per pixel per selected channel.
+        This is a per-render estimate, not a process-wide memory limit.
+        """
+        width, height = output_size
+        if min(width, height) <= 0:
+            raise InvalidRenderSelectionError("OME output dimensions must be positive.")
+        estimated_bytes = _RENDER_DECODE_RESERVE_BYTES + width * height * (
+            _RENDER_BASE_BYTES_PER_PIXEL + channel_count * _RENDER_SOURCE_BYTES_PER_PIXEL
+        )
+        if estimated_bytes > _RENDER_MEMORY_BUDGET_BYTES:
+            raise InvalidRenderSelectionError(
+                f"OME render exceeds the {_RENDER_MEMORY_BUDGET_BYTES // (1024 * 1024)} MiB "
+                f"estimated working-memory budget ({width}x{height}, {channel_count} enabled channels). "
+                "Use a smaller max_size or a lower-resolution pyramid level."
+            )
+
     def resolve_render(
         self,
         project_id: UUID,
@@ -229,6 +255,12 @@ class OmeRenderingService:
             raise InvalidRenderSelectionError("OME z or t selection is out of range.")
         if max_size is not None and max_size <= 0:
             raise InvalidRenderSelectionError("OME max_size must be positive.")
+        output_size = None
+        if max_size is not None and max(width, height) > max_size:
+            scale = max_size / max(width, height)
+            output_size = max(1, round(width * scale)), max(1, round(height * scale))
+        dimensions = output_size or (width, height)
+        self._validate_render_budget(dimensions, 0)
         view = override if override is not None else self._get_channel_view(project_id, media_id, info, storage)
         self._validate_settings(view, info)
         settings = OmeChannelSettings(
@@ -236,10 +268,7 @@ class OmeRenderingService:
                 (setting for setting in view.settings if setting.enabled), key=lambda setting: setting.channel
             )
         )
-        output_size = None
-        if max_size is not None and max(width, height) > max_size:
-            scale = max_size / max(width, height)
-            output_size = max(1, round(width * scale)), max(1, round(height * scale))
+        self._validate_render_budget(dimensions, len(settings.settings))
         key = hashlib.sha256(
             json.dumps(
                 {
@@ -259,6 +288,10 @@ class OmeRenderingService:
 
     def render(self, selection: OmeRender) -> bytes:
         """Read and composite a plane, encoding PNG bytes without filesystem writes."""
+        self._validate_render_budget(
+            selection.output_size or self._level_size(selection.info, selection.level),
+            len(selection.settings.settings),
+        )
         with self._open_image(selection.storage) as handle:
             pixels = handle.read_region(
                 z=selection.z,

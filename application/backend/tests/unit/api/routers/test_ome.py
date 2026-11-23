@@ -271,3 +271,19 @@ def test_render_decode_failure(fxt_get_project, fxt_rendering_service, fxt_clien
     response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{uuid4()}/render")
     assert response.status_code == 422
     assert response.json()["detail"] == "Cannot decode pixels."
+
+
+def test_render_budget_error_precedes_etag_revalidation(fxt_get_project, fxt_rendering_service, fxt_client):
+    detail = (
+        "OME render exceeds the 256 MiB estimated working-memory budget. "
+        "Use a smaller max_size or a lower-resolution pyramid level."
+    )
+    fxt_rendering_service.resolve_render.side_effect = InvalidRenderSelectionError(detail)
+    response = fxt_client.get(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{uuid4()}/render",
+        params={"max_size": 16384},
+        headers={"If-None-Match": "*"},
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"] == detail
+    fxt_rendering_service.render.assert_not_called()

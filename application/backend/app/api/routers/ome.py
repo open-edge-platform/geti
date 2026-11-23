@@ -113,7 +113,7 @@ def set_ome_channel_view(
         status.HTTP_400_BAD_REQUEST: {"description": "Media is not OME or the channel override is malformed"},
         status.HTTP_404_NOT_FOUND: {"description": "Project or media not found"},
         status.HTTP_422_UNPROCESSABLE_CONTENT: {
-            "description": "Invalid pyramid level, plane selection or unreadable pixels"
+            "description": "Invalid pyramid level, plane selection, render memory budget exceeded or unreadable pixels"
         },
     },
 )
@@ -128,7 +128,12 @@ def render_ome_plane(  # noqa: PLR0913
         str | None, Query(description="Zero-based index|min:max$RRGGBB entries; empty hides all channels.")
     ] = None,
     max_size: Annotated[
-        int | None, Query(ge=1, le=16384, description="Downsample to fit this maximum side length.")
+        int | None,
+        Query(
+            ge=1,
+            le=16384,
+            description="Downsample to fit this maximum side length; render memory budget also applies.",
+        ),
     ] = None,
     if_none_match: Annotated[str | None, Header()] = None,
 ) -> Response:
