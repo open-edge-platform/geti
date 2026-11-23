@@ -5,7 +5,7 @@ import pytest
 
 from app.models.ome import OmeImageInfo, RgbProjection
 from app.services.base import InvalidImageError
-from app.services.ome.rgb_channel_mapping import MetadataRgbChannelMappingStrategy
+from app.services.ome.rgb_channel_projection import MetadataRgbChannelProjectionStrategy
 
 
 def _info(size_c, channels=None):
@@ -20,8 +20,8 @@ def _info(size_c, channels=None):
 
 
 @pytest.mark.parametrize("size_c", [1, 2, 3, 5])
-def test_fallback_channel_mapping(size_c):
-    projection = MetadataRgbChannelMappingStrategy().compute(_info(size_c))
+def test_fallback_channel_projection(size_c):
+    projection = MetadataRgbChannelProjectionStrategy().compute(_info(size_c))
 
     assert isinstance(projection, RgbProjection)
     assert projection.model_dump(mode="json") == {
@@ -34,8 +34,8 @@ def test_fallback_channel_mapping(size_c):
     assert projection.source_channels == tuple(range(min(size_c, 3)))
 
 
-def test_wavelength_mapping_precedes_rgb_identity():
-    assert MetadataRgbChannelMappingStrategy().compute(
+def test_wavelength_projection_precedes_rgb_identity():
+    assert MetadataRgbChannelProjectionStrategy().compute(
         _info(
             3,
             [
@@ -61,7 +61,7 @@ def test_wavelength_collision_prefers_color_then_index():
             {"index": 3, "emission_wavelength": 520, "color": "#00ff00"},
         ],
     )
-    assert MetadataRgbChannelMappingStrategy().compute(info).model_dump(mode="json")["channels"] == [
+    assert MetadataRgbChannelProjectionStrategy().compute(info).model_dump(mode="json")["channels"] == [
         {"channel": 1, "target": "red"},
         {"channel": 3, "target": "green"},
     ]
@@ -76,7 +76,7 @@ def test_incomplete_or_invalid_wavelengths_use_fallback(wavelength):
             {"index": 1, "emission_wavelength": wavelength},
         ],
     )
-    assert MetadataRgbChannelMappingStrategy().compute(info).model_dump(mode="json")["channels"] == [
+    assert MetadataRgbChannelProjectionStrategy().compute(info).model_dump(mode="json")["channels"] == [
         {"channel": 0, "target": "red"},
         {"channel": 1, "target": "green"},
     ]
@@ -87,7 +87,7 @@ def test_incomplete_or_invalid_wavelengths_use_fallback(wavelength):
     [(499.9, "blue"), (500, "green"), (580, "green"), (580.1, "red")],
 )
 def test_wavelength_boundaries(wavelength, target):
-    projection = MetadataRgbChannelMappingStrategy().compute(
+    projection = MetadataRgbChannelProjectionStrategy().compute(
         _info(1, [{"index": 0, "emission_wavelength": wavelength}])
     )
 
@@ -99,7 +99,7 @@ def test_wavelength_boundaries(wavelength, target):
     [(520, "nm"), (0.52, "\u00b5m"), (0.52, "um"), (0.00052, "mm"), (5.2e-7, "m"), (520000, "pm")],
 )
 def test_wavelength_unit_conversion(wavelength, unit):
-    projection = MetadataRgbChannelMappingStrategy().compute(
+    projection = MetadataRgbChannelProjectionStrategy().compute(
         _info(1, [{"index": 0, "emission_wavelength": wavelength, "emission_wavelength_unit": unit}])
     )
 
@@ -120,7 +120,7 @@ def test_wavelength_unit_conversion(wavelength, unit):
     ],
 )
 def test_incomplete_metadata_uses_index_order(channels):
-    projection = MetadataRgbChannelMappingStrategy().compute(_info(2, channels))
+    projection = MetadataRgbChannelProjectionStrategy().compute(_info(2, channels))
 
     assert projection.model_dump(mode="json")["channels"] == [
         {"channel": 0, "target": "red"},
@@ -138,7 +138,7 @@ def test_collision_without_color_signal_prefers_lowest_source_index(color):
         ],
     )
 
-    projection = MetadataRgbChannelMappingStrategy().compute(info)
+    projection = MetadataRgbChannelProjectionStrategy().compute(info)
 
     assert projection.source_channels == (0,)
     assert projection.channels[0].target == "red"
@@ -153,10 +153,10 @@ def test_red_hue_collision_uses_circular_distance():
         ],
     )
 
-    assert MetadataRgbChannelMappingStrategy().compute(info).source_channels == (1,)
+    assert MetadataRgbChannelProjectionStrategy().compute(info).source_channels == (1,)
 
 
-def test_wavelength_mapping_can_select_channels_beyond_first_three():
+def test_wavelength_projection_can_select_channels_beyond_first_three():
     info = _info(
         4,
         [
@@ -167,7 +167,7 @@ def test_wavelength_mapping_can_select_channels_beyond_first_three():
         ],
     )
 
-    projection = MetadataRgbChannelMappingStrategy().compute(info)
+    projection = MetadataRgbChannelProjectionStrategy().compute(info)
 
     assert projection.source_channels == (3, 1, 2)
 
@@ -176,10 +176,10 @@ def test_invalid_hex_color_raises_explicit_error():
     info = _info(1, [{"index": 0, "emission_wavelength": 650, "color": "#gg0000"}])
 
     with pytest.raises(InvalidImageError, match="Invalid OME channel color"):
-        MetadataRgbChannelMappingStrategy().compute(info)
+        MetadataRgbChannelProjectionStrategy().compute(info)
 
 
-def test_mapping_is_deterministic_and_does_not_mutate_metadata():
+def test_projection_is_deterministic_and_does_not_mutate_metadata():
     info = _info(
         3,
         [
@@ -189,7 +189,7 @@ def test_mapping_is_deterministic_and_does_not_mutate_metadata():
         ],
     )
     original = info.model_dump(mode="json")
-    strategy = MetadataRgbChannelMappingStrategy()
+    strategy = MetadataRgbChannelProjectionStrategy()
 
     first = strategy.compute(info)
     second = strategy.compute(info)

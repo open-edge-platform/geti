@@ -3,9 +3,48 @@
 
 from typing import Annotated, Literal
 
-from pydantic import AliasChoices, Field, computed_field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from .base import BaseValueObject
+
+
+class OmeChannelSetting(BaseValueObject):
+    """Display color, visibility and intensity window for one source channel."""
+
+    channel: int = Field(ge=0)
+    color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
+    enabled: bool = True
+    window_min: float = Field(allow_inf_nan=False)
+    window_max: float = Field(allow_inf_nan=False)
+
+    @field_validator("color")
+    @classmethod
+    def normalize_color(cls, value: str) -> str:
+        return value.upper()
+
+    @model_validator(mode="after")
+    def validate_window(self) -> "OmeChannelSetting":
+        if self.window_min >= self.window_max:
+            raise ValueError("window_min must be less than window_max.")
+        return self
+
+
+class OmeChannelSettings(BaseValueObject):
+    """A complete display view; unlisted channels are hidden."""
+
+    settings: list[OmeChannelSetting]
+
+    @model_validator(mode="after")
+    def validate_channels(self) -> "OmeChannelSettings":
+        if len({setting.channel for setting in self.settings}) != len(self.settings):
+            raise ValueError("Display channel indices must be unique.")
+        return self
+
+
+class OmeChannelView(OmeChannelSettings):
+    """Resolved display settings and whether they are server-computed defaults."""
+
+    is_default: bool
 
 
 class Region(BaseValueObject):
@@ -96,19 +135,10 @@ class OmeImageMetadata(OmeImageInfo):
     """Persisted OME structure, immutable training projection and constituent files."""
 
     channel_projection: ChannelProjection = Field(
-        validation_alias=AliasChoices("channel_projection", "channel_mapping"),
         description="Immutable projection defining RGB or single-channel grayscale output.",
     )
     entrypoint: str | None = None
     files: list[str] = Field(default_factory=list)
-
-    @computed_field(deprecated="Use channel_projection; channel_mapping contains only legacy RGB assignments.")
-    @property
-    def channel_mapping(self) -> list[dict[str, int | str]]:
-        """Return the legacy RGB assignments; grayscale projections have no RGB assignments."""
-        if isinstance(self.channel_projection, RgbProjection):
-            return [assignment.model_dump(mode="json") for assignment in self.channel_projection.channels]
-        return []
 
     @model_validator(mode="after")
     def validate_projection_channels(self) -> "OmeImageMetadata":

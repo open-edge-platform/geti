@@ -20,7 +20,6 @@ from app.api.dependencies import (
     get_inference_media_limit,
     get_media_prediction_service,
     get_media_segment_service,
-    get_media_service,
     get_project_service,
     get_upload_max_size,
 )
@@ -60,13 +59,11 @@ from app.models.media import (
     VideoFormat,
     VideoRange,
 )
-from app.models.ome import OmeImageMetadata, RgbChannelAssignment, RgbProjection
 from app.models.system import DeviceInfo, DeviceType
 from app.services import (
     DatasetService,
     DatasetViewService,
     MediaPredictionService,
-    MediaService,
     ProjectService,
     ResourceNotFoundError,
     ResourceType,
@@ -267,36 +264,6 @@ def test_ome_binary_rejected(fxt_get_project, fxt_media_service, fxt_ome_media, 
     fxt_media_service.get_media_binary_path_by_id.assert_not_called()
 
 
-def test_get_ome_structure(fxt_get_project, fxt_media_service, fxt_client):
-    media_id = uuid4()
-    info = OmeImageMetadata(
-        size_x=5,
-        size_y=4,
-        size_c=3,
-        dimension_order="XYCZT",
-        pixel_type="uint16",
-        channel_projection=RgbProjection(channels=(RgbChannelAssignment(channel=0, target="red"),)),
-        raw_metadata="<OME/>",
-    )
-    fxt_media_service.get_ome_image_info.return_value = info
-    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/ome")
-    assert response.status_code == 200
-    assert response.json() == info.model_dump(mode="json")
-    fxt_media_service.get_ome_image_info.assert_called_once_with(fxt_get_project.id, media_id)
-
-
-@pytest.mark.parametrize("expected", [400, 404])
-def test_get_ome_structure_errors(fxt_get_project, fxt_media_service, fxt_client, expected):
-    media_id = uuid4()
-    fxt_media_service.get_ome_image_info.side_effect = (
-        ValueError("Media is not an OME image.")
-        if expected == 400
-        else ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
-    )
-    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/ome")
-    assert response.status_code == expected
-
-
 @pytest.fixture
 def fxt_video_frame_media():
     return VideoFrame(
@@ -320,13 +287,6 @@ def fxt_project_service(fxt_app) -> MagicMock:
     project_service = MagicMock(spec=ProjectService)
     fxt_app.dependency_overrides[get_project_service] = lambda: project_service
     return project_service
-
-
-@pytest.fixture
-def fxt_media_service(fxt_app) -> MagicMock:
-    media_service = MagicMock(spec=MediaService)
-    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
-    return media_service
 
 
 @pytest.fixture(autouse=True)

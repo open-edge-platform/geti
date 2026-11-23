@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import base64
 from collections.abc import AsyncGenerator, Callable
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 from uuid import UUID
 
 import pytest
@@ -11,8 +11,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 
-from app.api.dependencies import get_dataset_view_service, get_project_service
-from app.services import DatasetViewService, ProjectService, UploadService
+from app.api.dependencies import get_dataset_view_service, get_media_service, get_project_service
+from app.services import DatasetViewService, MediaService, ProjectService, UploadService
 
 
 @pytest.fixture
@@ -25,6 +25,13 @@ def fxt_project_service(fxt_app: FastAPI) -> Mock:
     project_service = Mock(spec=ProjectService)
     fxt_app.dependency_overrides[get_project_service] = lambda: project_service
     return project_service
+
+
+@pytest.fixture
+def fxt_media_service(fxt_app: FastAPI) -> MagicMock:
+    media_service = MagicMock(spec=MediaService)
+    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
+    return media_service
 
 
 @pytest.fixture

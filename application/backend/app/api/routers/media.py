@@ -60,7 +60,6 @@ from app.models.media import (
     SortDirection,
     VideoFormat,
 )
-from app.models.ome import OmeImageMetadata
 from app.services import (
     DatasetService,
     DatasetViewService,
@@ -333,25 +332,6 @@ def _create_media(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid image has been uploaded."
         )
-
-
-@router.get(
-    "/{media_id}/ome",
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"description": "Media is not an OME image"},
-        status.HTTP_404_NOT_FOUND: {"description": "Project or media not found"},
-    },
-)
-def get_ome_image_info(
-    project: Annotated[Project, Depends(get_project)],
-    media_id: MediaID,
-    media_service: Annotated[MediaService, Depends(get_media_service)],
-) -> OmeImageMetadata:
-    """Get OME dimensions, channels, pyramid levels, provenance and fixed training mapping."""
-    try:
-        return media_service.get_ome_image_info(project.id, media_id)
-    except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
 
 
 def _normalize_date_range(
