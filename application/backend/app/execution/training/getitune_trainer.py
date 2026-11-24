@@ -570,6 +570,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         """
         from getitune.backend.openvino.engine import OVEngine
 
+        from .progress import TestingProgressCallback
+
         metric_callable = get_metric_by_task(task)
         ov_work_dir_base = Path(getitune_engine.work_dir)
         datamodule = getitune_engine.datamodule
@@ -596,7 +598,11 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                     case _:
                         raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
 
-                metrics = engine.test(metric=metric_callable)
+                progress_callback = TestingProgressCallback(self.update_progress, min_p=85, max_p=90)
+                if isinstance(engine, OVEngine):
+                    metrics = engine.test(metric=metric_callable, progress_callback=progress_callback)
+                else:
+                    metrics = engine.test(metric=metric_callable, callbacks=[progress_callback])
             except Exception as eval_exc:
                 # PyTorch is the source of truth for fallback metrics; if it's the one failing, or no
                 # fallback is available yet, there is nothing to reuse, so let the job fail as usual.
