@@ -9,9 +9,8 @@ from loguru import logger
 from app.core.jobs.models import Job, JobStatus
 from app.db.engine import get_db_session
 from app.models import TrainingJob, TrainingStatus
-
-from .base import ResourceNotFoundError
-from .model_service import ModelService
+from app.services.base import ResourceNotFoundError
+from app.services.model_service import ModelService
 
 
 def complete_training_job(job: Job) -> None:

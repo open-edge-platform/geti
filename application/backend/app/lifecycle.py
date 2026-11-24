@@ -46,8 +46,8 @@ from app.services.base_weights_service import BaseWeightsService
 from app.services.data_collect import DataCollector
 from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
+from app.services.job_hooks.training_completion import complete_training_job
 from app.services.subset_assignment import SubsetAssigner, SubsetService
-from app.services.training_completion import complete_training_job
 from app.services.upload_service import UploadService
 from app.services.video import CacheConfig, VideoService
 from app.settings import get_settings

@@ -241,7 +241,6 @@ hiddenimports += [
 # Ensure cryptography is bundled so the runtime cert-generation hook (windows/certs.py)
 # can create a self-signed TLS certificate on first launch.
 hiddenimports += collect_submodules('cryptography')
-hiddenimports += ['app.services.training_completion']
 
 # Runtime hook to patch importlib.metadata must execute before torch is imported
 # in every process (including multiprocessing-spawned children).

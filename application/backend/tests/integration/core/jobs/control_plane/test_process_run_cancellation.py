@@ -16,7 +16,7 @@ from app.core.jobs.models import JobStatus, JobType
 from app.core.run import ExecutionContext, RunnableFactory
 from app.models import Task, TaskType, TrainingJob, TrainingJobParams
 from app.models.system import DeviceInfo, DeviceType
-from app.services.training_completion import complete_training_job
+from app.services.job_hooks.training_completion import complete_training_job
 
 
 class UnresponsiveTraining:
@@ -69,7 +69,7 @@ async def test_force_killed_cancelled_training_runs_completion_hook(tmp_path, mo
         completion_hooks={JobType.TRAIN: complete_training_job},
     )
 
-    with patch("app.services.training_completion._reconcile_stuck_training_status") as reconcile:
+    with patch("app.services.job_hooks.training_completion._reconcile_stuck_training_status") as reconcile:
         await controller.start()
         try:
             await queue.submit(job)
