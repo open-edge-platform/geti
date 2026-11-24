@@ -1137,7 +1137,7 @@
             "done": "完了"
         },
         "type": {
-            "quantize": "最適化"
+            "quantize": "量子化"
         },
         "columns": {
             "type": "種類"
