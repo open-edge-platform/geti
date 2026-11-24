@@ -1359,11 +1359,19 @@ class TestGetiTuneTrainerEvaluateModel:
         mock_onnx_engine = Mock()
         mock_onnx_engine.test.return_value = onnx_metrics
 
+        mock_callback = Mock()
+
         # Act
-        with patch(
-            "getitune.backend.openvino.engine.OVEngine",
-            side_effect=[mock_ov_engine, mock_onnx_engine],
-        ) as mock_ov_engine_cls:
+        with (
+            patch(
+                "getitune.backend.openvino.engine.OVEngine",
+                side_effect=[mock_ov_engine, mock_onnx_engine],
+            ) as mock_ov_engine_cls,
+            patch(
+                "app.execution.training.progress.TestingProgressCallback",
+                return_value=mock_callback,
+            ) as mock_callback_cls,
+        ):
             getitune_trainer.evaluate_model(
                 getitune_engine=mock_getitune_engine,
                 task=training_params.task,
@@ -1373,7 +1381,10 @@ class TestGetiTuneTrainerEvaluateModel:
             )
 
         # Assert: PyTorch evaluation via the LightningEngine
-        mock_getitune_engine.test.assert_called_once_with(metric=metric_callable)
+        mock_getitune_engine.test.assert_called_once_with(metric=metric_callable, callbacks=[mock_callback])
+
+        # Assert: Callback instantiated 3 times (PYTORCH, OV + ONNX)
+        assert mock_callback_cls.call_count == 3
 
         # Assert: OVEngine instantiated twice (OV + ONNX) and tested with the right checkpoints
         assert mock_ov_engine_cls.call_count == 2
@@ -1391,8 +1402,8 @@ class TestGetiTuneTrainerEvaluateModel:
                 ),
             ]
         )
-        mock_ov_engine.test.assert_called_once_with(metric=metric_callable)
-        mock_onnx_engine.test.assert_called_once_with(metric=metric_callable)
+        mock_ov_engine.test.assert_called_once_with(metric=metric_callable, callbacks=[mock_callback])
+        mock_onnx_engine.test.assert_called_once_with(metric=metric_callable, callbacks=[mock_callback])
 
         # Assert: each variant's metrics are persisted with the matching variant id
         save_calls = fxt_model_service.save_evaluation_result.call_args_list
@@ -1434,6 +1445,7 @@ class TestGetiTuneTrainerEvaluateModel:
         mock_getitune_engine.datamodule = Mock()
         model_checkpoint_path = tmp_path / "best.pt"
         model_checkpoint_path.touch()
+        mock_callback = Mock()
 
         model_variants = [
             ModelVariantDescriptor(
@@ -1444,17 +1456,22 @@ class TestGetiTuneTrainerEvaluateModel:
         ]
 
         # Act
-        getitune_trainer.evaluate_model(
-            getitune_engine=mock_getitune_engine,
-            task=Task(task_type=TaskType.DETECTION),
-            model_revision_id=model_id,
-            model_variants=model_variants,
-            dataset_revision_id=dataset_revision_id,
-        )
+        with patch(
+            "app.execution.training.progress.TestingProgressCallback",
+            return_value=mock_callback,
+        ) as mock_callback_cls:
+            getitune_trainer.evaluate_model(
+                getitune_engine=mock_getitune_engine,
+                task=Task(task_type=TaskType.DETECTION),
+                model_revision_id=model_id,
+                model_variants=model_variants,
+                dataset_revision_id=dataset_revision_id,
+            )
 
         # Assert — metric is always passed uniformly; Ultralytics engines ignore it.
-        mock_getitune_engine.test.assert_called_once_with(metric=MeanAPCallable)
+        mock_getitune_engine.test.assert_called_once_with(metric=MeanAPCallable, callbacks=[mock_callback])
         fxt_model_service.save_evaluation_result.assert_called_once()
+        mock_callback_cls.assert_called_once()
 
     def test_evaluate_model_reuses_pytorch_results_when_openvino_fails(
         self,

@@ -599,10 +599,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                         raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
 
                 progress_callback = TestingProgressCallback(self.update_progress, min_p=85, max_p=90)
-                if isinstance(engine, OVEngine):
-                    metrics = engine.test(metric=metric_callable, progress_callback=progress_callback)
-                else:
-                    metrics = engine.test(metric=metric_callable, callbacks=[progress_callback])
+                metrics = engine.test(metric=metric_callable, callbacks=[progress_callback])
             except Exception as eval_exc:
                 # PyTorch is the source of truth for fallback metrics; if it's the one failing, or no
                 # fallback is available yet, there is nothing to reuse, so let the job fail as usual.

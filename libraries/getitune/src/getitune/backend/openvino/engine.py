@@ -285,7 +285,7 @@ class OVEngine(Engine):
             msg = "Please provide a `metric` when creating a OVModel or pass it in OVEngine.test()."
             raise RuntimeError(msg)
 
-        progress_callback = kwargs.get("progress_callback")
+        callbacks = kwargs.get("callbacks", [])
         if model.label_info != datamodule.label_info:
             msg = (
                 "To launch a test pipeline, the label information should be same "
@@ -304,8 +304,8 @@ class OVEngine(Engine):
             for batch_idx, data_batch in enumerate(dataloader):
                 model.test_step(data_batch, metric_callable)
                 progress.update(task, advance=1)
-                if progress_callback is not None:
-                    progress_callback.on_test_batch_end(
+                for callback in callbacks:
+                    callback.on_test_batch_end(
                         trainer=callback_trainer,
                         pl_module=model,
                         outputs=None,
