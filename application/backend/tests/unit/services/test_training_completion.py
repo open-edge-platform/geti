@@ -10,7 +10,8 @@ import pytest
 from app.models import Task, TaskType, TrainingJob, TrainingJobParams, TrainingStatus
 from app.models.system import DeviceInfo, DeviceType
 from app.services import ResourceNotFoundError, ResourceType
-from app.services.job_hooks import _reconcile_stuck_training_status, complete_training_job
+from app.services.job_hooks import finalize_training_job
+from app.services.job_hooks.training import _reconcile_stuck_training_status
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ class TestTrainingCompletion:
     @pytest.fixture(autouse=True)
     def fxt_skip_status_reconciliation(self):
         """These tests only cover log/workspace cleanup; the reconciliation step has its own test class."""
-        with patch("app.services.job_hooks._reconcile_stuck_training_status") as reconcile:
+        with patch("app.services.job_hooks.training._reconcile_stuck_training_status") as reconcile:
             yield reconcile
 
     def test_complete_copies_log_file(self, fxt_training_job):
@@ -60,7 +61,7 @@ class TestTrainingCompletion:
         log_path.write_text("Training log content")
 
         # Execute
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
         # Verify the log was copied
         expected_path = (
@@ -74,13 +75,13 @@ class TestTrainingCompletion:
         assert expected_path.exists()
         assert expected_path.read_text() == "Training log content"
 
-    @patch("app.services.job_hooks.logger")
+    @patch("app.services.job_hooks.training.logger")
     def test_complete_logs_warning(self, mock_logger, fxt_training_job):
         """Test that a warning is logged and no file copied when the source log file doesn't exist."""
         # Don't create the log file
 
         # Execute
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
         # Verify warning was logged and no file was copied
         log_path = fxt_training_job.log_dir / fxt_training_job.log_file
@@ -103,7 +104,7 @@ class TestTrainingCompletion:
         timestamp_dir.mkdir(parents=True)
         (timestamp_dir / "leftover.txt").write_text("temp")
 
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
         assert not workspace_dir.exists()
 
@@ -113,7 +114,7 @@ class TestTrainingCompletion:
         assert not workspace_dir.exists()
 
         # Should not raise
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
     def test_cancel_after_start_cleans_up_without_keeping_log(self, fxt_training_job, fxt_skip_status_reconciliation):
         """A cancelled job that ran must remove its workspace and reconcile, without recreating the model dir."""
@@ -123,13 +124,13 @@ class TestTrainingCompletion:
 
         fxt_training_job.start()
         fxt_training_job.cancel()
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
         assert not workspace_dir.exists()
         assert not (fxt_training_job.data_dir / "projects").exists()
         fxt_skip_status_reconciliation.assert_called_once_with(fxt_training_job)
 
-    @pytest.mark.parametrize("operation", ["pathlib.Path.mkdir", "app.services.job_hooks.shutil.copy2"])
+    @pytest.mark.parametrize("operation", ["pathlib.Path.mkdir", "app.services.job_hooks.training.shutil.copy2"])
     def test_log_save_error_still_cleans_up_and_reconciles(
         self, operation, fxt_training_job, fxt_skip_status_reconciliation
     ):
@@ -142,36 +143,54 @@ class TestTrainingCompletion:
 
         with (
             patch(operation, side_effect=PermissionError("cannot save log")) as save_operation,
-            patch("app.services.job_hooks.logger") as logger,
+            patch("app.services.job_hooks.training.logger") as logger,
         ):
-            complete_training_job(job)
+            finalize_training_job(job)
 
         save_operation.assert_called_once()
         logger.error.assert_called_once()
         assert not workspace.exists()
         fxt_skip_status_reconciliation.assert_called_once_with(job)
 
-    @patch("app.services.job_hooks.shutil.rmtree", side_effect=PermissionError("busy"))
+    @patch("app.services.job_hooks.training.shutil.rmtree", side_effect=PermissionError("busy"))
     def test_workspace_cleanup_error_still_reconciles(
         self, mock_rmtree, fxt_training_job, fxt_skip_status_reconciliation
     ):
-        complete_training_job(fxt_training_job)
+        finalize_training_job(fxt_training_job)
 
         fxt_skip_status_reconciliation.assert_called_once_with(fxt_training_job)
 
-    def test_reconciliation_error_does_not_escape(self, fxt_training_job, fxt_skip_status_reconciliation):
-        fxt_skip_status_reconciliation.side_effect = RuntimeError("database unavailable")
+    def test_reconciliation_runs_before_file_io_and_failure_does_not_skip_it(
+        self, fxt_training_job, fxt_skip_status_reconciliation
+    ):
+        job = fxt_training_job
+        workspace = job.data_dir / f"getitune-workspace-{job.params.model_id}"
+        workspace.mkdir()
+        (job.log_dir / job.log_file).write_text("Training log content")
+        model_dir = job.data_dir / "projects" / str(job.project_id) / "models" / str(job.params.model_id)
+        state_at_reconciliation = []
+        fxt_skip_status_reconciliation.side_effect = _reconcile_stuck_training_status
 
-        with patch("app.services.job_hooks.logger") as logger:
-            complete_training_job(fxt_training_job)
+        def fail_to_open_session():
+            state_at_reconciliation.append((workspace.exists(), model_dir.exists()))
+            raise RuntimeError("database unavailable")
 
+        with (
+            patch("app.services.job_hooks.training.get_db_session", side_effect=fail_to_open_session),
+            patch("app.services.job_hooks.training.logger") as logger,
+        ):
+            finalize_training_job(job)
+
+        assert state_at_reconciliation == [(True, False)]
+        assert not workspace.exists()
+        assert (model_dir / "training.log").read_text() == "Training log content"
         logger.error.assert_called_once()
 
 
 class TestTrainingJobReconcileTrainingStatus:
     @pytest.mark.parametrize("status", [TrainingStatus.IN_PROGRESS, TrainingStatus.NOT_STARTED])
-    @patch("app.services.job_hooks.ModelService")
-    @patch("app.services.job_hooks.get_db_session")
+    @patch("app.services.job_hooks.training.ModelService")
+    @patch("app.services.job_hooks.training.get_db_session")
     def test_forces_failed_when_status_stuck_in_progress(
         self, mock_get_db_session, mock_model_service_cls, status, fxt_training_job
     ):
@@ -189,8 +208,8 @@ class TestTrainingJobReconcileTrainingStatus:
         assert call_kwargs["training_status"] == TrainingStatus.FAILED
 
     @pytest.mark.parametrize("terminal_status", [TrainingStatus.SUCCESSFUL, TrainingStatus.FAILED])
-    @patch("app.services.job_hooks.ModelService")
-    @patch("app.services.job_hooks.get_db_session")
+    @patch("app.services.job_hooks.training.ModelService")
+    @patch("app.services.job_hooks.training.get_db_session")
     def test_no_op_when_status_already_terminal(
         self, mock_get_db_session, mock_model_service_cls, terminal_status, fxt_training_job
     ):
@@ -203,8 +222,8 @@ class TestTrainingJobReconcileTrainingStatus:
 
         mock_model_service.update_revision_status.assert_not_called()
 
-    @patch("app.services.job_hooks.ModelService")
-    @patch("app.services.job_hooks.get_db_session")
+    @patch("app.services.job_hooks.training.ModelService")
+    @patch("app.services.job_hooks.training.get_db_session")
     def test_no_op_when_model_revision_missing(self, mock_get_db_session, mock_model_service_cls, fxt_training_job):
         """A job that failed before the model revision was ever created has nothing to reconcile."""
         mock_get_db_session.return_value.__enter__.return_value = Mock()

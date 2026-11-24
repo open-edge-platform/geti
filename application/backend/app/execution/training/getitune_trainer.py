@@ -676,7 +676,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         Each variant's files are stored under model_dir/variants/<variant_id>/model.*
         or, for directory-backed PyTorch checkpoints, in the ``model`` directory.
 
-        The getitune workspace itself is removed by ``complete_training_job`` after
+        The getitune workspace itself is removed by ``finalize_training_job`` after
         the job terminates, so this step does not clean it up.
 
         Args:

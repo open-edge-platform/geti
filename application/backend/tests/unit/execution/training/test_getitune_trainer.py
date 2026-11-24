@@ -1775,7 +1775,7 @@ class TestGetiTuneTrainerStoreModelArtifacts:
         assert (model_dir / "metrics" / "metrics.csv").read_text() == "epoch,loss\n1,0.5\n"
 
         # The getitune work directory is no longer cleaned up here; it is removed
-        # by ``complete_training_job`` after the job finishes.
+        # by ``finalize_training_job`` after the job finishes.
         assert getitune_work_dir.exists()
 
     def test_store_directory_backed_pytorch_checkpoint(
