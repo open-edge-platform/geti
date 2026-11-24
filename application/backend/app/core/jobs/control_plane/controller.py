@@ -4,6 +4,7 @@
 import asyncio
 import contextlib
 import threading
+from collections.abc import Callable, Mapping
 
 from loguru import logger
 
@@ -39,12 +40,20 @@ class JobController:
         jobs_queue: Source of jobs to execute and cancellation state tracker
         runner_factory: Creates appropriate runner contexts for different job types
         max_parallel_jobs: Maximum number of capacity-managed jobs that can execute simultaneously
+        completion_hooks: Synchronous completion handlers run in a thread after a started job reaches a terminal state
     """
 
-    def __init__(self, jobs_queue: JobQueue, runner_factory: RunnerFactory, max_parallel_jobs: int) -> None:
+    def __init__(
+        self,
+        jobs_queue: JobQueue,
+        runner_factory: RunnerFactory,
+        max_parallel_jobs: int,
+        completion_hooks: Mapping[JobType, Callable[[Job], None]] | None = None,
+    ) -> None:
         self._jobs_q = jobs_queue
         self._runner_factory = runner_factory
         self._capacity = Capacity(max_parallel_jobs)
+        self._completion_hooks = completion_hooks or {}
         self._running = False
         self._supervisor_task: asyncio.Task | None = None
         self._stale_monitor_task: asyncio.Task | None = None
@@ -119,6 +128,7 @@ class JobController:
             except Exception as exc:
                 logger.exception("Failed to start the runner for job {}", job.id)
                 job.fail(msg=f"Failed to start the job: {exc}")
+                await self._complete_job(job)
                 return
             # Set up event pumping and cancellation monitoring
             cancel_task = self._setup_job_execution(job, job_run, event_q)
@@ -131,6 +141,7 @@ class JobController:
                 with contextlib.suppress(asyncio.CancelledError):
                     await cancel_task
                 self._jobs_q.cleanup_cancellation_event(job.id)
+                await self._complete_job(job)
 
             # Log when the job has reached its final status
             final_status: JobStatus = job.status
@@ -143,6 +154,16 @@ class JobController:
                     logger.info("Job cancelled, job_id: {}", job.id)
                 case _:
                     logger.warning("Job ended in unexpected status {}, job_id: {}", final_status.name, job.id)
+
+    async def _complete_job(self, job: Job) -> None:
+        if job.started_at is None or job.status not in (JobStatus.DONE, JobStatus.FAILED, JobStatus.CANCELLED):
+            return
+        hook = self._completion_hooks.get(job.job_type)
+        if hook is not None:
+            try:
+                await asyncio.to_thread(hook, job)
+            except Exception:
+                logger.exception("Completion hook failed for job {}", job.id)
 
     def _setup_job_execution(self, job: Job, job_run: Runner, event_q: asyncio.Queue) -> asyncio.Task:
         """Set up event pumping thread and cancellation monitoring task."""

@@ -230,6 +230,90 @@ class TestJobController:
         assert job.error == "Failed to start the job: cannot spawn"
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize("event", [Done(), Failed("boom"), Cancelled()])
+    async def test_completion_hook_runs_once_after_terminal_event(self, event, fxt_runner_factory, fxt_job):
+        hook = Mock()
+        queue = JobQueue()
+        controller = JobController(queue, fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        fxt_runner_factory.for_job.return_value = MockRunner([event])
+        job = fxt_job()
+        event_loop_thread = threading.get_ident()
+        observations = []
+        hook.side_effect = lambda completed: observations.append((completed.status, threading.get_ident()))
+
+        await controller._run_job(job)
+
+        hook.assert_called_once_with(job)
+        [(status_at_completion, hook_thread)] = observations
+        assert status_at_completion == job.status
+        assert hook_thread != event_loop_thread
+        assert job.status in (JobStatus.DONE, JobStatus.FAILED, JobStatus.CANCELLED)
+        assert job.id not in queue._cancellation_events
+
+    @pytest.mark.asyncio
+    async def test_completion_hook_runs_when_runner_start_fails(self, fxt_runner_factory, fxt_job):
+        hook = Mock()
+        controller = JobController(JobQueue(), fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        runner = MockRunner()
+        runner.start = Mock(side_effect=OSError("cannot spawn"))
+        fxt_runner_factory.for_job.return_value = runner
+        job = fxt_job()
+
+        await controller._run_job(job)
+
+        hook.assert_called_once_with(job)
+        assert job.status == JobStatus.FAILED
+
+    @pytest.mark.asyncio
+    async def test_pending_cancellation_skips_completion_hook(self, fxt_runner_factory, fxt_job):
+        hook = Mock()
+        controller = JobController(JobQueue(), fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        job = fxt_job()
+        job.cancel()
+
+        await controller._run_job(job)
+
+        hook.assert_not_called()
+        fxt_runner_factory.for_job.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_completion_hook_only_runs_for_registered_type(self, fxt_runner_factory, fxt_job):
+        hook = Mock()
+        controller = JobController(JobQueue(), fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        fxt_runner_factory.for_job.return_value = MockRunner([Done()])
+
+        await controller._run_job(fxt_job(JobType.EXPORT_DATASET))
+
+        hook.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_completion_hook_error_preserves_terminal_state(self, fxt_runner_factory, fxt_job):
+        hook = Mock(side_effect=OSError("cannot copy log"))
+        controller = JobController(JobQueue(), fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        fxt_runner_factory.for_job.return_value = MockRunner([Done()])
+        job = fxt_job()
+
+        with patch("app.core.jobs.control_plane.controller.logger") as logger:
+            await controller._run_job(job)
+
+        assert job.status == JobStatus.DONE
+        logger.exception.assert_called_once_with("Completion hook failed for job {}", job.id)
+
+    @pytest.mark.asyncio
+    async def test_failed_event_during_cancellation_runs_completion_hook(self, fxt_runner_factory, fxt_job):
+        hook = Mock()
+        controller = JobController(JobQueue(), fxt_runner_factory, 1, completion_hooks={JobType.TRAIN: hook})
+        job = fxt_job()
+        runner = MockRunner([Failed("process exit -15")])
+        runner.start = Mock(side_effect=job.cancelling)
+        fxt_runner_factory.for_job.return_value = runner
+
+        await controller._run_job(job)
+
+        hook.assert_called_once_with(job)
+        assert job.status == JobStatus.CANCELLED
+
+    @pytest.mark.asyncio
     async def test_supervise_loop_handles_exceptions(self, fxt_job_controller, fxt_job_queue):
         """Test supervisor loop handles exceptions gracefully."""
         fxt_job_queue.next_runnable.side_effect = [Exception("Test error"), asyncio.CancelledError()]

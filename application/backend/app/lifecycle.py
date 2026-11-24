@@ -46,6 +46,7 @@ from app.services.base_weights_service import BaseWeightsService
 from app.services.data_collect import DataCollector
 from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
+from app.services.job_hooks import finalize_training_job
 from app.services.subset_assignment import SubsetAssigner, SubsetService
 from app.services.upload_service import UploadService
 from app.services.video import CacheConfig, VideoService
@@ -226,7 +227,10 @@ def setup_job_controller(
     )
     process_runner_factory = ProcessRunnerFactory(job_runnable_factory)
     job_controller = JobController(
-        jobs_queue=q, runner_factory=process_runner_factory, max_parallel_jobs=max_parallel_jobs
+        jobs_queue=q,
+        runner_factory=process_runner_factory,
+        max_parallel_jobs=max_parallel_jobs,
+        completion_hooks={JobType.TRAIN: finalize_training_job},
     )
     return q, job_controller
 
