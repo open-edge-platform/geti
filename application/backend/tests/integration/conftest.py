@@ -22,7 +22,7 @@ from app.services.event.event_bus import EventBus
 def db_engine():
     """Create database engine and run migrations."""
     db_url = "sqlite://"
-    engine = create_engine(db_url, echo=True, poolclass=StaticPool)
+    engine = create_engine(db_url, echo=True, poolclass=StaticPool, connect_args={"check_same_thread": False})
     Base.metadata.create_all(engine)
     yield engine
     engine.dispose()

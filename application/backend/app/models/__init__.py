@@ -33,7 +33,7 @@ from .jobs import (
     TrainingJobParams,
 )
 from .label import Label, LabelReference, LabelUpdateInfo
-from .media import Image, Media, MediaFormat, MediaType, OmeImage, Video, VideoFrame
+from .media import Image, Media, MediaFormat, MediaType, OmeImage, OmePlane, Video, VideoFrame
 from .media_storage import MediaStorage
 from .model_manifest import ModelManifest
 from .model_revision import ModelRevision, ModelVariant, TrainingInfo, TrainingStatus
@@ -116,6 +116,7 @@ __all__ = [
     "OmeImage",
     "OmeImageInfo",
     "OmeImageMetadata",
+    "OmePlane",
     "OutputFormat",
     "Pipeline",
     "PipelineStatus",

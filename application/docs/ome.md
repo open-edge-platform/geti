@@ -64,7 +64,7 @@ function for cloud scalability.
 | An annotatable `(Z, T)` plane, all channels | `OmePlane` - one `MediaDB` row, `type = "ome_plane"`, created lazily on first annotation      |
 | X, Y                                        | `media.width` / `media.height` (full-resolution level)                                        |
 | C                                           | Not a media row. A rendering concern (`OmeChannelView`) and a training-preprocessing concern. |
-| Z, T                                        | `ome_plane.z_index` / `t_index`, plus a linear `frame_index`                                  |
+| Z, T                                        | `ome_plane.z_index` / `t_index`, unique within the parent image                               |
 | Pyramid levels                              | Metadata only (`ome_images.pyramid_levels`), never media rows                                 |
 | Other axes                                  | Ignored; series 0, index 0 assumed                                                            |
 
@@ -280,15 +280,16 @@ class MediaDB(BaseID):
     __table_args__ = (
         Index("idx_media_parent_id", "parent_id"),
         UniqueConstraint("parent_id", "frame_index", name="uq_parent_id_frame_index"),
+        Index("uq_parent_id_z_index_t_index", "parent_id", "z_index", "t_index", unique=True),
     )
     ...
     # Renamed from video_id. Parent container: a Video for video frames, an OmeImage for OME planes.
     parent_id: Mapped[str | None] = mapped_column(
         Text, ForeignKey("media.id", ondelete="CASCADE"), nullable=True, default=None
     )
-    # Linear index within the parent: video frame number, or (z + t * size_z) for OME planes.
+    # Video frame number; NULL for OME planes.
     frame_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
-    # Populated only for ome_plane rows. Redundant with frame_index, but needed for filtering/sorting.
+    # Plane coordinates, populated only for ome_plane rows.
     z_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
     t_index: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
 ```
@@ -312,8 +313,10 @@ Do **not** rely on `from_attributes` auto-mapping for this field after the renam
 - Add a `model_validator(mode="before")` on `VideoFrame`/`VideoFrameView` that reads `.parent_id` off an ORM object and
   injects it as `video_id` before the rest of validation runs.
 
-`OmePlane` is a new type with no legacy field name to preserve; decide its public field name (`parent_id` vs. a more
-descriptive `ome_image_id`) once, since it becomes part of the stable contract from day one.
+`OmePlane` exposes `ome_image_id: UUID` publicly, mirroring `VideoFrame.video_id`; its domain model explicitly accepts
+the ORM's `parent_id` when validating a database row. Plane responses include `z_index` and `t_index`, with level-zero
+`width` and `height`, but no `frame_index`. Registering a plane does not extract pixels:
+`format = "png"` describes its future materialization format and `size = 0` means no separate plane binary exists yet.
 
 ### 4.2 `OmeImageDB` - new table, 1:1 with an `ome_image` media row
 
@@ -396,11 +399,12 @@ the separate, immutable projection used for revision materialization.
 
 ### 4.5 Migration
 
-One Alembic revision:
+One OME Alembic revision:
 
 1. `media.video_id` → `media.parent_id`; rename `idx_media_video_id` and `uq_video_id_frame_index`.
 2. Add `media.z_index`, `media.t_index`.
 3. Create `ome_images`, `ome_channel_views`.
+4. Add the unique `(parent_id, z_index, t_index)` index for OME planes.
 
 SQLite requires `op.batch_alter_table` for (1); follow the existing pattern in `app/alembic/versions/`.
 Downgrade is symmetric and lossless as long as no OME media exists; the downgrade must therefore refuse to run if any
@@ -409,6 +413,11 @@ Downgrade is symmetric and lossless as long as no OME media exists; the downgrad
 The rename in (1) is DB/ORM-internal only - see the callout in §4.1. Every `MediaDB.video_id` attribute reference must
 become `MediaDB.parent_id` (repositories, filters, services), but the public `video_id` field on `VideoFrame` /
 `VideoFrameView` must keep serializing under that name.
+
+Both upgrade and downgrade rebuild `media` with SQLite foreign-key enforcement temporarily disabled outside the
+transaction, a savepoint protecting the rebuild, and an explicit integrity check before restoring enforcement.
+This preserves existing video frames, dataset items, label links, and dataset-view membership instead of triggering
+`ON DELETE CASCADE` when Alembic drops the original table.
 
 ---
 
@@ -597,27 +606,55 @@ and region in the ETag/cache key. Preserve the existing channel-view/compositing
 
 ### 5.5 Plane listing and thumbnails
 
-Mirrors the existing `list_video_frames`:
+The OME router lists annotated planes, including explicitly saved empty annotations:
 
 ```http
 GET /api/projects/{project_id}/dataset/media/{media_id}/planes?z=&t=&limit=&offset=
-200 -> paginated OmePlane views (annotated planes only), for Z-slider / T-timeline overlays
+200 -> {"items": [{"media_id": "...", "ome_image_id": "...", "z_index": 12, "t_index": 0,
+                  "annotation_data": {"media_id": "...", "annotations": [...], "user_reviewed": true,
+                                      "prediction_model_id": null, "subset": "unassigned"}}],
+        "pagination": {"limit": 50, "offset": 0, "total": 1, "count": 1}}
 
 GET /api/projects/{project_id}/dataset/media/{media_id}/thumbnail?z=12&t=0
 200 -> image/jpeg
 ```
 
+`z` and `t` independently filter the list; omitted coordinates include the whole axis. Results are ordered by `t`,
+then `z`. `limit` defaults to 50 (range 1–100); `offset` defaults to 0. Out-of-range coordinates return 400.
+Planes whose annotations have been deleted are omitted; saving an empty annotation list includes the plane again.
+
+Plane thumbnails require both `z` and `t`, or can be addressed directly as `/{ome_plane_id}/thumbnail` after
+registration. They use the lowest pyramid level, sample to a maximum side of 256 before compositing, then crop to
+256×256 JPEG using the saved display view or defaults. They create neither plane rows nor thumbnail files.
+The existing container thumbnail without `z`/`t` remains the immutable ingest-time training-projection thumbnail.
+
 ### 5.6 Annotations - no new endpoints
 
 Extend the `_get_request_media` dependency so that, alongside `frame_index`, it accepts `z` and `t`. When the addressed
-media is an `ome_image`, it resolves - or lazily creates - the corresponding `ome_plane` row, exactly as the video-frame
-branch does today. The existing annotation `GET`/`PUT` then work verbatim:
+media is an `ome_image`, it requires both coordinates and resolves an existing `ome_plane`, or an unregistered-plane
+descriptor. The first annotation `POST` registers that plane and its dataset item in the same request transaction.
+Registration uses the unique `(parent_id, z_index, t_index)` index to reuse the existing row on repeated or competing
+saves; it does not read or write plane pixels. `GET`, `DELETE`, plane listing and thumbnails never register planes.
+The existing annotation endpoints work with either parent ID plus coordinates or a registered plane ID:
 
 ```http
 GET  /api/projects/{project_id}/dataset/media/{media_id}/annotations?z=12&t=0
 POST /api/projects/{project_id}/dataset/media/{media_id}/annotations?z=12&t=0
+DELETE /api/projects/{project_id}/dataset/media/{media_id}/annotations?z=12&t=0
 400 -> z or t out of range for this image
 ```
+
+Missing coordinates, coordinates supplied for non-OME media, or mixing `z`/`t` with `frame_index` return 400.
+Reading/deleting an unregistered plane's annotations returns 404. Deleting annotations preserves the plane and its
+dataset item; deleting the parent container cascades to its planes, dataset items and label links.
+Registered plane `/binary` and OME prediction remain unsupported until the later training/prediction steps;
+use the parent `/render?z=…&t=…` for display.
+
+`LEAF_MEDIA_TYPES` contains video frames and OME planes: media listing/counting/IDs and dataset-view membership exclude
+both, while dataset-item queries include them. Views inherit plane membership from the parent OME image. Parent
+annotation-status, label and subset filters aggregate across the planes, just as for videos; an OME image is missing
+annotations while any of its `size_z * size_t` planes remains unannotated. The existing video-specific statistics
+aggregate deliberately counts video frames only, not OME planes.
 
 ### 5.7 Prediction
 
@@ -753,13 +790,16 @@ Validation tests for the 422 cases in §5.3.
 
 ### Step 6 - Annotation
 
-`MediaType.OME_IMAGE` / `OME_PLANE`, Pydantic `OmeImage` / `OmePlane`, lazy `create_ome_plane`, `z`/`t` in
-`_get_request_media`, `/planes` and plane `/thumbnail`. Audit every `MediaType.VIDEO_FRAME` filter -
-`dataset_view_repo` (×4), `dataset_view_service`, `demo_files_service` - and replace them with a shared
-`LEAF_MEDIA_TYPES` constant so the next container type cannot be forgotten.
+`MediaType.OME_IMAGE` / `OME_PLANE`, Pydantic `OmeImage` / `OmePlane`, idempotent lazy `create_ome_plane`,
+`z`/`t` in `_get_request_media`, paginated `/planes` with per-plane annotations, and bounded in-memory plane
+`/thumbnail`. Shared `LEAF_MEDIA_TYPES` covers media and dataset-view listing/membership filters plus demo-file
+selection; genuinely video-specific statistics remain video-only. Parent annotation status and label/subset filters
+also include OME planes. Neither reads nor thumbnails register a plane; the first annotation save registers both
+the plane and its dataset item, without materializing pixels. Coordinate uniqueness is included in the original OME
+migration; video frame indexing is unchanged.
 
 _Testing._ Integration test: annotate `(z=12, t=0)`, assert exactly one `ome_plane` row plus one `dataset_item`;
-re-annotate and assert no duplicate row (this is what `uq_parent_id_frame_index` guards). Out-of-range `z`/`t`
+re-annotate and assert no duplicate row (this is what `uq_parent_id_z_index_t_index` guards). Out-of-range `z`/`t`
 returns 400. Media listing and counting must exclude `ome_plane` rows exactly as they exclude `video_frame`. Deleting
 the parent returns 204 - cascades to planes, items and labels.
 
@@ -776,7 +816,7 @@ the single end-to-end gate for requirements 5–8.
 
 ### Step 8 - Prediction
 
-`PlaneRange`, `MediaService.get_plane_binaries()`, `MediaNumpyLoader` dispatch on `media.type`, SAM loader dispatch.
+`PlaneRange`, `MediaService.get_plane_binaries()`, and `MediaNumpyLoader` dispatch on `media.type`.
 
 _Testing._ Unit test that `load_media_binary` for an `ome_plane` returns the same `(H, W, C)` RGB(A) contract as for a
 JPEG. Integration test predicting over a `PlaneRange` with a stride, asserting the predicted plane set. Assert the
@@ -820,3 +860,4 @@ migration, no API break.
 - Non-XYCZT axes.
 - UI implementation (separate workstream; this document fixes the contract it consumes).
 - Full-fidelity dataset export/import of OME media — export/import carries materialized PNGs and annotations only.
+- SAM embeddings for OME media, including changes to `get_media_embeddings()`.

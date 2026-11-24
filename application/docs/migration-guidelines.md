@@ -40,7 +40,7 @@
 
 - Before migrating, it takes a **backup of `geti.db`**.
 - If `alembic upgrade head` succeeds, the backup is deleted and the process continues.
-- If `alembic upgrade head` fails, the error is logged so that the use know how to proceed in this situation. 
+- If `alembic upgrade head` fails, the error is logged so that the use know how to proceed in this situation.
 - The process then exits with a dedicated fatal exit code (`3`) so it is not
   restarted in a loop.
 
@@ -138,16 +138,22 @@ with op.batch_alter_table("projects") as batch_op:
     batch_op.drop_column("old_field")
 ```
 
-> ⚠️ **SQLite foreign key constraint caveat:** `batch_alter_table` works by dropping and recreating the table. If _other_ tables have foreign keys pointing **to** the table being rebuilt, SQLite will raise `FOREIGN KEY constraint failed` on the `DROP TABLE` step — even if no rows would actually be violated. Wrap the batch operation with `PRAGMA foreign_keys = OFF/ON` to suppress this:
+> ⚠️ **SQLite foreign key constraint caveat:** `batch_alter_table` drops and recreates the table. With foreign-key enforcement enabled, incoming references can either reject the drop or **cascade-delete dependent rows**, including self-referencing rows such as video frames.
+> SQLite ignores `PRAGMA foreign_keys = OFF/ON` inside an active transaction. Use the shared `sqlite_batch_rebuild()` helper from `app/alembic/utils.py`. It checks for existing integrity violations before changing enforcement, changes enforcement outside the transaction using Alembic's `autocommit_block()`, protects the rebuild with a savepoint, checks integrity again before releasing it, and restores the previous enforcement setting in `finally`:
 >
 > ```python
-> op.execute("PRAGMA foreign_keys = OFF")
-> with op.batch_alter_table("my_table") as batch_op:
->     batch_op.alter_column("some_col", nullable=False)
-> op.execute("PRAGMA foreign_keys = ON")
+> from app.alembic.utils import sqlite_batch_rebuild
+>
+> with sqlite_batch_rebuild():
+>     with op.batch_alter_table("my_table") as batch_op:
+>         batch_op.alter_column("some_col", nullable=False)
 > ```
 >
-> This is safe because Alembic's batch mode copies all data into the new table before dropping the old one — referential integrity is preserved in practice. You only need this when other tables have FK references **pointing to** the table you are rebuilding (not when the table itself has outbound FKs).
+> Autocommit blocks commit preceding work, so keep this scope narrow and put dependent table drops inside it, not before it. The savepoint rolls back its schema and data changes if the rebuild or integrity check fails. Apply the same protection in both upgrade and downgrade, and test with existing parent and dependent rows rather than only an empty database. The OME migration (`c7f1d7a4a2de`) uses this pattern for rebuilding `media`.
+>
+> Integrity checks cover the entire database, not only the rebuilt table. Errors identify the first violation's child table, rowid, parent table, and foreign-key constraint number, and distinguish existing violations from those detected after the rebuild. Repair existing invalid references explicitly; do not bypass the check.
+>
+> The helper supports online SQLite migrations only. Keep shared migration utilities backward-compatible: historical revisions import them when a fresh installation replays the migration chain. Do not import helpers from another revision in `versions/`.
 
 ---
 

@@ -13,6 +13,19 @@ const png = Uint8Array.from(
 );
 
 export const omeHandlers = [
+    http.get('/api/projects/{project_id}/dataset/media/{media_id}/planes', ({ request, response }) => {
+        const searchParams = new URL(request.url).searchParams;
+
+        return response(200).json({
+            items: [],
+            pagination: {
+                limit: Number(searchParams.get('limit') ?? 50),
+                offset: Number(searchParams.get('offset') ?? 0),
+                total: 0,
+                count: 0,
+            },
+        });
+    }),
     http.get('/api/projects/{project_id}/dataset/media/{media_id}/channel-view', ({ response }) =>
         response(200).json({ settings, is_default: true })
     ),

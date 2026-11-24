@@ -4,7 +4,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import CursorResult, Select, delete, func, select, update
+from sqlalchemy import CursorResult, Select, delete, func, null, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
@@ -38,6 +38,20 @@ class DatasetItemRepository:
         self.db.add(dataset_item_db)
         self.db.flush()
         return dataset_item_db
+
+    def ensure_ome_plane_item(self, media_id: str) -> None:
+        """Create an unannotated plane item once without overwriting existing annotations or subsets."""
+        self.db.execute(
+            insert(DatasetItemDB)
+            .values(
+                id=media_id,
+                project_id=self.project_id,
+                subset=DatasetItemSubset.UNASSIGNED,
+                user_reviewed=False,
+                annotation_data=null(),
+            )
+            .on_conflict_do_nothing(index_elements=["id"])
+        )
 
     def count(
         self,
@@ -146,7 +160,7 @@ class DatasetItemRepository:
                 DatasetItemDB.id == obj_id,
             )
             .values(
-                annotation_data=None,
+                annotation_data=null(),
                 updated_at=datetime.now(UTC),
                 user_reviewed=False,
                 prediction_model_id=None,

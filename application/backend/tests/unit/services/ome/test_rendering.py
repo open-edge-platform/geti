@@ -126,6 +126,34 @@ def rendering(tmp_path):
         yield service, uuid4(), uuid4(), info
 
 
+def test_thumbnail_bounds_sampling_at_lowest_level(rendering):
+    service, project_id, media_id, info = rendering
+    large = info.model_copy(
+        update={
+            "size_x": 40000,
+            "size_y": 30000,
+            "pyramid_levels": [
+                {"level": 0, "width": 40000, "height": 30000},
+                {"level": 1, "width": 20000, "height": 15000},
+            ],
+        }
+    )
+    service.media_service.validate_ome_plane_selection.return_value = large
+    service.media_service.get_ome_image_info.return_value = large
+    handle = MagicMock()
+    handle.__enter__.return_value = handle
+    handle.read_region.return_value = np.zeros((1, 192, 256), dtype=np.uint16)
+    with (
+        patch.object(service, "_open_image", return_value=handle),
+        patch.object(service, "_get_channel_view", return_value=parse_channel_override("0|0:65535$FFFFFF")),
+    ):
+        content = service.render_thumbnail(project_id, media_id, z=0, t=0)
+    handle.read_region.assert_called_once_with(z=0, t=0, level=1, channels=[0], output_size=(256, 192))
+    with Image.open(BytesIO(content)) as thumbnail:
+        assert thumbnail.format == "JPEG"
+        assert thumbnail.size == (256, 256)
+
+
 def test_defaults_are_sampled_deterministically_without_creating_db_row(rendering):
     service, project_id, media_id, info = rendering
     with patch.object(service.registry, "get_reader", wraps=service.registry.get_reader) as reader:

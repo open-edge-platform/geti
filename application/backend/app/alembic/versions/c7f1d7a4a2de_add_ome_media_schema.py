@@ -14,6 +14,8 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
+from app.alembic.utils import sqlite_batch_rebuild
+
 # revision identifiers, used by Alembic.
 revision: str = "c7f1d7a4a2de"
 down_revision: str | Sequence[str] | None = "b7e2d94a1f3c"
@@ -23,18 +25,20 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.drop_index("idx_media_video_id", table_name="media")
+    with sqlite_batch_rebuild():
+        op.drop_index("idx_media_video_id", table_name="media")
 
-    with op.batch_alter_table("media") as batch_op:
-        batch_op.drop_constraint("uq_video_id_frame_index", type_="unique")
-        batch_op.alter_column("video_id", new_column_name="parent_id", existing_type=sa.Text())
-        batch_op.add_column(sa.Column("z_index", sa.Integer(), nullable=True))
-        batch_op.add_column(sa.Column("t_index", sa.Integer(), nullable=True))
+        with op.batch_alter_table("media") as batch_op:
+            batch_op.drop_constraint("uq_video_id_frame_index", type_="unique")
+            batch_op.alter_column("video_id", new_column_name="parent_id", existing_type=sa.Text())
+            batch_op.add_column(sa.Column("z_index", sa.Integer(), nullable=True))
+            batch_op.add_column(sa.Column("t_index", sa.Integer(), nullable=True))
 
-    with op.batch_alter_table("media") as batch_op:
-        batch_op.create_unique_constraint("uq_parent_id_frame_index", ["parent_id", "frame_index"])
+        with op.batch_alter_table("media") as batch_op:
+            batch_op.create_unique_constraint("uq_parent_id_frame_index", ["parent_id", "frame_index"])
 
-    op.create_index("idx_media_parent_id", "media", ["parent_id"], unique=False)
+        op.create_index("idx_media_parent_id", "media", ["parent_id"], unique=False)
+        op.create_index("uq_parent_id_z_index_t_index", "media", ["parent_id", "z_index", "t_index"], unique=True)
 
     op.create_table(
         "ome_images",
@@ -79,18 +83,19 @@ def downgrade() -> None:
     if ome_image_count > 0:
         raise RuntimeError("Cannot downgrade while OME media exists. Remove rows from ome_images first.")
 
-    op.drop_table("ome_channel_views")
-    op.drop_table("ome_images")
+    with sqlite_batch_rebuild():
+        op.drop_table("ome_channel_views")
+        op.drop_table("ome_images")
+        op.drop_index("idx_media_parent_id", table_name="media")
+        op.drop_index("uq_parent_id_z_index_t_index", table_name="media")
 
-    op.drop_index("idx_media_parent_id", table_name="media")
+        with op.batch_alter_table("media") as batch_op:
+            batch_op.drop_constraint("uq_parent_id_frame_index", type_="unique")
+            batch_op.drop_column("t_index")
+            batch_op.drop_column("z_index")
+            batch_op.alter_column("parent_id", new_column_name="video_id", existing_type=sa.Text())
 
-    with op.batch_alter_table("media") as batch_op:
-        batch_op.drop_constraint("uq_parent_id_frame_index", type_="unique")
-        batch_op.drop_column("t_index")
-        batch_op.drop_column("z_index")
-        batch_op.alter_column("parent_id", new_column_name="video_id", existing_type=sa.Text())
+        with op.batch_alter_table("media") as batch_op:
+            batch_op.create_unique_constraint("uq_video_id_frame_index", ["video_id", "frame_index"])
 
-    with op.batch_alter_table("media") as batch_op:
-        batch_op.create_unique_constraint("uq_video_id_frame_index", ["video_id", "frame_index"])
-
-    op.create_index("idx_media_video_id", "media", ["video_id"], unique=False)
+        op.create_index("idx_media_video_id", "media", ["video_id"], unique=False)

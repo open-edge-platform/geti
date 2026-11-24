@@ -27,7 +27,7 @@ from app.models import (
 )
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItemSortBy
-from app.models.media import MediaAdapter, SortDirection, VideoFrame
+from app.models.media import MediaAdapter, OmePlane, SortDirection, VideoFrame
 from app.repositories import DatasetItemRepository, DatasetViewRepository
 from app.services.media_service import MediaService
 
@@ -77,6 +77,12 @@ class DatasetService(BaseSessionManagedService):
         self._label_service = label_service
         self._media_service = media_service
         self.register_managed_services(label_service, media_service)
+
+    def register_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane:
+        """Register a plane and its dataset item in the caller's annotation transaction."""
+        plane = self._media_service.create_ome_plane(project_id, media_id, z=z, t=t)
+        DatasetItemRepository(str(project_id), self.db_session).ensure_ome_plane_item(str(plane.id))
+        return plane
 
     def create_dataset_item(
         self,

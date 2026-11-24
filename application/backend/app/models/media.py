@@ -4,7 +4,7 @@ from enum import StrEnum
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, computed_field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, TypeAdapter, computed_field, model_validator
 
 from .base import BaseEntity
 
@@ -54,6 +54,11 @@ class MediaType(StrEnum):
     VIDEO = "video"
     VIDEO_FRAME = "video_frame"
     OME_IMAGE = "ome_image"
+    OME_PLANE = "ome_plane"
+
+
+LEAF_MEDIA_TYPES: tuple[MediaType, ...] = (MediaType.VIDEO_FRAME, MediaType.OME_PLANE)
+CONTAINER_MEDIA_TYPES: tuple[MediaType, ...] = (MediaType.VIDEO, MediaType.OME_IMAGE)
 
 
 class MediaSortBy(StrEnum):
@@ -71,7 +76,7 @@ class SortDirection(StrEnum):
 
 class MediaAnnotationStatus(BaseModel):
     """
-    Annotation status of an image or a video frame.
+    Annotation status of an image, video frame, OME plane or OME container.
 
     It is loaded when media are listed or fetched by id (see ``MediaService``); elsewhere it keeps its default.
 
@@ -105,7 +110,7 @@ class VideoAnnotationStatus(BaseModel):
 
 class BaseMedia(BaseEntity):
     """
-    Media represents an uploaded or fetched media within a dataset, it can be one of Image, Video or VideoFrame.
+    Media represents an image, container, or registered frame/plane within a dataset.
 
     Attributes:
         id: Unique identifier for the media.
@@ -147,6 +152,16 @@ class OmeImage(BaseMedia):
     annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
 
 
+class OmePlane(BaseMedia):
+    """A lazily registered plane; pixels remain in its parent OME container."""
+
+    type: Literal[MediaType.OME_PLANE]
+    ome_image_id: UUID = Field(validation_alias=AliasChoices("ome_image_id", "parent_id"))
+    z_index: int = Field(ge=0)
+    t_index: int = Field(ge=0)
+    annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
+
+
 class VideoFrame(BaseMedia):
     """
     Attributes:
@@ -156,34 +171,9 @@ class VideoFrame(BaseMedia):
     """
 
     type: Literal[MediaType.VIDEO_FRAME]
-    video_id: UUID
+    video_id: UUID = Field(validation_alias=AliasChoices("video_id", "parent_id"))
     frame_index: int
     annotation_status: MediaAnnotationStatus = Field(default_factory=MediaAnnotationStatus)
-
-    @model_validator(mode="before")
-    @classmethod
-    def _map_parent_id(cls, value: object) -> object:
-        """Accept ORM payloads using `parent_id` while keeping `video_id` on the public model."""
-        if isinstance(value, dict):
-            if value.get("video_id") is None and value.get("parent_id") is not None:
-                return {**value, "video_id": str(value["parent_id"])}
-            return value
-
-        if getattr(value, "video_id", None) is None and (parent_id := getattr(value, "parent_id", None)) is not None:
-            return {
-                "id": getattr(value, "id"),
-                "project_id": getattr(value, "project_id"),
-                "type": getattr(value, "type"),
-                "name": getattr(value, "name"),
-                "format": getattr(value, "format"),
-                "width": getattr(value, "width"),
-                "height": getattr(value, "height"),
-                "size": getattr(value, "size"),
-                "source_id": getattr(value, "source_id"),
-                "video_id": str(parent_id),
-                "frame_index": getattr(value, "frame_index"),
-            }
-        return value
 
 
 class Video(BaseMedia):
@@ -227,7 +217,16 @@ class NotAnnotatedVideoFrame(BaseModel):
         return self.video.id
 
 
-Media = Annotated[Image | Video | VideoFrame | OmeImage, Field(discriminator="type")]
+class NotAnnotatedOmePlane(BaseModel):
+    """An addressed plane that has not yet been registered for annotation."""
+
+    model_config = ConfigDict(frozen=True)
+    image: OmeImage
+    z_index: int
+    t_index: int
+
+
+Media = Annotated[Image | Video | VideoFrame | OmeImage | OmePlane, Field(discriminator="type")]
 
 MediaAdapter: TypeAdapter[Media] = TypeAdapter(Media)
 

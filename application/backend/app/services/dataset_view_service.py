@@ -9,7 +9,7 @@ from app.db.schema import DatasetViewDB
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItem
 from app.models.dataset_view import DatasetView
-from app.models.media import Media, MediaType
+from app.models.media import LEAF_MEDIA_TYPES, Media, MediaType
 from app.repositories import DatasetViewRepository, MediaRepository
 from app.repositories.base import UniqueConstraintIntegrityError
 from app.services.dataset_service import DatasetItemFilters
@@ -55,13 +55,10 @@ class DatasetViewService(BaseSessionManagedService):
     def _validate_media_exist(self, project_id: UUID, media_ids: list[UUID]) -> None:
         """
         Raise ResourceNotFoundError if any of the given media ids does not exist in the project, or if it
-        refers to a video frame.
+        refers to a video frame or OME plane.
 
-        Dataset view membership is only tracked at the image/video level (see class docstring); video frames
-        are considered part of a view solely via their parent video. Video frame ids are therefore treated as
-        non-existent in this context, to keep view membership consistent across all of the service's read
-        paths (media listing/counting explicitly exclude frames, and items/statistics derive frame membership
-        from the parent video rather than from any direct frame assignment).
+        Views assign plain images or whole containers. Video frames and OME planes inherit membership solely
+        via their parent, so leaf IDs are treated as non-existent here, consistently with media listing/counting.
         """
         media_repo = MediaRepository(project_id=str(project_id), db=self.db_session)
         found_media = {
@@ -69,7 +66,7 @@ class DatasetViewService(BaseSessionManagedService):
         }
         for media_id in media_ids:
             media_type = found_media.get(str(media_id))
-            if media_type is None or media_type == MediaType.VIDEO_FRAME:
+            if media_type is None or media_type in LEAF_MEDIA_TYPES:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
 
     def create_dataset_view(self, project_id: UUID, name: str, media_ids: list[UUID] | None = None) -> DatasetView:
