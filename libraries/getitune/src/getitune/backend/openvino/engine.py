@@ -285,7 +285,7 @@ class OVEngine(Engine):
             msg = "Please provide a `metric` when creating a OVModel or pass it in OVEngine.test()."
             raise RuntimeError(msg)
 
-        callbacks = kwargs.get("callbacks", [])
+        callbacks = kwargs.get("callbacks") or []
         if model.label_info != datamodule.label_info:
             msg = (
                 "To launch a test pipeline, the label information should be same "
