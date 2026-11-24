@@ -140,15 +140,14 @@ export const useMediaUpload = () => {
             };
 
             const uploadTasks = files.map((file, index) => buildUploadTask(file, itemIds[index]));
-            const allResults = await executeInBatches(uploadTasks, MEDIA_UPLOAD_CONCURRENCY, onBatchCompleted);
-
-            finishUploadProgress();
+            const allResults = await executeInBatches(uploadTasks, MEDIA_UPLOAD_CONCURRENCY, onBatchCompleted).finally(
+                finishUploadProgress
+            );
 
             await invalidateMediaQuery();
 
             return getFulfilledValues(allResults);
         } catch (_error) {
-            finishUploadProgress();
             return [];
         }
     };
