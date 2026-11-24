@@ -10,7 +10,7 @@ import pytest
 from app.models import Task, TaskType, TrainingJob, TrainingJobParams, TrainingStatus
 from app.models.system import DeviceInfo, DeviceType
 from app.services import ResourceNotFoundError, ResourceType
-from app.services.job_hooks.training_completion import _reconcile_stuck_training_status, complete_training_job
+from app.services.job_hooks import _reconcile_stuck_training_status, complete_training_job
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ class TestTrainingCompletion:
     @pytest.fixture(autouse=True)
     def fxt_skip_status_reconciliation(self):
         """These tests only cover log/workspace cleanup; the reconciliation step has its own test class."""
-        with patch("app.services.job_hooks.training_completion._reconcile_stuck_training_status") as reconcile:
+        with patch("app.services.job_hooks._reconcile_stuck_training_status") as reconcile:
             yield reconcile
 
     def test_complete_copies_log_file(self, fxt_training_job):
@@ -74,7 +74,7 @@ class TestTrainingCompletion:
         assert expected_path.exists()
         assert expected_path.read_text() == "Training log content"
 
-    @patch("app.services.job_hooks.training_completion.logger")
+    @patch("app.services.job_hooks.logger")
     def test_complete_logs_warning(self, mock_logger, fxt_training_job):
         """Test that a warning is logged and no file copied when the source log file doesn't exist."""
         # Don't create the log file
@@ -129,9 +129,7 @@ class TestTrainingCompletion:
         assert not (fxt_training_job.data_dir / "projects").exists()
         fxt_skip_status_reconciliation.assert_called_once_with(fxt_training_job)
 
-    @pytest.mark.parametrize(
-        "operation", ["pathlib.Path.mkdir", "app.services.job_hooks.training_completion.shutil.copy2"]
-    )
+    @pytest.mark.parametrize("operation", ["pathlib.Path.mkdir", "app.services.job_hooks.shutil.copy2"])
     def test_log_save_error_still_cleans_up_and_reconciles(
         self, operation, fxt_training_job, fxt_skip_status_reconciliation
     ):
@@ -144,7 +142,7 @@ class TestTrainingCompletion:
 
         with (
             patch(operation, side_effect=PermissionError("cannot save log")) as save_operation,
-            patch("app.services.job_hooks.training_completion.logger") as logger,
+            patch("app.services.job_hooks.logger") as logger,
         ):
             complete_training_job(job)
 
@@ -153,7 +151,7 @@ class TestTrainingCompletion:
         assert not workspace.exists()
         fxt_skip_status_reconciliation.assert_called_once_with(job)
 
-    @patch("app.services.job_hooks.training_completion.shutil.rmtree", side_effect=PermissionError("busy"))
+    @patch("app.services.job_hooks.shutil.rmtree", side_effect=PermissionError("busy"))
     def test_workspace_cleanup_error_still_reconciles(
         self, mock_rmtree, fxt_training_job, fxt_skip_status_reconciliation
     ):
@@ -164,7 +162,7 @@ class TestTrainingCompletion:
     def test_reconciliation_error_does_not_escape(self, fxt_training_job, fxt_skip_status_reconciliation):
         fxt_skip_status_reconciliation.side_effect = RuntimeError("database unavailable")
 
-        with patch("app.services.job_hooks.training_completion.logger") as logger:
+        with patch("app.services.job_hooks.logger") as logger:
             complete_training_job(fxt_training_job)
 
         logger.error.assert_called_once()
@@ -172,8 +170,8 @@ class TestTrainingCompletion:
 
 class TestTrainingJobReconcileTrainingStatus:
     @pytest.mark.parametrize("status", [TrainingStatus.IN_PROGRESS, TrainingStatus.NOT_STARTED])
-    @patch("app.services.job_hooks.training_completion.ModelService")
-    @patch("app.services.job_hooks.training_completion.get_db_session")
+    @patch("app.services.job_hooks.ModelService")
+    @patch("app.services.job_hooks.get_db_session")
     def test_forces_failed_when_status_stuck_in_progress(
         self, mock_get_db_session, mock_model_service_cls, status, fxt_training_job
     ):
@@ -191,8 +189,8 @@ class TestTrainingJobReconcileTrainingStatus:
         assert call_kwargs["training_status"] == TrainingStatus.FAILED
 
     @pytest.mark.parametrize("terminal_status", [TrainingStatus.SUCCESSFUL, TrainingStatus.FAILED])
-    @patch("app.services.job_hooks.training_completion.ModelService")
-    @patch("app.services.job_hooks.training_completion.get_db_session")
+    @patch("app.services.job_hooks.ModelService")
+    @patch("app.services.job_hooks.get_db_session")
     def test_no_op_when_status_already_terminal(
         self, mock_get_db_session, mock_model_service_cls, terminal_status, fxt_training_job
     ):
@@ -205,8 +203,8 @@ class TestTrainingJobReconcileTrainingStatus:
 
         mock_model_service.update_revision_status.assert_not_called()
 
-    @patch("app.services.job_hooks.training_completion.ModelService")
-    @patch("app.services.job_hooks.training_completion.get_db_session")
+    @patch("app.services.job_hooks.ModelService")
+    @patch("app.services.job_hooks.get_db_session")
     def test_no_op_when_model_revision_missing(self, mock_get_db_session, mock_model_service_cls, fxt_training_job):
         """A job that failed before the model revision was ever created has nothing to reconcile."""
         mock_get_db_session.return_value.__enter__.return_value = Mock()
