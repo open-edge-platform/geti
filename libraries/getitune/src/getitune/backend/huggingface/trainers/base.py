@@ -22,7 +22,7 @@ from getitune.metrics import MetricCallable
 from .utils import plateau_warmup_lr, resolve_greater_is_better
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Callable, Iterator, Sequence
 
     from torch.utils.data import DataLoader
     from torchmetrics import Metric, MetricCollection
@@ -312,6 +312,7 @@ class GetiTuneHFTrainer(Trainer):
         split: str = "val",
         metric: Metric | MetricCollection | None = None,
         compute_kwargs: dict[str, Any] | None = None,
+        on_progress_update: Callable[[float], None] | None = None,
     ) -> dict[str, float]:
         """Run a Geti metric on *split* and return scalar ``val/`` or ``test/`` metrics.
 
@@ -334,6 +335,8 @@ class GetiTuneHFTrainer(Trainer):
             compute_kwargs: Extra keyword arguments forwarded to
                 ``metric.compute()``, e.g.
                 ``{"best_confidence_threshold": 0.3}``.
+            on_progress_update: Optional callback receiving the completed
+                fraction after each evaluation batch.
 
         Returns:
             A dictionary of scalar metrics prefixed with ``val/`` or ``test/``.
@@ -367,6 +370,7 @@ class GetiTuneHFTrainer(Trainer):
         data_time = 0.0
         iter_time = 0.0
         num_batches = 0
+        total_batches = len(dataloader) if on_progress_update is not None else 0
         iterator = iter(dataloader)
         with torch.no_grad():
             while True:
@@ -383,6 +387,8 @@ class GetiTuneHFTrainer(Trainer):
                 metric_obj.update(**metric_inputs)
                 iter_time += perf_counter() - start
                 num_batches += 1
+                if on_progress_update is not None and total_batches > 0:
+                    on_progress_update(min(num_batches / total_batches, 1.0))
 
         computed = metric_obj.compute(**(compute_kwargs or {}))
         metrics = self._format_metrics(computed, f"{split}/")
@@ -390,7 +396,7 @@ class GetiTuneHFTrainer(Trainer):
             return {}
 
         if split == "val":
-            if num_batches:
+            if num_batches > 0:
                 metrics["validation/data_time"] = data_time / num_batches
                 metrics["validation/iter_time"] = iter_time / num_batches
             # ``transformers.EarlyStoppingCallback`` looks up ``eval_`` + ``metric_for_best_model``

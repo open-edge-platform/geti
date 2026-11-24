@@ -4,7 +4,7 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import ANY, MagicMock, Mock, call, patch
 from uuid import uuid4
 
 import numpy as np
@@ -1385,6 +1385,13 @@ class TestGetiTuneTrainerEvaluateModel:
 
         # Assert: Callback instantiated 3 times (PYTORCH, OV + ONNX)
         assert mock_callback_cls.call_count == 3
+        mock_callback_cls.assert_has_calls(
+            calls=[
+                call(ANY, min_p=85, max_p=88),
+                call(ANY, min_p=88, max_p=91),
+                call(ANY, min_p=91, max_p=94),
+            ]
+        )
 
         # Assert: OVEngine instantiated twice (OV + ONNX) and tested with the right checkpoints
         assert mock_ov_engine_cls.call_count == 2

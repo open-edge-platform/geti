@@ -39,7 +39,7 @@ from getitune.utils.device import is_xpu_available
 from .models.base import UltralyticsModel
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping
+    from collections.abc import Callable, Iterator, Mapping
 
     from lightning_fabric.plugins.precision.precision import _PRECISION_INPUT
     from torch.utils.data import DataLoader
@@ -263,7 +263,8 @@ class UltralyticsEngine(Engine):
             metric: A ``MetricCallable`` — a function that accepts
                 ``LabelInfo`` and returns a ``torchmetrics.Metric``.
                 When provided, the torchmetrics evaluation path is used.
-            **kwargs: Overrides forwarded to validation.
+            **kwargs: Overrides forwarded to validation. ``callbacks`` is
+                consumed separately for per-batch evaluation progress.
 
         Returns:
             Metric dict.  Keys are prefixed with ``test/`` when using
@@ -272,19 +273,20 @@ class UltralyticsEngine(Engine):
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
 
+        callbacks = kwargs.pop("callbacks", None)
         if metric is not None and self._datamodule is not None:
-            return self._test_with_torchmetrics(metric)
+            return self._test_with_torchmetrics(metric, callbacks=callbacks)
 
         if self._datamodule is not None and getattr(self._model, "is_multilabel", False):
-            return self._test_with_torchmetrics(MultiLabelClsMetricCallable)
+            return self._test_with_torchmetrics(MultiLabelClsMetricCallable, callbacks=callbacks)
 
         if self._datamodule is not None and self._model.task == "semantic":
-            return self._test_with_torchmetrics(SegmCallable)  # pyrefly: ignore[bad-argument-type]
+            return self._test_with_torchmetrics(SegmCallable, callbacks=callbacks)  # pyrefly: ignore[bad-argument-type]
 
         merged = self._build_overrides(**kwargs)
 
         if self._datamodule is not None:
-            return self._test_with_datamodule(merged, checkpoint=None)
+            return self._test_with_datamodule(merged, checkpoint=None, callbacks=callbacks)
 
         yolo = self._model.yolo
         if self._data_root is not None and "data" not in merged:
@@ -301,7 +303,14 @@ class UltralyticsEngine(Engine):
 
         logger.info("Starting Ultralytics validation: model=%s", self._model.model_name)
 
-        results = yolo.val(**val_args)
+        progress_hook = self._validation_progress_hook(callbacks)
+        if progress_hook is not None:
+            yolo.add_callback("on_val_batch_end", progress_hook)
+        try:
+            results = yolo.val(**val_args)
+        finally:
+            if progress_hook is not None:
+                yolo.callbacks["on_val_batch_end"].remove(progress_hook)
         return self._translate_metrics(results)
 
     def predict(
@@ -511,7 +520,9 @@ class UltralyticsEngine(Engine):
         msg = "No DataModule or data_root configured"
         raise ValueError(msg)
 
-    def _test_with_datamodule(self, overrides: dict, checkpoint: PathLike | None = None) -> dict[str, float]:
+    def _test_with_datamodule(
+        self, overrides: dict, checkpoint: PathLike | None = None, callbacks: list[Any] | None = None
+    ) -> dict[str, float]:
         """Run validation via a bound validator class with DataModule data."""
         validator_cls = self._make_bound_validator()
 
@@ -531,6 +542,9 @@ class UltralyticsEngine(Engine):
             save_dir=self._work_dir / "val",
             args=args,
         )
+        progress_hook = self._validation_progress_hook(callbacks)
+        if progress_hook is not None:
+            validator.add_callback("on_val_batch_end", progress_hook)
 
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
@@ -540,6 +554,7 @@ class UltralyticsEngine(Engine):
     def _test_with_torchmetrics(
         self,
         metric_callable: Callable[[LabelInfo], Metric | MetricCollection],
+        callbacks: list[Any] | None = None,
     ) -> dict[str, float]:
         """Evaluate using torchmetrics — same metrics as Lightning models.
 
@@ -564,6 +579,7 @@ class UltralyticsEngine(Engine):
 
         Args:
             metric_callable: A function ``(LabelInfo) -> Metric``.
+            callbacks: Application progress callbacks adapted to evaluation batches.
 
         Returns:
             Flat metric dict, e.g. ``{"test/map": 0.75, "test/map_50": 0.90}``.
@@ -591,14 +607,16 @@ class UltralyticsEngine(Engine):
         )
 
         if self._model.task == "classify":
-            return self._test_classification_with_torchmetrics(metric_callable, dataloader, yolo, device, imgsz)
+            return self._test_classification_with_torchmetrics(
+                metric_callable, dataloader, yolo, device, imgsz, callbacks=callbacks
+            )
 
         if self._model.task == "semantic":
-            return self._test_semantic_with_torchmetrics(metric_callable, dataloader, yolo, device)
+            return self._test_semantic_with_torchmetrics(metric_callable, dataloader, yolo, device, callbacks=callbacks)
 
         iter_times: list[float] = []
         batch_start = time.perf_counter()
-        for batch in dataloader:
+        for batch in self._iter_evaluation_batches(dataloader, callbacks):
             if not isinstance(batch, SampleBatch):
                 msg = f"Expected test_dataloader to yield SampleBatch, got {type(batch)}"
                 raise TypeError(msg)
@@ -684,6 +702,7 @@ class UltralyticsEngine(Engine):
         yolo: YOLO,
         device: torch.device,
         imgsz: int | tuple[int, int],
+        callbacks: list[Any] | None = None,
     ) -> dict[str, float]:
         """Run torchmetrics evaluation for classification tasks.
 
@@ -697,7 +716,7 @@ class UltralyticsEngine(Engine):
         self._model.ensure_predict_ready()
         is_multilabel = getattr(self._model, "is_multilabel", False)
 
-        for batch in dataloader:
+        for batch in self._iter_evaluation_batches(dataloader, callbacks):
             if not isinstance(batch, SampleBatch):
                 msg = f"Expected test_dataloader to yield SampleBatch, got {type(batch)}"
                 raise TypeError(msg)
@@ -736,6 +755,7 @@ class UltralyticsEngine(Engine):
         dataloader: DataLoader,
         yolo: YOLO,
         device: torch.device,
+        callbacks: list[Any] | None = None,
     ) -> dict[str, float]:
         """Run torchmetrics evaluation for semantic segmentation.
 
@@ -764,7 +784,7 @@ class UltralyticsEngine(Engine):
             len(dataloader),
         )
 
-        for batch in dataloader:
+        for batch in self._iter_evaluation_batches(dataloader, callbacks):
             if not isinstance(batch, SampleBatch):
                 msg = f"Expected test_dataloader to yield SampleBatch, got {type(batch)}"
                 raise TypeError(msg)
@@ -787,6 +807,34 @@ class UltralyticsEngine(Engine):
 
         results = metric.compute()
         return self._format_torchmetrics_results(results)
+
+    def _iter_evaluation_batches(self, dataloader: DataLoader, callbacks: list[Any] | None) -> Iterator[SampleBatch]:
+        """Report completed batch progress after each evaluation loop iteration."""
+        progress_fn, min_p, max_p = self._extract_progress_callback(callbacks)
+        total_batches = len(dataloader) if progress_fn is not None else 0
+        for batch_index, batch in enumerate(dataloader):
+            yield batch
+            if progress_fn is not None and total_batches > 0:
+                fraction = min((batch_index + 1) / total_batches, 1.0)
+                progress_fn(min_p + fraction * (max_p - min_p))
+
+    def _validation_progress_hook(self, callbacks: list[Any] | None) -> Callable[[Any], None] | None:
+        """Adapt application progress to native Ultralytics validation events."""
+        progress_fn, min_p, max_p = self._extract_progress_callback(callbacks)
+        if progress_fn is None:
+            return None
+        progress_update = progress_fn
+        completed_batches = 0
+
+        def on_batch_end(validator: Any) -> None:  # noqa: ANN401
+            nonlocal completed_batches
+            completed_batches += 1
+            total_batches = len(validator.dataloader)
+            if total_batches > 0:
+                fraction = min(completed_batches / total_batches, 1.0)
+                progress_update(min_p + fraction * (max_p - min_p))
+
+        return on_batch_end
 
     def _compute_best_confidence_threshold(self) -> float | None:
         """Run FMeasure on the validation set to find the optimal confidence threshold.
