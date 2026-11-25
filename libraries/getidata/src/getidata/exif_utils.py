@@ -9,6 +9,8 @@ and media/image converters).
 
 from __future__ import annotations
 
+import os
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -54,9 +56,18 @@ def get_oriented_size(width: int, height: int, orientation: int) -> tuple[int, i
 def has_nontrivial_exif_orientation(path: str) -> bool:
     """Return True if the image at ``path`` has a non-identity EXIF orientation.
 
-    Uses a lightweight PIL header read (does not decode pixel data). Returns
-    False if the file can't be opened or has no EXIF data.
+    Returns False if the file can't be opened or has no EXIF data. The result is cached per file version, because
+    for PNG ``getexif`` decodes the whole image and tiled datasets ask once per tile.
     """
+    try:
+        stat = os.stat(path)
+    except OSError:
+        return False
+    return _has_nontrivial_exif_orientation(path, stat.st_mtime_ns, stat.st_size)
+
+
+@lru_cache(maxsize=4096)
+def _has_nontrivial_exif_orientation(path: str, mtime_ns: int, size: int) -> bool:  # noqa: ARG001
     try:
         from PIL import Image
 

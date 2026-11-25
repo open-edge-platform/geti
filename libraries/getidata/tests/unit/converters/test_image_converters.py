@@ -886,3 +886,39 @@ def test_image_path_to_image_info_converter_respects_exif_orientation(orientatio
         info = result_df["image_info"][0]
         assert info["width"] == expected_width
         assert info["height"] == expected_height
+
+
+def test_path_converter_decodes_same_file_once_and_reloads_on_change(tmp_path, monkeypatch):
+    """Repeat reads of one file (one per tile) hit the decoded-image cache; a rewritten file is decoded again."""
+    from PIL import Image as PILImage
+
+    from getidata.converters import image_converters
+
+    image_converters._decoded_cache.clear()
+    path = str(tmp_path / "img.png")
+    PILImage.fromarray(np.zeros((8, 8, 3), dtype=np.uint8)).save(path)
+
+    converter_instance = ImagePathToImageConverter()  # type: ignore[call-arg]
+    converter_instance.input_path = AttributeSpec(name="image_path", field=ImagePathField())
+    converter_instance.output_image = AttributeSpec(name="image", field=ImageField(dtype=pl.UInt8(), format="RGB"))
+
+    calls = []
+    original = ImagePathToImageConverter._load_image_opencv
+
+    def counting(self, p, fmt):
+        calls.append(p)
+        return original(self, p, fmt)
+
+    monkeypatch.setattr(ImagePathToImageConverter, "_load_image_opencv", counting)
+    df = pl.DataFrame({"image_path": [path]})
+
+    first = converter_instance.convert(df)
+    second = converter_instance.convert(df)
+    assert len(calls) == 1
+    assert first["image"].to_list() == second["image"].to_list()
+
+    PILImage.fromarray(np.full((8, 8, 3), 7, dtype=np.uint8)).save(path)
+    os.utime(path, ns=(1, 2_000_000_000))  # force a different mtime
+    third = converter_instance.convert(df)
+    assert len(calls) == 2
+    assert set(third["image"][0].to_list()) == {7}

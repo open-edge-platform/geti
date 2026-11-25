@@ -806,3 +806,104 @@ def test_sliced_lazy_instance_masks_follow_filtered_boxes():
     assert tile[0, "labels"].to_list() == ["first"]
     assert len(tile[0, "bboxes"]) == tile[0, "instances_shape"][0] == 1
     np.testing.assert_array_equal(np.asarray(tile[0, "instances"]).reshape(1, 10, 10), masks[:1, :10, :10])
+
+
+def test_bbox_tiling_image_without_annotations_and_threshold():
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float32())),
+        }
+    )
+    polars_schema = schema.attributes["image_info"].field.to_polars_schema("image_info")
+    polars_schema.update(schema.attributes["bboxes"].field.to_polars_schema("bboxes"))
+    df = pl.DataFrame(
+        {
+            "image_info": [{"width": 100, "height": 50}, {"width": 100, "height": 50}],
+            "bboxes": [[], [[40, 10, 60, 30]]],  # first image has no boxes; second box is split 50/50 by the cut
+        },
+        schema=polars_schema,
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=50, tile_height=50), threshold_drop_ann=0.6)
+    result_df, _ = _apply_tiling(df, None, plan, ["bboxes"])
+
+    assert len(result_df) == 4  # 2 tiles per image
+    assert result_df[0, "bboxes"].to_list() == [] and result_df[1, "bboxes"].to_list() == []
+    # 10 of 20 px visible = 50% < 60%: the box is dropped from both tiles
+    assert result_df[2, "bboxes"].to_list() == [] and result_df[3, "bboxes"].to_list() == []
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=50, tile_height=50), threshold_drop_ann=0.5)
+    result_df, _ = _apply_tiling(df, None, plan, ["bboxes"])
+    assert result_df[2, "bboxes"].to_list() == [[40.0, 10.0, 50.0, 30.0]]
+    assert result_df[3, "bboxes"].to_list() == [[0.0, 10.0, 10.0, 30.0]]
+
+
+def test_bbox_tiling_equal_box_counts_stay_list_columns():
+    # Every tile holds the same number of boxes: polars must not turn the per-tile lists into fixed-size arrays.
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "bboxes": AttributeInfo(type=list, field=bbox_field(dtype=pl.Float32())),
+        }
+    )
+    polars_schema = schema.attributes["image_info"].field.to_polars_schema("image_info")
+    polars_schema.update(schema.attributes["bboxes"].field.to_polars_schema("bboxes"))
+    df = pl.DataFrame(
+        {"image_info": [{"width": 100, "height": 50}], "bboxes": [[[1, 1, 5, 5], [60, 10, 70, 20]]]},
+        schema=polars_schema,
+    )
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=50, tile_height=50), threshold_drop_ann=0.5)
+    result_df, _ = _apply_tiling(df, None, plan, ["bboxes"])
+
+    assert len(result_df) == 2
+    assert result_df.schema["bboxes"] == df.schema["bboxes"]
+    assert [len(b) for b in result_df["bboxes"]] == [1, 1]
+
+
+def _polygon_tiling(polygons, threshold):
+    schema = Schema(
+        attributes={
+            "image_info": AttributeInfo(type=dict, field=image_info_field()),
+            "polygons": AttributeInfo(type=list, field=polygon_field(dtype=pl.Float32())),
+        }
+    )
+    polars_schema = schema.attributes["image_info"].field.to_polars_schema("image_info")
+    polars_schema.update(schema.attributes["polygons"].field.to_polars_schema("polygons"))
+    df = pl.DataFrame({"image_info": [{"width": 100, "height": 50}], "polygons": [polygons]}, schema=polars_schema)
+    plan = _create_tiling_plan(schema, TilingConfig(tile_width=50, tile_height=50), threshold_drop_ann=threshold)
+    result_df, _ = _apply_tiling(df, None, plan, ["polygons"])
+    return [[np.array(p.to_list()) for p in tile] for tile in result_df["polygons"]]
+
+
+def test_polygon_tiling_clips_edge_polygons_and_keeps_inner_ones():
+    inner = [[5, 5], [15, 5], [15, 15], [5, 15]]  # inside the left tile only
+    straddling = [[40, 10], [60, 10], [60, 30], [40, 30]]  # cut in half by the tile edge at x=50
+    left, right = _polygon_tiling([inner, straddling], threshold=0.5)
+
+    assert len(left) == 2 and len(right) == 1
+
+    def areas(tile):
+        return sorted(
+            round(abs(np.dot(p[:, 0], np.roll(p[:, 1], -1)) - np.dot(p[:, 1], np.roll(p[:, 0], -1))) / 2) for p in tile
+        )
+
+    assert areas(left) == [100, 200]
+    assert areas(right) == [200]
+    assert right[0][:, 0].min() == 0  # offset to the tile origin
+
+
+def test_polygon_tiling_threshold_drops_mostly_cut_polygons():
+    mostly_outside = [[45, 10], [75, 10], [75, 30], [45, 30]]  # 5 of 30 px visible in the left tile
+    left, right = _polygon_tiling([mostly_outside], threshold=0.5)
+
+    assert left == []
+    assert len(right) == 1
+
+
+def test_polygon_tiling_survives_self_intersecting_polygon():
+    bowtie = [[10, 10], [40, 40], [40, 10], [10, 40]]  # GEOS rejects intersections with this ring
+    valid = [[5, 5], [10, 5], [10, 10], [5, 10]]
+
+    left, right = _polygon_tiling([bowtie, valid], threshold=0.5)
+
+    assert len(left) >= 1  # the valid polygon is still tiled, no exception
+    assert right == []
