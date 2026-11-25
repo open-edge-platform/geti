@@ -1,24 +1,30 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
+import shutil
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from uuid import UUID, uuid4
 
 import numpy as np
 import pytest
 import tifffile
+from getidata.data_formats.base import DataFormat
+from getidata.export_import import export_dataset
 from PIL import Image
 from sqlalchemy import func, select
 
 from app.datumaro_converter import SampleMode
-from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewItemDB, MediaDB, OmeImageDB
+from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetRevisionDB, DatasetViewItemDB, MediaDB, OmeImageDB
 from app.models import DatasetItemAnnotation, DatasetItemAnnotationStatus, DatasetItemSubset, LabelReference, Rectangle
 from app.models.media import LEAF_MEDIA_TYPES, ImageFormat, MediaType
 from app.models.ome import OmeChannelSettings
 from app.services.base import ResourceNotFoundError
-from app.services.dataset_service import UnsupportedDatasetMediaError
+from app.services.dataset_revision_service import DatasetRevisionService
+from app.services.dataset_service import DatasetService, UnsupportedDatasetMediaError
 from app.services.media_service import MediaFilters
+from app.services.ome.materialization import OME_PROJECTIONS_FILENAME
 from app.services.ome.rendering import OmeRenderingService
 
 
@@ -286,14 +292,12 @@ def test_dataset_conversion_rejects_selected_virtual_planes(
     selected = view_scope != "excluded" and (annotation_state != "missing" or annotation_status is None)
     with patch.object(fxt_dataset_service._media_service, "get_media_binary_path_by_id") as get_path:
         if selected:
-            with pytest.raises(
-                UnsupportedDatasetMediaError, match="not supported for training or dataset export"
-            ) as error:
+            with pytest.raises(UnsupportedDatasetMediaError, match="requires annotated training") as error:
                 fxt_dataset_service.get_dm_dataset(
                     project.id, project.task, annotation_status, sample_mode, dataset_view_id=view_id
                 )
             assert str(plane.id) in str(error.value)
-            assert "materialization is not implemented" in str(error.value)
+            assert "Direct dataset export" in str(error.value)
         else:
             dataset = fxt_dataset_service.get_dm_dataset(
                 project.id, project.task, annotation_status, sample_mode, dataset_view_id=view_id
@@ -301,3 +305,202 @@ def test_dataset_conversion_rejects_selected_virtual_planes(
             assert len(dataset) == 0
         get_path.assert_not_called()
     assert fxt_dataset_service.get_dataset_item_by_id(project.id, plane.id).id == plane.id
+
+
+@pytest.mark.parametrize(
+    "projection",
+    [
+        {"mode": "rgb", "channels": [{"channel": 2, "target": "red"}, {"channel": 0, "target": "blue"}]},
+        {"mode": "grayscale", "channel": 1},
+    ],
+)
+@pytest.mark.parametrize("view_scoped", [False, True])
+def test_training_revision_materializes_annotated_planes(
+    ome_annotation,
+    db_session,
+    fxt_label_service,
+    fxt_db_labels,
+    fxt_dataset_view_service,
+    tmp_path,
+    projection,
+    view_scoped,
+):
+    """Persist only selected annotated planes, retaining pixels and coordinates after source removal."""
+    service, project, image = ome_annotation
+    dataset_service = DatasetService(fxt_label_service, service, db_session)
+    revision_service = DatasetRevisionService(service.projects_dir.parent, db_session)
+    db_session.get(OmeImageDB, str(image.id)).channel_projection = projection
+    db_session.flush()
+    coordinates = [(12, 0), (0, 1), (12, 1)]
+    planes = []
+    for (z, t), subset in zip(
+        coordinates, [DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING], strict=True
+    ):
+        plane = dataset_service.register_ome_plane(project.id, image.id, z=z, t=t)
+        dataset_service.set_dataset_item_annotations(project, plane.id, _annotations(fxt_db_labels[0].id), True, None)
+        dataset_service.assign_dataset_item_subset(project.id, plane.id, subset)
+        planes.append(plane)
+    # Registered but unannotated planes must not get PNGs or revision rows.
+    dataset_service.register_ome_plane(project.id, image.id, z=1, t=0)
+    view_id = None
+    if view_scoped:
+        view_id = fxt_dataset_view_service.create_dataset_view(project.id, "OME training", [image.id]).id
+        payload = BytesIO()
+        tifffile.imwrite(payload, np.zeros((8, 10), dtype=np.uint16), ome=True)
+        payload.seek(0)
+        excluded = service.create_ome_image(project.id, "excluded", ImageFormat.OME_TIFF, payload, max_size=1024 * 1024)
+        excluded_plane = dataset_service.register_ome_plane(project.id, excluded.id, z=0, t=0)
+        dataset_service.set_dataset_item_annotations(
+            project, excluded_plane.id, _annotations(fxt_db_labels[0].id), True, None
+        )
+    OmeRenderingService(service).set_channel_view(project.id, image.id, OmeChannelSettings(settings=[]))
+    workspace = tmp_path / "training-workspace"
+    with patch(
+        "app.services.ome.rgb_channel_projection.MetadataRgbChannelProjectionStrategy.compute",
+        side_effect=AssertionError("Training must not recompute the ingest projection"),
+    ):
+        dataset = dataset_service.get_dm_dataset(
+            project.id,
+            project.task,
+            DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+            SampleMode.TRAINING,
+            dataset_view_id=view_id,
+            ome_plane_dir=workspace,
+        )
+    assert len(list(workspace.glob("*.png"))) == 3
+    revision_id = revision_service.save_revision(
+        project.id, dataset, dataset_view_id=view_id, ome_projections_path=workspace / OME_PROJECTIONS_FILENAME
+    )
+    revision_path = service.projects_dir / str(project.id) / "dataset_revisions" / str(revision_id)
+    pngs = list((revision_path / "images").glob("*.png"))
+    assert len(pngs) == 3
+    assert json.loads((revision_path / OME_PROJECTIONS_FILENAME).read_text()) == {
+        "format_version": 1,
+        "images": [
+            {"media_id": str(image.id), "container_format": "ome_tiff", "size_c": 3, "channel_projection": projection}
+        ],
+    }
+    revision = revision_service.get_dataset_revision(project.id, revision_id)
+    assert revision.item_counts.model_dump() == {"total": 3, "training": 1, "validation": 1, "testing": 1}
+    assert revision.size == sum(path.stat().st_size for path in revision_path.rglob("*") if path.is_file())
+    shutil.rmtree(workspace)
+    # Saved artifacts must no longer depend on the OME container or current display state.
+    storage = service.get_media_storage(project.id, image)
+    storage.effective_path.unlink()
+    reloaded = revision_service.load_revision(project.id, revision_id)
+    assert len(reloaded) == 3
+    assert set(reloaded.df["id"]) == {str(plane.id) for plane in planes}
+    from getitune.data.dataset.detection import DetectionDataset
+
+    training_dataset = DetectionDataset(reloaded)
+    pixels = np.arange(2 * 13 * 3 * 8 * 10, dtype=np.uint16).reshape(2, 13, 3, 8, 10)
+    for index, sample in enumerate(reloaded):
+        plane = next(plane for plane in planes if str(plane.id) == sample.id)
+        assert (sample.image_info.width, sample.image_info.height) == (10, 8)
+        np.testing.assert_array_equal(sample.bboxes, [[1, 2, 4, 6]])
+        source = (pixels[plane.t_index, plane.z_index].astype(np.float64) / 65535 * 255).astype(np.uint8)
+        if projection["mode"] == "rgb":
+            expected = np.stack([source[2], np.zeros((8, 10), dtype=np.uint8), source[0]], axis=2)
+        else:
+            expected = source[1]
+        with Image.open(sample.image.path) as png:
+            assert png.mode == ("RGB" if projection["mode"] == "rgb" else "L")
+            np.testing.assert_array_equal(np.array(png), expected)
+        expected_rgb = expected if expected.ndim == 3 else np.repeat(expected[..., np.newaxis], 3, axis=2)
+        np.testing.assert_array_equal(sample.image.data, expected_rgb)
+        np.testing.assert_allclose(
+            training_dataset[index].image.numpy(), expected_rgb.transpose(2, 0, 1) / 255, atol=1e-7
+        )
+    export_path = tmp_path / "coco-export"
+    export_dataset(reloaded, output_path=export_path, data_format=DataFormat.COCO, as_zip=False)
+    assert len(list(export_path.rglob("*.png"))) == 3
+
+
+def test_training_revision_preserves_mixed_parent_projection_policies(
+    ome_annotation, db_session, fxt_label_service, fxt_db_labels, tmp_path
+):
+    """Keep distinct RGB and grayscale ingest policies together in a single revision."""
+    service, project, image = ome_annotation
+    dataset_service = DatasetService(fxt_label_service, service, db_session)
+    payload = BytesIO()
+    tifffile.imwrite(payload, np.full((8, 10), 65535, dtype=np.uint16), ome=True)
+    payload.seek(0)
+    second = service.create_ome_image(project.id, "grayscale", ImageFormat.OME_TIFF, payload, max_size=1024 * 1024)
+    db_session.get(OmeImageDB, str(second.id)).channel_projection = {"mode": "grayscale", "channel": 0}
+    db_session.flush()
+    for parent, z, subset in [
+        (image, 0, DatasetItemSubset.TRAINING),
+        (image, 1, DatasetItemSubset.VALIDATION),
+        (second, 0, DatasetItemSubset.TESTING),
+    ]:
+        plane = dataset_service.register_ome_plane(project.id, parent.id, z=z, t=0)
+        dataset_service.set_dataset_item_annotations(project, plane.id, _annotations(fxt_db_labels[0].id), True, None)
+        dataset_service.assign_dataset_item_subset(project.id, plane.id, subset)
+    workspace = tmp_path / "workspace"
+    dataset = dataset_service.get_dm_dataset(
+        project.id,
+        project.task,
+        DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+        SampleMode.TRAINING,
+        ome_plane_dir=workspace,
+    )
+    revisions = DatasetRevisionService(service.projects_dir.parent, db_session)
+    revision_id = revisions.save_revision(
+        project.id, dataset, ome_projections_path=workspace / OME_PROJECTIONS_FILENAME
+    )
+    revision_path = service.projects_dir / str(project.id) / "dataset_revisions" / str(revision_id)
+    manifest = json.loads((revision_path / OME_PROJECTIONS_FILENAME).read_text())
+    assert {entry["media_id"]: entry["channel_projection"] for entry in manifest["images"]} == {
+        str(parent.id): service.get_ome_image_info(project.id, parent.id).channel_projection.model_dump(mode="json")
+        for parent in (image, second)
+    }
+    modes = set()
+    for path in (revision_path / "images").glob("*.png"):
+        with Image.open(path) as png:
+            modes.add(png.mode)
+    assert modes == {"RGB", "L"}
+
+
+@pytest.mark.parametrize("failure", ["export", "sidecar", "database"])
+def test_revision_failures_remove_partial_artifacts(
+    ome_annotation, db_session, fxt_label_service, fxt_db_labels, tmp_path, monkeypatch, failure
+):
+    """Remove a failed revision on disk and never persist a success-shaped revision record."""
+    service, project, image = ome_annotation
+    dataset_service = DatasetService(fxt_label_service, service, db_session)
+    for z, subset in enumerate([DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING]):
+        plane = dataset_service.register_ome_plane(project.id, image.id, z=z, t=0)
+        dataset_service.set_dataset_item_annotations(project, plane.id, _annotations(fxt_db_labels[0].id), True, None)
+        dataset_service.assign_dataset_item_subset(project.id, plane.id, subset)
+    workspace = tmp_path / "workspace"
+    dataset = dataset_service.get_dm_dataset(
+        project.id,
+        project.task,
+        DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+        SampleMode.TRAINING,
+        ome_plane_dir=workspace,
+    )
+    revision_id = uuid4()
+    monkeypatch.setattr("app.services.dataset_revision_service.uuid4", lambda: revision_id)
+    sidecar = workspace / OME_PROJECTIONS_FILENAME
+    if failure == "export":
+
+        def fail_export(*, output_path, **kwargs):
+            output_path.mkdir(parents=True)
+            (output_path / "partial.png").write_bytes(b"partial")
+            raise OSError("Export failed")
+
+        monkeypatch.setattr("getidata.export_import.export_dataset", fail_export)
+    elif failure == "sidecar":
+        sidecar.unlink()
+    else:
+        monkeypatch.setattr(
+            "app.services.dataset_revision_service.DatasetRevisionRepository.save",
+            Mock(side_effect=RuntimeError("Database save failed")),
+        )
+    revisions = DatasetRevisionService(service.projects_dir.parent, db_session)
+    with pytest.raises((OSError, RuntimeError)):
+        revisions.save_revision(project.id, dataset, ome_projections_path=sidecar)
+    revision_path = service.projects_dir / str(project.id) / "dataset_revisions" / str(revision_id)
+    assert not revision_path.exists()
+    assert db_session.scalar(select(func.count()).select_from(DatasetRevisionDB)) == 0
