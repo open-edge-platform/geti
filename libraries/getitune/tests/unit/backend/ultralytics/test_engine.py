@@ -722,7 +722,8 @@ class TestSummarizeIterTimes:
 class TestTorchmetricsEval:
     """Tests for torchmetrics-based test() evaluation."""
 
-    def test_classification_passes_probabilities_and_labels_to_metric(self, mocker, tmp_path) -> None:
+    @pytest.mark.parametrize("num_batches", [1, 2])
+    def test_classification_passes_probabilities_and_labels_to_metric(self, mocker, tmp_path, num_batches) -> None:
         """Classification torchmetrics must receive class scores and class indices."""
         model = UltralyticsMultiClassClsModel(model_name="yolo26n-cls", label_info=_label_info())
         datamodule = mocker.MagicMock(spec=DataModule)
@@ -749,22 +750,27 @@ class TestTorchmetricsEval:
                 ImageInfo(img_idx=1, img_shape=(64, 64), ori_shape=(64, 64)),  # pyrefly: ignore[no-matching-overload]
             ],
         )
-        engine._datamodule.test_dataloader = MagicMock(return_value=[batch])  # pyrefly: ignore[missing-attribute]
+        assert engine._datamodule is not None
+        mocker.patch.object(engine._datamodule, "test_dataloader", return_value=[batch] * num_batches)
         engine._datamodule.label_info = _label_info()  # pyrefly: ignore[missing-attribute]
 
         metric = MagicMock()
         metric.to = MagicMock(return_value=metric)
         metric.compute = MagicMock(return_value={"accuracy": torch.tensor(1.0)})
 
-        result = engine.test(metric=MagicMock(return_value=metric))
+        updates: list[float] = []
+        callback = SimpleNamespace(_on_progress_update=updates.append, _min_p=85, _max_p=90)
+        result = engine.test(metric=MagicMock(return_value=metric), callbacks=[callback])
 
-        metric.update.assert_called_once()
+        assert metric.update.call_count == num_batches
+        assert updates == [85 + 5 * (i + 1) / num_batches for i in range(num_batches)]
         _, update_kwargs = metric.update.call_args
         torch.testing.assert_close(update_kwargs["preds"], torch.tensor([[0.9, 0.1], [0.2, 0.8]]))
         torch.testing.assert_close(update_kwargs["target"], torch.tensor([0, 1]))
         assert result["test/accuracy"] == pytest.approx(1.0)
 
-    def test_test_uses_torchmetrics_when_metric_provided(self, mocker, tmp_path) -> None:
+    @pytest.mark.parametrize("num_batches", [1, 2])
+    def test_test_uses_torchmetrics_when_metric_provided(self, mocker, tmp_path, num_batches) -> None:
         """test() should use torchmetrics path when metric callable is provided."""
         engine, yolo = _make_engine(tmp_path, mocker)
 
@@ -792,7 +798,8 @@ class TestTorchmetricsEval:
                 ImageInfo(img_idx=0, img_shape=(64, 64), ori_shape=(64, 64))  # pyrefly: ignore[no-matching-overload]
             ],
         )
-        engine._datamodule.test_dataloader = MagicMock(return_value=[batch])  # pyrefly: ignore[missing-attribute]
+        assert engine._datamodule is not None
+        mocker.patch.object(engine._datamodule, "test_dataloader", return_value=[batch] * num_batches)
         engine._datamodule.label_info = _label_info()  # pyrefly: ignore[missing-attribute]
 
         mock_metric = MagicMock()
@@ -810,10 +817,18 @@ class TestTorchmetricsEval:
         )
         metric_callable = MagicMock(return_value=mock_metric)
 
-        result = engine.test(metric=metric_callable)
+        updates: list[float] = []
+
+        def report_progress(value: float) -> None:
+            assert mock_metric.update.call_count == len(updates) + 1
+            updates.append(value)
+
+        callback = SimpleNamespace(_on_progress_update=report_progress, _min_p=85, _max_p=90)
+        result = engine.test(metric=metric_callable, callbacks=[callback])
 
         metric_callable.assert_called_once()
-        mock_metric.update.assert_called_once()
+        assert mock_metric.update.call_count == num_batches
+        assert updates == [85 + 5 * (i + 1) / num_batches for i in range(num_batches)]
         mock_metric.compute.assert_called_once()
 
         assert result["test/map"] == pytest.approx(0.75)
@@ -839,6 +854,78 @@ class TestTorchmetricsEval:
             result = engine.test(metric=None)
 
         assert "val/map_50" in result
+
+    def test_semantic_evaluation_reports_each_batch(self, mocker, tmp_path) -> None:
+        engine, yolo = _make_engine(tmp_path, mocker)
+        mocker.patch.object(engine._model, "task", "semantic")
+        assert engine._datamodule is not None
+        engine._datamodule.label_info = _label_info()  # pyrefly: ignore[missing-attribute]
+        batch = SampleBatch(images=torch.rand(1, 3, 64, 64), masks=[tv_tensors.Mask(torch.zeros(1, 64, 64))])
+        mocker.patch.object(engine._datamodule, "test_dataloader", return_value=[batch, batch])
+        yolo.model.return_value = torch.rand(1, 2, 64, 64)
+        metric = MagicMock()
+        metric.to.return_value = metric
+        metric.compute.return_value = {"Dice": torch.tensor(0.5)}
+        updates: list[float] = []
+        callback = SimpleNamespace(_on_progress_update=updates.append, _min_p=85, _max_p=90)
+
+        result = engine.test(metric=MagicMock(return_value=metric), callbacks=[callback])
+
+        assert metric.update.call_count == 2
+        assert updates == [87.5, 90]
+        assert result["test/Dice"] == pytest.approx(0.5)
+
+    def test_native_datamodule_validation_reports_each_batch(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+        validator = MagicMock()
+        validator.dataloader = [object(), object()]
+        updates: list[float] = []
+        callback = SimpleNamespace(_on_progress_update=updates.append, _min_p=85, _max_p=90)
+
+        def validate(**kwargs) -> dict[str, float]:
+            event, hook = validator.add_callback.call_args.args
+            assert event == "on_val_batch_end"
+            for _ in validator.dataloader:
+                hook(validator)
+            return {"metrics/mAP50(B)": 0.8}
+
+        validator.side_effect = validate
+        with patch.object(engine, "_make_bound_validator", return_value=MagicMock(return_value=validator)):
+            engine.test(callbacks=[callback])
+
+        assert updates == [87.5, 90]
+
+    @pytest.mark.parametrize("fails", [False, True])
+    def test_native_yolo_validation_reports_progress_and_removes_hook(self, mocker, tmp_path, fails) -> None:
+        engine, yolo = _make_engine(tmp_path, mocker)
+        engine._datamodule = None
+        engine._data_root = tmp_path
+        hooks: list = []
+        yolo.callbacks = {"on_val_batch_end": hooks}
+        yolo.add_callback.side_effect = lambda event, hook: yolo.callbacks[event].append(hook)
+        validator = SimpleNamespace(dataloader=[object(), object()])
+        updates: list[float] = []
+        callback = SimpleNamespace(_on_progress_update=updates.append, _min_p=85, _max_p=90)
+
+        def validate(**kwargs) -> dict[str, float]:
+            assert "callbacks" not in kwargs
+            for _ in validator.dataloader:
+                for hook in hooks:
+                    hook(validator)
+            if fails:
+                msg = "validation failed"
+                raise RuntimeError(msg)
+            return {"metrics/mAP50(B)": 0.8}
+
+        yolo.val.side_effect = validate
+        if fails:
+            with pytest.raises(RuntimeError, match="validation failed"):
+                engine.test(callbacks=[callback])
+        else:
+            engine.test(callbacks=[callback])
+
+        assert updates == [87.5, 90]
+        assert hooks == []
 
     def test_format_torchmetrics_results_skips_non_scalar(self) -> None:
         """Non-scalar tensors and known auxiliary keys should be excluded."""

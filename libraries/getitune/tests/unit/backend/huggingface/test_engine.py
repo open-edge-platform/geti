@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, ClassVar
 from unittest.mock import MagicMock, patch
 
@@ -230,6 +231,29 @@ def test_test_defaults_to_best_checkpoint(tmp_path: Path, model: _StubHFModel) -
     engine._model.load_checkpoint.assert_called_once_with(best_dir)
     mock_trainer.evaluate.assert_called_once()
     assert metrics == {"test/map": 0.5}
+
+
+def test_test_adapts_progress_callbacks_before_training_arguments(tmp_path: Path, model: _StubHFModel) -> None:
+    """Application evaluation callbacks must not leak into TrainingArguments."""
+    engine = HFEngine(model=model, data=tmp_path, work_dir=tmp_path, device="cpu")
+    engine._datamodule = MagicMock()
+    progress_values: list[float] = []
+    callback = SimpleNamespace(_on_progress_update=progress_values.append, _min_p=85, _max_p=90)
+    metric_callable = MagicMock()
+    trainer = MagicMock()
+
+    def evaluate(**kwargs) -> dict[str, float]:
+        kwargs["on_progress_update"](0.5)
+        kwargs["on_progress_update"](1.0)
+        return {"test/map": 0.5}
+
+    trainer.evaluate.side_effect = evaluate
+    with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+        metrics = engine.test(metric=metric_callable, callbacks=[callback])
+
+    assert metrics == {"test/map": 0.5}
+    assert progress_values == [87.5, 90.0]
+    metric_callable.assert_called_once_with(model.label_info)
 
 
 @pytest.mark.parametrize(
