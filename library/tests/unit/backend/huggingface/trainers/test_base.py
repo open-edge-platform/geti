@@ -309,6 +309,22 @@ class TestEvaluateOnTestSplitAndPredictBatches:
         assert result["test/map"] == pytest.approx(0.42)
         assert fake_metric.update_calls == 1
 
+    def test_evaluate_reports_progress_after_each_test_batch(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path)
+        batch = next(iter(trainer.get_test_dataloader()))
+        trainer.get_test_dataloader = MagicMock(return_value=[batch, batch])
+        fake_metric = _FakeMetric(0.42)
+        updates: list[float] = []
+
+        trainer.evaluate(
+            split="test",
+            metric=fake_metric,  # pyrefly: ignore[bad-argument-type]
+            on_progress_update=updates.append,
+        )
+
+        assert updates == [0.5, 1.0]
+        assert fake_metric.update_calls == 2
+
     def test_predict_batches_returns_one_batch_per_dataloader_batch(self, tmp_path: Path) -> None:
         trainer = self._build_trainer(tmp_path)
 
