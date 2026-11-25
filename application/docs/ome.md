@@ -798,6 +798,12 @@ also include OME planes. Neither reads nor thumbnails register a plane; the firs
 the plane and its dataset item, without materializing pixels. Coordinate uniqueness is included in the original OME
 migration; video frame indexing is unchanged.
 
+Until step 7 adds materialization, `get_dm_dataset()` rejects selected OME-plane items with an explicit
+unsupported-media error before resolving binary paths. This applies to training and dataset export, including
+view-scoped conversion and export with unannotated items. Planes remain available for annotation and navigation;
+they are never silently skipped to produce an incomplete dataset. Views and annotation filters that exclude
+all OME-plane items can still be converted normally.
+
 _Testing._ Integration test: annotate `(z=12, t=0)`, assert exactly one `ome_plane` row plus one `dataset_item`;
 re-annotate and assert no duplicate row (this is what `uq_parent_id_z_index_t_index` guards). Out-of-range `z`/`t`
 returns 400. Media listing and counting must exclude `ome_plane` rows exactly as they exclude `video_frame`. Deleting

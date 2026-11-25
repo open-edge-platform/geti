@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from io import BytesIO
+from unittest.mock import patch
 from uuid import UUID, uuid4
 
 import numpy as np
@@ -10,11 +11,13 @@ import tifffile
 from PIL import Image
 from sqlalchemy import func, select
 
+from app.datumaro_converter import SampleMode
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewItemDB, MediaDB, OmeImageDB
 from app.models import DatasetItemAnnotation, DatasetItemAnnotationStatus, DatasetItemSubset, LabelReference, Rectangle
 from app.models.media import LEAF_MEDIA_TYPES, ImageFormat, MediaType
 from app.models.ome import OmeChannelSettings
 from app.services.base import ResourceNotFoundError
+from app.services.dataset_service import UnsupportedDatasetMediaError
 from app.services.media_service import MediaFilters
 from app.services.ome.rendering import OmeRenderingService
 
@@ -251,3 +254,50 @@ def test_plane_services_are_project_scoped(ome_annotation, fxt_dataset_service):
         service.list_annotated_ome_planes(other_project_id, image.id)
     with pytest.raises(ResourceNotFoundError):
         OmeRenderingService(service).render_thumbnail(other_project_id, image.id, z=0, t=0)
+
+
+@pytest.mark.parametrize("sample_mode", [SampleMode.TRAINING, SampleMode.IMPORT_EXPORT])
+@pytest.mark.parametrize("annotation_status", [None, DatasetItemAnnotationStatus.WITH_ANNOTATIONS])
+@pytest.mark.parametrize("annotation_state", ["missing", "empty", "labeled"])
+@pytest.mark.parametrize("view_scope", ["project", "included", "excluded"])
+def test_dataset_conversion_rejects_selected_virtual_planes(
+    ome_annotation,
+    fxt_dataset_service,
+    fxt_dataset_view_service,
+    fxt_db_labels,
+    sample_mode,
+    annotation_status,
+    annotation_state,
+    view_scope,
+):
+    """Reject selected planes before path lookup without blocking views or filters that exclude them."""
+    _, project, image = ome_annotation
+    plane = fxt_dataset_service.register_ome_plane(project.id, image.id, z=12, t=0)
+    if annotation_state != "missing":
+        annotations = _annotations(fxt_db_labels[0].id) if annotation_state == "labeled" else []
+        fxt_dataset_service.set_dataset_item_annotations(project, plane.id, annotations, True, None)
+    view_id = None
+    if view_scope != "project":
+        view = fxt_dataset_view_service.create_dataset_view(
+            project.id, "conversion", [image.id] if view_scope == "included" else []
+        )
+        view_id = view.id
+
+    selected = view_scope != "excluded" and (annotation_state != "missing" or annotation_status is None)
+    with patch.object(fxt_dataset_service._media_service, "get_media_binary_path_by_id") as get_path:
+        if selected:
+            with pytest.raises(
+                UnsupportedDatasetMediaError, match="not supported for training or dataset export"
+            ) as error:
+                fxt_dataset_service.get_dm_dataset(
+                    project.id, project.task, annotation_status, sample_mode, dataset_view_id=view_id
+                )
+            assert str(plane.id) in str(error.value)
+            assert "materialization is not implemented" in str(error.value)
+        else:
+            dataset = fxt_dataset_service.get_dm_dataset(
+                project.id, project.task, annotation_status, sample_mode, dataset_view_id=view_id
+            )
+            assert len(dataset) == 0
+        get_path.assert_not_called()
+    assert fxt_dataset_service.get_dataset_item_by_id(project.id, plane.id).id == plane.id

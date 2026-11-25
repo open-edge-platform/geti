@@ -40,7 +40,7 @@
 
 - Before migrating, it takes a **backup of `geti.db`**.
 - If `alembic upgrade head` succeeds, the backup is deleted and the process continues.
-- If `alembic upgrade head` fails, the error is logged so that the use know how to proceed in this situation.
+- If `alembic upgrade head` fails, the error is logged so that the user knows how to proceed in this situation.
 - The process then exits with a dedicated fatal exit code (`3`) so it is not
   restarted in a loop.
 

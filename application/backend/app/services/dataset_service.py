@@ -44,6 +44,10 @@ class AnnotationValidationError(Exception):
         super().__init__(message)
 
 
+class UnsupportedDatasetMediaError(ValueError):
+    """Raised when dataset conversion encounters media without a supported binary loader."""
+
+
 class SubsetAlreadyAssignedError(Exception):
     """Exception raised when subset is being assigned to a dataset item, which already has one assigned."""
 
@@ -379,6 +383,12 @@ class DatasetService(BaseSessionManagedService):
         sample_mode: SampleMode,
         dataset_view_id: UUID | None = None,
     ) -> Dataset:
+        """Convert selected items, rejecting OME planes until materialization is supported.
+
+        Raises:
+            UnsupportedDatasetMediaError: A selected item is a virtual OME plane.
+            ResourceNotFoundError: The requested dataset view does not exist.
+        """
         from app.datumaro_converter import SampleMode, convert_dataset
 
         if dataset_view_id is not None:
@@ -402,6 +412,12 @@ class DatasetService(BaseSessionManagedService):
             information is preserved in the sample, while for other media types or training samples, the media binary
             path is sufficient.
             """
+            if isinstance(media, OmePlane):
+                raise UnsupportedDatasetMediaError(
+                    f"OME plane '{media.id}' is not supported for training or dataset export: "
+                    "plane binary materialization is not implemented. "
+                    "Select a dataset view without OME planes."
+                )
             if isinstance(media, VideoFrame) and sample_mode == SampleMode.IMPORT_EXPORT:
                 return str(
                     self._media_service.get_media_binary_path_by_id(project_id=project_id, media_id=media.video_id)
