@@ -146,7 +146,22 @@ class OmeChannelViewResponse(OmeChannelView):
     """API response containing resolved channel settings and their default/saved status."""
 
 
-MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView, Field(discriminator="type")]
+class OmePlaneView(BaseRequiredIDNameModel):
+    """OME plane with level-zero dimensions and coordinates in its parent."""
+
+    type: Literal[MediaType.OME_PLANE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    source_id: UUID | None = None
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+    annotation_status: MediaAnnotationStatusView
+
+
+MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView | OmePlaneView, Field(discriminator="type")]
 
 MediaViewAdapter: TypeAdapter[MediaView] = TypeAdapter(MediaView)
 
@@ -250,3 +265,16 @@ class AnnotatedVideoFrame(BaseModel):
     media_id: UUID
     frame_index: int
     annotation_data: MediaAnnotations
+
+
+class AnnotatedOmePlane(BaseModel):
+    media_id: UUID
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+    annotation_data: MediaAnnotations
+
+
+class OmePlanesWithPagination(BaseModel):
+    items: list[AnnotatedOmePlane]
+    pagination: Pagination

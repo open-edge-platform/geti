@@ -20,6 +20,10 @@ The collected frames are stored in a _dataset_ (`Dataset`) as _media_ (`Media`),
 examine them and eventually use them, for example, to make the model more robust via fine-tuning.
 It is also possible for the user to manually upload images or videos to a dataset, and annotate them using the built-in
 annotation tool. User cannot annotate whole video, but can annotate certain frames.
+OME microscopy images follow the same container/leaf distinction: an `OmeImage` stores the uploaded container and
+immutable metadata; an `OmePlane` identifies one `(z_index, t_index)` plane via its public `ome_image_id`. The first
+annotation save registers a plane and its `DatasetItem`; it does not extract a separate image file. Display-only
+channel settings are independent of the immutable training channel projection. See [OME support](ome.md).
 A dataset is therefore a collection of image-like or video items (`Media`), each of which may have
 some _annotation_ data (`Annotation`) via _dataset_item_ (`DatasetItem`) that is either a _user annotation_ or a _model prediction_.
 

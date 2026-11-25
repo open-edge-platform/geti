@@ -1,10 +1,15 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from uuid import uuid4
+
 import pytest
 from pydantic import ValidationError
 
+from app.api.schemas.media import MediaViewAdapter
+from app.db.schema import MediaDB
 from app.models import OmeImageInfo
+from app.models.media import ImageFormat, MediaAdapter, MediaType, OmePlane
 from app.models.ome import OmeImageMetadata
 
 
@@ -74,3 +79,53 @@ def test_metadata_rejects_channel_mapping(image_info_data: dict[str, object], in
 
     with pytest.raises(ValidationError, match="channel_mapping"):
         OmeImageMetadata.model_validate(data)
+
+
+def test_plane_orm_round_trip_preserves_public_parent_field():
+    parent_id = uuid4()
+    row = MediaDB(
+        id=str(uuid4()),
+        project_id=str(uuid4()),
+        type=MediaType.OME_PLANE,
+        name="specimen_z12_t1",
+        format=ImageFormat.PNG,
+        width=48,
+        height=32,
+        size=0,
+        source_id=None,
+        parent_id=str(parent_id),
+        z_index=12,
+        t_index=1,
+    )
+    plane = MediaAdapter.validate_python(row)
+    assert isinstance(plane, OmePlane)
+    assert plane.ome_image_id == parent_id
+    view = MediaViewAdapter.validate_python(plane, from_attributes=True).model_dump(mode="json")
+    assert view["ome_image_id"] == str(parent_id)
+    assert "parent_id" not in view
+    assert "video_id" not in view
+    assert "frame_index" not in view
+    assert "frame_index" not in plane.model_dump()
+    assert MediaAdapter.validate_python(plane.model_dump()) == plane
+
+
+@pytest.mark.parametrize("coordinate", ["z_index", "t_index"])
+def test_plane_rejects_negative_coordinates(coordinate):
+    with pytest.raises(ValidationError, match=coordinate):
+        OmePlane.model_validate(
+            {
+                "id": uuid4(),
+                "project_id": uuid4(),
+                "type": "ome_plane",
+                "name": "plane",
+                "format": "png",
+                "width": 48,
+                "height": 32,
+                "size": 0,
+                "source_id": None,
+                "ome_image_id": uuid4(),
+                "z_index": 0,
+                "t_index": 0,
+                coordinate: -1,
+            }
+        )

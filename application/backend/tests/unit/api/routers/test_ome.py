@@ -13,6 +13,7 @@ from PIL import Image as PILImage
 from app.api.dependencies import get_ome_rendering_service
 from app.api.routers import media, ome
 from app.api.schemas.media import OmeChannelViewResponse
+from app.models import DatasetItemAnnotation, LabelReference, Rectangle
 from app.models.ome import GrayscaleProjection, OmeChannelView, OmeImageMetadata, RgbChannelAssignment, RgbProjection
 from app.services import ResourceNotFoundError, ResourceType
 from app.services.base import InvalidImageError
@@ -38,6 +39,7 @@ def fxt_rendering_service(fxt_app: FastAPI) -> MagicMock:
         ("channel-view", "get", "get_ome_channel_view"),
         ("channel-view", "put", "set_ome_channel_view"),
         ("render", "get", "render_ome_plane"),
+        ("planes", "get", "list_ome_planes"),
     ],
 )
 def test_ome_routes_preserve_api_contract(fxt_app: FastAPI, suffix: str, method: str, handler: str) -> None:
@@ -94,6 +96,14 @@ def test_ome_structure_openapi_uses_channel_projection(fxt_app):
     assert schema["properties"]["channel_projection"]["discriminator"]["propertyName"] == "mode"
 
 
+def test_ome_plane_openapi_uses_coordinates_without_changing_video_frames(fxt_app):
+    schemas = fxt_app.openapi()["components"]["schemas"]
+    assert "frame_index" not in schemas["OmePlaneView"]["properties"]
+    assert {"ome_image_id", "z_index", "t_index"} <= set(schemas["OmePlaneView"]["required"])
+    assert "frame_index" in schemas["VideoFrameView"]["required"]
+    assert "video_id" in schemas["VideoFrameView"]["required"]
+
+
 @pytest.mark.parametrize("expected", [400, 404])
 def test_get_ome_structure_errors(fxt_get_project, fxt_media_service, fxt_client, expected):
     media_id = uuid4()
@@ -103,6 +113,68 @@ def test_get_ome_structure_errors(fxt_get_project, fxt_media_service, fxt_client
         else ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
     )
     response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/ome")
+    assert response.status_code == expected
+
+
+def test_list_ome_planes_forwards_filters_and_pagination(fxt_get_project, fxt_media_service, fxt_client):
+    media_id = uuid4()
+    fxt_media_service.list_annotated_ome_planes.return_value = ([], 7)
+    response = fxt_client.get(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/planes?z=12&t=0&limit=2&offset=8"
+    )
+    assert response.status_code == 200
+    assert response.json() == {"items": [], "pagination": {"limit": 2, "offset": 8, "total": 7, "count": 0}}
+    fxt_media_service.list_annotated_ome_planes.assert_called_once_with(
+        fxt_get_project.id, media_id, z=12, t=0, limit=2, offset=8
+    )
+
+
+def test_list_ome_planes_serializes_annotations(fxt_get_project, fxt_media_service, fxt_client):
+    media_id, plane_id = uuid4(), uuid4()
+    annotations = [
+        DatasetItemAnnotation(labels=[LabelReference(id=uuid4())], shape=Rectangle(x=1, y=2, width=3, height=4))
+    ]
+    item = MagicMock(annotation_data=annotations, user_reviewed=True, prediction_model_id=None, subset="training")
+    plane = MagicMock(id=plane_id, ome_image_id=media_id, z_index=12, t_index=1)
+    fxt_media_service.list_annotated_ome_planes.return_value = ([(item, plane)], 3)
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/planes?limit=1&offset=2")
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            {
+                "media_id": str(plane_id),
+                "ome_image_id": str(media_id),
+                "z_index": 12,
+                "t_index": 1,
+                "annotation_data": {
+                    "media_id": str(plane_id),
+                    "annotations": [annotation.model_dump(mode="json") for annotation in annotations],
+                    "user_reviewed": True,
+                    "prediction_model_id": None,
+                    "subset": "training",
+                },
+            }
+        ],
+        "pagination": {"limit": 1, "offset": 2, "total": 3, "count": 1},
+    }
+
+
+@pytest.mark.parametrize("query", ["limit=0", "limit=101", "offset=-1"])
+def test_list_ome_planes_rejects_invalid_pagination(fxt_get_project, fxt_media_service, fxt_client, query):
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{uuid4()}/planes?{query}")
+    assert response.status_code == 422
+    fxt_media_service.list_annotated_ome_planes.assert_not_called()
+
+
+@pytest.mark.parametrize("expected", [400, 404])
+def test_list_ome_planes_errors(fxt_get_project, fxt_media_service, fxt_client, expected):
+    media_id = uuid4()
+    fxt_media_service.list_annotated_ome_planes.side_effect = (
+        ValueError("Media is not an OME image.")
+        if expected == 400
+        else ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
+    )
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/planes")
     assert response.status_code == expected
 
 

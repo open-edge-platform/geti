@@ -17,7 +17,7 @@ from app.models import (
     Project,
     VideoFrame,
 )
-from app.models.media import Media, MediaListPredictionRequest, MediaType, Video, VideoRange
+from app.models.media import Media, MediaListPredictionRequest, MediaType, OmeImage, OmePlane, Video, VideoRange
 from app.models.system import DeviceInfo
 
 from .base import BaseSessionManagedService, ResourceError, ResourceNotFoundError, ResourceType
@@ -109,7 +109,7 @@ class MediaPredictionService(BaseSessionManagedService):
             media = media_dict.get(media_request.media_id, None)
             if media is None:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_request.media_id))
-            if media.type == MediaType.OME_IMAGE:
+            if isinstance(media, OmeImage | OmePlane):
                 raise ValueError("OME plane prediction is not available yet.")
             if media_request.range is None:
                 if media.type == MediaType.VIDEO:

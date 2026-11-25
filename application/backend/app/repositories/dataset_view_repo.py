@@ -13,16 +13,16 @@ from sqlalchemy.orm import Session
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewDB, DatasetViewItemDB, MediaDB
 from app.models import DatasetItemSubset
 from app.models.dataset_item import DatasetItemSortBy
-from app.models.media import MediaSortBy, MediaType, SortDirection
+from app.models.media import LEAF_MEDIA_TYPES, MediaSortBy, MediaType, SortDirection
 
 from .base import BaseRepository
 from .filters import (
     _apply_annotation_status_filter,
-    _apply_annotation_status_filter_with_video_support,
+    _apply_annotation_status_filter_with_container_support,
     _apply_date_range_filter,
-    _apply_label_filter_with_video_support,
+    _apply_label_filter_with_container_support,
     _apply_subset_filter,
-    _apply_subset_filter_with_video_support,
+    _apply_subset_filter_with_container_support,
 )
 
 # Maps each sortable field to its underlying DB column. Extend these when a new sort option is introduced.
@@ -79,7 +79,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
 
     def touch_views_containing_media(self, media_id: str) -> None:
         """
-        Bump ``updated_at`` on every view the given media belongs to, directly or via its parent video.
+        Bump ``updated_at`` on every view the given media belongs to, directly or via its parent container.
 
         Must be called *before* deleting the media: the deletion cascades its ``dataset_view_items`` rows, so
         without this the membership change would leave no trace and stale revisions would look up to date.
@@ -134,7 +134,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
 
@@ -146,7 +146,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
 
@@ -168,13 +168,13 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             .where(
                 DatasetViewItemDB.dataset_view_id == dataset_view_id,
                 MediaDB.project_id == self.project_id,
-                MediaDB.type != MediaType.VIDEO_FRAME,
+                MediaDB.type.not_in(LEAF_MEDIA_TYPES),
             )
         )
         stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         return self.db.scalar(stmt) or 0
 
     def list_media(  # noqa: PLR0913
@@ -195,9 +195,9 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             DatasetItemDB, DatasetItemDB.id == MediaDB.id, isouter=True
         )
         stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         sort_column = _MEDIA_SORT_BY_COLUMN[sort_by]
         order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
         stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
@@ -217,9 +217,9 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             DatasetItemDB, DatasetItemDB.id == MediaDB.id, isouter=True
         )
         stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         return tuple((media_id, media_type) for media_id, media_type in self.db.execute(stmt).all())
 
     def _base_item_select(self, dataset_view_id: str) -> Select:

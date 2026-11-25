@@ -18,6 +18,7 @@ from app.services.media_service import MediaService
 from app.services.ome.projection import channel_intensity_range, window_channel
 from app.services.ome.protocols import OmeImageHandle
 from app.services.ome.registry import OmeReaderRegistry, UnsupportedOmeStorageError
+from app.utils.images import crop_to_thumbnail
 
 _DEFAULT_COLORS: tuple[str, ...] = ("#FF0000", "#00FF00", "#0000FF")
 _RENDER_VERSION: int = 1
@@ -305,4 +306,15 @@ class OmeRenderingService:
             BytesIO() as buffer,
         ):
             image.save(buffer, format="PNG")
+            return buffer.getvalue()
+
+    def render_thumbnail(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> bytes:
+        """Render a bounded, display-view-aware JPEG without registering or materializing a plane."""
+        info = self.media_service.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        selection = self.resolve_render(
+            project_id, media_id, z=z, t=t, level=max(0, len(info.pyramid_levels) - 1), max_size=256
+        )
+        with Image.open(BytesIO(self.render(selection))) as image, BytesIO() as buffer:
+            thumbnail = crop_to_thumbnail(image=image, target_width=256, target_height=256)
+            thumbnail.save(buffer, format="JPEG")
             return buffer.getvalue()

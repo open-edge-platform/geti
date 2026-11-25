@@ -25,6 +25,12 @@ from the video, assigns it an ID, and saves it as an image; the extracted frame 
 considered a media, supporting all the operations that are normally possible for images.
 A media may have a reference to a source, e.g. the camera from which it was acquired.
 
+OME-TIFF containers (`ome_image`) can also be uploaded. Their `(z, t)` planes are annotated through the same annotation
+endpoints using both coordinates. The first save registers an `ome_plane` and dataset item, without extracting pixels;
+the plane exposes `ome_image_id`, `z_index` and `t_index`. Media lists exclude planes, just as they exclude video
+frames. A container's `/planes` endpoint lists annotated planes with their annotations and pagination; plane thumbnails
+render on demand without creating files. See [OME support](ome.md#55-plane-listing-and-thumbnails) for the contract.
+
 A _dataset item_, on the other hand, is the fundamental unit of a machine learning dataset.
 Each dataset item corresponds to an annotated image or video frame, enriched with metadata that is relevant for ML tasks.
 Each dataset item typically contains:
@@ -92,6 +98,8 @@ from the dataset automatically removes it from all views.
 Membership in a view is tracked at the _media_ level (images and videos), not at the dataset item level. This allows
 a video to be assigned to a view as soon as it is uploaded, even before any of its frames have been annotated (and
 therefore before a dataset item exists for it).
+OME containers follow the same rule: assign the `ome_image`, not individual `ome_plane` IDs. Its registered planes'
+dataset items inherit membership from the container.
 
 Views are managed through the `/api/projects/<project_id>/dataset/views` endpoints (create, rename, delete, assign
 and unassign media). The _content_ of a view is however not listed there: the regular dataset listing endpoints
