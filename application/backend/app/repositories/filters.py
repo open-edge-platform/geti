@@ -3,11 +3,12 @@
 
 from datetime import datetime
 
-from sqlalchemy import Select, exists, func, select
+from sqlalchemy import Select, case, exists, func, select
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
-from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
+from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB, OmeImageDB
 from app.models import DatasetItemAnnotationStatus, MediaType
+from app.models.media import CONTAINER_MEDIA_TYPES
 
 
 def _apply_date_range_filter(
@@ -44,12 +45,13 @@ def _apply_annotation_status_filter(stmt: Select, annotation_status: str | None 
     return stmt
 
 
-def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_status: str | None = None) -> Select:
-    """Apply annotation status filter to a media query, accounting for the video/frame hierarchy.
+def _apply_annotation_status_filter_with_container_support(
+    stmt: Select, annotation_status: str | None = None
+) -> Select:
+    """Apply annotation status filters across video/frame and OME image/plane hierarchies.
 
-    Unlike the base filter, this handles the case where videos do not have their own
-    ``DatasetItemDB`` rows. A video is considered annotated if at least one of its
-    frames has a ``DatasetItemDB`` with non-null ``annotation_data``.
+    Containers have no dataset item of their own. They match WITH_ANNOTATIONS if any child is annotated,
+    and MISSING_ANNOTATIONS while fewer than their total frame/plane count are annotated.
 
     Args:
         stmt: The base SQLAlchemy select statement, expected to have ``MediaDB`` as its
@@ -61,57 +63,50 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
         The select statement with the annotation status condition applied.
     """
     if annotation_status == DatasetItemAnnotationStatus.WITH_ANNOTATIONS:
-        # Images/frames: have a dataset_item with annotation_data
-        # Videos: have no dataset_item themselves, but at least one annotated frame
-        frame_alias = aliased(MediaDB)
-        annotated_frame_exists = exists(
-            select(frame_alias.id)
-            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
+        child_alias = aliased(MediaDB)
+        annotated_child_exists = exists(
+            select(child_alias.id)
+            .join(DatasetItemDB, DatasetItemDB.id == child_alias.id)
             .where(
-                frame_alias.parent_id == MediaDB.id,
+                child_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
         )
         stmt = stmt.where(
-            (MediaDB.type != MediaType.VIDEO)
-            & (DatasetItemDB.annotation_data.isnot(None))  # image or frame with annotation
-            | (
-                (MediaDB.type == MediaType.VIDEO) & annotated_frame_exists  # video with at least one annotated frame
-            )
+            (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES)) & (DatasetItemDB.annotation_data.isnot(None))
+            | (MediaDB.type.in_(CONTAINER_MEDIA_TYPES) & annotated_child_exists)
         )
     elif annotation_status == DatasetItemAnnotationStatus.MISSING_ANNOTATIONS:
-        frame_alias = aliased(MediaDB)
-        annotated_frame_count = (
-            select(func.count(frame_alias.id))
-            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
+        child_alias = aliased(MediaDB)
+        annotated_child_count = (
+            select(func.count(child_alias.id))
+            .join(DatasetItemDB, DatasetItemDB.id == child_alias.id)
             .where(
-                frame_alias.parent_id == MediaDB.id,
+                child_alias.parent_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
             )
             .correlate(MediaDB)
             .scalar_subquery()
         )
+        plane_count = (
+            select(OmeImageDB.size_z * OmeImageDB.size_t)
+            .where(OmeImageDB.media_id == MediaDB.id)
+            .correlate(MediaDB)
+            .scalar_subquery()
+        )
+        total_child_count = case((MediaDB.type == MediaType.OME_IMAGE, plane_count), else_=MediaDB.frame_count)
         stmt = stmt.where(
-            (MediaDB.type != MediaType.VIDEO)
-            & (DatasetItemDB.annotation_data.is_(None))  # image or frame missing annotation
-            | (
-                (MediaDB.type == MediaType.VIDEO)
-                & (annotated_frame_count < MediaDB.frame_count)  # not all frames annotated
-            )
+            (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES)) & (DatasetItemDB.annotation_data.is_(None))
+            | (MediaDB.type.in_(CONTAINER_MEDIA_TYPES) & (annotated_child_count < total_child_count))
         )
     return stmt
 
 
-def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | None = None) -> Select:
-    """Apply a label filter to a media query, accounting for the video/frame hierarchy.
+def _apply_label_filter_with_container_support(stmt: Select, label_ids: list[str] | None = None) -> Select:
+    """Apply a label filter across video/frame and OME image/plane hierarchies.
 
-    Unlike a plain join on ``DatasetItemLabelDB``, this also works for videos, which do
-    not have their own ``DatasetItemDB`` rows. A video is considered to match a label if
-    at least one of its frames has a ``DatasetItemDB`` annotated with one of the given
-    labels. In that case the video itself is returned (not its individual frames).
-
-    Images and video frames match when their own dataset item carries one of the labels.
+    Containers match if any child carries a requested label; images and leaves match their own dataset items.
 
     Args:
         stmt: The base SQLAlchemy select statement, expected to have ``MediaDB`` as its
@@ -124,7 +119,6 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
     if not label_ids:
         return stmt
 
-    # Image or frame: its own dataset item carries one of the requested labels
     own_label_exists = exists(
         select(DatasetItemLabelDB.dataset_item_id)
         .where(
@@ -134,21 +128,20 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
         .correlate(MediaDB)
     )
 
-    # Video: at least one of its frames has a dataset item carrying one of the requested labels
-    frame_alias = aliased(MediaDB)
-    frame_label_exists = exists(
-        select(frame_alias.id)
-        .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == frame_alias.id)
+    child_alias = aliased(MediaDB)
+    child_label_exists = exists(
+        select(child_alias.id)
+        .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == child_alias.id)
         .where(
-            frame_alias.parent_id == MediaDB.id,
+            child_alias.parent_id == MediaDB.id,
             DatasetItemLabelDB.label_id.in_(label_ids),
         )
         .correlate(MediaDB)
     )
 
     return stmt.where(
-        ((MediaDB.type != MediaType.VIDEO) & own_label_exists)
-        | ((MediaDB.type == MediaType.VIDEO) & frame_label_exists)
+        (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES) & own_label_exists)
+        | (MediaDB.type.in_(CONTAINER_MEDIA_TYPES) & child_label_exists)
     )
 
 
@@ -159,15 +152,10 @@ def _apply_subset_filter(stmt: Select, subsets: list[str] | None = None) -> Sele
     return stmt
 
 
-def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | None = None) -> Select:
-    """Apply a subset filter to a media query, accounting for the video/frame hierarchy.
+def _apply_subset_filter_with_container_support(stmt: Select, subsets: list[str] | None = None) -> Select:
+    """Apply a subset filter across video/frame and OME image/plane hierarchies.
 
-    Unlike a plain filter on ``DatasetItemDB.subset``, this also works for videos, which do
-    not have their own ``DatasetItemDB`` rows. A video is considered to match if at least
-    one of its frames has a ``DatasetItemDB`` belonging to one of the given subsets. In that
-    case the video itself is returned (not its individual frames).
-
-    Images and video frames match when their own dataset item belongs to one of the subsets.
+    Containers match if any child belongs to a requested subset; images and leaves match their own dataset items.
 
     Args:
         stmt: The base SQLAlchemy select statement, expected to have ``MediaDB`` as its
@@ -180,7 +168,6 @@ def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | N
     if not subsets:
         return stmt
 
-    # Image or frame: its own dataset item belongs to one of the requested subsets
     own_subset_exists = exists(
         select(DatasetItemDB.id)
         .where(
@@ -190,19 +177,18 @@ def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | N
         .correlate(MediaDB)
     )
 
-    # Video: at least one of its frames has a dataset item belonging to one of the requested subsets.
-    frame_alias = aliased(MediaDB)
-    frame_subset_exists = exists(
-        select(frame_alias.id)
-        .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
+    child_alias = aliased(MediaDB)
+    child_subset_exists = exists(
+        select(child_alias.id)
+        .join(DatasetItemDB, DatasetItemDB.id == child_alias.id)
         .where(
-            frame_alias.parent_id == MediaDB.id,
+            child_alias.parent_id == MediaDB.id,
             DatasetItemDB.subset.in_(subsets),
         )
         .correlate(MediaDB)
     )
 
     return stmt.where(
-        ((MediaDB.type != MediaType.VIDEO) & own_subset_exists)
-        | ((MediaDB.type == MediaType.VIDEO) & frame_subset_exists)
+        (MediaDB.type.not_in(CONTAINER_MEDIA_TYPES) & own_subset_exists)
+        | (MediaDB.type.in_(CONTAINER_MEDIA_TYPES) & child_subset_exists)
     )

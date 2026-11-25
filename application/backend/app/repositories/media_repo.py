@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from typing import cast
 
 from sqlalchemy import CursorResult, Select, delete, func, select
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, MediaDB
@@ -12,9 +13,9 @@ from app.models import MediaType
 from app.models.media import MediaSortBy, SortDirection
 
 from .filters import (
-    _apply_annotation_status_filter_with_video_support,
-    _apply_label_filter_with_video_support,
-    _apply_subset_filter_with_video_support,
+    _apply_annotation_status_filter_with_container_support,
+    _apply_label_filter_with_container_support,
+    _apply_subset_filter_with_container_support,
 )
 
 # Maps each sortable field to its underlying DB column. Extend this when a new
@@ -78,9 +79,9 @@ class MediaRepository:
         if exclude_types:
             stmt = stmt.where(MediaDB.type.not_in(exclude_types))
         stmt = self._apply_date_filters(stmt, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         return self.db.scalar(stmt) or 0
 
     def list_items(  # noqa: PLR0913
@@ -100,9 +101,9 @@ class MediaRepository:
         if exclude_types:
             stmt = stmt.where(MediaDB.type.not_in(exclude_types))
         stmt = self._apply_date_filters(stmt, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         sort_column = _SORT_BY_COLUMN[sort_by]
         order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
         stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
@@ -122,9 +123,9 @@ class MediaRepository:
         if exclude_types:
             stmt = stmt.where(MediaDB.type.not_in(exclude_types))
         stmt = self._apply_date_filters(stmt, start_date, end_date)
-        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
-        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        stmt = _apply_annotation_status_filter_with_container_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_container_support(stmt, subsets)
+        stmt = _apply_label_filter_with_container_support(stmt, label_ids)
         return tuple((media_id, media_type) for media_id, media_type in self.db.execute(stmt).all())
 
     def get_earliest(self) -> MediaDB | None:
@@ -159,6 +160,67 @@ class MediaRepository:
     def get_video_frame_by_video_id_and_index(self, video_id: str, frame_index: int) -> MediaDB | None:
         stmt = self._base_select().where(MediaDB.parent_id == video_id, MediaDB.frame_index == frame_index)
         return self.db.scalar(stmt)
+
+    def create_ome_plane(self, plane: MediaDB) -> MediaDB:
+        """Register a plane once, including concurrent attempts for the same coordinates."""
+        self.db.execute(
+            insert(MediaDB)
+            .values(
+                id=plane.id,
+                project_id=self.project_id,
+                type=plane.type,
+                name=plane.name,
+                format=plane.format,
+                width=plane.width,
+                height=plane.height,
+                size=plane.size,
+                source_id=plane.source_id,
+                parent_id=plane.parent_id,
+                z_index=plane.z_index,
+                t_index=plane.t_index,
+            )
+            .on_conflict_do_nothing(index_elements=["parent_id", "z_index", "t_index"])
+        )
+        return self.db.scalars(
+            self._base_select().where(
+                MediaDB.parent_id == plane.parent_id,
+                MediaDB.z_index == plane.z_index,
+                MediaDB.t_index == plane.t_index,
+            )
+        ).one()
+
+    def get_ome_plane(self, image_id: str, z: int, t: int) -> MediaDB | None:
+        return self.db.scalar(
+            self._base_select().where(
+                MediaDB.type == MediaType.OME_PLANE,
+                MediaDB.parent_id == image_id,
+                MediaDB.z_index == z,
+                MediaDB.t_index == t,
+            )
+        )
+
+    def list_annotated_ome_planes(
+        self, image_id: str, *, z: int | None, t: int | None, limit: int, offset: int
+    ) -> tuple[list[tuple[DatasetItemDB, MediaDB]], int]:
+        """List only planes with annotation data, including explicitly empty annotations."""
+        stmt = (
+            select(DatasetItemDB, MediaDB)
+            .join(MediaDB, MediaDB.id == DatasetItemDB.id)
+            .where(
+                MediaDB.project_id == self.project_id,
+                DatasetItemDB.project_id == self.project_id,
+                MediaDB.type == MediaType.OME_PLANE,
+                MediaDB.parent_id == image_id,
+                DatasetItemDB.annotation_data.is_not(None),
+            )
+        )
+        if z is not None:
+            stmt = stmt.where(MediaDB.z_index == z)
+        if t is not None:
+            stmt = stmt.where(MediaDB.t_index == t)
+        total = self.db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+        rows = self.db.execute(stmt.order_by(MediaDB.t_index, MediaDB.z_index).offset(offset).limit(limit)).all()
+        return [(item, media) for item, media in rows], total
 
     def search_video_frames_by_video_id_and_indexes(self, video_id: str, frame_indexes: list[int]) -> list[MediaDB]:
         stmt = self._base_select().where(MediaDB.parent_id == video_id, MediaDB.frame_index.in_(frame_indexes))
@@ -197,7 +259,7 @@ class MediaRepository:
         return set(self.db.scalars(stmt).all())
 
     def count_annotated_video_frames_by_video_ids(self, video_ids: Sequence[str]) -> dict[str, int]:
-        """Count the annotated frames of each given video. Videos without annotated frames are omitted."""
+        """Count annotated children of each parent (videos or OME images); omit parents without annotations."""
         if not video_ids:
             return {}
         stmt = (

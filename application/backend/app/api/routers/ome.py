@@ -7,8 +7,9 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from starlette.responses import Response
 
 from app.api.dependencies import get_media_service, get_ome_rendering_service, get_project
-from app.api.schemas.media import OmeChannelViewResponse
+from app.api.schemas.media import AnnotatedOmePlane, MediaAnnotations, OmeChannelViewResponse, OmePlanesWithPagination
 from app.api.validators import MediaID
+from app.core.models import Pagination
 from app.models import Project
 from app.models.ome import OmeChannelSettings, OmeImageMetadata
 from app.services import MediaService
@@ -29,6 +30,52 @@ OME_RENDER_RESPONSE_HEADERS: dict[str, Any] = {
         "schema": {"type": "string"},
     },
 }
+
+
+@router.get(
+    "/{media_id}/planes",
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "Media is not OME or z/t is out of range"},
+        status.HTTP_404_NOT_FOUND: {"description": "Project or media not found"},
+    },
+)
+def list_ome_planes(
+    project: Annotated[Project, Depends(get_project)],
+    media_id: MediaID,
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+    z: Annotated[int | None, Query(description="Filter by Z index")] = None,
+    t: Annotated[int | None, Query(description="Filter by T index")] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> OmePlanesWithPagination:
+    """List annotated planes with their labels, ordered by T then Z; empty annotations count."""
+    try:
+        planes, total = media_service.list_annotated_ome_planes(
+            project.id, media_id, z=z, t=t, limit=limit, offset=offset
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
+    return OmePlanesWithPagination(
+        items=[
+            AnnotatedOmePlane(
+                media_id=plane.id,
+                ome_image_id=plane.ome_image_id,
+                z_index=plane.z_index,
+                t_index=plane.t_index,
+                annotation_data=MediaAnnotations.model_validate(
+                    {
+                        "media_id": plane.id,
+                        "annotations": item.annotation_data,
+                        "user_reviewed": item.user_reviewed,
+                        "prediction_model_id": item.prediction_model_id,
+                        "subset": item.subset,
+                    }
+                ),
+            )
+            for item, plane in planes
+        ],
+        pagination=Pagination(limit=limit, offset=offset, total=total, count=len(planes)),
+    )
 
 
 @router.get(

@@ -210,6 +210,8 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 # these modules must be discoverable by the child even though they are only imported
 # dynamically inside the training / export code paths.
 hiddenimports += [
+    # Shared utilities imported by dynamically loaded Alembic revisions
+    'app.alembic.utils',
     # Lightning internals used by Trainer
     'lightning.pytorch.callbacks',
     'lightning.pytorch.loggers',

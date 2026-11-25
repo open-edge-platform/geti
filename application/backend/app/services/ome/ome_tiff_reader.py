@@ -16,7 +16,8 @@ from app.models import MediaStorage, OmeImageInfo, Region
 from app.services.base import InvalidImageError
 
 if TYPE_CHECKING:
-    from xml.etree.ElementTree import Element
+    # Type-only import; XML parsing uses defusedxml.
+    from xml.etree.ElementTree import Element  # nosec B405
 
 _MAX_SEGMENT_BYTES: int = 64 * 1024 * 1024
 

@@ -164,6 +164,7 @@ class MediaDB(BaseID):
     __table_args__ = (
         Index("idx_media_parent_id", "parent_id"),
         UniqueConstraint("parent_id", "frame_index", name="uq_parent_id_frame_index"),
+        Index("uq_parent_id_z_index_t_index", "parent_id", "z_index", "t_index", unique=True),
     )
 
     project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)

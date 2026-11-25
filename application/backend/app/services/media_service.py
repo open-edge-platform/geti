@@ -28,11 +28,13 @@ from app.models import (
     VideoFrame,
 )
 from app.models.media import (
+    CONTAINER_MEDIA_TYPES,
     ImageFormat,
     MediaAdapter,
     MediaAnnotationStatus,
     MediaSortBy,
     OmeImage,
+    OmePlane,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
@@ -113,9 +115,11 @@ def to_media_with_annotation_status(repo: MediaRepository, media_dbs: Sequence[M
     Returns:
         The domain media, in the same order as ``media_dbs``.
     """
-    annotated_media_ids = repo.list_annotated_media_ids([m.id for m in media_dbs if m.type != MediaType.VIDEO])
+    annotated_media_ids = repo.list_annotated_media_ids(
+        [m.id for m in media_dbs if m.type not in CONTAINER_MEDIA_TYPES]
+    )
     annotated_frame_counts = repo.count_annotated_video_frames_by_video_ids(
-        [m.id for m in media_dbs if m.type == MediaType.VIDEO]
+        [m.id for m in media_dbs if m.type in CONTAINER_MEDIA_TYPES]
     )
     media_list: list[Media] = []
     for media_db in media_dbs:
@@ -123,7 +127,9 @@ def to_media_with_annotation_status(repo: MediaRepository, media_dbs: Sequence[M
         annotation_status = (
             VideoAnnotationStatus(annotated_video_frames=annotated_frame_counts.get(media_db.id, 0))
             if isinstance(media, Video)
-            else MediaAnnotationStatus(has_annotations=media_db.id in annotated_media_ids)
+            else MediaAnnotationStatus(
+                has_annotations=media_db.id in annotated_media_ids or annotated_frame_counts.get(media_db.id, 0) > 0
+            )
         )
         media_list.append(media.model_copy(update={"annotation_status": annotation_status}))
     return media_list
@@ -423,6 +429,63 @@ class MediaService(BaseSessionManagedService):
         self.get_media_thumbnail_path_by_id(project_id, media_id).unlink(missing_ok=True)
         discard_media_storage(storage, None if storage.is_directory else MediaStorage(root=upload_path))
 
+    def validate_ome_plane_selection(
+        self, project_id: UUID, media_id: UUID, *, z: int | None, t: int | None
+    ) -> OmeImageMetadata:
+        """Validate any supplied coordinates against the immutable container dimensions."""
+        info = self.get_ome_image_info(project_id, media_id)
+        if (z is not None and not 0 <= z < info.size_z) or (t is not None and not 0 <= t < info.size_t):
+            raise ValueError("OME z or t selection is out of range.")
+        return info
+
+    def get_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane | None:
+        """Resolve a registered plane without creating rows or materializing pixels."""
+        self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        repo = MediaRepository(str(project_id), self.db_session)
+        row = repo.get_ome_plane(str(media_id), z, t)
+        return OmePlane.model_validate(row) if row is not None else None
+
+    def create_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane:
+        """Idempotently register plane metadata; its pixels remain in the parent container."""
+        info = self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        image = self.get_media_by_id(project_id, media_id)
+        repo = MediaRepository(str(project_id), self.db_session)
+        row = repo.create_ome_plane(
+            MediaDB(
+                id=str(uuid4()),
+                project_id=str(project_id),
+                type=MediaType.OME_PLANE,
+                name=f"{image.name}_z{z}_t{t}",
+                format=ImageFormat.PNG,
+                width=info.size_x,
+                height=info.size_y,
+                size=0,
+                source_id=image.source_id,
+                parent_id=str(media_id),
+                z_index=z,
+                t_index=t,
+            )
+        )
+        return OmePlane.model_validate(row)
+
+    def list_annotated_ome_planes(
+        self,
+        project_id: UUID,
+        media_id: UUID,
+        *,
+        z: int | None = None,
+        t: int | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> tuple[list[tuple[DatasetItem, OmePlane]], int]:
+        """Return annotated planes in T-major, Z-minor order and their filtered count."""
+        self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        if limit < 1 or offset < 0:
+            raise ValueError("Plane pagination requires a positive limit and non-negative offset.")
+        repo = MediaRepository(str(project_id), self.db_session)
+        rows, total = repo.list_annotated_ome_planes(str(media_id), z=z, t=t, limit=limit, offset=offset)
+        return [(DatasetItem.model_validate(item), OmePlane.model_validate(plane)) for item, plane in rows], total
+
     def count_media(
         self,
         project: Project,
@@ -553,6 +616,12 @@ class MediaService(BaseSessionManagedService):
         """Delete a media by its ID"""
         media = self.get_media_by_id(project_id=project.id, media_id=media_id)
         repo = MediaRepository(project_id=str(project.id), db=self.db_session)
+
+        if isinstance(media, OmePlane):
+            view_repo = DatasetViewRepository(project_id=str(project.id), db=self.db_session)
+            view_repo.touch_views_containing_media(str(media.id))
+            repo.delete(obj_id=str(media.id))
+            return
 
         storage = self.get_media_storage(project_id=project.id, media=media)
         binary_path = storage.effective_path
