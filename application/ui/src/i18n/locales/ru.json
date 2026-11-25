@@ -800,6 +800,21 @@
             "annotation": "Разметка",
             "prediction": "Результаты модели"
         },
+        "copyPaste": {
+            "copied_one": "Скопирован {{count}} объект разметки",
+            "copied_few": "Скопировано {{count}} объекта разметки",
+            "copied_many": "Скопировано {{count}} объектов разметки",
+            "copied_other": "Скопировано {{count}} объекта разметки",
+            "skippedSummary": "{{pasted}} вставлено, {{skipped}} пропущено: {{reasons}}",
+            "labelMissing_one": "{{count}} класс больше не существует",
+            "labelMissing_few": "{{count}} класса больше не существуют",
+            "labelMissing_many": "{{count}} классов больше не существуют",
+            "labelMissing_other": "{{count}} класса больше не существуют",
+            "outsideImage_one": "{{count}} объект разметки за пределами изображения",
+            "outsideImage_few": "{{count}} объекта разметки за пределами изображения",
+            "outsideImage_many": "{{count}} объектов разметки за пределами изображения",
+            "outsideImage_other": "{{count}} объекта разметки за пределами изображения"
+        },
         "predictions": {
             "settingsTitle": "Настройки результатов модели",
             "confirm": "Принять как разметку"
@@ -815,6 +830,8 @@
             "selectAllAnnotations": "Выбрать все объекты разметки",
             "deselectAllAnnotations": "Снять выделение со всех объектов разметки",
             "selectNextAnnotation": "Выбрать следующий объект разметки",
+            "copyAnnotations": "Копировать выбранные объекты разметки",
+            "pasteAnnotations": "Вставить объекты разметки",
             "resetZoom": "Сбросить масштаб"
         },
         "tools": {

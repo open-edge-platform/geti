@@ -754,6 +754,15 @@
             "annotation": "标注",
             "prediction": "预测"
         },
+        "copyPaste": {
+            "copied_one": "已复制 {{count}} 个标注",
+            "copied_other": "已复制 {{count}} 个标注",
+            "skippedSummary": "已粘贴 {{pasted}} 个，已跳过 {{skipped}} 个：{{reasons}}",
+            "labelMissing_one": "{{count}} 个标签已不存在",
+            "labelMissing_other": "{{count}} 个标签已不存在",
+            "outsideImage_one": "{{count}} 个超出图像范围",
+            "outsideImage_other": "{{count}} 个超出图像范围"
+        },
         "predictions": {
             "settingsTitle": "预测设置",
             "confirm": "确认预测"
@@ -769,6 +778,8 @@
             "selectAllAnnotations": "选择所有标注",
             "deselectAllAnnotations": "取消选择所有标注",
             "selectNextAnnotation": "选择下一个标注",
+            "copyAnnotations": "复制所选标注",
+            "pasteAnnotations": "粘贴标注",
             "resetZoom": "重置缩放"
         },
         "tools": {

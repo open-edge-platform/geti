@@ -754,6 +754,15 @@
             "annotation": "Annotatie",
             "prediction": "Voorspelling"
         },
+        "copyPaste": {
+            "copied_one": "{{count}} annotatie gekopieerd",
+            "copied_other": "{{count}} annotaties gekopieerd",
+            "skippedSummary": "{{pasted}} geplakt, {{skipped}} overgeslagen: {{reasons}}",
+            "labelMissing_one": "{{count}} label bestaat niet meer",
+            "labelMissing_other": "{{count}} labels bestaan niet meer",
+            "outsideImage_one": "{{count}} annotatie buiten de afbeelding",
+            "outsideImage_other": "{{count}} annotaties buiten de afbeelding"
+        },
         "predictions": {
             "settingsTitle": "Voorspellingsinstellingen",
             "confirm": "Voorspelling bevestigen"
@@ -769,6 +778,8 @@
             "selectAllAnnotations": "Alle annotaties selecteren",
             "deselectAllAnnotations": "Selectie van alle annotaties opheffen",
             "selectNextAnnotation": "Volgende annotatie selecteren",
+            "copyAnnotations": "Geselecteerde annotaties kopiëren",
+            "pasteAnnotations": "Annotaties plakken",
             "resetZoom": "Zoom herstellen"
         },
         "tools": {

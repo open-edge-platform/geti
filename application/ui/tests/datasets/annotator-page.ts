@@ -23,6 +23,13 @@ export class AnnotatorPage {
             .evaluateAll((nodes) => nodes.filter((node) => !node.closest('mask')));
     }
 
+    async getAnnotationRectBoxes() {
+        const rects = this.getAnnotationsList().getByLabel('annotation rect');
+        const boxes = await Promise.all((await rects.all()).map((rect) => rect.boundingBox()));
+
+        return boxes.filter((box) => box !== null).sort((a, b) => a.x - b.x);
+    }
+
     getAnnotatorMode(mode: 'annotation' | 'prediction') {
         return this.page.getByTestId('annotator-modes-id').getByRole('button', { name: mode });
     }
@@ -49,6 +56,14 @@ export class AnnotatorPage {
 
     async editPrediction() {
         await this.page.getByRole('button', { name: 'Edit prediction' }).click();
+    }
+
+    async undo() {
+        await this.page.getByTestId('undo-button').click();
+    }
+
+    async openHotkeys() {
+        await this.page.getByRole('button', { name: 'Hotkeys' }).click();
     }
 
     async goto(projectId: string, datasetItemId: string) {

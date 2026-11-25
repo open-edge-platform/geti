@@ -754,6 +754,15 @@
             "annotation": "Annotazione",
             "prediction": "Predizione"
         },
+        "copyPaste": {
+            "copied_one": "{{count}} annotazione copiata",
+            "copied_other": "{{count}} annotazioni copiate",
+            "skippedSummary": "{{pasted}} incollate, {{skipped}} saltate: {{reasons}}",
+            "labelMissing_one": "{{count}} etichetta non esiste più",
+            "labelMissing_other": "{{count}} etichette non esistono più",
+            "outsideImage_one": "{{count}} annotazione fuori dall’immagine",
+            "outsideImage_other": "{{count}} annotazioni fuori dall’immagine"
+        },
         "predictions": {
             "settingsTitle": "Impostazioni predizione",
             "confirm": "Conferma predizione"
@@ -769,6 +778,8 @@
             "selectAllAnnotations": "Seleziona tutte le annotazioni",
             "deselectAllAnnotations": "Deseleziona tutte le annotazioni",
             "selectNextAnnotation": "Seleziona annotazione successiva",
+            "copyAnnotations": "Copia annotazioni selezionate",
+            "pasteAnnotations": "Incolla annotazioni",
             "resetZoom": "Ripristina zoom"
         },
         "tools": {
