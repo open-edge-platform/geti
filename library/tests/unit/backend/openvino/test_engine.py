@@ -1,7 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest.mock import MagicMock
+from asyncio import CancelledError
+from unittest.mock import MagicMock, call
 
 import onnx
 import openvino as ov
@@ -112,7 +113,8 @@ class TestEngine:
         with pytest.raises(ValueError, match="Please provide a valid OpenVINO model"):
             OVEngine(work_dir=tmp_path, data=data_root, model="path/to/model.pth")
 
-    def test_test(self, fxt_engine, mocker: MockerFixture) -> None:
+    @pytest.mark.parametrize("callback_mode", ["omitted", "none", "recording", "cancelling"])
+    def test_test(self, fxt_engine, mocker: MockerFixture, callback_mode: str) -> None:
         mocker.patch(
             "getitune.backend.openvino.engine.AutoConfigurator.update_ov_subset_pipeline",
             return_value=fxt_engine.datamodule,
@@ -125,16 +127,52 @@ class TestEngine:
 
         # Mock the dataloader to avoid actual data processing
         mock_dataloader = MagicMock()
-        mock_batch = MagicMock()
-        mock_dataloader.__iter__ = MagicMock(return_value=iter([mock_batch]))
-        mock_dataloader.__len__ = MagicMock(return_value=1)
+        batches = [MagicMock(), MagicMock(), MagicMock()]
+        mock_dataloader.__iter__ = MagicMock(return_value=iter(batches))
+        mock_dataloader.__len__ = MagicMock(return_value=len(batches))
         mocker.patch.object(fxt_engine.datamodule, "test_dataloader", return_value=mock_dataloader)
 
         # Correct label_info from the checkpoint
         mock_model.label_info = fxt_engine.datamodule.label_info
         mock_model.prepare_metric_inputs = mocker.MagicMock(return_value={"preds": [1], "target": [1]})
         mock_model.compute_metrics = mocker.MagicMock(return_value={})
-        fxt_engine.test(metric=MagicMock())
+        notifications: list[int] = []
+        cancellation = CancelledError()
+        callback = MagicMock()
+
+        def on_test_batch_end(*, trainer, pl_module, outputs, batch, batch_idx: int) -> None:
+            assert mock_model.test_step.call_count == batch_idx + 1
+            assert mock_model.test_step.call_args.args[0] is batch
+            assert batch is batches[batch_idx]
+            assert trainer.num_test_batches == len(batches)
+            assert pl_module is mock_model
+            assert outputs is None
+            notifications.append(batch_idx)
+            if callback_mode == "cancelling":
+                raise cancellation
+
+        callback.on_test_batch_end.side_effect = on_test_batch_end
+        metric = MagicMock()
+        if callback_mode == "cancelling":
+            with pytest.raises(CancelledError) as exc_info:
+                fxt_engine.test(metric=metric, callbacks=[callback])
+            assert exc_info.value is cancellation
+            assert notifications == [0]
+            assert mock_model.test_step.call_count == 1
+            mock_model.compute_metrics.assert_not_called()
+            return
+        if callback_mode == "recording":
+            fxt_engine.test(metric=metric, callbacks=[callback])
+            assert notifications == [0, 1, 2]
+            assert callback.on_test_batch_end.call_count == len(batches)
+        elif callback_mode == "none":
+            fxt_engine.test(metric=metric, callbacks=None)
+            callback.on_test_batch_end.assert_not_called()
+        else:
+            fxt_engine.test(metric=metric)
+            callback.on_test_batch_end.assert_not_called()
+        assert mock_model.test_step.call_args_list == [call(batch, metric.return_value) for batch in batches]
+        mock_model.compute_metrics.assert_called_once_with(metric.return_value)
 
         mock_model.label_info = NullLabelInfo()
         # Incorrect label_info from the checkpoint

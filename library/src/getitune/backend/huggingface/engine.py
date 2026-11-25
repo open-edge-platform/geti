@@ -399,6 +399,8 @@ class HFEngine(Engine):
                 ``None``, ``self.best_checkpoint`` is used, matching
                 :meth:`export` and ``LightningEngine.test()``.
             **kwargs: Additional ``transformers.TrainingArguments`` overrides.
+                ``callbacks`` is consumed separately to adapt application
+                progress reporters to per-batch evaluation updates.
 
         Returns:
             Scalar metrics keyed with the ``test/`` prefix.
@@ -416,6 +418,8 @@ class HFEngine(Engine):
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
 
+        callbacks = kwargs.pop("callbacks", None)
+        progress_fn, min_p, max_p = extract_progress_fn(callbacks)
         trainer = self._build_test_scoped_trainer("test", batch, kwargs)
 
         metric_obj = metric(self._model.label_info) if metric is not None else self._model.build_default_metric()
@@ -424,6 +428,15 @@ class HFEngine(Engine):
             if metric is None and self._model.best_confidence_threshold is not None
             else None
         )
+        if progress_fn is not None:
+            progress_update = progress_fn
+
+            def report_progress(fraction: float) -> None:
+                progress_update(min_p + fraction * (max_p - min_p))
+
+            return trainer.evaluate(
+                split="test", metric=metric_obj, compute_kwargs=compute_kwargs, on_progress_update=report_progress
+            )
         return trainer.evaluate(split="test", metric=metric_obj, compute_kwargs=compute_kwargs)
 
     def _extract_best_confidence_threshold(self, trainer: GetiTuneHFTrainer) -> None:
