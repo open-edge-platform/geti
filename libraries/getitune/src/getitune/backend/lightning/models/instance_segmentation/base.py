@@ -38,7 +38,7 @@ from getitune.data.entity.base import BatchLoss, ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.data.entity.utils import stack_batch
-from getitune.data.utils.structures.mask.mask_util import encode_rle
+from getitune.data.utils.structures.mask.mask_util import RLEMasks, encode_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import FMeasure, MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -46,11 +46,17 @@ from getitune.types.label import LabelInfoTypes
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
-    from getidata.fields import TileInfo
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
     from getitune.types import PathLike
+
+
+def _as_rle(masks: tv_tensors.Mask | RLEMasks) -> list[dict]:
+    """COCO RLE of every instance mask. Masks that are already RLE (large tiled images) pass through."""
+    if isinstance(masks, RLEMasks):
+        return masks.rles
+    return [encode_rle(mask) for mask in masks.data]
 
 
 class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
@@ -215,8 +221,6 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         Returns:
             TorchPredBatch: Merged instance segmentation prediction.
         """
-        tile_preds: list[PredictionBatch] = []
-        tile_infos: list[list[TileInfo]] = []
         merger = InstanceSegTileMerge(
             inputs.imgs_info,
             self.num_classes,
@@ -228,9 +232,8 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             if isinstance(output, BatchLoss):
                 msg = "Loss output is not supported for tile merging"
                 raise TypeError(msg)
-            tile_preds.append(output)
-            tile_infos.append(batch_tile_infos)
-        pred_entities = merger.merge(tile_preds, tile_infos)
+            merger.add(output, batch_tile_infos)  # reduces the dense tile masks right away
+        pred_entities = merger.finalize()
 
         pred_entity = PredictionBatch(
             images=[pred_entity.image for pred_entity in pred_entities],
@@ -462,7 +465,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             pred_info.append(
                 {
                     "boxes": bboxes.data,
-                    "masks": [encode_rle(mask) for mask in masks.data],
+                    "masks": _as_rle(masks),
                     "scores": scores,
                     "labels": labels,
                 },
@@ -476,7 +479,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             if masks is None:
                 msg = "Masks are required for metric computation"
                 raise ValueError(msg)
-            rles = [encode_rle(mask) for mask in masks.data]
+            rles = _as_rle(masks)
             target_info.append(
                 {
                     "boxes": bboxes.data,
@@ -516,9 +519,9 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
     @staticmethod
     @torch.no_grad()
     def _forward_explain_inst_seg(
-        self: TwoStageDetector,  # noqa: PLW0211
+        self: TwoStageDetector,
         entity: SampleBatch,
-        mode: str = "tensor",  # noqa: ARG004
+        mode: str = "tensor",
     ) -> dict[str, Tensor]:
         """Forward func of the BaseDetector instance in ExplainableLightningInstanceSegModel().model."""
         _images = cast("torch.Tensor", entity.images)

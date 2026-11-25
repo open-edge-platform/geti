@@ -10,14 +10,19 @@ import logging as log
 from typing import TYPE_CHECKING, Callable
 
 import torch
-from getidata.fields import Subset
+from getidata.fields import Subset, SubsetField
 from getidata.fields.datasets import TileInfo
 from getidata.filtering.filter_registry import create_filtering_transform
 from getidata.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
 from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
-from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample
+from getitune.data.entity.sample import (
+    BaseSample,
+    DetectionSample,
+    InstanceSegmentationPolygonSample,
+    InstanceSegmentationSample,
+)
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
     TileBatchInstSegDataEntity,
@@ -26,6 +31,7 @@ from getitune.data.entity.tile import (
     TileInstSegDataEntity,
     TileSegDataEntity,
 )
+from getitune.data.utils.structures.mask.mask_util import RLEMasks
 from getitune.data.utils.utils import fill_null_annotation_lists as _fill_null_annotation_lists
 from getitune.types.task import TaskType
 
@@ -43,6 +49,16 @@ if TYPE_CHECKING:
 # ruff: noqa: SLF001
 # NOTE: Disable private-member-access (SLF001).
 # This is a workaround so we could apply the same transforms to tiles as the original dataset.
+
+
+def _first_subset(dm_subset) -> Subset:  # noqa: ANN001
+    """Read the subset of the first row from the dataframe.
+
+    Indexing the dataset instead would build a whole sample, which for instance segmentation rasterizes every
+    instance mask at full image size (gigabytes for a 20 MP image) just to read one enum.
+    """
+    column = next(name for name, attr in dm_subset.schema.attributes.items() if isinstance(attr.field, SubsetField))
+    return Subset[dm_subset.df[column][0]]
 
 
 class TileDatasetFactory:
@@ -68,7 +84,7 @@ class TileDatasetFactory:
         Returns:
             TileDataset: Tile dataset.
         """
-        subset = dataset.dm_subset[0].subset  # type: ignore[attr-defined]
+        subset = _first_subset(dataset.dm_subset)  # type: ignore[attr-defined]
         logger.info(
             "Tiling %s subset with tile_size=%s overlap=%s min_object_ratio_thr=%s iou_threshold=%s "
             "max_num_instances=%s sampling_ratio=%s tile_inference_batch_size=%s",
@@ -81,6 +97,9 @@ class TileDatasetFactory:
             tile_config.sampling_ratio,
             tile_config.tile_inference_batch_size,
         )
+        # Instance segmentation tiles polygons and rasterizes masks per tile (see ``InstanceSegDataset.use_polygons``).
+        if (use_polygons := getattr(dataset, "use_polygons", None)) is not None:
+            use_polygons()
         if subset == Subset.TRAINING:
             dm_dataset = dataset.dm_subset
             dm_dataset = dm_dataset.transform(  # type: ignore[attr-defined]
@@ -178,6 +197,10 @@ class TileDataset(VisionDataset):
         """Get item implementation from the original dataset."""
         return self._dataset._get_item_impl(index)
 
+    def _prepare_tile(self, tile: BaseSample) -> BaseSample:
+        """Hook to turn a tile read from the tiled subset into the sample the transforms expect."""
+        return tile
+
     def get_tiles(
         self,
         parent_idx: int,
@@ -214,6 +237,7 @@ class TileDataset(VisionDataset):
                 # ``img_infos`` and ``img_ids`` lengths consistent).
                 tile_entities: list[BaseSample] = []
                 for raw_item in parent_slice_ds:
+                    raw_item = self._prepare_tile(raw_item)  # noqa: PLW2901
                     raw_item.image = _ensure_chw_format(raw_item.image)
                     img = raw_item.img_info
                     tile_info = TileInfo(
@@ -256,6 +280,7 @@ class TileDataset(VisionDataset):
             info = tile.tile
             # `clone` so the tile does not pin the source image.
             tile.image = source_image[:, info.y : info.y + info.height, info.x : info.x + info.width].clone()
+            tile = self._prepare_tile(tile)  # noqa: PLW2901
             # apply the same transforms as the original dataset
             object.__setattr__(tile.tile, "source_sample_idx", parent_idx)
             transformed_tile = self._apply_transforms(tile)
@@ -352,14 +377,28 @@ class TileInstSegTestDataset(TileDataset):
         item = self.dm_subset[index]
         tile_entities = self.get_tiles(index)
 
+        if isinstance(item, InstanceSegmentationPolygonSample):
+            # Ground truth as RLE straight from the polygons: no dense (N, H, W) masks, which for a 20 MP image with
+            # hundreds of instances are gigabytes. The IS metric consumes RLE directly.
+            ori_masks = RLEMasks.from_polygons(item.polygons, (item.dm_image_info.height, item.dm_image_info.width))
+        else:
+            ori_masks = item.masks  # type: ignore[attr-defined]
+
         return TileInstSegDataEntity(
             num_tiles=len(tile_entities),
             entity_list=tile_entities,
             ori_img_info=item.img_info,  # type: ignore[attr-defined]
             ori_bboxes=item.bboxes,  # type: ignore[attr-defined]
             ori_labels=item.label,  # type: ignore[attr-defined]
-            ori_masks=item.masks,  # type: ignore[attr-defined]
+            ori_masks=ori_masks,
         )
+
+    def _prepare_tile(self, tile: BaseSample) -> BaseSample:
+        if isinstance(tile, InstanceSegmentationPolygonSample):
+            return tile.to_instance_segmentation_sample(
+                with_annotations=False
+            )  # only the image is run through the model
+        return tile
 
 
 class TileSemanticSegTestDataset(TileDataset):

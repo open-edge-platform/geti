@@ -116,8 +116,10 @@ def validate_masks(masks_batch: list[Mask | None]) -> None:
     first_non_none = next((mask for mask in masks_batch if mask is not None), None)
     if first_non_none is None:
         return
-    if not isinstance(first_non_none, torch.Tensor):
-        msg = f"Masks batch must be a list of torch tensors. Got {type(first_non_none)}"
+    from getitune.data.utils.structures.mask.mask_util import RLEMasks
+
+    if not isinstance(first_non_none, torch.Tensor | RLEMasks):
+        msg = f"Masks batch must be a list of torch tensors or RLEMasks. Got {type(first_non_none)}"
         raise TypeError(msg)
 
 

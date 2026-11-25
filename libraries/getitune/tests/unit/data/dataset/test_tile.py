@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import Mock
 
-from getidata.fields import Subset
+import polars as pl
+from getidata.fields import Subset, SubsetField
 
 from getitune.config.data import TileConfig
 from getitune.data.dataset.tile import (
@@ -24,6 +25,9 @@ class TestTileDatasetFactory:
         # dm_dataset.transform(...) is used and returns a new dm_dataset
         mock_dm = Mock()
         mock_dm.__getitem__ = Mock(return_value=mock_item)
+        # The factory reads the subset from the dataframe, without building a sample.
+        mock_dm.schema.attributes = {"subset": Mock(field=SubsetField())}
+        mock_dm.df = pl.DataFrame({"subset": [subset.name]})
         mock_dm.transform = Mock(return_value=mock_dm)
         mock_dm.dtype = "inmemory"
         mock_dm.__len__ = Mock(return_value=1)
