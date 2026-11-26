@@ -1,0 +1,141 @@
+"""Tests for primitives."""
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import logging
+
+import numpy as np
+import PIL
+import pytest
+from model_api.visualizer import BoundingBox, Keypoint, Label, Overlay, Polygon
+from PIL import ImageDraw
+
+
+def test_overlay(mock_image: PIL.Image):
+    """Test if the overlay is created correctly."""
+    empty_image = PIL.Image.new("RGB", (100, 100))
+    expected_image = PIL.Image.blend(empty_image, mock_image, 0.4)
+    # Test from image
+    overlay = Overlay(mock_image)
+    assert overlay.compute(empty_image) == expected_image
+
+    # Test from numpy array
+    data = np.zeros((100, 100, 3), dtype=np.uint8)
+    data *= 255
+    overlay = Overlay(data)
+    assert overlay.compute(empty_image) == expected_image
+
+
+def test_bounding_box(mock_image: PIL.Image):
+    """Test if the bounding box is created correctly."""
+    expected_image = mock_image.copy()
+    draw = ImageDraw.Draw(expected_image)
+    draw.rectangle((10, 10, 100, 100), outline="blue", width=2)
+    bounding_box = BoundingBox(x1=10, y1=10, x2=100, y2=100)
+    assert bounding_box.compute(mock_image) == expected_image
+
+
+def test_polygon(mock_image: PIL.Image):
+    """Test if the polygon is created correctly."""
+    # Test from points
+    expected_image = mock_image.copy()
+    draw = ImageDraw.Draw(expected_image)
+    draw.polygon([(10, 10), (100, 10), (100, 100), (10, 100)], fill="red", width=1)
+    polygon = Polygon(
+        points=[(10, 10), (100, 10), (100, 100), (10, 100)],
+        color="red",
+        opacity=1,
+        outline_width=1,
+    )
+    assert polygon.compute(mock_image) == expected_image
+
+    # Test from mask
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    mask[10:100, 10:100] = 255
+    expected_image = mock_image.copy()
+    draw = ImageDraw.Draw(expected_image)
+    draw.polygon([(10, 10), (100, 10), (100, 100), (10, 100)], fill="red", width=1)
+    polygon = Polygon(mask=mask, color="red", opacity=1, outline_width=1)
+    assert polygon.compute(mock_image) == expected_image
+
+    # Test with empty mask - should not raise, just return image unchanged
+    empty_mask = np.zeros((100, 100), dtype=np.uint8)
+    polygon_empty = Polygon(mask=empty_mask)
+    result = polygon_empty.compute(mock_image)
+    assert result == mock_image
+
+
+def test_label(mock_image: PIL.Image):
+    label = Label(label="Label")
+    # When using a single label, compute and overlay_labels should return the same image
+    assert label.compute(mock_image) == Label.overlay_labels(mock_image, [label])
+
+
+def test_keypoint(mock_image: PIL.Image):
+    keypoint = Keypoint(keypoints=np.array([[100, 100]]), color="red", keypoint_size=3)
+    draw = ImageDraw.Draw(mock_image)
+    draw.ellipse((97, 97, 103, 103), fill="red")
+    assert keypoint.compute(mock_image) == mock_image
+
+
+def test_polygon_both_points_and_mask_raises(mock_image: PIL.Image):
+    """Providing both points and mask should raise ValueError."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    mask[10:50, 10:50] = 255
+    with pytest.raises(ValueError, match="Either points or mask should be provided"):
+        Polygon(points=[(10, 10), (50, 10), (50, 50)], mask=mask)
+
+
+def test_polygon_neither_points_nor_mask_warns(mock_image: PIL.Image, caplog):
+    """Providing neither points nor mask should warn and produce empty polygon."""
+    with caplog.at_level(logging.WARNING):
+        polygon = Polygon()
+    assert "Neither points nor mask provided" in caplog.text
+    assert polygon.points == []
+    # compute should return the image unchanged
+    result = polygon.compute(mock_image)
+    assert result == mock_image
+
+
+def test_polygon_mask_multiple_contours(mock_image: PIL.Image, caplog):
+    """Mask with multiple contours should log debug and use the largest one."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    # Two separate blobs
+    mask[10:30, 10:30] = 255  # smaller
+    mask[50:90, 50:90] = 255  # larger
+    with caplog.at_level(logging.DEBUG):
+        polygon = Polygon(mask=mask)
+    assert "Multiple contours found" in caplog.text
+    assert len(polygon.points) > 0
+    result = polygon.compute(mock_image.copy())
+    assert isinstance(result, PIL.Image.Image)
+
+
+def test_polygon_mask_single_pixel_contour_does_not_raise(mock_image: PIL.Image):
+    """Mask with a single-pixel contour should not fail while extracting points."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    mask[50, 50] = 255
+
+    polygon = Polygon(mask=mask)
+    result = polygon.compute(mock_image.copy())
+
+    assert isinstance(result, PIL.Image.Image)
+
+
+def test_keypoint_with_scores(mock_image: PIL.Image):
+    """Keypoint primitive draws scores when provided."""
+    kp = Keypoint(
+        keypoints=np.array([[50, 50], [70, 70]]),
+        scores=np.array([0.95, 0.80]),
+        color="blue",
+        keypoint_size=3,
+    )
+    result = kp.compute(mock_image.copy())
+    assert isinstance(result, PIL.Image.Image)
+
+
+def test_keypoint_wrong_shape_raises():
+    """Keypoints with wrong shape should raise ValueError."""
+    with pytest.raises(ValueError, match="Keypoints must have shape"):
+        Keypoint(keypoints=np.array([[1, 2, 3]]))  # shape (1, 3) instead of (N, 2)
