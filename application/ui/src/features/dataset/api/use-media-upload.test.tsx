@@ -7,6 +7,7 @@ import { act, waitFor } from '@testing-library/react';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
+import { createQueryClient } from '../../../query-client/query-client';
 import { useUploadActions } from '../hooks/use-upload-actions';
 import { useMediaUploadState } from '../providers/media-upload-context';
 import { MediaUploadProvider } from '../providers/media-upload-provider.component';
@@ -101,6 +102,45 @@ describe('useMediaUpload', () => {
 
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
+
+    it.each(['success', 'failure'] as const)(
+        'keeps progress active for the second batch after a refresh %s',
+        async (refresh) => {
+            const firstResult = Promise.withResolvers<ReturnType<typeof getMockedMediaImage>>();
+            const secondResult = Promise.withResolvers<ReturnType<typeof getMockedMediaImage>>();
+            uploadMock.mockReturnValueOnce(firstResult.promise).mockReturnValueOnce(secondResult.promise);
+
+            const queryClient = createQueryClient();
+            if (refresh === 'failure') {
+                rs.spyOn(queryClient, 'invalidateQueries').mockRejectedValueOnce(new Error('Refresh failed'));
+            }
+            const { result } = renderHook(useMediaUploadProgress, { wrapper: MediaUploadProvider, queryClient });
+            let firstBatch: Promise<unknown>;
+            let secondBatch: Promise<unknown>;
+
+            act(() => {
+                firstBatch = result.current.upload.uploadMedia([new File(['first'], 'first.jpg')]);
+                secondBatch = result.current.upload.uploadMedia([new File(['second'], 'second.jpg')]);
+            });
+            expect(result.current.state.isUploading).toBe(true);
+
+            await act(async () => {
+                firstResult.resolve(getMockedMediaImage({ id: 'first' }));
+                await firstBatch;
+            });
+            const stateAfterFirstBatch = result.current.state;
+
+            await act(async () => {
+                secondResult.resolve(getMockedMediaImage({ id: 'second' }));
+                await secondBatch;
+            });
+
+            expect(stateAfterFirstBatch.items.map(({ status }) => status)).toEqual(['uploaded', 'uploading']);
+            expect(stateAfterFirstBatch.isUploading).toBe(true);
+            expect(result.current.state.isUploading).toBe(false);
+            expect(result.current.uploadProgress.succeeded).toBe(2);
+        }
+    );
 
     it('does not exceed configured upload concurrency', async () => {
         let runningUploads = 0;

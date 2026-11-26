@@ -27,12 +27,14 @@ export type UploadProgressSummary = {
 
 export type MediaUploadState = {
     items: UploadFileItem[];
+    activeBatchCount: number;
     isUploading: boolean;
     isDetailsDialogOpen: boolean;
 };
 
 export const INITIAL_STATE: MediaUploadState = {
     items: [],
+    activeBatchCount: 0,
     isUploading: false,
     isDetailsDialogOpen: false,
 };
@@ -55,6 +57,7 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
                 ...state,
                 // Append rather than replace so the details dialog accumulates history across uploads.
                 items: [...state.items, ...action.payload],
+                activeBatchCount: state.activeBatchCount + 1,
                 isUploading: true,
             };
         case 'SET_UPLOADING':
@@ -105,8 +108,11 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
                 ),
             };
         }
-        case 'FINISH_UPLOAD':
-            return { ...state, isUploading: false };
+        case 'FINISH_UPLOAD': {
+            const activeBatchCount = Math.max(0, state.activeBatchCount - 1);
+
+            return { ...state, activeBatchCount, isUploading: activeBatchCount > 0 };
+        }
         case 'OPEN_DIALOG':
             return { ...state, isDetailsDialogOpen: true };
         case 'CLOSE_DIALOG':
