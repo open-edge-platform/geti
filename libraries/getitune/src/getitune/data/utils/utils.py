@@ -138,7 +138,9 @@ def adapt_tile_config(tile_config: TileConfig, train_dm_subset: Any, input_size:
 
     - ``overlap`` is fixed to ``_ADAPTIVE_TILE_OVERLAP`` (0.25),
     - the tile edge is ``ceil32(p95(box larger edge) / overlap)``, with a minimum of
-      ``_MIN_ADAPTIVE_TILE_SIZE`` so small-object datasets keep the validated default,
+      ``_MIN_ADAPTIVE_TILE_SIZE`` so small-object datasets keep the validated default, and a maximum of the
+      median shorter image edge (rounded down to 32): a larger tile would only cut the image without zooming.
+      Tiling is disabled when that edge is not larger than the minimum tile,
     - tiling is disabled (``enable_tiler = False``) when the typical object is already large
       enough in the model input: a typical (p50) object edge of ``L`` in an image of edge ``I``
       becomes ``L * input / I`` after the whole-image resize to ``input_size``, and if that is
@@ -186,6 +188,19 @@ def adapt_tile_config(tile_config: TileConfig, train_dm_subset: Any, input_size:
         )
         tile_config.enable_tiler = False
         return
+    if image_edge is not None:
+        if image_edge <= _MIN_ADAPTIVE_TILE_SIZE:
+            logger.info(
+                "Adaptive tiling: the median shorter image edge %s is not larger than the minimum tile %s; "
+                "tiling is disabled.",
+                image_edge,
+                _MIN_ADAPTIVE_TILE_SIZE,
+            )
+            tile_config.enable_tiler = False
+            return
+        # A tile larger than the image cuts it for no zoom gain; keep tiles within the shorter edge.
+        floor32 = image_edge // _ADAPTIVE_TILE_SIZE_MULTIPLE * _ADAPTIVE_TILE_SIZE_MULTIPLE
+        tile_size = min(tile_size, max(floor32, _MIN_ADAPTIVE_TILE_SIZE))
     tile_config.tile_size = (tile_size, tile_size)
     tile_config.overlap = _ADAPTIVE_TILE_OVERLAP
     logger.info(

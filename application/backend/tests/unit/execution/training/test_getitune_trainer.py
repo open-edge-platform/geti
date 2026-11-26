@@ -739,6 +739,93 @@ class TestGetiTuneTrainerCreateTrainingDataset:
         assert dataset_info.getitune_testing_subset_config.transforms == mock_test_transforms
 
 
+class TestGetiTuneTrainerTilingModes:
+    """The Tiling setting chosen in the UI (Off / Automatic / Custom) must reach the tile config used in training."""
+
+    UI_SETTINGS = {
+        "off": {"enable": False, "enable_adaptive_tiling": False, "tile_size": 512, "tile_overlap": 0.3},
+        "automatic": {"enable": True, "enable_adaptive_tiling": True, "tile_size": 512, "tile_overlap": 0.3},
+        "custom": {"enable": True, "enable_adaptive_tiling": False, "tile_size": 512, "tile_overlap": 0.3},
+    }
+
+    @staticmethod
+    def _training_subset():
+        import polars as pl
+
+        # p50 object edge 34 px (small), p95 214 px on 1280x720 images: adaptive tile = ceil32(214/0.25) = 864,
+        # capped at the 720 px shorter edge -> 704.
+        boxes = [[0, 0, 34, 20]] * 90 + [[0, 0, 214, 30]] * 10
+        df = pl.DataFrame(
+            {
+                "bboxes": pl.Series([boxes] * 5, dtype=pl.List(pl.Array(pl.Float32, 4))),
+                "dm_image_info": pl.Series(
+                    [{"width": 1280, "height": 720}] * 5, dtype=pl.Struct({"width": pl.Int32, "height": pl.Int32})
+                ),
+            }
+        )
+        schema = Mock()
+        schema.attributes = {"bboxes": Mock(field=Mock(format="x1y1x2y2", normalize=False))}
+        return Mock(df=df, schema=schema)
+
+    @pytest.mark.parametrize("mode", ["off", "automatic", "custom"])
+    def test_ui_tiling_mode_reaches_training_tile_config(
+        self,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+        fxt_dataset_revision_service: Mock,
+        mode: str,
+    ):
+        from app.execution.common.geti_config_converter import TransformsUpdater
+
+        trainer = fxt_getitune_trainer()
+        dm_dataset = Mock()
+        dm_dataset.filter_by_subset.side_effect = [self._training_subset(), Mock(), Mock()]
+        fxt_dataset_revision_service.load_revision.return_value = dm_dataset
+        subset = {"batch_size": 2, "num_workers": 0, "sampler": {"class_path": "torch.utils.data.RandomSampler"}}
+        config = {
+            "data": {
+                "input_size": (384, 384),
+                "train_subset": {**subset, "augmentations_cpu": []},
+                "val_subset": {**subset, "augmentations_cpu": []},
+                "test_subset": {**subset, "augmentations_cpu": []},
+            }
+        }
+        TransformsUpdater.update_tiling(self.UI_SETTINGS[mode], config)
+        dataset = MagicMock()
+        dataset.__len__.return_value = 3
+
+        with (
+            patch("getitune.data.factory.TransformLibFactory.generate", return_value=[Mock()]),
+            patch("getitune.data.entity.utils.detect_storage_dtype", return_value=("uint8", 3)),
+            patch("app.execution.training.getitune_trainer.get_getitune_dataset_class_by_task_type") as get_cls,
+            patch("getitune.data.dataset.tile.TileDatasetFactory.create", return_value=dataset) as create,
+        ):
+            get_cls.return_value = Mock(return_value=dataset)
+            get_cls.return_value.__name__ = "DetectionDataset"
+            info = trainer.prepare_training_dataset(
+                project_id=uuid4(),
+                task=Task(task_type=TaskType.DETECTION, exclusive_labels=True),
+                getitune_training_config=config,
+                training_config=TrainingConfiguration(
+                    task_level_parameters=TaskLevelParameters(),
+                    algo_level_parameters=MagicMock(spec=AlgoLevelParameters),
+                ),
+                dataset_revision_id=uuid4(),
+            )
+
+        if mode == "off":
+            create.assert_not_called()
+            assert info.tile_config.enable_tiler is False
+            return
+        assert create.call_count == 3
+        tile_config = create.call_args.kwargs["tile_config"]
+        assert info.tile_config is tile_config
+        assert tile_config.enable_adaptive_tiling is False  # adapted once, nothing downstream re-adapts
+        if mode == "automatic":
+            assert (tile_config.tile_size, tile_config.overlap) == ((704, 704), 0.25)
+        else:
+            assert (tile_config.tile_size, tile_config.overlap) == ((512, 512), 0.3)
+
+
 class TestGetiTuneTrainerPrepareModel:
     """Tests for the GetiTuneTrainer.prepare_model method."""
 

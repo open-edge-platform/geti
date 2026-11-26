@@ -83,6 +83,35 @@ class TestAdaptTileConfig:
 
         assert tile_config.enable_tiler is False
 
+    def test_tile_is_capped_at_shorter_image_edge(self) -> None:
+        # p50 edge 34 (small at input), p95 edge 214 -> ceil32(214/0.25)=864, but the images are 1280x720:
+        # the tile must not exceed 720 -> 704.
+        boxes = [[0, 0, 34, 20]] * 90 + [[0, 0, 214, 30]] * 10
+        subset_df = make_dm_subset([boxes] * 5, sizes=[(1280, 720)] * 5)
+        tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400), overlap=0.2)
+
+        adapt_tile_config(tile_config, subset_df, input_size=(384, 384))
+
+        assert tile_config.enable_tiler is True
+        assert tile_config.tile_size == (704, 704)
+
+    def test_cap_never_goes_below_minimum_tile(self) -> None:
+        # Shorter edge 410 rounds down to 384 < 400: the minimum tile wins and still fits in the image.
+        subset_df = make_dm_subset([[[0, 0, 300, 30]]] * 20, sizes=[(900, 410)] * 20)
+        tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400))
+
+        adapt_tile_config(tile_config, subset_df, input_size=(384, 384))
+
+        assert tile_config.tile_size == (400, 400)
+
+    def test_image_not_larger_than_minimum_tile_disables_tiling(self) -> None:
+        subset_df = make_dm_subset([[[0, 0, 10, 10]]] * 20, sizes=[(640, 400)] * 20)
+        tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400))
+
+        adapt_tile_config(tile_config, subset_df, input_size=(384, 384))
+
+        assert tile_config.enable_tiler is False
+
     def test_input_size_unknown_falls_back_to_tiling(self) -> None:
         # Without input_size the on/off gate cannot run; tiling stays on with the computed size.
         subset_df = make_dm_subset([[[0, 0, 100, 215]]] * 20, sizes=[(1280, 720)] * 20)
@@ -91,7 +120,7 @@ class TestAdaptTileConfig:
         adapt_tile_config(tile_config, subset_df)
 
         assert tile_config.enable_tiler is True
-        assert tile_config.tile_size == (864, 864)  # ceil32(215/0.25)
+        assert tile_config.tile_size == (704, 704)  # ceil32(215/0.25)=864, capped at the 720 px shorter edge
 
     def test_huge_objects_disable_tiling(self) -> None:
         # Vehicle-like: p50 edge 3500 on 4160, input 640: 3500*640/4160=538 >= 80 -> no tiling.
