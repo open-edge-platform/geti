@@ -51,10 +51,10 @@ const startedAt = (job: ModelJob): number =>
 
 export const sortJobs = (jobs: ModelJob[]): ModelJob[] => jobs.toSorted((a, b) => startedAt(b) - startedAt(a));
 
-export const formatElapsed = (job: ModelJob): string => {
+export const formatElapsed = (job: ModelJob, now = Date.now()): string => {
     if (!job.started_at) return '—';
 
-    const finishedAt = job.finished_at ? new Date(job.finished_at).getTime() : Date.now();
+    const finishedAt = job.finished_at ? new Date(job.finished_at).getTime() : now;
     const elapsedSeconds = Math.floor(Math.max(0, finishedAt - new Date(job.started_at).getTime()) / 1000);
     const hours = Math.floor(elapsedSeconds / 3600);
     const minutes = Math.floor((elapsedSeconds % 3600) / 60);
