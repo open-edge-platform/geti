@@ -8,6 +8,9 @@ resolution-markers = [
     "python_full_version < '3.12' and sys_platform != 'linux' and sys_platform != 'win32'",
 ]
 
+[manifest]
+excludes = ["opencv-python"]
+
 [[package]]
 name = "cachetools"
 version = "7.3.2"
