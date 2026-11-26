@@ -389,6 +389,7 @@ class DatasetService(BaseSessionManagedService):
         """Convert selected items, optionally materializing annotated OME training planes.
 
         The caller owns ``ome_plane_dir`` and must keep it until the dataset is exported.
+        Paths are staged during conversion; only retained OME samples are materialized afterward.
         Materialization also writes the revision projection sidecar into that directory.
 
         Raises:
@@ -404,6 +405,7 @@ class DatasetService(BaseSessionManagedService):
             and annotation_status == DatasetItemAnnotationStatus.WITH_ANNOTATIONS
             else None
         )
+        staged_planes: dict[str, OmePlane] = {}
         if dataset_view_id is not None:
             # The view may have been deleted between the moment the caller resolved it and now.
             view_repo = DatasetViewRepository(project_id=str(project_id), db=self.db_session)
@@ -427,7 +429,8 @@ class DatasetService(BaseSessionManagedService):
             """
             if isinstance(media, OmePlane):
                 if materializer is not None:
-                    return str(materializer.materialize(project_id, media))
+                    staged_planes[str(media.id)] = media
+                    return str(materializer.get_plane_path(media.id))
                 raise UnsupportedDatasetMediaError(
                     f"OME plane '{media.id}' requires annotated training revision materialization. "
                     "Direct dataset export of virtual OME planes is not supported. "
@@ -448,5 +451,8 @@ class DatasetService(BaseSessionManagedService):
             sample_mode=sample_mode,
         )
         if materializer is not None:
-            materializer.write_projections(dataset.df["id"].to_list())
+            retained_ids = dataset.df["id"].to_list()
+            for item_id in staged_planes.keys() & set(retained_ids):
+                materializer.materialize(project_id, staged_planes[item_id])
+            materializer.write_projections(retained_ids)
         return dataset

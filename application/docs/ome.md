@@ -821,7 +821,10 @@ Reads cover at most 1048576 pixels and 256 rows; output strips normally contain 
 (3 MiB for RGB). A 4096×4096 plane therefore needs 16 full-width reads instead of 64.
 The strip budget balances TIFF decode reuse against projection temporaries; it is not a total-process RAM limit.
 A single scanline may occupy up to 8 MiB; wider planes fail explicitly rather than silently changing resolution.
-Dataset conversion keeps the usual annotation, subset, task and dataset-view filtering. Revision export copies
+Dataset conversion stages expected PNG paths without decoding OME pixels, applies the usual annotation,
+subset, task and dataset-view filtering, and then materializes only retained sample IDs. Empty-labeled training
+planes discarded by the task's sample factory therefore require no decoding or temporary PNGs and cannot fail
+the revision because their pixels are unreadable or exceed rendering limits. Revision export copies
 the selected samples into `dataset_revisions/<id>/images/` and saves the parquet rows plus
 `ome_channel_projections.json`. The sidecar records only parents represented in the converted dataset and retains
 each parent's actual stored projection, including mixed RGB/grayscale policies. Its size is included in revision

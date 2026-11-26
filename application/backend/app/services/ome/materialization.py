@@ -86,6 +86,10 @@ class OmeTrainingMaterializer:
         self._images: dict[UUID, OmeImageMetadata] = {}
         self._planes: dict[str, UUID] = {}
 
+    def get_plane_path(self, plane_id: UUID) -> Path:
+        """Return the expected PNG path without reading or materializing the plane."""
+        return self._directory / f"{plane_id}.png"
+
     def materialize(self, project_id: UUID, plane: OmePlane) -> Path:
         """Write one complete level-zero PNG into the caller-owned temporary workspace."""
         info = self._media_service.validate_ome_plane_selection(
@@ -94,7 +98,7 @@ class OmeTrainingMaterializer:
         parent = self._media_service.get_media_by_id(project_id, plane.ome_image_id)
         storage = self._media_service.get_media_storage(project_id, parent)
         self._directory.mkdir(parents=True, exist_ok=True)
-        path = self._directory / f"{plane.id}.png"
+        path = self.get_plane_path(plane.id)
         # The workspace is private to one conversion; never reuse incomplete or stale PNGs.
         stream = path.open("xb")
         try:

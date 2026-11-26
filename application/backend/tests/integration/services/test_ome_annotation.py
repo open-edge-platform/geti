@@ -16,15 +16,34 @@ from PIL import Image
 from sqlalchemy import func, select
 
 from app.datumaro_converter import SampleMode
-from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetRevisionDB, DatasetViewItemDB, MediaDB, OmeImageDB
-from app.models import DatasetItemAnnotation, DatasetItemAnnotationStatus, DatasetItemSubset, LabelReference, Rectangle
+from app.db.schema import (
+    DatasetItemDB,
+    DatasetItemLabelDB,
+    DatasetRevisionDB,
+    DatasetViewItemDB,
+    MediaDB,
+    OmeImageDB,
+    ProjectDB,
+)
+from app.models import (
+    DatasetItemAnnotation,
+    DatasetItemAnnotationStatus,
+    DatasetItemSubset,
+    FullImage,
+    LabelReference,
+    Polygon,
+    Rectangle,
+    TaskType,
+)
 from app.models.media import LEAF_MEDIA_TYPES, ImageFormat, MediaType
 from app.models.ome import OmeChannelSettings
-from app.services.base import ResourceNotFoundError
+from app.models.shape import Point
+from app.services.base import InvalidImageError, ResourceNotFoundError
 from app.services.dataset_revision_service import DatasetRevisionService
 from app.services.dataset_service import DatasetService, UnsupportedDatasetMediaError
 from app.services.media_service import MediaFilters
-from app.services.ome.materialization import OME_PROJECTIONS_FILENAME
+from app.services.ome.materialization import _MAX_ROW_BYTES, OME_PROJECTIONS_FILENAME
+from app.services.ome.registry import UnsupportedOmeStorageError
 from app.services.ome.rendering import OmeRenderingService
 
 
@@ -50,6 +69,16 @@ def _annotations(label_id: str) -> list[DatasetItemAnnotation]:
             shape=Rectangle(x=1, y=2, width=3, height=4),
         )
     ]
+
+
+@pytest.fixture(params=[TaskType.DETECTION, TaskType.INSTANCE_SEGMENTATION, TaskType.CLASSIFICATION])
+def ome_training_task(ome_annotation, db_session, fxt_project_service, request):
+    service, project, image = ome_annotation
+    project_db = db_session.get(ProjectDB, str(project.id))
+    project_db.task_type = request.param
+    project_db.exclusive_labels = False
+    db_session.flush()
+    return service, fxt_project_service.get_project_by_id(project.id), image
 
 
 def test_annotate_plane_once_and_reload(ome_annotation, db_session, fxt_db_labels, fxt_dataset_service):
@@ -305,6 +334,104 @@ def test_dataset_conversion_rejects_selected_virtual_planes(
             assert len(dataset) == 0
         get_path.assert_not_called()
     assert fxt_dataset_service.get_dataset_item_by_id(project.id, plane.id).id == plane.id
+
+
+@pytest.mark.parametrize("failure", ["decode", "scanline"])
+@pytest.mark.parametrize(
+    "empty_subset", [DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING]
+)
+def test_training_materializes_only_retained_planes(
+    ome_training_task, db_session, fxt_label_service, fxt_db_labels, tmp_path, failure, empty_subset
+):
+    """Discarded empty training planes cannot block valid revisions; retained planes still surface failures."""
+    service, project, image = ome_training_task
+    dataset_service = DatasetService(fxt_label_service, service, db_session)
+    shape = {
+        TaskType.DETECTION: Rectangle(x=1, y=2, width=3, height=4),
+        TaskType.INSTANCE_SEGMENTATION: Polygon(points=[Point(x=1, y=2), Point(x=4, y=2), Point(x=4, y=6)]),
+        TaskType.CLASSIFICATION: FullImage(),
+    }[project.task.task_type]
+    annotations = [DatasetItemAnnotation(shape=shape, labels=[LabelReference(id=UUID(fxt_db_labels[0].id))])]
+    retained_planes = []
+    for z, subset in enumerate([DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING]):
+        plane = dataset_service.register_ome_plane(project.id, image.id, z=z, t=0)
+        dataset_service.set_dataset_item_annotations(project, plane.id, annotations, True, None)
+        dataset_service.assign_dataset_item_subset(project.id, plane.id, subset)
+        retained_planes.append(plane)
+
+    payload = BytesIO()
+    tifffile.imwrite(payload, np.zeros((8, 10), dtype=np.uint16), ome=True)
+    payload.seek(0)
+    broken = service.create_ome_image(project.id, "broken", ImageFormat.OME_TIFF, payload, max_size=1024 * 1024)
+    empty_plane = dataset_service.register_ome_plane(project.id, broken.id, z=0, t=0)
+    dataset_service.set_dataset_item_annotations(project, empty_plane.id, [], True, None)
+    dataset_service.assign_dataset_item_subset(project.id, empty_plane.id, empty_subset)
+    if failure == "decode":
+        service.get_media_storage(project.id, broken).effective_path.unlink()
+        expected_error = UnsupportedOmeStorageError
+    else:
+        db_session.get(OmeImageDB, str(broken.id)).size_x = _MAX_ROW_BYTES // 3 + 1
+        db_session.flush()
+        expected_error = InvalidImageError
+
+    workspace = tmp_path / "workspace"
+    with patch.object(service, "validate_ome_plane_selection", wraps=service.validate_ome_plane_selection) as validate:
+        if empty_subset != DatasetItemSubset.TRAINING:
+            with pytest.raises(expected_error):
+                dataset_service.get_dm_dataset(
+                    project.id,
+                    project.task,
+                    DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+                    SampleMode.TRAINING,
+                    ome_plane_dir=workspace,
+                )
+            return
+        dataset = dataset_service.get_dm_dataset(
+            project.id,
+            project.task,
+            DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+            SampleMode.TRAINING,
+            ome_plane_dir=workspace,
+        )
+    assert {call.args[1] for call in validate.call_args_list} == {image.id}
+    assert set(dataset.df["id"]) == {str(plane.id) for plane in retained_planes}
+    assert {path.stem for path in workspace.glob("*.png")} == {str(plane.id) for plane in retained_planes}
+    assert all(sample.image.path == str(workspace / f"{sample.id}.png") for sample in dataset)
+    assert {
+        record["media_id"] for record in json.loads((workspace / OME_PROJECTIONS_FILENAME).read_text())["images"]
+    } == {str(image.id)}
+    revisions = DatasetRevisionService(service.projects_dir.parent, db_session)
+    revision_id = revisions.save_revision(
+        project.id, dataset, ome_projections_path=workspace / OME_PROJECTIONS_FILENAME
+    )
+    assert revisions.get_dataset_revision(project.id, revision_id).item_counts.model_dump() == {
+        "total": 3,
+        "training": 1,
+        "validation": 1,
+        "testing": 1,
+    }
+
+
+def test_conversion_with_only_discarded_planes_creates_no_artifacts(
+    ome_training_task, db_session, fxt_label_service, tmp_path
+):
+    """An empty converted dataset requires no OME reads, PNGs, or projection sidecar."""
+    service, project, image = ome_training_task
+    dataset_service = DatasetService(fxt_label_service, service, db_session)
+    plane = dataset_service.register_ome_plane(project.id, image.id, z=0, t=0)
+    dataset_service.set_dataset_item_annotations(project, plane.id, [], True, None)
+    dataset_service.assign_dataset_item_subset(project.id, plane.id, DatasetItemSubset.TRAINING)
+    workspace = tmp_path / "workspace"
+    with patch.object(service, "validate_ome_plane_selection", side_effect=AssertionError("Discarded plane was read")):
+        dataset = dataset_service.get_dm_dataset(
+            project.id,
+            project.task,
+            DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+            SampleMode.TRAINING,
+            ome_plane_dir=workspace,
+        )
+    assert len(dataset) == 0
+    assert not workspace.exists()
 
 
 @pytest.mark.parametrize(
