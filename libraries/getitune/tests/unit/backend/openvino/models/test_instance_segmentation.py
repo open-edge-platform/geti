@@ -115,8 +115,9 @@ class TestOVInstanceSegmentationModelTiling:
         assert result.masks is not None
         assert result.masks[0].shape == (1, 256, 256)  # pyrefly: ignore[unsupported-operation]
 
-    def test_forward_tiles_crops_become_rle_without_dense_masks(self, inst_seg_model):
-        """Merged mask crops go straight to RLE, equal to the dense result, and `.masks` is never read."""
+    def test_forward_tiles_crops_become_rle_without_dense_masks(self, inst_seg_model, monkeypatch):
+        """Large merged results go straight to RLE, equal to the dense result, and `.masks` is never read."""
+        monkeypatch.setattr("getitune.backend.openvino.models.instance_segmentation.MAX_DENSE_MASK_BYTES", 1)
         tile_batch = self._make_tile_batch()
         crop = np.ones((10, 20), dtype=np.uint8)
         merged = MagicMock()
@@ -136,8 +137,26 @@ class TestOVInstanceSegmentationModelTiling:
         dense[10:20, 10:30] = 1
         assert result.masks[0].rles == [encode_rle(dense.bool())]  # pyrefly: ignore[unsupported-operation]
 
-    def test_predict_step_filters_rle_masks_by_confidence(self, inst_seg_model):
+    def test_small_merged_results_stay_dense(self, inst_seg_model):
+        """Below the dense-size limit, tiled predictions keep tensor masks, as before."""
+        merged = MagicMock()
+        merged.bboxes = np.array([[10, 10, 30, 20]], dtype=np.int32)
+        merged.scores = np.array([0.9], dtype=np.float32)
+        merged.labels = np.array([2], dtype=np.int32)
+        merged.mask_crops = [(np.ones((10, 20), dtype=np.uint8), 10, 10)]
+        merged.masks = np.zeros((1, 256, 256), dtype=np.uint8)
+        tiler = MagicMock()
+        tiler.predict_tiles.return_value = merged
+        inst_seg_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = inst_seg_model.forward_tiles(self._make_tile_batch())
+
+        assert isinstance(result.masks[0], torch.Tensor)  # pyrefly: ignore[unsupported-operation]
+        assert result.masks[0].shape == (1, 256, 256)  # pyrefly: ignore[unsupported-operation]
+
+    def test_predict_step_filters_rle_masks_by_confidence(self, inst_seg_model, monkeypatch):
         """Tiled predictions carry RLE masks; the confidence filter must keep them aligned with boxes."""
+        monkeypatch.setattr("getitune.backend.openvino.models.instance_segmentation.MAX_DENSE_MASK_BYTES", 1)
         inst_seg_model.hparams = {"best_confidence_threshold": 0.5}
         merged = MagicMock()
         merged.bboxes = np.array([[10, 10, 30, 20], [50, 50, 70, 60]], dtype=np.int32)

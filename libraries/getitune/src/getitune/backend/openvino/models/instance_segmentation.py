@@ -16,7 +16,7 @@ from getitune.backend.openvino.models.base import OVModel
 from getitune.backend.openvino.models.utils import rescale_bboxes_to_original, rescale_masks_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
-from getitune.data.utils.structures.mask.mask_util import RLEMasks, crop_to_rle, encode_rle
+from getitune.data.utils.structures.mask.mask_util import MAX_DENSE_MASK_BYTES, RLEMasks, crop_to_rle, encode_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 from getitune.types.label import LabelInfo
@@ -319,8 +319,9 @@ class OVInstanceSegmentationModel(OVModel):
             # ModelAPI instance labels are 1-based (0 = background); shift to getitune 0-based.
             labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - 1)
             crops = getattr(merged, "mask_crops", None)
-            if crops is not None:
-                # Crops straight to RLE: a dense (N, H, W) stack is GBs on large images.
+            if crops is not None and len(crops) * ori_h * ori_w > MAX_DENSE_MASK_BYTES:
+                # Crops straight to RLE: a dense (N, H, W) stack is GBs on large images. Smaller results stay dense,
+                # as in the Lightning tile merge, so only very large predictions change type.
                 masks.append(RLEMasks([crop_to_rle(c, x, y, (ori_h, ori_w)) for c, x, y in crops], (ori_h, ori_w)))
                 continue
             merged_masks = np.asarray(merged.masks)
