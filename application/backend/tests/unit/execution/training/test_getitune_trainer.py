@@ -53,6 +53,7 @@ from app.models.system import DeviceInfo, DeviceType
 from app.models.training_configuration import AlgoLevelParameters, TaskLevelParameters, TrainingConfiguration
 from app.services import ModelRevisionMetadata, ModelService, TrainingConfigurationService
 from app.services.base_weights_service import BaseWeightsService
+from app.services.ome.materialization import OME_PROJECTIONS_FILENAME
 from app.services.subset_assignment import DatasetItemWithLabels, SubsetAssigner, SubsetAssignment, SubsetService
 
 
@@ -535,6 +536,7 @@ class TestGetiTuneTrainerCreateTrainingDataset:
             "with up-to-date existing dataset revision from a dataset view",
         ],
     )
+    @pytest.mark.parametrize("has_ome_planes", [False, True])
     def test_prepare_training_dataset_success(
         self,
         fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
@@ -543,6 +545,7 @@ class TestGetiTuneTrainerCreateTrainingDataset:
         dataset_revision_id,
         uptodate_existing_dataset,
         dataset_view_id,
+        has_ome_planes,
     ):
         """Test successful creation of training, validation, and testing datasets."""
         # Arrange
@@ -552,7 +555,14 @@ class TestGetiTuneTrainerCreateTrainingDataset:
 
         # Mock the Datumaro dataset
         mock_dm_dataset = Mock()
-        fxt_dataset_service.get_dm_dataset.return_value = mock_dm_dataset
+        temporary_dataset = Mock()
+
+        def convert_dataset(**kwargs):
+            if has_ome_planes:
+                (kwargs["ome_plane_dir"] / OME_PROJECTIONS_FILENAME).write_text("{}")
+            return temporary_dataset
+
+        fxt_dataset_service.get_dm_dataset.side_effect = convert_dataset
         fxt_dataset_revision_service.load_revision.return_value = mock_dm_dataset
 
         # Mock filtered subsets
@@ -676,14 +686,24 @@ class TestGetiTuneTrainerCreateTrainingDataset:
                     annotation_status=DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
                     sample_mode=SampleMode.TRAINING,
                     dataset_view_id=dataset_view_id,
+                    ome_plane_dir=ANY,
                 )
                 fxt_dataset_revision_service.save_revision.assert_called_once_with(
                     project_id=project_id,
-                    dataset=mock_dm_dataset,
+                    dataset=temporary_dataset,
                     dataset_view_id=dataset_view_id,
                     dataset_view_name=expected_view_name,
+                    ome_projections_path=ANY if has_ome_planes else None,
                 )
-                fxt_dataset_revision_service.load_revision.assert_not_called()
+                fxt_dataset_revision_service.load_revision.assert_called_once_with(
+                    project_id=project_id, dataset_revision_id=new_dataset_revision_id
+                )
+                workspace = fxt_dataset_service.get_dm_dataset.call_args.kwargs["ome_plane_dir"]
+                assert not workspace.exists()
+                if has_ome_planes:
+                    assert fxt_dataset_revision_service.save_revision.call_args.kwargs["ome_projections_path"] == (
+                        workspace / OME_PROJECTIONS_FILENAME
+                    )
                 assert dataset_info.revision_id == new_dataset_revision_id
         else:
             fxt_dataset_service.get_dm_dataset.assert_not_called()

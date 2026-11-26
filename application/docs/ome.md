@@ -235,7 +235,7 @@ Existing images, and later dataset revisions, use the stored projection rather t
 currently configured. A revision can therefore contain images ingested under different policies; its sidecar records
 each image's actual projection, not a single purported strategy version for the entire revision.
 
-Proposed file structure:
+Sidecar file structure:
 
 ```
 // dataset_revisions/<revision_id>/ome_channel_projections.json
@@ -798,11 +798,11 @@ also include OME planes. Neither reads nor thumbnails register a plane; the firs
 the plane and its dataset item, without materializing pixels. Coordinate uniqueness is included in the original OME
 migration; video frame indexing is unchanged.
 
-Until step 7 adds materialization, `get_dm_dataset()` rejects selected OME-plane items with an explicit
-unsupported-media error before resolving binary paths. This applies to training and dataset export, including
-view-scoped conversion and export with unannotated items. Planes remain available for annotation and navigation;
-they are never silently skipped to produce an incomplete dataset. Views and annotation filters that exclude
-all OME-plane items can still be converted normally.
+`get_dm_dataset()` requires an explicit materialization workspace when converting annotated OME planes for
+training (step 7). Other conversions reject selected virtual planes before resolving nonexistent binary paths.
+This includes direct export of the live dataset, with or without unannotated items. Export a saved training
+revision to use its materialized PNGs, or select a view without OME planes. Planes are never silently skipped
+because their pixels are virtual; existing task-specific annotation filtering still applies.
 
 _Testing._ Integration test: annotate `(z=12, t=0)`, assert exactly one `ome_plane` row plus one `dataset_item`;
 re-annotate and assert no duplicate row (this is what `uq_parent_id_z_index_t_index` guards). Out-of-range `z`/`t`
@@ -811,14 +811,41 @@ the parent returns 204 - cascades to planes, items and labels.
 
 ### Step 7 - Training
 
-Materialize annotated planes into the revision `images/` directory using the fixed channel projection computed at
-ingest time (§3.6.1); write `ome_channel_projections.json` alongside the revision for provenance.
+Annotated planes selected for a new training revision are rendered as level-zero PNGs using the fixed channel
+projection computed at ingest time (§3.6.1). RGB output has three channels, with unassigned targets black;
+grayscale output is a single-channel PNG. Rendering uses immutable source intensity ranges, not the current
+display channel view, and never downsamples or rescales annotation coordinates.
 
-_Testing._ Integration test building a revision from a project containing an OME image with three annotated planes,
-asserting the rendered PNG count, the parquet rows, the subset counts, and the sidecar projection file content. Add a
-unit test per projection strategy in §3.6.1 (3-channel identity, wavelength-based, >3-channel fallback, <3-channel
-padding). BDD scenario (`behave`) covering upload → annotate → train → quantize → export on a small fixture, which is
-the single end-to-end gate for requirements 5–8.
+`OmeTrainingMaterializer` reads bounded regions and streams PNG scanlines to a private per-run temporary workspace.
+Reads cover at most 1048576 pixels and 256 rows; output strips normally contain at most 1048576 pixels
+(3 MiB for RGB). A 4096×4096 plane therefore needs 16 full-width reads instead of 64.
+The strip budget balances TIFF decode reuse against projection temporaries; it is not a total-process RAM limit.
+A single scanline may occupy up to 8 MiB; wider planes fail explicitly rather than silently changing resolution.
+Dataset conversion stages expected PNG paths without decoding OME pixels, applies the usual annotation,
+subset, task and dataset-view filtering, and then materializes only retained sample IDs. Empty-labeled training
+planes discarded by the task's sample factory therefore require no decoding or temporary PNGs and cannot fail
+the revision because their pixels are unreadable or exceed rendering limits. Revision export copies
+the selected samples into `dataset_revisions/<id>/images/` and saves the parquet rows plus
+`ome_channel_projections.json`. The sidecar records only parents represented in the converted dataset and retains
+each parent's actual stored projection, including mixed RGB/grayscale policies. Its size is included in revision
+size accounting; no revision database schema change is needed.
+
+Training reloads the saved revision before removing temporary files, so initial training, subsequent revision
+reuse, quantization and revision export all consume persistent images. Changes to the display view or removal of
+the original OME payload cannot change those saved pixels. Failed materialization removes its incomplete PNG;
+failed revision export, sidecar copy or database insertion removes the partial revision directory and propagates
+the error.
+
+_Testing._ Integration tests build revisions with three annotated planes and an unannotated plane, assert the
+PNG pixels, parquet rows, dimensions, unchanged bounding boxes, subset counts and projection sidecar, and reload
+after deleting the temporary PNGs and source payload. The saved samples also pass through the real training
+dataset loader and COCO export. Additional cases cover view scoping, mixed parent projection policies and
+failure cleanup. Unit tests verify bounded level-zero reads, RGB/grayscale PNG decoding and resource
+cleanup. Existing projection-strategy tests cover 3-channel identity, wavelength selection, >3-channel fallback
+and <3-channel padding. `tests/bdd/features/ome_training.feature` defines the `@ome`
+upload → annotate → train → quantize → export gate using a generated fixture and a one-epoch ResNet-18 run.
+Its step bindings are dry-run validated; full execution remains pending and is not established by the
+revision-level tests.
 
 ### Step 8 - Prediction
 
