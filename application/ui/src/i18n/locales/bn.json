@@ -1,0 +1,1213 @@
+{
+    "common": {
+        "actions": {
+            "cancel": "বাতিল",
+            "close": "বন্ধ করুন",
+            "delete": "মুছুন",
+            "goBack": "ফিরে যান",
+            "rename": "নাম বদলান",
+            "save": "সংরক্ষণ করুন",
+            "assign": "বরাদ্দ করুন",
+            "back": "পেছনে",
+            "clear": "সাফ করুন",
+            "clearAll": "সব সাফ করুন",
+            "confirm": "নিশ্চিত করুন",
+            "connect": "সংযুক্ত করুন",
+            "continue": "চালিয়ে যান",
+            "create": "তৈরি করুন",
+            "disconnect": "সংযোগ বিচ্ছিন্ন করুন",
+            "dismiss": "সরিয়ে দিন",
+            "download": "ডাউনলোড করুন",
+            "edit": "সম্পাদনা করুন",
+            "export": "রপ্তানি করুন",
+            "hide": "লুকান",
+            "next": "পরবর্তী",
+            "refresh": "রিফ্রেশ করুন",
+            "remove": "সরান",
+            "selectAll": "সব নির্বাচন করুন",
+            "skip": "এড়িয়ে যান",
+            "start": "শুরু করুন",
+            "submit": "জমা দিন",
+            "train": "প্রশিক্ষণ দিন",
+            "upload": "আপলোড করুন",
+            "undo": "পূর্বাবস্থায় ফেরান",
+            "redo": "আবার করুন",
+            "annotate": "অ্যানোটেট করুন",
+            "addAndUse": "যোগ করুন ও ব্যবহার করুন",
+            "saveAndConnect": "সংরক্ষণ করে সংযোগ করুন",
+            "testConnection": "সংযোগ পরীক্ষা করুন"
+        },
+        "labels": {
+            "allUppercase": "সব",
+            "yes": "হ্যাঁ",
+            "no": "না",
+            "unknown": "অজানা",
+            "name": "নাম",
+            "architecture": "আর্কিটেকচার",
+            "device": "ডিভাইস",
+            "on": "চালু",
+            "off": "বন্ধ",
+            "noMaximum": "সর্বোচ্চ সীমা নেই",
+            "active": "সক্রিয়",
+            "dataset": "ডেটাসেট",
+            "filters": "ফিল্টার",
+            "images": "ছবি",
+            "videos": "ভিডিও",
+            "size": "আকার",
+            "sizeUppercase": "আকার",
+            "statusUppercase": "অবস্থা",
+            "settings": "সেটিংস",
+            "training": "প্রশিক্ষণ",
+            "training_subset": "প্রশিক্ষণ",
+            "validation": "যাচাই",
+            "validation_subset": "যাচাই",
+            "testing": "পরীক্ষা",
+            "unassigned": "বরাদ্দ করা হয়নি",
+            "trainingLowercase": "প্রশিক্ষণ",
+            "validationLowercase": "যাচাই",
+            "testingLowercase": "পরীক্ষা",
+            "frames": "ফ্রেম",
+            "seconds": "সেকেন্ড",
+            "every": "প্রতি",
+            "model": "মডেল",
+            "jobs": "কাজ",
+            "labels": "লেবেল",
+            "bytesTransferred": "{{total}}-এর মধ্যে {{transferred}}",
+            "annotations": "অ্যানোটেশন"
+        },
+        "viewModes": {
+            "large": "বড় থাম্বনেইল",
+            "medium": "মাঝারি থাম্বনেইল",
+            "small": "ছোট থাম্বনেইল"
+        },
+        "status": {
+            "pending": "অপেক্ষমাণ",
+            "running": "চলছে",
+            "done": "সম্পন্ন",
+            "cancelled": "বাতিল হয়েছে",
+            "uploading": "আপলোড হচ্ছে",
+            "failed": "ব্যর্থ",
+            "error": "ত্রুটি",
+            "disconnected": "সংযোগ বিচ্ছিন্ন",
+            "loading": "লোড হচ্ছে...",
+            "unavailable": "অনুপলব্ধ"
+        },
+        "errors": {
+            "unknown": "একটি অজানা ত্রুটি ঘটেছে",
+            "unknownDetail": "অজানা ত্রুটি"
+        }
+    },
+    "navigation": {
+        "logoAlt": "Geti লোগো",
+        "datasetDescription": "আপনার মিডিয়া দেখার জন্য ডেটা সংগ্রহের পৃষ্ঠা",
+        "models": "মডেলসমূহ",
+        "modelsDescription": "আপনার মডেলগুলি দেখার পৃষ্ঠা",
+        "inference": "ইনফারেন্স",
+        "inferenceDescription": "আপনার প্রকল্পের লাইভ ইনফারেন্স দেখার পৃষ্ঠা",
+        "help": {
+            "documentation": "ব্যবহার নির্দেশিকা",
+            "whatsNew": "নতুন কী আছে",
+            "reportIssue": "সমস্যা জানান"
+        }
+    },
+    "dataset": {
+        "validation": {
+            "datasetViewNameExists": "এই নামে একটি ভিউ ইতিমধ্যে আছে।",
+            "invalidDateRange": "শেষের তারিখটি শুরুর তারিখের পরে হতে হবে"
+        },
+        "views": {
+            "deleted": "ভিউ মুছে ফেলা হয়েছে",
+            "title": "ভিউ",
+            "entireDataset": "পুরো ডেটাসেট",
+            "assignToExistingView": "বিদ্যমান ভিউতে বরাদ্দ করুন",
+            "assignTo": "বরাদ্দের গন্তব্য",
+            "selectView": "একটি ভিউ নির্বাচন করুন",
+            "assignmentNote": "এই ভিউতে আগে থেকে বরাদ্দ করা অন্য মিডিয়ায় এর প্রভাব পড়বে না।",
+            "mediaAssigned_one": "{{count}}টি মিডিয়া আইটেম সফলভাবে বরাদ্দ করা হয়েছে।",
+            "mediaAssigned_other": "{{count}}টি মিডিয়া আইটেম সফলভাবে বরাদ্দ করা হয়েছে।",
+            "openView": "{{viewName}} খুলুন",
+            "saveView": "ভিউ সংরক্ষণ করুন",
+            "viewNameLabel": "ভিউয়ের নাম",
+            "renameTitle": "ডেটাসেট ভিউয়ের নাম বদলান",
+            "deleteTitle": "মোছা নিশ্চিত করুন",
+            "deleteConfirmation": "আপনি কি নিশ্চিত যে “{{viewName}}” ডেটাসেট ভিউটি মুছতে চান?",
+            "deleteSuccess": "“{{viewName}}” ডেটাসেট ভিউটি সফলভাবে মুছে ফেলা হয়েছে।",
+            "unassignFromView": "এই ভিউ থেকে বরাদ্দ সরান",
+            "selectedMediaCount_one": "{{count}}টি মিডিয়া আইটেম নির্বাচিত",
+            "selectedMediaCount_other": "{{count}}টি মিডিয়া আইটেম নির্বাচিত"
+        },
+        "filters": {
+            "allMedia": "সব মিডিয়া",
+            "withAnnotations": "অ্যানোটেশনযুক্ত মিডিয়া",
+            "missingAnnotations": "অ্যানোটেশনবিহীন মিডিয়া",
+            "subset": "উপসেট দিয়ে ফিল্টার করুন",
+            "searchLabels": "লেবেল খুঁজুন",
+            "labelsSelected_one": "{{count}}টি লেবেল নির্বাচিত",
+            "labelsSelected_other": "{{count}}টি লেবেল নির্বাচিত",
+            "toggleAll": "সবগুলির নির্বাচন বদলান",
+            "more": "আরও ফিল্টার",
+            "dateRange": {
+                "heading": "আপলোডের তারিখ দিয়ে ফিল্টার করুন",
+                "startDateLabel": "শুরুর তারিখ",
+                "endDateLabel": "শেষের তারিখ",
+                "from": "{{date}} থেকে",
+                "to": "{{date}} পর্যন্ত"
+            }
+        },
+        "upload": {
+            "queued": "সারিতে আছে",
+            "processing": "প্রক্রিয়াকরণ চলছে",
+            "uploaded": "আপলোড হয়েছে",
+            "errorTitle": "আপলোডে ত্রুটি",
+            "details": "আপলোডের বিবরণ",
+            "filename": "ফাইলের নাম",
+            "uploadingSummary_one": "{{total}}টি আইটেম আপলোড হচ্ছে, {{uploaded}}টি সম্পন্ন",
+            "uploadingSummary_other": "{{total}}টি আইটেম আপলোড হচ্ছে, {{uploaded}}টি সম্পন্ন",
+            "uploadingFailedSummary_one": "{{total}}টি আইটেম আপলোড হচ্ছে, {{uploaded}}টি সম্পন্ন ও {{failed}}টি ব্যর্থ",
+            "uploadingFailedSummary_other": "{{total}}টি আইটেম আপলোড হচ্ছে, {{uploaded}}টি সম্পন্ন ও {{failed}}টি ব্যর্থ",
+            "uploadedSummary_one": "{{count}}টি আইটেম আপলোড হয়েছে",
+            "uploadedSummary_other": "{{count}}টি আইটেম আপলোড হয়েছে",
+            "failedSummary_one": "{{count}}টি আইটেম আপলোড করা যায়নি",
+            "failedSummary_other": "{{count}}টি আইটেম আপলোড করা যায়নি",
+            "mixedSummary_one": "{{uploaded}}টি আইটেম আপলোড হয়েছে, {{failed}}টি ব্যর্থ",
+            "mixedSummary_other": "{{uploaded}}টি আইটেম আপলোড হয়েছে, {{failed}}টি ব্যর্থ",
+            "mixedCancelledSummary_one": "{{uploaded}}টি আইটেম আপলোড হয়েছে, {{failed}}টি ব্যর্থ, {{cancelled}}টি বাতিল",
+            "mixedCancelledSummary_other": "{{uploaded}}টি আইটেম আপলোড হয়েছে, {{failed}}টি ব্যর্থ, {{cancelled}}টি বাতিল",
+            "genericError": "মিডিয়া আপলোড করা যায়নি।",
+            "uploadMedia": "মিডিয়া আপলোড করুন",
+            "showDetails": "বিবরণ দেখুন",
+            "inProgressToast_one": "{{count}}টি আইটেম আপলোড হচ্ছে...",
+            "inProgressToast_other": "{{count}}টি আইটেম আপলোড হচ্ছে...",
+            "inProgressSucceededPart": "{{count}}টি সফল",
+            "inProgressFailedPart": "{{count}}টি ব্যর্থ",
+            "cancelAll": "সব বাতিল করুন",
+            "cancelledSummary_one": "{{count}}টি আপলোড বাতিল করা হয়েছে",
+            "cancelledSummary_other": "{{count}}টি আপলোড বাতিল করা হয়েছে"
+        },
+        "empty": {
+            "noMatches": "আপনার ফিল্টারের সঙ্গে কোনো মিডিয়া আইটেম মেলেনি।",
+            "changeFilter": "ফিল্টার সরান অথবা অন্য ফিল্টার নির্বাচন করুন।",
+            "viewEmpty": "এই ভিউতে কোনো মিডিয়া আইটেম নেই।",
+            "assignOrBack": "এতে মিডিয়া আইটেম বরাদ্দ করুন অথবা পুরো ডেটাসেটে ফিরে যান।",
+            "goToEntireDataset": "{{datasetName}}-এ যান",
+            "datasetEmpty": "আপনার ডেটাসেট খালি।",
+            "uploadToStart": "শুরু করতে প্রথম মিডিয়া আইটেমটি আপলোড করুন।"
+        },
+        "review": {
+            "reviewed": "পর্যালোচিত",
+            "forReview": "পর্যালোচনার জন্য",
+            "selectSubsetPlaceholder": "উপসেট নির্বাচন করুন"
+        },
+        "statistics": {
+            "label": "ডেটাসেটের পরিসংখ্যান",
+            "title": "ডেটাসেটের পরিসংখ্যান",
+            "numberOfMedia": "মিডিয়ার সংখ্যা",
+            "annotatedImages": "অ্যানোটেশনযুক্ত ছবি",
+            "annotatedVideosFrames": "অ্যানোটেশনযুক্ত ভিডিও বা ফ্রেম",
+            "numberOfObjectsPerLabel": "প্রতি লেবেলে অবজেক্টের সংখ্যা",
+            "unannotated": "অ্যানোটেশনবিহীন",
+            "annotated": "অ্যানোটেশনযুক্ত"
+        },
+        "delete": {
+            "title": "আইটেম মুছুন",
+            "mediaItem": "মিডিয়া আইটেম মুছুন",
+            "confirmation_one": "আপনি কি নিশ্চিত যে {{count}}টি আইটেম মুছতে চান?",
+            "confirmation_other": "আপনি কি নিশ্চিত যে {{count}}টি আইটেম মুছতে চান?",
+            "deletingItems": "আইটেম মোছা হচ্ছে...",
+            "deleteError": "মোছা যায়নি, {{detail}}",
+            "deletedSuccess_one": "{{count}}টি আইটেম সফলভাবে মুছে ফেলা হয়েছে",
+            "deletedSuccess_other": "{{count}}টি আইটেম সফলভাবে মুছে ফেলা হয়েছে"
+        },
+        "bulkLabels": {
+            "title": "লেবেল বরাদ্দ",
+            "uploadInstructions": "আপলোড করা ছবিগুলির জন্য লেবেল নির্বাচন করে ‘চালিয়ে যান’ ক্লিক করুন। পরে ছবিগুলি অ্যানোটেট করতে চাইলে ‘এড়িয়ে যান’ নির্বাচন করুন।",
+            "selectedInstructions": "নির্বাচিত ছবিগুলির জন্য লেবেল নির্বাচন করে ‘বরাদ্দ করুন’ ক্লিক করুন।",
+            "imageOnlyNote": "নির্বাচিত লেবেলগুলি শুধু ছবিতে প্রযোজ্য। ভিডিও থাকলে সেগুলি অ্যানোটেশন ছাড়াই আপলোড হবে।",
+            "selectedImagesNote": "নির্বাচিত লেবেলগুলি শুধু ছবিতে প্রযোজ্য। ভিডিও থাকলে সেগুলি অপরিবর্তিত থাকবে।",
+            "noResults": "কোনো ফল পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজে দেখুন।",
+            "cancelUpload": "আপলোড বাতিল করুন",
+            "assignLabelTooltip": "লেবেল বরাদ্দ করুন",
+            "assignAllSuccess": "সব {{count}}টি ছবিতে লেবেল সফলভাবে বরাদ্দ করা হয়েছে",
+            "assignAllFailure": "{{count}}টি ছবির কোনোটিতেই লেবেল বরাদ্দ করা যায়নি",
+            "assignPartialSuccess": "{{total}}টি ছবির মধ্যে {{succeeded}}টিতে লেবেল বরাদ্দ করা হয়েছে, {{failed}}টি ব্যর্থ"
+        },
+        "mediaDetails": {
+            "title": "বিবরণ",
+            "resolution": "রেজোলিউশন",
+            "fileSize": "ফাইলের আকার",
+            "format": "ফরম্যাট",
+            "type": "মিডিয়ার ধরন",
+            "image": "ছবি",
+            "video": "ভিডিও",
+            "frameRate": "ফ্রেম রেট",
+            "duration": "সময়কাল",
+            "frames": "মোট ফ্রেম",
+            "annotatedFrames": "অ্যানোটেশনযুক্ত ফ্রেম",
+            "labels": "স্বতন্ত্র লেবেল",
+            "retry": "আবার চেষ্টা করুন"
+        },
+        "mediaActions": {
+            "downloadStarted": "{{fileName}} ডাউনলোড শুরু হয়েছে"
+        },
+        "gallery": {
+            "sort": {
+                "label": "মিডিয়া সাজানোর ক্রম:",
+                "uploadDateDescending": "আপলোডের তারিখ (সাম্প্রতিক আগে)",
+                "uploadDateAscending": "আপলোডের তারিখ (পুরোনো আগে)"
+            },
+            "selectedCount": "{{count}}টি নির্বাচিত",
+            "totalMediaCount_one": "{{count}}টি মিডিয়া আইটেম",
+            "totalMediaCount_other": "{{count}}টি মিডিয়া আইটেম",
+            "dropZone": {
+                "title": "মিডিয়া ফাইল এখানে ছেড়ে দিন",
+                "description": "এই ডেটাসেটে ছবি ও ভিডিও আপলোড হবে।"
+            }
+        },
+        "import": {
+            "jobTitle": "ডেটাসেট আমদানি করুন - {{fileName}} - {{size}}",
+            "processingMessage": "{{fileName}} ফাইলটি আমদানির জন্য প্রক্রিয়া করা হচ্ছে",
+            "technicalDetails": "প্রযুক্তিগত বিবরণ",
+            "preparingJob": "প্রস্তুত হচ্ছে",
+            "stagedFileReadError": "অস্থায়ীভাবে রাখা ফাইল পড়ার সময় ত্রুটি ঘটেছে",
+            "prepareError": "আমদানির প্রস্তুতির সময় ত্রুটি ঘটেছে।",
+            "genericError": "আমদানির সময় ত্রুটি ঘটেছে।",
+            "importedSuccess": "{{fileName}} {{size}} ডেটাসেট সফলভাবে আমদানি হয়েছে।",
+            "multipleFilesError": "ফোল্ডার বা একাধিক ফাইল যোগ করা যায় না। একটি মাত্র ফাইল নির্বাচন করুন।",
+            "unsupportedFormatError": "অসমর্থিত ফাইল ফরম্যাট। একটি বৈধ .zip ফাইল আপলোড করুন।",
+            "datasetBeingUploaded": "ডেটাসেট আপলোড হচ্ছে",
+            "dropZipHere": "ডেটাসেটের .zip ফাইলটি এখানে ছেড়ে দিন",
+            "learnMoreFormats": "বিভিন্ন ফরম্যাট সম্পর্কে আরও জানুন",
+            "dialogHeading": "ডেটাসেট আমদানি করুন",
+            "scanningMessage": "আমদানির জন্য ডেটাসেট আর্কাইভ স্ক্যান ও বিশ্লেষণ করা হচ্ছে...",
+            "mapLabelsMessage": "আপলোড করা ডেটাসেটের লেবেল মেলান",
+            "deleteStagedFile": {
+                "title": "অস্থায়ীভাবে রাখা ফাইল মুছুন",
+                "confirmation": "আপনি কি নিশ্চিত যে “{{stagedDatasetId}}” ডেটাসেট ফাইলটি মুছতে চান?"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "আমদানি করা ডেটাসেটে বাউন্ডিং বক্স অ্যানোটেশন আছে, কিন্তু আপনার প্রকল্পের ডেটাসেটে পলিগন ব্যবহার করা হয়। সামঞ্জস্য রাখতে অ্যানোটেশনগুলি স্বয়ংক্রিয়ভাবে পলিগনে রূপান্তর করা হবে।",
+                "polygonToBoundingBox": "আমদানি করা ডেটাসেটে পলিগন অ্যানোটেশন আছে, কিন্তু আপনার প্রকল্পের ডেটাসেটে বাউন্ডিং বক্স ব্যবহার করা হয়। সামঞ্জস্য রাখতে অ্যানোটেশনগুলি স্বয়ংক্রিয়ভাবে বাউন্ডিং বক্সে রূপান্তর করা হবে।"
+            },
+            "labelMapping": {
+                "statisticsHeading": "আমদানি করা ডেটাসেটের পরিসংখ্যান",
+                "heading": "লেবেল মেলানো - ঐচ্ছিক",
+                "unmappedNote": "যেসব আইটেমের লেবেল মেলানো হয়নি, সেগুলি লেবেল ছাড়াই আমদানি হবে",
+                "datasetLabelsColumn": "ডেটাসেটের লেবেল",
+                "projectLabelsColumn": "প্রকল্পের লেবেল",
+                "selectLabelPlaceholder": "লেবেল নির্বাচন করুন",
+                "imagesLabel": "ছবি",
+                "framesLabel": "ফ্রেম"
+            }
+        },
+        "export": {
+            "heading": "{{name}} রপ্তানি করুন",
+            "headingDatasetView": "ডেটাসেট ভিউ রপ্তানি করুন",
+            "datasetView": "ভিউ: {{name}}",
+            "statisticsHeading": "রপ্তানি করা ডেটাসেটের পরিসংখ্যান",
+            "settingsHeading": "রপ্তানির সেটিংস",
+            "filterByLabel": "লেবেল দিয়ে অ্যানোটেশন ফিল্টার করুন",
+            "selectFormat": "ডেটাসেট রপ্তানির ফরম্যাট নির্বাচন করুন",
+            "learnMoreFormats": "রপ্তানির ফরম্যাট সম্পর্কে আরও জানুন",
+            "processing": "রপ্তানির জন্য ডেটাসেট প্রক্রিয়া করা হচ্ছে",
+            "readyForDownload": "ডেটাসেট ডাউনলোডের জন্য প্রস্তুত",
+            "downloadStarted": "ডেটাসেট ডাউনলোড শুরু হয়েছে",
+            "error": "ত্রুটি: {{error}}",
+            "itemsLabel": "আইটেম",
+            "details": {
+                "defaultName": "ডেটাসেট",
+                "format": "ফরম্যাট:",
+                "media": "মিডিয়া:",
+                "onlyAnnotated": "শুধু অ্যানোটেশনযুক্ত মিডিয়া",
+                "labels": "লেবেল:"
+            },
+            "warnings": {
+                "videos": "এই ডেটাসেট ফরম্যাটে ভিডিও রপ্তানি করা যায় না। ভিডিওর সব অ্যানোটেশনযুক্ত ফ্রেম ছবি হিসেবে রপ্তানি হবে।",
+                "emptyLabel": "নির্বাচিত ফরম্যাটে খালি লেবেল সমর্থিত নয় (যেমন “{{emptyLabelName}}”)। এ ধরনের লেবেলযুক্ত ছবি ও ফ্রেম অ্যানোটেশন ছাড়াই রপ্তানি হবে।",
+                "unsupportedItemsEmptyLabels": "খালি লেবেল",
+                "unsupportedItemsVideos": "ভিডিও",
+                "unsupportedItems": "{{items}} সংরক্ষণ করতে Geti রপ্তানি ফরম্যাট ব্যবহার করুন।",
+                "subsetNotIncluded": "প্রতিটি মিডিয়া কোন উপসেটে বরাদ্দ করা হয়েছে, সেই তথ্য রপ্তানি করা ডেটাসেটে থাকবে না।"
+            }
+        },
+        "importExport": {
+            "trigger": "ডেটাসেট আমদানি বা রপ্তানি",
+            "exportItem": "ডেটাসেট রপ্তানি করুন"
+        },
+        "revisions": {
+            "createdOn": "তৈরির তারিখ {{date}}",
+            "unnamedName": "ডেটাসেট #{{id}}",
+            "notFoundForModel": "এই মডেলের জন্য কোনো ডেটাসেট সংস্করণ পাওয়া যায়নি",
+            "filesDeleted": "এই ডেটাসেট সংস্করণের ফাইলগুলি মুছে ফেলা হয়েছে।",
+            "noItemsInSubset": "এই উপসেটে কোনো আইটেম নেই",
+            "itemAlt": "{{subset}} উপসেটের আইটেম",
+            "trainingSubsets": {
+                "test": "পরীক্ষা"
+            },
+            "rename": {
+                "title": "ডেটাসেট সংস্করণের নাম বদলান",
+                "nameLabel": "ডেটাসেট সংস্করণের নাম"
+            },
+            "delete": {
+                "title": "ডেটাসেট সংস্করণ মুছুন",
+                "description": "আপনি কি নিশ্চিত যে “{{name}}” ডেটাসেট সংস্করণটি মুছতে চান? মডেলের পরিসংখ্যান দেখতে পারবেন, তবে প্রশিক্ষণের ডেটাসেট ফাইলগুলি আর খুলতে পারবেন না।"
+            }
+        },
+        "includeUnannotated": "অ্যানোটেশনবিহীন মিডিয়া অন্তর্ভুক্ত করুন"
+    },
+    "inference": {
+        "validation": {
+            "keyEmpty": "কী খালি রাখা যাবে না",
+            "keyDuplicate": "প্রতিটি কী আলাদা হতে হবে",
+            "valueEmpty": "মান খালি রাখা যাবে না"
+        },
+        "connection": {
+            "testing": "সংযোগ পরীক্ষা করা হচ্ছে...",
+            "inUse": "ব্যবহৃত হচ্ছে",
+            "unreachable": "সংযোগ করা যাচ্ছে না",
+            "ready": "প্রস্তুত",
+            "saveErrorFallback": "আবার চেষ্টা করুন",
+            "removeSuccess": "{{name}} সফলভাবে সরানো হয়েছে!"
+        },
+        "confidenceThreshold": {
+            "label": "কনফিডেন্স সীমা"
+        },
+        "devices": {
+            "label": "ইনফারেন্স ডিভাইস"
+        },
+        "sources": {
+            "title": "উৎস",
+            "uploadError": "ভিডিও ফাইল আপলোড করা যায়নি।",
+            "deleteVideoError": "আপলোড করা ভিডিও ফাইল মোছা যায়নি।",
+            "list": {
+                "addSource": "নতুন উৎস যোগ করুন"
+            },
+            "types": {
+                "usbCamera": "USB ক্যামেরা",
+                "ipCamera": "IP ক্যামেরা",
+                "videoFile": "ভিডিও ফাইল"
+            },
+            "options": {
+                "usbCamera": "USB ক্যামেরা",
+                "ipCamera": "IP ক্যামেরা",
+                "videoFile": "ভিডিও ফাইল"
+            },
+            "add": {
+                "title": "নতুন ইনপুট উৎস যোগ করুন"
+            },
+            "edit": {
+                "title": "ইনপুট উৎস সম্পাদনা করুন"
+            },
+            "form": {
+                "createSuccess": "উৎসের কনফিগারেশন সফলভাবে তৈরি হয়েছে।",
+                "updateSuccess": "উৎসের কনফিগারেশন সফলভাবে হালনাগাদ হয়েছে।",
+                "saveError": "উৎসের কনফিগারেশন সংরক্ষণ করা যায়নি, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "“{{name}}”-এর সঙ্গে সফলভাবে সংযোগ হয়েছে।",
+                "disconnectSuccess": "“{{name}}”-এর সংযোগ সফলভাবে বিচ্ছিন্ন হয়েছে।",
+                "disablePipelineAndDisconnectSuccess": "পাইপলাইন সফলভাবে নিষ্ক্রিয় করা হয়েছে এবং “{{name}}”-এর সংযোগ বিচ্ছিন্ন হয়েছে।",
+                "disconnectDialog": {
+                    "title": "{{name}}-এর সংযোগ বিচ্ছিন্ন করুন",
+                    "message": "এই উৎসের সংযোগ বিচ্ছিন্ন করলে ইনফারেন্স পাইপলাইনও নিষ্ক্রিয় হবে। আপনি কি চালিয়ে যেতে চান?"
+                }
+            },
+            "settings": {
+                "device": "ডিভাইস: {{name}}",
+                "unknownDevice": "অজানা ডিভাইস (আইডি: {{deviceId}})",
+                "streamUrl": "স্ট্রিমের URL: {{url}}",
+                "videoPath": "ভিডিওর পাথ: {{path}}"
+            },
+            "fields": {
+                "streamUrl": "স্ট্রিমের URL:",
+                "requireAuthentication": "প্রমাণীকরণ আবশ্যক করুন",
+                "camera": "ক্যামেরা",
+                "videoFilePath": "ভিডিও ফাইলের পাথ",
+                "selectedFile": "নির্বাচিত: {{fileName}}",
+                "loopVideo": "ভিডিও বারবার চালান"
+            },
+            "defaultNames": {
+                "usbCamera": "USB ক্যামেরা উৎস",
+                "ipCamera": "IP ক্যামেরা উৎস",
+                "videoFile": "ভিডিও ফাইল উৎস"
+            }
+        },
+        "sinks": {
+            "title": "আউটপুট গন্তব্য",
+            "types": {
+                "folder": "ফোল্ডার",
+                "mqtt": "MQTT",
+                "webhook": "ওয়েবহুক"
+            },
+            "options": {
+                "folder": "ফোল্ডার",
+                "webhook": "ওয়েবহুক",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "নতুন আউটপুট গন্তব্য যোগ করুন"
+            },
+            "edit": {
+                "title": "আউটপুট গন্তব্য সম্পাদনা করুন"
+            },
+            "form": {
+                "createSuccess": "আউটপুট গন্তব্যের কনফিগারেশন সফলভাবে তৈরি হয়েছে।",
+                "updateSuccess": "আউটপুট গন্তব্যের কনফিগারেশন সফলভাবে হালনাগাদ হয়েছে।",
+                "saveError": "আউটপুট গন্তব্যের কনফিগারেশন সংরক্ষণ করা যায়নি, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "“{{name}}”-এর সঙ্গে সফলভাবে সংযোগ হয়েছে",
+                "disconnectSuccess": "“{{name}}”-এর সংযোগ সফলভাবে বিচ্ছিন্ন হয়েছে"
+            },
+            "settings": {
+                "rateLimit": "হারের সীমা: {{value}}",
+                "httpMethod": "HTTP পদ্ধতি: {{value}}",
+                "timeout": "সময়সীমা: {{value}}",
+                "webhookUrl": "ওয়েবহুক URL: {{value}}",
+                "topic": "টপিক: {{value}}",
+                "brokerHost": "ব্রোকার হোস্ট: {{value}}",
+                "brokerPort": "ব্রোকার পোর্ট: {{value}}",
+                "outputFormats": "আউটপুট ফরম্যাট: ",
+                "outputFormatTypes": {
+                    "imageOriginal": "মূল ছবি",
+                    "imageWithPredictions": "পূর্বাভাসসহ ছবি",
+                    "predictions": "পূর্বাভাস"
+                }
+            },
+            "rateLimit": {
+                "notSet": "নির্ধারণ করা হয়নি",
+                "samplesPerSecond_one": "প্রতি সেকেন্ডে {{count}}টি নমুনা",
+                "samplesPerSecond_other": "প্রতি সেকেন্ডে {{count}}টি নমুনা",
+                "oneSamplePerSeconds_one": "প্রতি {{count}} সেকেন্ডে ১টি নমুনা",
+                "oneSamplePerSeconds_other": "প্রতি {{count}} সেকেন্ডে ১টি নমুনা"
+            },
+            "fields": {
+                "samples": "নমুনা",
+                "outputFormatsLabel": "আউটপুট ফরম্যাট",
+                "outputFormatPredictions": "পূর্বাভাস",
+                "outputFormatImageOriginal": "মূল ছবি",
+                "outputFormatImageWithPredictions": "পূর্বাভাসসহ ছবি",
+                "folderPath": "ফোল্ডারের পাথ",
+                "httpMethod": "HTTP পদ্ধতি",
+                "timeout": "সময়সীমা",
+                "webhookUrl": "ওয়েবহুক URL",
+                "headers": "হেডার",
+                "topic": "টপিক",
+                "brokerHost": "ব্রোকার হোস্ট",
+                "brokerPort": "ব্রোকার পোর্ট",
+                "authRequired": "প্রমাণীকরণ আবশ্যক"
+            },
+            "webhook": {
+                "headersHelp": "প্রয়োজনমতো কী-মান জোড়া যোগ করুন। প্রতিটি জোড়া ‘{{title}}’ অবজেক্টে অন্তর্ভুক্ত হবে।",
+                "keyPlaceholder": "কী",
+                "valuePlaceholder": "মান"
+            },
+            "defaultNames": {
+                "localFolder": "স্থানীয় ফোল্ডার গন্তব্য",
+                "webhook": "ওয়েবহুক গন্তব্য",
+                "mqtt": "MQTT গন্তব্য"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "loading": "মডেল: ..."
+            },
+            "toggle": {
+                "enabledLabel": "পাইপলাইন সক্রিয়",
+                "disabledLabel": "পাইপলাইন নিষ্ক্রিয়",
+                "enabledSuccess": "পাইপলাইন সফলভাবে সক্রিয় হয়েছে",
+                "disabledSuccess": "পাইপলাইন সফলভাবে নিষ্ক্রিয় হয়েছে"
+            },
+            "configuration": {
+                "sidebarLabel": "পাইপলাইনের কনফিগারেশন"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "ডেটা সংগ্রহের নীতি",
+            "maxDatasetSize": {
+                "title": "ডেটাসেটের সর্বোচ্চ আকার",
+                "description": "সংগ্রহযোগ্য আইটেমের সর্বোচ্চ সংখ্যা"
+            },
+            "captureRate": {
+                "title": "ক্যাপচারের হার",
+                "description": "স্ট্রিম চলার সময় ফ্রেম ক্যাপচার করুন",
+                "toggleLabel": "স্বয়ংক্রিয় ক্যাপচার চালু বা বন্ধ করুন"
+            },
+            "confidenceThreshold": {
+                "description": "কনফিডেন্স সীমার নিচে থাকলে ফ্রেম ক্যাপচার করুন",
+                "sliderLabel": "সীমা"
+            }
+        },
+        "metrics": {
+            "time": "সময়",
+            "sidebarLabel": "পাইপলাইনের মেট্রিক",
+            "empty": {
+                "title": "কোনো পরিসংখ্যান পাওয়া যায়নি",
+                "description": "পাইপলাইন চালু হয়ে ডেটা প্রক্রিয়া শুরু করলে এখানে মেট্রিক দেখা যাবে।"
+            },
+            "throughput": {
+                "title": "থ্রুপুট",
+                "axisLabel": "অনুরোধ/সেকেন্ড"
+            },
+            "latency": {
+                "title": "লেটেন্সি",
+                "axisLabel": "মি.সে."
+            }
+        },
+        "health": {
+            "overall": {
+                "idle": "নিষ্ক্রিয়",
+                "problemsDetected": "সমস্যা শনাক্ত হয়েছে"
+            },
+            "component": {
+                "healthy": "স্বাভাবিক",
+                "finished": "শেষ হয়েছে"
+            }
+        },
+        "stream": {
+            "start": "স্ট্রিম চালু করুন",
+            "enablePipelineToStart": "স্ট্রিম চালু করতে পাইপলাইন সক্রিয় করুন",
+            "connectError": "স্ট্রিমের সঙ্গে সংযোগ করা যায়নি",
+            "captureFrame": "ফ্রেম ক্যাপচার করুন",
+            "captureSuccess": "ফ্রেম ক্যাপচার করে ডেটাসেটে যোগ করা হয়েছে।"
+        },
+        "settings": {
+            "folderPath": "ফোল্ডারের পাথ: {{path}}",
+            "authRequired": "প্রমাণীকরণ আবশ্যক: {{value}}"
+        }
+    },
+    "project": {
+        "delete": {
+            "confirmation": "আপনি কি নিশ্চিত যে “{{projectName}}” প্রকল্পটি মুছতে চান?",
+            "success": "প্রকল্পটি সফলভাবে মুছে ফেলা হয়েছে"
+        },
+        "rename": {
+            "title": "প্রকল্পের নাম সম্পাদনা করুন",
+            "success": "প্রকল্পটি সফলভাবে হালনাগাদ হয়েছে"
+        },
+        "validation": {
+            "nameEmpty": "প্রকল্পের নাম খালি রাখা যাবে না",
+            "nameExists": "এই নামে একটি প্রকল্প ইতিমধ্যে আছে"
+        },
+        "panel": {
+            "manageProjects": "প্রকল্প পরিচালনা করুন",
+            "enablePipelineBlocked": {
+                "title": "পাইপলাইন সক্রিয় করা যাচ্ছে না",
+                "message": "পাইপলাইন সক্রিয় করার আগে একটি মডেল ও উৎস নির্বাচন করুন।"
+            }
+        },
+        "taskTypes": {
+            "detection": "অবজেক্ট শনাক্তকরণ",
+            "classification": "শ্রেণিবিন্যাস",
+            "instanceSegmentation": "ইনস্ট্যান্স সেগমেন্টেশন",
+            "multiLabelClassification": "বহু-লেবেল শ্রেণিবিন্যাস",
+            "recommended": "{{taskType}} (প্রস্তাবিত)"
+        },
+        "list": {
+            "count_one": "{{count}}টি প্রকল্প",
+            "count_other": "{{count}}টি প্রকল্প",
+            "countFiltered_one": "{{count}}টি প্রকল্পের মধ্যে {{filtered}}টি",
+            "countFiltered_other": "{{count}}টি প্রকল্পের মধ্যে {{filtered}}টি",
+            "createNewProject": "নতুন প্রকল্প তৈরি করুন",
+            "createProjectFromDataset": "ডেটাসেট থেকে তৈরি করুন",
+            "card": {
+                "created": "তৈরির তারিখ: {{date}}",
+                "models_one": "{{count}}টি মডেল",
+                "models_other": "{{count}}টি মডেল"
+            },
+            "menu": {
+                "enablePipeline": "পাইপলাইন সক্রিয় করুন",
+                "disablePipeline": "পাইপলাইন নিষ্ক্রিয় করুন"
+            },
+            "sort": {
+                "label": "প্রকল্প সাজানোর ক্রম:",
+                "nameAscending": "নাম (ঊর্ধ্বক্রম)",
+                "nameDescending": "নাম (নিম্নক্রম)",
+                "createdAtDescending": "তৈরির তারিখ (সাম্প্রতিক আগে)",
+                "createdAtAscending": "তৈরির তারিখ (পুরোনো আগে)"
+            },
+            "filters": {
+                "searchPlaceholder": "প্রকল্প খুঁজুন",
+                "taskType": "কাজের ধরন দিয়ে ফিল্টার করুন",
+                "models": "মডেল দিয়ে ফিল্টার করুন",
+                "withTrainedModels": "প্রশিক্ষিত মডেল আছে"
+            },
+            "noMatches": {
+                "title": "আপনার ফিল্টারের সঙ্গে কোনো প্রকল্প মেলেনি",
+                "description": "যা খুঁজছেন তা পেতে অনুসন্ধান বা কাজের ধরনের ফিল্টার বদলে দেখুন।"
+            },
+            "empty": {
+                "intro": "<name>Geti</name>-তে স্বাগতম। এই ভিশন AI প্ল্যাটফর্ম ডেটাসেট প্রস্তুতি থেকে প্রশিক্ষণ, অপ্টিমাইজেশন ও ডিপ্লয়মেন্ট পর্যন্ত <highlight>মডেলের পুরো জীবনচক্রে</highlight> আপনাকে সহায়তা করে।"
+            },
+            "workflow": {
+                "addData": "ডেটা যোগ করুন",
+                "optimize": "অপ্টিমাইজ করুন",
+                "runInference": "ইনফারেন্স চালান",
+                "loop": "পূর্বাভাস পর্যবেক্ষণ করুন এবং ধাপে ধাপে মডেল উন্নত করতে আরও ডেটা সংগ্রহ করুন"
+            }
+        },
+        "create": {
+            "taskQuestion": "মডেলটি দিয়ে কী ধরনের কাজ করাতে চান?",
+            "labelsQuestion": "মডেল কোন অবজেক্টগুলি {{verb}} শিখবে?",
+            "submit": "প্রকল্প তৈরি করুন",
+            "tasks": {
+                "detection": {
+                    "title": "অবজেক্ট শনাক্তকরণ",
+                    "description": "ছবিতে অবজেক্ট শনাক্ত করে তার অবস্থান বের করুন",
+                    "advice": "সবচেয়ে উপযোগী: গণনা, ট্র্যাকিং",
+                    "verb": "শনাক্ত করতে"
+                },
+                "instanceSegmentation": {
+                    "title": "ইনস্ট্যান্স সেগমেন্টেশন",
+                    "description": "নির্দিষ্ট অঞ্চল বা আকৃতি শনাক্ত করে তার সীমানা আঁকুন",
+                    "advice": "সবচেয়ে উপযোগী: পরিমাপ, অনিয়মিত আকৃতি",
+                    "verb": "সেগমেন্ট করতে"
+                },
+                "classification": {
+                    "title": "ছবি শ্রেণিবিন্যাস",
+                    "description": "ছবির বিষয়বস্তু অনুযায়ী পুরো ছবিকে শ্রেণিবদ্ধ করুন",
+                    "advice": "সবচেয়ে উপযোগী: ফিল্টারিং, বিষয়বস্তু নিয়ন্ত্রণ",
+                    "verb": "শ্রেণিবদ্ধ করতে"
+                }
+            },
+            "classificationType": {
+                "title": "মডেলটি কোন ধরনের শ্রেণিবিন্যাস ব্যবহার করবে?",
+                "singleLabel": {
+                    "label": "একক লেবেল",
+                    "description": "পরস্পর-বর্জনশীল লেবেলগুলির মধ্যে একটি বরাদ্দ করুন",
+                    "warning": "অন্তত ২টি লেবেল প্রয়োজন"
+                },
+                "multiLabel": {
+                    "label": "বহু লেবেল",
+                    "description": "একসঙ্গে প্রযোজ্য লেবেলগুলির মধ্যে একটি বা একাধিক বরাদ্দ করুন"
+                }
+            },
+            "labels": {
+                "atLeastOneRequired": "অন্তত একটি অবজেক্ট প্রয়োজন"
+            },
+            "defaultName": "প্রকল্প #{{number}}"
+        },
+        "import": {
+            "title": "ডেটাসেট আমদানি করে প্রকল্প তৈরি করুন",
+            "labelMapping": {
+                "title": "লেবেল মেলানো"
+            },
+            "preparingMessage": "নতুন প্রকল্প হিসেবে ডেটাসেট আমদানির প্রস্তুতি নিন",
+            "taskSelection": {
+                "projectName": "প্রকল্পের নাম",
+                "selectTaskPlaceholder": "কাজ নির্বাচন করুন",
+                "recommendationHint": "ডেটাসেটে শনাক্ত অ্যানোটেশনের ধরন অনুযায়ী এই পছন্দটি প্রস্তাব করা হয়েছে। অন্য ধরন বেছে নিলে আমদানির সময় অ্যানোটেশন স্বয়ংক্রিয়ভাবে সেই ধরনের উপযোগী করে রূপান্তর করা হবে।"
+            },
+            "jobsList": {
+                "selectTaskType": "কাজের ধরন নির্বাচন করুন",
+                "mapLabelsButton": "লেবেল মেলান"
+            }
+        },
+        "taskType": "কাজের ধরন"
+    },
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "শর্টকাট কী",
+            "nameExists": "এই নামে একটি লেবেল ইতিমধ্যে আছে",
+            "hotkeyExists": "এই শর্টকাটটি ইতিমধ্যে ব্যবহৃত হচ্ছে"
+        },
+        "editor": {
+            "namePlaceholder": "লেবেলের নাম",
+            "pin": "লেবেল পিন করুন",
+            "unpin": "লেবেলের পিন খুলুন",
+            "editTrigger": "লেবেল সম্পাদনা করুন",
+            "createTrigger": "লেবেল তৈরি করুন",
+            "delete": {
+                "title": "লেবেল মুছুন",
+                "message": "{{labelName}} লেবেলটি সরালে আপনার ডেটাসেটে এই লেবেলের সব অ্যানোটেশন মুছে যাবে। আগে প্রশিক্ষিত মডেলগুলিতে এর প্রভাব পড়বে না।"
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "শর্টকাট কী: {{hotkey}}",
+            "overflowCount": "+ আরও {{count}}টি"
+        },
+        "empty": {
+            "noLabel": "কোনো লেবেল নেই",
+            "noObject": "কোনো অবজেক্ট নেই"
+        }
+    },
+    "annotator": {
+        "canvas": {
+            "hideLabels": "লেবেল লুকান",
+            "pixelView": "পিক্সেল ভিউ",
+            "annotationFillOpacity": "অ্যানোটেশনের ভরাট অংশের অস্বচ্ছতা",
+            "annotationBorderOpacity": "অ্যানোটেশনের সীমানার অস্বচ্ছতা",
+            "imageBrightness": "ছবির উজ্জ্বলতা",
+            "imageContrast": "ছবির কনট্রাস্ট",
+            "imageSaturation": "ছবির বর্ণের তীব্রতা"
+        },
+        "actions": {
+            "zoomIn": "বড় করে দেখুন",
+            "zoomOut": "ছোট করে দেখুন",
+            "fitToScreen": "পর্দার সঙ্গে মানানসই করুন ({{hotkey}})",
+            "undo": "পূর্বাবস্থায় ফেরান ({{hotkey}})",
+            "redo": "আবার করুন ({{hotkeys}})",
+            "toggleFocus": "ফোকাস বদলান",
+            "showAnnotations": "অ্যানোটেশন দেখান ({{hotkey}})",
+            "hideAnnotations": "অ্যানোটেশন লুকান ({{hotkey}})"
+        },
+        "modes": {
+            "annotation": "অ্যানোটেশন",
+            "prediction": "পূর্বাভাস"
+        },
+        "predictions": {
+            "settingsTitle": "পূর্বাভাসের সেটিংস",
+            "confirm": "পূর্বাভাস নিশ্চিত করুন"
+        },
+        "hotkeys": {
+            "alternatives": "{{primary}} অথবা {{alternative}}",
+            "title": "কিবোর্ড শর্টকাট",
+            "submitAnnotationsPredictions": "অ্যানোটেশন বা পূর্বাভাস জমা দিন",
+            "previousMedia": "আগের মিডিয়া",
+            "nextMedia": "পরের মিডিয়া",
+            "deleteSelectedAnnotation": "নির্বাচিত অ্যানোটেশন মুছুন",
+            "toggleAnnotationsVisibility": "সব অ্যানোটেশন দেখান বা লুকান",
+            "selectAllAnnotations": "সব অ্যানোটেশন নির্বাচন করুন",
+            "deselectAllAnnotations": "সব অ্যানোটেশনের নির্বাচন তুলে দিন",
+            "selectNextAnnotation": "পরের অ্যানোটেশন নির্বাচন করুন",
+            "resetZoom": "জুম রিসেট করুন"
+        },
+        "tools": {
+            "selection": {
+                "label": "নির্বাচন"
+            },
+            "boundingBox": {
+                "label": "বাউন্ডিং বক্স",
+                "description": "ছবিতে অবজেক্ট ঘিরে একটি আয়তক্ষেত্র বা বর্গ আঁকুন।"
+            },
+            "autoSegmentation": {
+                "label": "স্বয়ংক্রিয় সেগমেন্টেশন",
+                "detectionDescription": "প্রস্তাবিত আয়তক্ষেত্রের পূর্বরূপ দেখতে অবজেক্টের ওপর কার্সর নিন, তারপর অ্যানোটেশন তৈরি করতে ক্লিক করুন।",
+                "segmentationDescription": "প্রস্তাবিত পলিগনের পূর্বরূপ দেখতে অবজেক্টের ওপর কার্সর নিন, তারপর অ্যানোটেশন তৈরি করতে ক্লিক করুন।",
+                "loading": "ছবি প্রক্রিয়া করা হচ্ছে, অপেক্ষা করুন...",
+                "error": "Segment Anything টুলে ত্রুটি: {{message}}",
+                "unknownError": "অজানা ত্রুটি। পৃষ্ঠাটি রিফ্রেশ করে আবার চেষ্টা করুন।",
+                "timeoutError": "{{timeoutMs}} মি.সে. পর {{operation}}-এর সময়সীমা পেরিয়ে গেছে। পৃষ্ঠাটি রিফ্রেশ করে দেখুন।",
+                "embeddingError": "ছবির এমবেডিং আনা যায়নি ({{status}}{{statusText}})।",
+                "hint": "কোনো অঞ্চল যোগ করতে Shift চেপে ক্লিক করুন, বাদ দিতে Alt চেপে ক্লিক করুন। অ্যানোটেশন তৈরি করতে ক্লিক করুন, বিন্দুগুলি মুছতে Esc চাপুন।",
+                "operations": {
+                    "workerBuild": "SAM ওয়ার্কার বিল্ড",
+                    "workerInit": "SAM ওয়ার্কার চালু করা",
+                    "decoder": "SAM ডিকোডার"
+                }
+            },
+            "polygon": {
+                "label": "পলিগন",
+                "description": "ক্লিক করে একে একে বিন্দু বসান অথবা চেপে টেনে মুক্তহাতে আঁকুন। পিক্সেল-নির্ভুল সীমানা প্রয়োজন এমন অনিয়মিত আকৃতির জন্য উপযোগী।"
+            },
+            "magneticLasso": {
+                "label": "ম্যাগনেটিক ল্যাসো",
+                "description": "অবজেক্টের ধার বরাবর কার্সর নিয়ে যান এবং মাঝে মাঝে ক্লিক করে সীমানার সঙ্গে রেখাটি মেলান।",
+                "error": "আকৃতির সীমানা নির্বাচন করা যায়নি। আবার চেষ্টা করুন।"
+            },
+            "ssim": {
+                "label": "শনাক্তকরণ সহায়ক",
+                "description": "ছবিতে কোনো অবজেক্টের চারপাশে একটি বক্স আঁকুন। এতে অনুরূপ অবজেক্টগুলি স্বয়ংক্রিয়ভাবে খুঁজে অ্যানোটেট করা হবে।",
+                "loading": "শনাক্তকরণ সহায়ক লোড হচ্ছে, অপেক্ষা করুন...",
+                "error": "শনাক্তকরণ সহায়ক টুলে ত্রুটি: {{message}}",
+                "operations": {
+                    "workerBuild": "শনাক্তকরণ সহায়কের ওয়ার্কার বিল্ড"
+                },
+                "options": {
+                    "accept": "গ্রহণ করুন",
+                    "reject": "প্রত্যাখ্যান করুন",
+                    "numberOfItems": "আইটেমের সংখ্যা",
+                    "autoMergeDuplicates": "ডুপ্লিকেট স্বয়ংক্রিয়ভাবে একত্র করুন"
+                }
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "আরও ধীর",
+                "slow": "ধীর",
+                "normal": "স্বাভাবিক গতি",
+                "speed": "প্লেব্যাকের গতি",
+                "showAllFrames": "সব ফ্রেম দেখান",
+                "showOneFramePerSecond": "প্রতি সেকেন্ডে ১টি ফ্রেম দেখান"
+            },
+            "frames": {
+                "currentTotal": "বর্তমান ফ্রেম: {{currentFrame}} / মোট ফ্রেম: {{totalFrames}}",
+                "thumbnailAlt": "{{frameNumber}} নম্বর ফ্রেমের থাম্বনেইল"
+            },
+            "errors": {
+                "network": "নেটওয়ার্ক ত্রুটির কারণে ভিডিও চালানো যাচ্ছে না। রিফ্রেশ করে আবার চেষ্টা করুন।",
+                "unableToPlay": "ভিডিও চালানো যাচ্ছে না। আবার চেষ্টা করুন।",
+                "unsupportedFormat": "ভিডিও চালানো যাচ্ছে না। অন্য ভিডিও ফরম্যাট দিয়ে চেষ্টা করুন (mp4/webm)।"
+            }
+        }
+    },
+    "models": {
+        "jobs": {
+            "error": "কাজটি ব্যর্থ হয়েছে। বিবরণের জন্য লগ দেখে আবার চেষ্টা করুন।",
+            "pending": "অপেক্ষমাণ...",
+            "running": "চলছে...",
+            "stopDialog": {
+                "title": "কাজ থামান",
+                "confirmation": "আপনি কি নিশ্চিত যে এই কাজটি থামাতে চান?"
+            },
+            "logs": "লগ",
+            "startedAt": "শুরুর সময়: {{time}}",
+            "waitingToStart": "শুরুর অপেক্ষায়...",
+            "device": "ডিভাইস: {{device}}"
+        },
+        "detail": {
+            "loadError": "মডেলের বিবরণ লোড করা যায়নি",
+            "tabs": {
+                "variants": "মডেলের ভ্যারিয়েন্ট",
+                "metrics": "মডেলের মেট্রিক",
+                "parameters": "প্রশিক্ষণের প্যারামিটার",
+                "datasets": "প্রশিক্ষণের ডেটাসেট"
+            }
+        },
+        "metrics": {
+            "noMetrics": "কোনো মেট্রিক পাওয়া যায়নি",
+            "loadError": "প্রশিক্ষণের মেট্রিক লোড করা যায়নি",
+            "evaluationsTitle": "মূল্যায়ন",
+            "noEvaluations": "পরীক্ষার মূল্যায়ন মেট্রিক পাওয়া যায়নি"
+        },
+        "training": {
+            "logs": {
+                "copySuccess": "সফলভাবে কপি হয়েছে",
+                "copyError": "কপি করা যায়নি",
+                "copyPathTooltip": "পাথ কপি করতে ক্লিক করুন",
+                "showTraceback": "ট্রেসব্যাক দেখান",
+                "levelLabel": "স্তর",
+                "levelHelpTitle": "সর্বনিম্ন লগ স্তর",
+                "levelHelpDescription": "নির্বাচিত স্তর ও তার চেয়ে উচ্চ স্তরের লগ দেখায়। যেমন WARNING নির্বাচন করলে WARNING, ERROR এবং CRITICAL দেখাবে, আর DEBUG ও INFO লুকানো থাকবে।",
+                "searchPlaceholder": "লগ খুঁজুন...",
+                "connectionStatus": {
+                    "connecting": "সংযোগ করা হচ্ছে...",
+                    "connected": "লাইভ",
+                    "error": "সংযোগে ত্রুটি"
+                },
+                "entriesCount": "{{filtered}} / {{total}}টি এন্ট্রি",
+                "noEntries": "কোনো লগ এন্ট্রি নেই",
+                "noMatchingEntries": "কোনো লগ এন্ট্রি মেলেনি",
+                "scrollToBottom": "নিচে স্ক্রল করুন",
+                "dialogTitle": "প্রশিক্ষণের লগ",
+                "loadError": "লগ লোড করা যায়নি: {{message}}",
+                "noJobOrModel": "কোনো কাজ বা মডেল নির্দিষ্ট করা হয়নি",
+                "downloadStarted": "প্রশিক্ষণের লগ ডাউনলোড শুরু হয়েছে"
+            },
+            "parameters": {
+                "noParameters": "কোনো প্যারামিটার নেই।",
+                "learningParameters": "শেখার প্যারামিটার",
+                "filters": "ফিল্টার",
+                "augmentations": "অগমেন্টেশন",
+                "intensityMapping": "তীব্রতার ম্যাপিং"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "ImageNet-এ Top-1 নির্ভুলতা",
+                    "mapOnCoco": "COCO-তে mAP",
+                    "map50OnCoco": "COCO-তে mAP50"
+                },
+                "card": {
+                    "numberOfParameters": "প্যারামিটারের সংখ্যা: {{count}} মিলিয়ন",
+                    "gigaflops": "গিগাফ্লপ: {{value}}"
+                },
+                "sort": {
+                    "label": "মডেল সাজানোর ক্রম:",
+                    "recommended": "প্রস্তাবিতগুলি আগে",
+                    "nameAsc": "নাম (ঊর্ধ্বক্রম)",
+                    "nameDesc": "নাম (নিম্নক্রম)",
+                    "speedAsc": "গতি (দ্রুততম আগে)",
+                    "speedDesc": "গতি (ধীরতম আগে)",
+                    "accuracyAsc": "নির্ভুলতা (সর্বনিম্ন আগে)",
+                    "accuracyDesc": "নির্ভুলতা (সর্বোচ্চ আগে)"
+                },
+                "timm": {
+                    "heading": "TIMM মডেলের কনফিগারেশন",
+                    "architectureFamilyLabel": "আর্কিটেকচারের পরিবার",
+                    "selectArchitecturePlaceholder": "আর্কিটেকচার নির্বাচন করুন",
+                    "modelVariantLabel": "মডেলের ভ্যারিয়েন্ট",
+                    "selectVariantPlaceholder": "ভ্যারিয়েন্ট নির্বাচন করুন",
+                    "pretrainedWeightsLabel": "পূর্বপ্রশিক্ষিত ওয়েট",
+                    "selectWeightsPlaceholder": "ওয়েট নির্বাচন করুন",
+                    "parameters": "প্যারামিটার: {{count}} মিলিয়ন",
+                    "gigaflops": "গিগাফ্লপ: {{value}}"
+                }
+            },
+            "devices": {
+                "selectLabel": "প্রশিক্ষণের ডিভাইস নির্বাচন করুন"
+            },
+            "setup": {
+                "trigger": "মডেল প্রশিক্ষণ দিন",
+                "dialog": {
+                    "title": "প্রশিক্ষণের জন্য একটি মডেল নির্বাচন করুন",
+                    "disabledReasonTitle": "প্রশিক্ষণ শুরু করা যাচ্ছে না কেন?",
+                    "advancedSettings": "উন্নত সেটিংস"
+                },
+                "toast": {
+                    "trainingStarted": "মডেলের প্রশিক্ষণ সফলভাবে শুরু হয়েছে।",
+                    "trainingStartedWithLink": "মডেলের প্রশিক্ষণ সফলভাবে শুরু হয়েছে। <modelsLink>অগ্রগতি দেখতে মডেলের পৃষ্ঠা খুলুন।</modelsLink>"
+                },
+                "selectDataset": {
+                    "label": "ডেটাসেট নির্বাচন করুন",
+                    "useEntireDataset": "পুরো ডেটাসেট ব্যবহার করুন",
+                    "helpTitle": "ডেটাসেট নির্বাচন",
+                    "helpDescription": "প্রশিক্ষণের জন্য ডেটা বেছে নিন। ‘পুরো ডেটাসেট ব্যবহার করুন’ বেছে নিলে ‘ডেটাসেট’ পৃষ্ঠায় দেখা সব ডেটার সর্বশেষ সংস্করণে প্রশিক্ষণ হবে। কোনো ডেটাসেট ভিউ বেছে নিলে শুধু সেই ভিউতে বরাদ্দ করা মিডিয়া ব্যবহার করা হবে। অন্য মডেলের ঠিক একই ডেটায় (মিডিয়া ও অ্যানোটেশন) প্রশিক্ষণ দিতে তার ডেটাসেট সংস্করণ বেছে নিন।",
+                    "sections": {
+                        "views": "ডেটাসেট ভিউ",
+                        "revisions": "ডেটাসেট সংস্করণ"
+                    }
+                },
+                "selectModel": {
+                    "label": "ইনপুট ওয়েট নির্বাচন করুন",
+                    "defaultPretrainedWeights": "ডিফল্ট পূর্বপ্রশিক্ষিত ওয়েট",
+                    "helpTitle": "ইনপুট ওয়েট নির্বাচন",
+                    "helpDescription": "ফাইন-টিউনিং চালিয়ে যেতে বিদ্যমান মডেল বেছে নিন। বড় পাবলিক ডেটাসেটে আগে থেকে প্রশিক্ষিত ওয়েট দিয়ে নতুন মডেল ফাইন-টিউন করতে ‘ডিফল্ট পূর্বপ্রশিক্ষিত ওয়েট’ বেছে নিন।"
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "মডেল প্রশিক্ষণের জন্য ডেটাসেটে অন্তত ৩টি আইটেম অ্যানোটেট করতে হবে। ভালো ফল পেতে আরও কয়েকটি আইটেম অ্যানোটেট করার পরামর্শ দেওয়া হচ্ছে।",
+                "notEnoughAnnotationsInView": "মডেল প্রশিক্ষণের জন্য নির্বাচিত ডেটাসেট ভিউতে অন্তত ৩টি আইটেম অ্যানোটেট করতে হবে। ভালো ফল পেতে আরও কয়েকটি আইটেম অ্যানোটেট করার পরামর্শ দেওয়া হচ্ছে।",
+                "emptySubsetsReason": "মডেল প্রশিক্ষণের জন্য প্রতিটি উপসেটে (প্রশিক্ষণ, যাচাই, পরীক্ষা) অন্তত একটি আইটেম থাকতে হবে। এখন এই শর্ত পূরণ করা যাচ্ছে না, কারণ {{subsetClause}} খালি এবং {{assignmentDetail}}।",
+                "emptySubsetClause_one": "{{list}} উপসেট",
+                "emptySubsetClause_other": "{{list}} উপসেটগুলি",
+                "reviewedOnly_one": "বরাদ্দের জন্য {{count}}টি পর্যালোচিত আইটেম বাকি আছে",
+                "reviewedOnly_other": "বরাদ্দের জন্য {{count}}টি পর্যালোচিত আইটেম বাকি আছে",
+                "unannotatedOnly_one": "বরাদ্দের আগে {{count}}টি আইটেম অ্যানোটেট করতে হবে",
+                "unannotatedOnly_other": "বরাদ্দের আগে {{count}}টি আইটেম অ্যানোটেট করতে হবে",
+                "mixedReviewedClause_one": "{{count}}টি পর্যালোচিত আইটেম বরাদ্দের জন্য প্রস্তুত",
+                "mixedReviewedClause_other": "{{count}}টি পর্যালোচিত আইটেম বরাদ্দের জন্য প্রস্তুত",
+                "mixedUnannotatedClause_one": "বরাদ্দের আগে {{count}}টি আইটেম অ্যানোটেট করতে হবে",
+                "mixedUnannotatedClause_other": "বরাদ্দের আগে {{count}}টি আইটেম অ্যানোটেট করতে হবে",
+                "mixedAssignmentDetail": "{{reviewedClause}} এবং {{unannotatedClause}}",
+                "noUnassignedItems": "পুনর্বণ্টনের জন্য কোনো অবরাদ্দকৃত আইটেম নেই"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "ডেটা ব্যবস্থাপনা"
+                },
+                "notAvailable": "প্রশিক্ষণের কনফিগারেশন পাওয়া যায়নি।"
+            },
+            "learning": {
+                "title": "শেখার প্যারামিটার",
+                "tagDefault": "ডিফল্ট",
+                "tagModified": "পরিবর্তিত",
+                "inputSize": "ইনপুটের আকার"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "প্রশিক্ষণের উপসেট",
+                    "description": "যেসব অ্যানোটেশনযুক্ত নমুনা এখনো কোনো উপসেটে বরাদ্দ হয়নি, সেগুলি কীভাবে বণ্টন হবে তা নির্ধারণ করুন। ডেটা মিশে যাওয়া এবং মূল্যায়নে পক্ষপাত এড়াতে আগের প্রশিক্ষণে ব্যবহৃত নমুনাগুলি তাদের বর্তমান উপসেটেই থাকবে।",
+                    "unavailableTitle": "প্রশিক্ষণের উপসেটের কনফিগারেশন অবৈধ",
+                    "unavailableDescription": "প্রশিক্ষণ, যাচাই ও পরীক্ষার উপসেটের মধ্যে পছন্দমতো ভাগ করার জন্য যথেষ্ট মিডিয়া আইটেম নেই।",
+                    "unavailableHint": "প্রতিটি উপসেটে অন্তত একটি আইটেম রাখতে আরও মিডিয়া আইটেম যোগ করুন।",
+                    "datasetSamples": "ডেটাসেট: {{count}}টি নমুনা",
+                    "assignedSamples": "বরাদ্দ করা হয়েছে: {{count}}",
+                    "unassignedSamples": "বরাদ্দ করা হয়নি: {{count}}",
+                    "distributionLabel": "নতুন নমুনার বণ্টন",
+                    "resultingDistribution": "ডেটাসেটের চূড়ান্ত বণ্টন:",
+                    "totalLabel": "মোট:",
+                    "mediaItemsLabel": "মিডিয়া আইটেম"
+                },
+                "filters": {
+                    "noMinimum": "সর্বনিম্ন সীমা নেই",
+                    "unlimited": "সীমাহীন"
+                },
+                "augmentation": {
+                    "title": "ডেটা অগমেন্টেশন"
+                },
+                "tiling": {
+                    "title": "টাইলিং",
+                    "description": "টাইলিংয়ে উচ্চ রেজোলিউশনের ছবিকে ছোট টাইলে ভাগ করা হয়। এতে ছোট অবজেক্ট শনাক্তকরণের নির্ভুলতা বাড়তে পারে।",
+                    "modeLabel": "টাইলিং মোড",
+                    "modes": {
+                        "automatic": "স্বয়ংক্রিয়",
+                        "custom": "কাস্টম"
+                    },
+                    "offDescription": "মডেলটি পুরো ছবি একসঙ্গে প্রক্রিয়া করে, ছোট টাইলে ভাগ করে না। পদ্ধতিটি সহজ, তবে উচ্চ রেজোলিউশনের ছবির সূক্ষ্ম বিবরণ বাদ পড়লে ছোট অবজেক্ট শনাক্ত করা কঠিন হতে পারে।",
+                    "automaticDescription": "ছবির রেজোলিউশন ও অ্যানোটেশনের আকার দেখে সিস্টেম স্বয়ংক্রিয়ভাবে প্যারামিটার নির্ধারণ করবে।"
+                },
+                "intensityMapping": {
+                    "title": "তীব্রতার ম্যাপিং"
+                }
+            }
+        },
+        "list": {
+            "groupByPlaceholder": "গোষ্ঠীবদ্ধ করুন",
+            "groupByDataset": "ডেটাসেট অনুযায়ী গোষ্ঠীবদ্ধ করুন",
+            "groupByArchitecture": "আর্কিটেকচার অনুযায়ী গোষ্ঠীবদ্ধ করুন",
+            "hideFailedModels": "ব্যর্থ মডেলগুলি লুকান",
+            "showFailedModels": "ব্যর্থ মডেলগুলি দেখান",
+            "searchPlaceholder": "মডেল খুঁজুন...",
+            "noModelsFound": "কোনো মডেল পাওয়া যায়নি",
+            "empty": {
+                "title": "এখনো কোনো মডেল নেই।",
+                "description": "শুরু করতে প্রথম মডেলটি প্রশিক্ষণ দিন।"
+            },
+            "deletedWeightsBadge": "মুছে ফেলা ওয়েট",
+            "fineTunedFrom": "যে মডেল থেকে ফাইন-টিউন করা হয়েছে",
+            "columns": {
+                "trained": "প্রশিক্ষিত",
+                "totalSize": "মোট আকার"
+            }
+        },
+        "performance": {
+            "metrics": {
+                "accuracy": "নির্ভুলতা",
+                "precision": "প্রিসিশন",
+                "recall": "রিকল",
+                "fMeasure": "F-মেজার"
+            },
+            "categories": {
+                "balance": "ভারসাম্য",
+                "speed": "গতি",
+                "accuracy": "নির্ভুলতা"
+            }
+        },
+        "variants": {
+            "empty": "কোনো মডেল ভ্যারিয়েন্ট পাওয়া যায়নি।",
+            "columns": {
+                "precision": "প্রিসিশন"
+            },
+            "quantizedInfo": {
+                "title": "NNCF PTQ দিয়ে কোয়ান্টাইজ করা হয়েছে",
+                "maxAccuracyDrop": "নির্ভুলতার সর্বোচ্চ হ্রাস: {{value}}",
+                "calibrationDatasetSize": "ক্যালিব্রেশন ডেটাসেটের আকার: {{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "মডেল ডাউনলোড শুরু হয়েছে"
+        },
+        "optimize": {
+            "description": "OpenVINO NNCF দিয়ে INT8 কোয়ান্টাইজেশন করে FP16 মডেল অপ্টিমাইজ করুন",
+            "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) দিয়ে INT8 কোয়ান্টাইজেশন করলে নির্ভুলতায় সামান্য প্রভাব পড়ে, মডেলের আকার কমে এবং ইনফারেন্সের গতি বাড়ে",
+            "start": "কোয়ান্টাইজেশন শুরু করুন",
+            "dialogTitle": "কোয়ান্টাইজেশন",
+            "subheading": "মডেলকে INT8-এ কোয়ান্টাইজ করুন",
+            "jobStarted": "কোয়ান্টাইজেশনের কাজ শুরু হয়েছে।",
+            "recommendedCalibrationSize": "ক্যালিব্রেশন ডেটাসেটের প্রস্তাবিত আকার: ২০০ থেকে ৫০০টি মিডিয়া আইটেম",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "নির্ভুলতার সর্বোচ্চ হ্রাস (%)",
+                    "help": {
+                        "paragraph1": "যাচাইয়ের নির্ভুলতা সর্বোচ্চ যতটা কমতে পারে।",
+                        "paragraph2": "অনুমোদিত হ্রাস কম হলে নির্ভুলতা-সচেতন কোয়ান্টাইজেশনে বেশি সময় লাগতে পারে।",
+                        "paragraph3": "পরীক্ষার চূড়ান্ত নির্ভুলতা যাচাইয়ের জন্য নির্ধারিত সীমার চেয়ে কম হতে পারে, বিশেষত অপেক্ষাকৃত ছোট ডেটাসেটের ক্ষেত্রে।"
+                    }
+                },
+                "maxIterations": {
+                    "label": "পুনরাবৃত্তির সর্বোচ্চ সংখ্যা",
+                    "help": {
+                        "paragraph1": "নির্ভুলতা-সচেতন কোয়ান্টাইজেশনে পুনরাবৃত্তির সর্বোচ্চ সংখ্যা।",
+                        "paragraph2": "নির্ভুলতা-সচেতন কোয়ান্টাইজেশন নির্ভুলতার সর্বোচ্চ হ্রাসের শর্ত পূরণ না হওয়া পর্যন্ত ধাপে ধাপে মডেলের লেয়ারগুলিকে কোয়ান্টাইজেশনের আওতা থেকে বাদ দেয়। পুনরাবৃত্তি সীমিত করলে অনেক লেয়ারযুক্ত মডেল কোয়ান্টাইজ করার সময় উল্লেখযোগ্যভাবে কমতে পারে।",
+                        "paragraph3": "নির্ভুলতার সর্বোচ্চ হ্রাস নির্ধারণ করা হলেই এই প্যারামিটার ব্যবহার করা হয়।"
+                    }
+                },
+                "calibrationSize": {
+                    "label": "ক্যালিব্রেশনের সর্বোচ্চ আকার",
+                    "help": "ডেটাসেট থেকে ক্যালিব্রেশনের নমুনা এলোমেলোভাবে বেছে নেওয়া হবে",
+                    "useFullDataset": "পুরো ডেটাসেট ব্যবহার করুন"
+                }
+            }
+        },
+        "actions": {
+            "deleteWeights": "ওয়েট মুছুন",
+            "deleteModel": "মডেল মুছুন",
+            "viewLogs": "প্রশিক্ষণের লগ দেখুন",
+            "deleteWeightsDescription": "আপনি কি নিশ্চিত যে “{{modelName}}” মডেলের ওয়েট মুছতে চান?",
+            "deleteModelDescription": "আপনি কি নিশ্চিত যে “{{modelName}}” মডেলটি মুছতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+            "renameDialog": {
+                "title": "মডেলের নাম বদলান",
+                "nameLabel": "মডেলের নাম"
+            }
+        },
+        "columns": {
+            "modelName": "মডেলের নাম"
+        }
+    },
+    "jobs": {
+        "allProjects": "সব প্রকল্প",
+        "currentProjectLabel": "{{name}} (বর্তমান)",
+        "projectsSection": "প্রকল্পসমূহ",
+        "tabs": {
+            "all": "সব",
+            "finished": "শেষ হয়েছে"
+        },
+        "status": {
+            "pending": "সারিতে আছে",
+            "cancelling": "বাতিল করা হচ্ছে",
+            "done": "সম্পন্ন হয়েছে"
+        },
+        "type": {
+            "quantize": "অপ্টিমাইজেশন"
+        },
+        "columns": {
+            "type": "ধরন"
+        },
+        "cancel": {
+            "title": "কাজ বাতিল করুন",
+            "confirmation": "আপনি কি নিশ্চিত যে {{jobId}} নম্বর কাজটি বাতিল করতে চান?"
+        },
+        "meta": {
+            "started": "শুরু হয়েছে {{time}}",
+            "elapsed": "অতিবাহিত সময় {{time}}",
+            "duration": "সময়কাল {{time}}",
+            "finished": "শেষ হয়েছে {{time}}",
+            "failed": "ব্যর্থ হয়েছে {{time}}",
+            "cancelled": "বাতিল হয়েছে {{time}}"
+        },
+        "emptyState": {
+            "all": "কোনো কাজ নেই",
+            "running": "কোনো কাজ চলছে না",
+            "finished": "কোনো কাজ শেষ হয়নি",
+            "scheduled": "সারিতে কোনো কাজ নেই",
+            "cancelled": "কোনো বাতিল করা কাজ নেই",
+            "failed": "কোনো ব্যর্থ কাজ নেই"
+        },
+        "actions": {
+            "viewLogs": "লগ দেখুন"
+        }
+    },
+    "license": {
+        "label": "লাইসেন্স: ",
+        "agreement": {
+            "title": "লাইসেন্স চুক্তি",
+            "intro": "Geti ব্যবহার চালিয়ে যেতে নিচের লাইসেন্সগুলি পড়ে গ্রহণ করুন।",
+            "progress": "{{total}}-এর মধ্যে {{current}}",
+            "required": "আবশ্যক",
+            "optional": "ঐচ্ছিক",
+            "fullLicense": "সম্পূর্ণ লাইসেন্স পড়ুন",
+            "previous": "পূর্ববর্তী",
+            "accept": "গ্রহণ করে চালিয়ে যান"
+        }
+    },
+    "application": {
+        "startup": {
+            "loading": "লোড হচ্ছে... অপেক্ষা করুন।"
+        },
+        "serverError": {
+            "heading": "সার্ভারে ত্রুটি"
+        },
+        "errorPage": {
+            "badRequest": "সার্ভার বর্তমান অনুরোধটি প্রক্রিয়া করতে পারছে না অথবা প্রক্রিয়া করবে না।",
+            "forbidden": "এই পৃষ্ঠা দেখার অনুমতি আপনার নেই।",
+            "notFound": "এই পৃষ্ঠাটি নেই!",
+            "unauthorized": "এটি দেখার অনুমতি আপনার নেই",
+            "serverError": "সার্ভারে ত্রুটি ঘটেছে, তাই অনুরোধটি সম্পন্ন করা যায়নি।",
+            "serviceUnavailable": "মনে হচ্ছে আমাদের API কাজ করছে না",
+            "goHome": "হোম পৃষ্ঠায় ফিরে যান"
+        },
+        "notifications": {
+            "unexpectedError": "অপ্রত্যাশিত ত্রুটি ঘটেছে। আবার চেষ্টা করুন।",
+            "networkError": "নেটওয়ার্কে ত্রুটি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।",
+            "uploadTransferError": "ফাইল স্থানান্তর ব্যর্থ হয়েছে। আবার চেষ্টা করুন।"
+        }
+    },
+    "downloads": {
+        "failure": {
+            "genericError": "ফাইল ডাউনলোড করা যায়নি"
+        },
+        "saveDialog": {
+            "allFiles": "সব ফাইল",
+            "fileTypeFilter": "{{extension}} ফাইল"
+        }
+    }
+}
