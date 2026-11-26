@@ -282,7 +282,7 @@ class TileDataset(VisionDataset):
             tile.image = source_image[:, info.y : info.y + info.height, info.x : info.x + info.width].clone()
             tile = self._prepare_tile(tile)  # noqa: PLW2901
             # apply the same transforms as the original dataset
-            object.__setattr__(tile.tile, "source_sample_idx", parent_idx)
+            object.__setattr__(tile.tile, "source_sample_idx", parent_idx)  # pyrefly: ignore[missing-attribute]
             transformed_tile = self._apply_transforms(tile)
             if transformed_tile is None:
                 msg = "Transformed tile is None"
@@ -390,7 +390,7 @@ class TileInstSegTestDataset(TileDataset):
             ori_img_info=item.img_info,  # type: ignore[attr-defined]
             ori_bboxes=item.bboxes,  # type: ignore[attr-defined]
             ori_labels=item.label,  # type: ignore[attr-defined]
-            ori_masks=ori_masks,
+            ori_masks=ori_masks,  # pyrefly: ignore[bad-argument-type]
         )
 
     def _prepare_tile(self, tile: BaseSample) -> BaseSample:

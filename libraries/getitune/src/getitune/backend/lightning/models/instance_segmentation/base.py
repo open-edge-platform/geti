@@ -432,7 +432,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             elif _masks is not None:
                 # Ensure filtered_idx is on the same device as masks
                 mask_filtered_idx = tuple(idx.to(_masks.device) for idx in filtered_idx)
-                masks.append(_masks[mask_filtered_idx])
+                masks.append(_masks[mask_filtered_idx])  # pyrefly: ignore[bad-argument-type]
 
         outputs.scores = scores
         outputs.bboxes = bboxes
@@ -467,7 +467,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             pred_info.append(
                 {
                     "boxes": bboxes.data,
-                    "masks": _as_rle(masks),
+                    "masks": _as_rle(masks),  # pyrefly: ignore[bad-argument-type]
                     "scores": scores,
                     "labels": labels,
                 },

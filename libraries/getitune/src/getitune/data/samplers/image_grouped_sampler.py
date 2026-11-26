@@ -52,7 +52,7 @@ class ImageGroupedSampler(Sampler[int]):
 
     def __len__(self) -> int:
         if self._inner is not None:
-            return len(self._inner)
+            return len(self._inner)  # pyrefly: ignore[bad-argument-type]
         return sum(self._take(len(g)) for g in self._groups)
 
     def __iter__(self) -> Iterator[int]:

@@ -320,7 +320,7 @@ def _instance_crops(masks: torch.Tensor, offset_x: int, offset_y: int) -> list[t
         rows, cols = np.flatnonzero(mask.any(axis=1)), np.flatnonzero(mask.any(axis=0))
         crop = np.asfortranarray(mask[rows[0] : rows[-1] + 1, cols[0] : cols[-1] + 1], dtype=np.uint8)
         crops.append((mask_utils.encode(crop), offset_x + int(cols[0]), offset_y + int(rows[0])))
-    return crops
+    return crops  # pyrefly: ignore[bad-return]
 
 
 def _paste_instances(
@@ -334,7 +334,7 @@ def _paste_instances(
         )
     masks = torch.zeros((len(crops), height, width), dtype=torch.bool)
     for i, (rle, x, y) in enumerate(crops):
-        crop = mask_utils.decode(rle).astype(bool)
+        crop = mask_utils.decode(rle).astype(bool)  # pyrefly: ignore[bad-argument-type]
         masks[i, y : y + crop.shape[0], x : x + crop.shape[1]] = torch.from_numpy(crop)
     return masks
 
@@ -385,11 +385,13 @@ class InstanceSegTileMerge(TileMerge):
             tile_f_vect = feature_vectors[i] if feature_vectors is not None else None
 
             # Instances whose mask is empty carry no information.
-            keep_indices = tile_masks.flatten(1).any(dim=1).nonzero(as_tuple=True)[0]
-            _bboxes = tile_bboxes[keep_indices]
-            _labels = tile_labels[keep_indices]
-            _scores = tile_scores[keep_indices]
-            _masks = tile_masks[keep_indices]
+            keep_indices = (
+                tile_masks.flatten(1).any(dim=1).nonzero(as_tuple=True)[0]
+            )  # pyrefly: ignore[missing-attribute]
+            _bboxes = tile_bboxes[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _labels = tile_labels[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _scores = tile_scores[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _masks = tile_masks[keep_indices]  # pyrefly: ignore[unsupported-operation]
 
             offset_x = tile_info.x
             offset_y = tile_info.y
@@ -413,8 +415,8 @@ class InstanceSegTileMerge(TileMerge):
             )
 
             if explain_mode:
-                inst_seg_pred_entity.feature_vector = tile_f_vect
-                inst_seg_pred_entity.saliency_map = []
+                inst_seg_pred_entity.feature_vector = tile_f_vect  # pyrefly: ignore[bad-assignment]
+                inst_seg_pred_entity.saliency_map = []  # pyrefly: ignore[bad-assignment]
             entities_to_merge[tile_id].append(inst_seg_pred_entity)
 
     def finalize(self) -> list[Prediction]:
@@ -473,7 +475,9 @@ class InstanceSegTileMerge(TileMerge):
             scores=scores,
             bboxes=tv_tensors.BoundingBoxes(bboxes, canvas_size=img_size, format="XYXY"),
             label=labels,
-            masks=masks if isinstance(masks, RLEMasks) else tv_tensors.Mask(masks, dtype=bool),
+            masks=masks  # pyrefly: ignore[bad-argument-type]
+            if isinstance(masks, RLEMasks)
+            else tv_tensors.Mask(masks, dtype=bool),  # pyrefly: ignore[bad-argument-type]
         )
 
         if explain_mode:
@@ -481,7 +485,7 @@ class InstanceSegTileMerge(TileMerge):
             inst_seg_pred_entity.saliency_map = self.get_saliency_maps_from_masks(
                 labels,
                 scores,
-                masks,
+                masks,  # pyrefly: ignore[bad-argument-type]
                 self.num_classes,
             )
 

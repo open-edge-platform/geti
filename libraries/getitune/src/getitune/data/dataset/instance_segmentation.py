@@ -91,7 +91,11 @@ class InstanceSegDataset(VisionDataset):
 
     def _read_dm_item(self, index: int) -> InstanceSegmentationSample:
         item = super()._read_dm_item(index)
-        return item.to_instance_segmentation_sample() if self.rasterize_polygons else item
+        return (
+            item.to_instance_segmentation_sample()  # pyrefly: ignore[bad-return, missing-attribute]
+            if self.rasterize_polygons
+            else item  # pyrefly: ignore[bad-return, missing-attribute]
+        )  # pyrefly: ignore[bad-return, missing-attribute]
 
     def get_idx_list_per_classes(self, use_string_label: bool = False) -> dict[int | str, list[int]]:
         """Get a dictionary mapping class labels (string or int) to lists of samples.

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import numpy as np
 import polars as pl
@@ -60,24 +61,27 @@ CFG = TileConfig(
 
 
 def _as_subset(dataset: Dataset, name: str) -> Dataset:
-    df = dataset.df.with_columns(pl.lit(name).cast(dataset.df.schema["subset"]).alias("subset"))
-    return Dataset.from_dataframe(df=df, dtype_or_schema=dataset.dtype, schema=dataset.schema)
+    frame = dataset.df.with_columns(pl.lit(name).cast(dataset.df.schema["subset"]).alias("subset"))
+    return Dataset.from_dataframe(df=frame, dtype_or_schema=dataset.dtype, schema=dataset.schema)
 
 
 def test_training_tiles_get_masks_rasterized_at_tile_size(coco_root):
     dataset = TileDatasetFactory.create(InstanceSegDataset(dm_subset=import_dataset(coco_root)), CFG)
 
-    assert dataset.rasterize_polygons
+    assert dataset.rasterize_polygons  # pyrefly: ignore[missing-attribute]
     samples = [dataset._read_dm_item(i) for i in range(len(dataset))]
     assert len(samples) == 2  # training keeps only the tiles that hold an object
     for sample in samples:
         height, width = sample.image.shape[-2:]
-        assert tuple(sample.masks.shape[-2:]) == (height, width)  # never image-size masks
-        assert len(sample.masks) == len(sample.bboxes) == len(sample.label)
+        assert tuple(sample.masks.shape[-2:]) == (  # pyrefly: ignore[missing-attribute]
+            height,
+            width,
+        )  # never image-size masks  # pyrefly: ignore[missing-attribute]
+        assert len(sample.masks) == len(sample.bboxes) == len(sample.label)  # pyrefly: ignore[missing-attribute]
     top_left, top_right = samples
     # the straddling polygon keeps 75% of its area in the right tile and only 25% (< 0.3) in the left one
-    assert [int(m.sum()) for m in top_left.masks] == [100 * 100]
-    assert [int(m.sum()) for m in top_right.masks] == [60 * 100]
+    assert [int(m.sum()) for m in top_left.masks] == [100 * 100]  # pyrefly: ignore[missing-attribute]
+    assert [int(m.sum()) for m in top_right.masks] == [60 * 100]  # pyrefly: ignore[missing-attribute]
 
 
 def test_validation_ground_truth_is_rle_and_tiles_carry_no_annotations(coco_root):
@@ -86,35 +90,40 @@ def test_validation_ground_truth_is_rle_and_tiles_carry_no_annotations(coco_root
 
     entity = dataset._get_item_impl(0)
 
-    assert isinstance(entity.ori_masks, RLEMasks)
+    assert isinstance(entity.ori_masks, RLEMasks)  # pyrefly: ignore[missing-attribute]
     polygons = np.empty(2, dtype=object)
     polygons[:] = [np.array(p, dtype=np.float32).reshape(-1, 2) for p in POLYGONS]
     assert (entity.ori_masks.to_dense().numpy() == polygon_to_bitmap(polygons, HEIGHT, WIDTH)).all()
-    assert len(entity.ori_bboxes) == len(entity.ori_labels) == 2
-    assert len(entity.entity_list) == 2  # validation tiles are also limited to the ones that hold an object
-    assert all(len(tile.masks) == 0 and len(tile.bboxes) == 0 for tile in entity.entity_list)
+    assert len(entity.ori_bboxes) == len(entity.ori_labels) == 2  # pyrefly: ignore[missing-attribute]
+    assert (
+        len(entity.entity_list) == 2  # pyrefly: ignore[missing-attribute]
+    )  # validation tiles are also limited to the ones that hold an object  # pyrefly: ignore[missing-attribute]
+    assert all(
+        len(tile.masks) == 0 and len(tile.bboxes) == 0
+        for tile in entity.entity_list  # pyrefly: ignore[not-iterable]
+    )  # pyrefly: ignore[not-iterable]
 
 
-def _merge(monkeypatch, max_dense_bytes: int, incremental: bool = False):
+def _merge(monkeypatch, max_dense_bytes: int, incremental: bool = False) -> Any:  # noqa: ANN401
     monkeypatch.setattr(tile_merge, "MAX_DENSE_MASK_BYTES", max_dense_bytes)
     cfg = TileConfig(enable_tiler=True, tile_size=(400, 400), iou_threshold=0.5)
     from getidata.fields import TileInfo
 
     from getitune.data.entity.base import ImageInfo
 
-    def tile_pred(mask_rows, offset):
+    def tile_pred(mask_rows, offset) -> Any:  # noqa: ANN401
         mask = torch.zeros(len(mask_rows), 400, 400, dtype=torch.bool)
         for i, (y0, y1, x0, x1) in enumerate(mask_rows):
             mask[i, y0:y1, x0:x1] = True
         boxes = torch.tensor([[x0, y0, x1, y1] for y0, y1, x0, x1 in mask_rows], dtype=torch.float32).reshape(-1, 4)
-        info = ImageInfo(img_idx=0, img_shape=(400, 400), ori_shape=(400, 400))
+        info = ImageInfo(img_idx=0, img_shape=(400, 400), ori_shape=(400, 400))  # pyrefly: ignore[no-matching-overload]
         batch = PredictionBatch(
             images=[torch.zeros(3, 4, 4)],
             imgs_info=[info],
             scores=[torch.tensor([0.9, 0.8][: len(mask_rows)])],
-            bboxes=[boxes],
+            bboxes=[boxes],  # pyrefly: ignore[bad-argument-type]
             labels=[torch.zeros(len(mask_rows), dtype=torch.long)],
-            masks=[mask],
+            masks=[mask],  # pyrefly: ignore[bad-argument-type]
         )
         return batch, [TileInfo(source_sample_idx=0, x=offset[0], y=offset[1], width=400, height=400)]
 
@@ -122,7 +131,9 @@ def _merge(monkeypatch, max_dense_bytes: int, incremental: bool = False):
         tile_pred([(10, 60, 20, 90), (300, 340, 300, 380)], (0, 0)),
         tile_pred([(100, 150, 50, 120)], (400, 200)),
     )
-    img_info = ImageInfo(img_idx=0, img_shape=(HEIGHT, WIDTH), ori_shape=(HEIGHT, WIDTH))
+    img_info = ImageInfo(  # pyrefly: ignore[no-matching-overload]
+        img_idx=0, img_shape=(HEIGHT, WIDTH), ori_shape=(HEIGHT, WIDTH)
+    )  # pyrefly: ignore[no-matching-overload]
     merger = InstanceSegTileMerge([img_info], 1, cfg)
     if incremental:
         merger.add(a, ia)
@@ -135,8 +146,8 @@ def test_incremental_add_equals_merge(monkeypatch):
     whole = _merge(monkeypatch, max_dense_bytes=10**12)
     incremental = _merge(monkeypatch, max_dense_bytes=10**12, incremental=True)
 
-    assert (incremental.masks == whole.masks).all()
-    assert torch.equal(incremental.scores, whole.scores)
+    assert (incremental.masks == whole.masks).all()  # pyrefly: ignore[missing-attribute]
+    assert torch.equal(incremental.scores, whole.scores)  # pyrefly: ignore[bad-argument-type]
 
 
 def test_merged_masks_are_rle_for_large_images_and_equal_the_dense_result(monkeypatch):
@@ -145,7 +156,10 @@ def test_merged_masks_are_rle_for_large_images_and_equal_the_dense_result(monkey
 
     assert not isinstance(dense.masks, RLEMasks)
     assert isinstance(rle.masks, RLEMasks)
-    assert len(rle.masks) == len(dense.masks) == 3
-    assert (rle.masks.to_dense() == dense.masks.as_subclass(torch.Tensor)).all()
-    assert sorted(int(m.sum()) for m in dense.masks) == [40 * 80, 50 * 70, 50 * 70]
-    assert any(m[300:350, 450:520].all() for m in dense.masks)  # second tile's instance sits at its (400, 200) offset
+    assert len(rle.masks) == len(dense.masks) == 3  # pyrefly: ignore[bad-argument-type]
+    assert (rle.masks.to_dense() == dense.masks.as_subclass(torch.Tensor)).all()  # pyrefly: ignore[missing-attribute]
+    assert sorted(int(m.sum()) for m in dense.masks) == [40 * 80, 50 * 70, 50 * 70]  # pyrefly: ignore[not-iterable]
+    assert any(
+        m[300:350, 450:520].all()
+        for m in dense.masks  # pyrefly: ignore[not-iterable]
+    )  # second tile's instance sits at its (400, 200) offset  # pyrefly: ignore[not-iterable]

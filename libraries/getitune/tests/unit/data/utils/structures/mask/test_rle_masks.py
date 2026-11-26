@@ -19,10 +19,17 @@ def test_crop_to_rle_equals_encoding_the_pasted_canvas(fill):
         canvas = np.zeros((height, width), dtype=bool)
         canvas[y : y + h, x : x + w] = mask
 
-        rle = crop_to_rle(mask, x, y, (height, width))
+        rle = crop_to_rle(mask, x, y, (height, width))  # pyrefly: ignore[bad-argument-type]
 
         assert rle == encode_rle(torch.from_numpy(canvas))
-        assert (mask_utils.decode(mask_utils.frPyObjects(rle, height, width)).astype(bool) == canvas).all()
+        assert (
+            mask_utils.decode(
+                mask_utils.frPyObjects(rle, height, width)  # pyrefly: ignore[no-matching-overload]
+            ).astype(  # pyrefly: ignore[no-matching-overload]
+                bool
+            )  # pyrefly: ignore[no-matching-overload]
+            == canvas  # pyrefly: ignore[no-matching-overload]
+        ).all()  # pyrefly: ignore[no-matching-overload]
 
 
 def test_rle_masks_from_polygons_matches_dense_rasterization_and_selects_instances():

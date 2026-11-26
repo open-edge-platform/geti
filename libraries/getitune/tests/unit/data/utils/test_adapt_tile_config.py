@@ -87,7 +87,7 @@ class TestAdaptTileConfig:
         # p50 edge 34 (small at input), p95 edge 214 -> ceil32(214/0.25)=864, but the images are 1280x720:
         # the tile must not exceed 720 -> 704.
         boxes = [[0, 0, 34, 20]] * 90 + [[0, 0, 214, 30]] * 10
-        subset_df = make_dm_subset([boxes] * 5, sizes=[(1280, 720)] * 5)
+        subset_df = make_dm_subset([boxes] * 5, sizes=[(1280, 720)] * 5)  # pyrefly: ignore[bad-argument-type]
         tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400), overlap=0.2)
 
         adapt_tile_config(tile_config, subset_df, input_size=(384, 384))

@@ -322,7 +322,11 @@ class OVInstanceSegmentationModel(OVModel):
             if crops is not None and len(crops) * ori_h * ori_w > MAX_DENSE_MASK_BYTES:
                 # Crops straight to RLE: a dense (N, H, W) stack is GBs on large images. Smaller results stay dense,
                 # as in the Lightning tile merge, so only very large predictions change type.
-                masks.append(RLEMasks([crop_to_rle(c, x, y, (ori_h, ori_w)) for c, x, y in crops], (ori_h, ori_w)))
+                masks.append(
+                    RLEMasks(  # pyrefly: ignore[bad-argument-type]
+                        [crop_to_rle(c, x, y, (ori_h, ori_w)) for c, x, y in crops], (ori_h, ori_w)
+                    )  # pyrefly: ignore[bad-argument-type]
+                )  # pyrefly: ignore[bad-argument-type]
                 continue
             merged_masks = np.asarray(merged.masks)
             if merged_masks.ndim == 3 and merged_masks.shape[0] > 0:

@@ -171,12 +171,17 @@ class RLEMasks:
         if not self.rles:
             return torch.zeros((0, height, width), dtype=torch.bool)
         rles = [
-            {**rle, "counts": mask_utils.frPyObjects(rle, height, width)["counts"]}
+            {
+                **rle,
+                "counts": mask_utils.frPyObjects(rle, height, width)["counts"],  # pyrefly: ignore[no-matching-overload]
+            }  # pyrefly: ignore[no-matching-overload]
             if isinstance(rle["counts"], list)
             else rle
             for rle in self.rles
         ]
-        return torch.from_numpy(mask_utils.decode(rles).astype(bool).transpose((2, 0, 1)))
+        return torch.from_numpy(
+            mask_utils.decode(rles).astype(bool).transpose((2, 0, 1))  # pyrefly: ignore[bad-argument-type]
+        )  # pyrefly: ignore[bad-argument-type]
 
 
 def crop_to_rle(mask: np.ndarray, x: int, y: int, shape: tuple[int, int]) -> dict:

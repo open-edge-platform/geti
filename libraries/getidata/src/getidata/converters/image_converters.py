@@ -380,8 +380,8 @@ class ImagePathToImageConverter(MediaBridgeConverter):
         output_format = self.output_image.field.format
 
         key = self._cache_key(str(df[input_col][0]), output_format) if len(df) == 1 else None
-        hit = _decoded_cache.get(key) if key else None
-        if hit is not None:
+        hit = _decoded_cache.get(key) if key is not None else None
+        if key is not None and hit is not None:
             _decoded_cache.move_to_end(key)
             image_series, shape_series, actual_polars_dtype = hit
             self._set_output_dtype(actual_polars_dtype)

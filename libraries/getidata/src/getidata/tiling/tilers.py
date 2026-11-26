@@ -7,6 +7,7 @@ Implementations of tilers for specific field types.
 
 import operator
 from collections.abc import Callable
+from functools import partial
 from typing import Any, Generic, TypeVar
 
 import numpy as np
@@ -315,7 +316,7 @@ class BboxTiler(Tiler):
 
         for tile_row in tiles_df["tile"]:
             image_id = tile_row["source_sample_idx"] - slice_offset
-            boxes = boxes_cache.get(image_id, lambda image_id=image_id: _load_boxes(image_id))
+            boxes = boxes_cache.get(image_id, partial(_load_boxes, image_id))
 
             tile_x = tile_row["x"]
             tile_y = tile_row["y"]
@@ -486,6 +487,10 @@ class ImageTiler(Tiler):
         return pl.DataFrame(results)
 
 
+def _polygons_of_image(df: pl.DataFrame, row: int, column_name: str) -> "_ImagePolygons":
+    return _ImagePolygons(df[row, column_name])
+
+
 class _ImagePolygons:
     """Polygon rings of one source image with their bounding boxes, for cheap per-tile pre-selection."""
 
@@ -558,7 +563,7 @@ class PolygonTiler(Tiler):
 
         for tile_row in tiles_df["tile"]:
             source_idx = tile_row["source_sample_idx"] - slice_offset
-            image = image_cache.get(source_idx, lambda i=source_idx: _ImagePolygons(df[i, column_name]))
+            image = image_cache.get(source_idx, partial(_polygons_of_image, df, source_idx, column_name))
             tx0, ty0 = tile_row["x"], tile_row["y"]
             tx1, ty1 = tx0 + tile_row["width"], ty0 + tile_row["height"]
 
@@ -583,7 +588,7 @@ class PolygonTiler(Tiler):
                         continue
                     tile_poly = tile_poly or box(tx0, ty0, tx1, ty1)
                     ring, clipped_area = self._clip(polygon, tile_poly)
-                    if ring is None or clipped_area < self.threshold_drop_ann * polygon.area:
+                    if ring is None or clipped_area is None or clipped_area < self.threshold_drop_ann * polygon.area:
                         continue
                 vertices.append(ring - (tx0, ty0))
                 lengths[i] = len(ring)

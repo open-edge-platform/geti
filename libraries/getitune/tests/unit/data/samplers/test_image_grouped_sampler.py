@@ -42,11 +42,16 @@ def test_tile_source_indices_reads_tile_column_and_handles_untiled_dataset():
     transforms.apply.return_value = pl.DataFrame({"tile": [{"source_sample_idx": 0}, {"source_sample_idx": 2}]})
     tiled = SimpleNamespace(dm_subset=SimpleNamespace(_transforms=transforms))
 
-    assert tile_source_indices(tiled).tolist() == [0, 2]
+    assert tile_source_indices(tiled).tolist() == [0, 2]  # pyrefly: ignore[bad-argument-type, missing-attribute]
     transforms.apply.assert_called_once_with(["tile"])
-    assert tile_source_indices(SimpleNamespace(dm_subset=SimpleNamespace(_transforms=None))) is None
+    assert (
+        tile_source_indices(
+            SimpleNamespace(dm_subset=SimpleNamespace(_transforms=None))  # pyrefly: ignore[bad-argument-type]
+        )  # pyrefly: ignore[bad-argument-type]
+        is None  # pyrefly: ignore[bad-argument-type]
+    )  # pyrefly: ignore[bad-argument-type]
     transforms.schema.attributes = {}
-    assert tile_source_indices(tiled) is None
+    assert tile_source_indices(tiled) is None  # pyrefly: ignore[bad-argument-type]
 
 
 def test_inner_sampler_draws_are_regrouped_by_image_and_keep_their_multiplicity():
@@ -54,7 +59,7 @@ def test_inner_sampler_draws_are_regrouped_by_image_and_keep_their_multiplicity(
     draws = [0, 0, 0, 5, 5, 10, 11, 2, 0, 5, 19, 1]
     inner = list(draws)
 
-    sampler = ImageGroupedSampler(SOURCE_IDX, inner=inner)
+    sampler = ImageGroupedSampler(SOURCE_IDX, inner=inner)  # pyrefly: ignore[bad-argument-type]
     order = list(sampler)
 
     assert len(sampler) == len(draws)

@@ -178,13 +178,19 @@ def test_filter_outputs_by_threshold_handles_rle_masks():
         images=[torch.empty(3, *shape)],
         imgs_info=[None],
         scores=[torch.tensor([0.9, 0.2, 0.7])],
-        bboxes=[torch.zeros(3, 4)],
+        bboxes=[torch.zeros(3, 4)],  # pyrefly: ignore[bad-argument-type]
         labels=[torch.tensor([0, 1, 2])],
-        masks=[masks],
+        masks=[masks],  # pyrefly: ignore[bad-argument-type]
     )
     fake_self = SimpleNamespace(best_confidence_threshold=0.5)
 
-    filtered = LightningInstanceSegModel._filter_outputs_by_threshold(fake_self, outputs)
+    filtered = LightningInstanceSegModel._filter_outputs_by_threshold(
+        fake_self,  # pyrefly: ignore[bad-argument-type]
+        outputs,  # pyrefly: ignore[bad-argument-type]
+    )  # pyrefly: ignore[bad-argument-type]
 
-    assert filtered.labels[0].tolist() == [0, 2]
-    assert filtered.masks[0].rles == [masks.rles[0], masks.rles[2]]
+    assert filtered.labels[0].tolist() == [0, 2]  # pyrefly: ignore[unsupported-operation]
+    assert filtered.masks[0].rles == [  # pyrefly: ignore[missing-attribute, unsupported-operation]
+        masks.rles[0],
+        masks.rles[2],
+    ]  # pyrefly: ignore[missing-attribute, unsupported-operation]
