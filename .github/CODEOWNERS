@@ -18,6 +18,10 @@ third-party-programs.txt @alexey-burdakov @AlexanderBarabanov @yvolokitin
 libraries/getitune/ @open-edge-platform/geti-lib-write
 libraries/getitune/uv.lock @sys-geti @open-edge-platform/geti-lib-write
 
+# Library (model_api)
+libraries/model_api/ @open-edge-platform/model_api-maintain
+libraries/model_api/uv.lock @sys-geti @open-edge-platform/geti-lib-write
+
 # Application backend
 application/backend/ @open-edge-platform/geti-backend-write
 application/backend/uv.lock @sys-geti @open-edge-platform/geti-backend-write
