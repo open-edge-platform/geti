@@ -10,6 +10,7 @@ import fr from './locales/fr.json';
 import hi from './locales/hi.json';
 import id from './locales/id.json';
 import it from './locales/it.json';
+import ja from './locales/ja.json';
 import nl from './locales/nl.json';
 import pl from './locales/pl.json';
 import pt from './locales/pt.json';
@@ -30,6 +31,7 @@ export const resources: Resource = {
     hi: { translation: hi satisfies Catalog },
     id: { translation: id satisfies Catalog },
     it: { translation: it satisfies Catalog },
+    ja: { translation: ja satisfies Catalog },
     nl: { translation: nl satisfies Catalog },
     pl: { translation: pl satisfies Catalog },
     pt: { translation: pt satisfies Catalog },

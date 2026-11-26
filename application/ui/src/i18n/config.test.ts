@@ -112,6 +112,15 @@ describe('createI18nInstance', () => {
         expect(instance.t('project.list.count', { count })).toBe(`${count} proyek`);
     });
 
+    it.each(['ja', 'ja-JP'])('renders Japanese for browser language %s', (language) => {
+        setNavigatorLanguage(language);
+        const instance = createI18nInstance();
+
+        expect(instance.resolvedLanguage).toBe('ja');
+        expect(instance.t('common.labels.dataset')).toBe('データセット');
+        expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('ja');
+    });
+
     it.each(['zh', 'zh-CN', 'zh-Hant-HK'])('renders Simplified Chinese for browser language %s', (language) => {
         setNavigatorLanguage(language);
         const instance = createI18nInstance();
@@ -165,6 +174,13 @@ describe('createI18nInstance', () => {
 
         expect(instance.resolvedLanguage).toBe('de');
         expect(instance.t('common.labels.dataset')).toBe('Datensatz');
+    });
+
+    it('renders Japanese for a pinned regional language', () => {
+        const instance = createI18nInstance({ lng: 'ja-JP' });
+
+        expect(instance.resolvedLanguage).toBe('ja');
+        expect(instance.t('common.labels.dataset')).toBe('データセット');
     });
 
     it('renders English for a pinned unsupported language', () => {
