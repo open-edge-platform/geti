@@ -1,0 +1,609 @@
+#
+# Copyright (C) 2020-2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+#
+import ast
+import json
+import operator
+from pathlib import Path
+from typing import Type
+
+import cv2
+import numpy as np
+import onnx
+import pytest
+from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
+from model_api.adapters.openvino_adapter import OpenvinoAdapter, create_core
+from model_api.adapters.utils import load_parameters_from_onnx
+
+# TODO refactor this test so that it does not use eval
+# flake8: noqa: F401
+from model_api.models import (
+    ActionClassificationModel,
+    AnomalyDetection,
+    AnomalyResult,
+    ClassificationModel,
+    ClassificationResult,
+    Contour,
+    DetectedKeypoints,
+    DetectionModel,
+    DetectionResult,
+    ImageModel,
+    ImageResultWithSoftPrediction,
+    InstanceSegmentationResult,
+    KeypointDetectionModel,
+    MaskRCNNModel,
+    Model,
+    Prompt,
+    SAMDecoder,
+    SAMImageEncoder,
+    SAMLearnableVisualPrompter,
+    SAMVisualPrompter,
+    SegmentationModel,
+    VisualPromptingResult,
+    ZSLVisualPromptingResult,
+    add_rotated_rects,
+    get_contours,
+)
+from model_api.tilers import (
+    DetectionTiler,
+    InstanceSegmentationTiler,
+    SemanticSegmentationTiler,
+)
+from model_api.visualizer import Visualizer
+
+# Mapping of model type strings to actual classes for security
+MODEL_TYPE_MAPPING = {
+    "ActionClassificationModel": ActionClassificationModel,
+    "AnomalyDetection": AnomalyDetection,
+    "ClassificationModel": ClassificationModel,
+    "DetectionModel": DetectionModel,
+    "ImageModel": ImageModel,
+    "KeypointDetectionModel": KeypointDetectionModel,
+    "MaskRCNNModel": MaskRCNNModel,
+    "SAMDecoder": SAMDecoder,
+    "SAMImageEncoder": SAMImageEncoder,
+    "SAMLearnableVisualPrompter": SAMLearnableVisualPrompter,
+    "SAMVisualPrompter": SAMVisualPrompter,
+    "SegmentationModel": SegmentationModel,
+    # Tiler classes
+    "DetectionTiler": DetectionTiler,
+    "InstanceSegmentationTiler": InstanceSegmentationTiler,
+    "SemanticSegmentationTiler": SemanticSegmentationTiler,
+}
+
+
+def read_config(fname):
+    with fname.open("r") as f:
+        return json.load(f)
+
+
+def create_models(
+    model_type,
+    model_path,
+    download_dir,
+    force_onnx_adapter=False,
+    device="CPU",
+    configuration=None,
+    dump: bool = False,
+):
+    if model_path.endswith(".onnx") and force_onnx_adapter:
+        wrapper_type = model_type.get_model_class(
+            load_parameters_from_onnx(onnx.load(model_path))["model_info"]["model_type"],
+        )
+        model = wrapper_type(
+            ONNXRuntimeAdapter(
+                model_path,
+                ort_options={"providers": ["CPUExecutionProvider"]},
+            ),
+        )
+        model.load()
+        return [model]
+
+    configuration = configuration or {}
+
+    models = [
+        model_type.create_model(model_path, device=device, download_dir=download_dir, configuration=configuration),
+    ]
+    if model_path.endswith(".xml") and not dump:
+        model = create_core().read_model(model_path)
+        if model.has_rt_info(["model_info", "model_type"]):
+            wrapper_type = model_type.get_model_class(
+                model.get_rt_info(["model_info", "model_type"]).astype(str),
+            )
+            model = wrapper_type(OpenvinoAdapter(create_core(), model_path, device=device), configuration=configuration)
+            model.load()
+            models.append(model)
+    return models
+
+
+@pytest.fixture(scope="session")
+def data(pytestconfig):
+    return pytestconfig.getoption("data")
+
+
+@pytest.fixture(scope="session")
+def results_dir(pytestconfig):
+    return pytestconfig.getoption("results_dir")
+
+
+@pytest.fixture(scope="session")
+def device(pytestconfig):
+    return pytestconfig.getoption("device")
+
+
+@pytest.fixture(scope="session")
+def dump(pytestconfig):
+    return pytestconfig.getoption("dump")
+
+
+@pytest.fixture(scope="session")
+def result(pytestconfig):
+    return pytestconfig.test_results
+
+
+@pytest.fixture(scope="session")
+def model_data_file(pytestconfig):
+    return pytestconfig.getoption("model_data")
+
+
+@pytest.fixture(scope="session")
+def only_model_class(pytestconfig) -> Type[Model] | None:
+    model_type = pytestconfig.getoption("only_model_type")
+    if not model_type:
+        return None
+    return Model.get_model_class(model_type)
+
+
+def pytest_generate_tests(metafunc):
+    if "model_data" in metafunc.fixturenames:
+        model_data_file = metafunc.config.getoption("model_data")
+        model_data_path = Path(__file__).resolve().parent / model_data_file
+        config_data = read_config(model_data_path)
+        metafunc.parametrize("model_data", config_data)
+
+
+def compare_classification_result(outputs: ClassificationResult, reference: dict) -> None:
+    """Compare ClassificationResult with reference data.
+
+    Args:
+        outputs: The ClassificationResult to validate
+        reference: Dictionary containing expected values for top_labels and/or raw_scores
+
+    Note:
+        When raw_scores are empty and confidence is 1.0, only confidence is checked.
+        This handles models with embedded TopK that may produce different argmax results
+        on different devices due to numerical precision differences.
+    """
+    assert "top_labels" in reference
+    assert outputs.top_labels is not None
+    assert len(outputs.top_labels) == len(reference["top_labels"])
+
+    # Check if we have raw scores to validate predictions
+    has_raw_scores = (
+        outputs.raw_scores is not None
+        and outputs.raw_scores.size > 0
+        and "raw_scores" in reference
+        and len(reference["raw_scores"]) > 0
+    )
+
+    for i, (actual_label, expected_label) in enumerate(zip(outputs.top_labels, reference["top_labels"])):
+        if not has_raw_scores and expected_label.get("confidence", 0.0) == 1.0:
+            assert abs(actual_label.confidence - expected_label["confidence"]) < 1e-1, f"Label {i} confidence mismatch"
+        else:
+            assert actual_label.id == expected_label["id"], f"Label {i} id mismatch"
+            assert actual_label.name == expected_label["name"], f"Label {i} name mismatch"
+            assert abs(actual_label.confidence - expected_label["confidence"]) < 1e-1, f"Label {i} confidence mismatch"
+
+    # Validate raw_scores if available
+    if has_raw_scores:
+        expected_scores = np.array(reference["raw_scores"])
+        assert np.allclose(outputs.raw_scores, expected_scores, rtol=1e-2, atol=1e-1), "raw_scores mismatch"
+
+
+def create_classification_result_dump(outputs: ClassificationResult) -> dict:
+    """Create a JSON-serializable dump of ClassificationResult.
+
+    Args:
+        outputs: The ClassificationResult to serialize
+
+    Returns:
+        Dictionary containing top_labels and raw_scores in JSON-serializable format
+    """
+    return {
+        "top_labels": [
+            {
+                "id": int(label.id) if label.id is not None else None,
+                "name": label.name,
+                "confidence": float(label.confidence) if label.confidence is not None else None,
+            }
+            for label in outputs.top_labels
+        ]
+        if outputs.top_labels
+        else None,
+        "raw_scores": [float(x) for x in outputs.raw_scores.tolist()] if outputs.raw_scores is not None else None,
+    }
+
+
+def compare_detection_result(outputs: DetectionResult, reference: dict) -> None:
+    """Compare DetectionResult with reference data.
+
+    Args:
+        outputs: The DetectionResult to validate
+        reference: Dictionary containing expected values for bboxes, labels, scores, and label_names
+    """
+    assert "bboxes" in reference
+    assert outputs.bboxes is not None
+    expected_bboxes = np.array(reference["bboxes"])
+
+    if expected_bboxes.size == 0 and outputs.bboxes.size == 0:
+        expected_bboxes = expected_bboxes.reshape(0, 4)
+
+    assert (
+        outputs.bboxes.shape == expected_bboxes.shape
+    ), f"bboxes shape mismatch: {outputs.bboxes.shape} vs {expected_bboxes.shape}"
+
+    # Sort both outputs and expected by bbox coordinates (x1, y1, x2, y2) for deterministic comparison
+    output_sort_indices = np.lexsort((
+        outputs.bboxes[:, 3],
+        outputs.bboxes[:, 2],
+        outputs.bboxes[:, 1],
+        outputs.bboxes[:, 0],
+    ))
+    expected_sort_indices = np.lexsort((
+        expected_bboxes[:, 3],
+        expected_bboxes[:, 2],
+        expected_bboxes[:, 1],
+        expected_bboxes[:, 0],
+    ))
+
+    sorted_output_bboxes = outputs.bboxes[output_sort_indices]
+    sorted_expected_bboxes = expected_bboxes[expected_sort_indices]
+
+    assert np.allclose(sorted_output_bboxes, sorted_expected_bboxes, rtol=1e-2, atol=1), "bboxes mismatch"
+
+    assert "labels" in reference
+    assert outputs.labels is not None
+    expected_labels = np.array(reference["labels"])
+    assert np.array_equal(outputs.labels, expected_labels), "labels mismatch"
+
+    assert "scores" in reference
+    assert outputs.scores is not None
+    expected_scores = np.array(reference["scores"])
+    assert np.allclose(outputs.scores, expected_scores, rtol=1e-2, atol=1e-1), "scores mismatch"
+
+    assert "label_names" in reference
+    assert outputs.label_names is not None
+    assert outputs.label_names == reference["label_names"], "label_names mismatch"
+
+
+def create_detection_result_dump(outputs: DetectionResult) -> dict:
+    """Create a JSON-serializable dump of DetectionResult.
+
+    Args:
+        outputs: The DetectionResult to serialize
+
+    Returns:
+        Dictionary containing bboxes, labels, scores, and label_names in JSON-serializable format
+    """
+    return {
+        "bboxes": outputs.bboxes.tolist() if outputs.bboxes is not None else None,
+        "labels": outputs.labels.tolist() if outputs.labels is not None else None,
+        "scores": [float(x) for x in outputs.scores.tolist()] if outputs.scores is not None else None,
+        "label_names": outputs.label_names if outputs.label_names is not None else None,
+    }
+
+
+def create_semantic_segmentation_result_dump(outputs: ImageResultWithSoftPrediction, contours: list[Contour]) -> dict:
+    return {
+        "hist": outputs.hist(),
+        "soft_prediction_shape": outputs.soft_prediction.shape,
+        "contours": sorted_contours_dicts(contours),
+    }
+
+
+def sorted_contours_dicts(contours: list[Contour]) -> list[dict]:
+    return sorted(
+        [contour.summarized_dict() for contour in contours],
+        key=operator.itemgetter("probability", "label", "length", "num_children"),
+        reverse=True,
+    )
+
+
+def compare_instance_segmentation_result(outputs: InstanceSegmentationResult, expected: dict) -> None:
+    """Compare InstanceSegmentationResult with reference data.
+
+    Args:
+        outputs: The InstanceSegmentationResult to validate
+        expected: Dictionary containing expected 'objects' and 'contours'
+    """
+    actual = create_instance_segmentation_result_dump(outputs)
+    assert "objects" in actual, "Actual data must contain 'objects' key"
+
+    assert "objects" in expected, "Expected data must contain 'objects' key"
+    assert len(actual["objects"]) == len(
+        expected["objects"],
+    ), f'Number of objects mismatch: {len(actual["objects"])} vs {len(expected["objects"])}'
+
+    for i, (actual_object, expected_object) in enumerate(zip(actual["objects"], expected["objects"])):
+        assert abs(actual_object["x1"] - expected_object["x1"]) < 1, f"Object {i} x1 mismatch"
+        assert abs(actual_object["y1"] - expected_object["y1"]) < 1, f"Object {i} y1 mismatch"
+        assert abs(actual_object["x2"] - expected_object["x2"]) < 1, f"Object {i} x2 mismatch"
+        assert abs(actual_object["y2"] - expected_object["y2"]) < 1, f"Object {i} y2 mismatch"
+        assert actual_object["class_id"] == expected_object["class_id"], f"Object {i} class_id mismatch"
+        assert actual_object["label"] == expected_object["label"], f"Object {i} label mismatch"
+        assert abs(actual_object["score"] - expected_object["score"]) < 1e-3, f"Object {i} score mismatch"
+        assert abs(actual_object["cx"] - expected_object["cx"]) < 1e-3, f"Object {i} cx mismatch"
+        assert abs(actual_object["cy"] - expected_object["cy"]) < 1e-3, f"Object {i} cy mismatch"
+        assert abs(actual_object["w"] - expected_object["w"]) < 1e-3, f"Object {i} w mismatch"
+        assert abs(actual_object["h"] - expected_object["h"]) < 1e-3, f"Object {i} h mismatch"
+        assert abs(actual_object["angle"] - expected_object["angle"]) < 1e-3, f"Object {i} angle mismatch"
+
+    assert "contours" in actual, "Actual data must contain 'contours' key"
+    assert "contours" in expected, "Expected data must contain 'contours' key"
+    assert_contours_match(actual["contours"], expected["contours"])
+
+
+def create_instance_segmentation_result_dump(outputs: InstanceSegmentationResult) -> dict:
+    """Create a JSON-serializable dump of InstanceSegmentationResult.
+
+    Args:
+        outputs: The InstanceSegmentationResult to serialize
+
+    Returns:
+        Dictionary containing 'objects' (bboxes with rotated rects) and 'contours'
+    """
+    rotated_outputs = add_rotated_rects(outputs)
+
+    objects = []
+    for i in range(len(rotated_outputs.bboxes)):
+        x1, y1, x2, y2 = rotated_outputs.bboxes[i]
+        (cx, cy), (w, h), angle = rotated_outputs.rotated_rects[i]
+        objects.append({
+            "x1": float(x1),
+            "y1": float(y1),
+            "x2": float(x2),
+            "y2": float(y2),
+            "class_id": int(rotated_outputs.labels[i]),
+            "label": rotated_outputs.label_names[i],
+            "score": float(rotated_outputs.scores[i]),
+            "cx": float(cx),
+            "cy": float(cy),
+            "w": float(w),
+            "h": float(h),
+            "angle": float(angle),
+        })
+
+    try:
+        contours = get_contours(outputs)
+    except RuntimeError:
+        # getContours() assumes each instance generates only one contour.
+        # That doesn't hold for some models
+        contours = []
+
+    return {
+        "objects": sorted(objects, key=operator.itemgetter("score", "class_id", "x1", "y1", "x2", "y2"), reverse=True),
+        "contours": sorted_contours_dicts(contours),
+    }
+
+
+def compare_semantic_segmentation_result(
+    outputs: ImageResultWithSoftPrediction,
+    contours: list[Contour],
+    reference: dict,
+) -> None:
+    assert "hist" in reference
+    assert outputs.hist() == pytest.approx(reference["hist"], abs=1e-2), "hist values mismatch"
+
+    assert "soft_prediction_shape" in reference
+    assert (
+        list(outputs.soft_prediction.shape) == reference["soft_prediction_shape"]
+    ), f"soft_prediction shape mismatch {list(outputs.soft_prediction.shape)} vs {reference['soft_prediction_shape']}"
+
+    assert "contours" in reference
+    assert_contours_match(sorted_contours_dicts(contours), reference["contours"])
+
+
+def assert_contours_match(actual: list[dict], expected: list[dict]) -> None:
+    """Assert that actual contours match expected contours."""
+    assert len(expected) == len(
+        actual,
+    ), f"Number of contours mismatch: {len(actual)} vs {len(expected)}"
+    for idx, actual_contour in enumerate(actual):
+        expected_contour = expected[idx]
+        assert (
+            actual_contour["label"] == expected_contour["label"]
+        ), f"Contour {idx} label mismatch: '{actual_contour['label']}' vs '{expected_contour['label']}'"
+        assert (
+            abs(actual_contour["probability"] - expected_contour["probability"]) < 1e-3
+        ), f"Contour {idx} probability mismatch: {actual_contour['probability']} vs {expected_contour['probability']}"
+        assert (
+            actual_contour["length"] == expected_contour["length"]
+        ), f"Contour {idx} length mismatch: {actual_contour['length']} vs {expected_contour['length']}"
+        assert actual_contour["num_children"] == expected_contour["num_children"], (
+            f"Contour {idx} num_children mismatch: "
+            f"{actual_contour['num_children']} vs {expected_contour['num_children']}"
+        )
+
+
+def test_image_models(data, device, dump, result, model_data, results_dir, only_model_class):  # noqa: C901
+    name = model_data["name"]
+
+    model_type = MODEL_TYPE_MAPPING[model_data["type"]]
+    if only_model_class and not issubclass(model_type, only_model_class):
+        pytest.skip(f"Skipping {name} as it is not a subclass of {only_model_class.__name__}")
+
+    if name.endswith((".xml", ".onnx")):
+        name = f"{data}/{name}"
+
+    for model in create_models(
+        model_type,
+        name,
+        data,
+        model_data.get("force_ort", False),
+        device=device,
+        configuration=model_data.get("configuration", None),
+        dump=dump,
+    ):
+        if "tiler" in model_data:
+            if "extra_model" in model_data:
+                extra_adapter = OpenvinoAdapter(
+                    create_core(),
+                    f"{data}/{model_data['extra_model']}",
+                    device=device,
+                )
+
+                extra_model = MODEL_TYPE_MAPPING[model_data["extra_type"]](
+                    extra_adapter,
+                    configuration={},
+                    preload=True,
+                )
+                model = MODEL_TYPE_MAPPING[model_data["tiler"]](
+                    model,
+                    configuration={},
+                    tile_classifier_model=extra_model,
+                )
+            else:
+                model = MODEL_TYPE_MAPPING[model_data["tiler"]](model, configuration={})
+        elif "prompter" in model_data:
+            encoder_adapter = OpenvinoAdapter(
+                create_core(),
+                f"{data}/{model_data['encoder']}",
+                device=device,
+            )
+
+            encoder_model = MODEL_TYPE_MAPPING[model_data["encoder_type"]](
+                encoder_adapter,
+                configuration={},
+                preload=True,
+            )
+            model = MODEL_TYPE_MAPPING[model_data["prompter"]](encoder_model, model)
+
+        if dump:
+            result.append(model_data)
+            inference_results = []
+
+        for test_data in model_data["test_data"]:
+            image_path = Path(data) / test_data["image"]
+            image = cv2.imread(str(image_path))
+            if image is None:
+                error_message = f"Failed to read the image at {image_path}"
+                raise RuntimeError(error_message)
+            if "input_res" in model_data:
+                image = cv2.resize(image, ast.literal_eval(model_data["input_res"]))
+            if isinstance(model, ActionClassificationModel):
+                image = np.stack([image for _ in range(8)])
+            if "prompter" in model_data:
+                if model_data["prompter"] == "SAMLearnableVisualPrompter":
+                    model.learn(
+                        image,
+                        points=[
+                            Prompt(
+                                np.array([image.shape[0] / 2, image.shape[1] / 2]),
+                                0,
+                            ),
+                        ],
+                        polygons=[
+                            Prompt(
+                                np.array(
+                                    [
+                                        [image.shape[0] / 4, image.shape[1] / 4],
+                                        [image.shape[0] / 4, image.shape[1] / 2],
+                                        [image.shape[0] / 2, image.shape[1] / 2],
+                                    ],
+                                ),
+                                1,
+                            ),
+                        ],
+                    )
+                    outputs = model(image)
+                else:
+                    outputs = model(
+                        image,
+                        points=[
+                            Prompt(
+                                np.array([image.shape[0] / 2, image.shape[1] / 2]),
+                                0,
+                            ),
+                        ],
+                    )
+            else:
+                outputs = model(image)
+
+            store_outputs(name, image, device, outputs, results_dir)
+
+            if isinstance(outputs, ClassificationResult):
+                if not dump:
+                    compare_classification_result(outputs, test_data["reference"])
+                image_result = create_classification_result_dump(outputs)
+            elif type(outputs) is DetectionResult:
+                if not dump:
+                    compare_detection_result(outputs, test_data["reference"])
+                image_result = create_detection_result_dump(outputs)
+            elif isinstance(outputs, ImageResultWithSoftPrediction):
+                contours: list[Contour] = (
+                    model.get_contours(outputs) if hasattr(model, "get_contours") else model.model.get_contours(outputs)
+                )
+                if not dump:
+                    compare_semantic_segmentation_result(outputs, contours, test_data["reference"])
+                image_result = create_semantic_segmentation_result_dump(outputs, contours)
+            elif type(outputs) is InstanceSegmentationResult:
+                if not dump:
+                    compare_instance_segmentation_result(outputs, test_data["reference"])
+                image_result = create_instance_segmentation_result_dump(outputs)
+            elif isinstance(outputs, AnomalyResult):
+                output_str = str(outputs)
+                if not dump:
+                    assert len(test_data["reference"]) == 1
+                    assert test_data["reference"][0] == output_str
+                image_result = [output_str]
+            elif isinstance(outputs, (ZSLVisualPromptingResult, VisualPromptingResult, DetectedKeypoints)):
+                output_str = str(outputs)
+                if not dump:
+                    assert test_data["reference"][0] == output_str
+                image_result = [output_str]
+            else:
+                pytest.fail(f"Unexpected output type: {type(outputs)}")
+            if dump:
+                inference_results.append(
+                    {"image": test_data["image"], "reference": image_result},
+                )
+    save_name = Path(name).name if name.endswith(".xml") else name + ".xml"
+
+    if not model_data.get("force_ort", False):
+        if "tiler" in model_data:
+            model.get_model().save(data + "/serialized/" + save_name)
+        elif "prompter" in model_data:
+            pass
+        else:
+            model.save(data + "/serialized/" + save_name)
+            if model_data.get("check_extra_rt_info", False):
+                assert (
+                    create_core()
+                    .read_model(data + "/serialized/" + save_name)
+                    .get_rt_info(["model_info", "label_ids"])
+                    .astype(str)
+                )
+
+    if dump:
+        result[-1]["test_data"] = inference_results
+
+
+def store_outputs(name, image, device, result, results_dir: str) -> None:
+    if not results_dir:
+        return
+
+    Path(results_dir).mkdir(exist_ok=True, parents=True)
+
+    iteration = 1
+    while True:
+        path = Path(results_dir) / f"{Path(name).stem}_{iteration}_{device}.png"
+        if not path.exists():
+            break
+        iteration += 1
+
+    visualizer = Visualizer()
+    try:
+        visualizer.save(image, result, path)
+    except (TypeError, ValueError) as e:
+        print(f"Cannot save the output visualization for {name}. Error: {e}")
