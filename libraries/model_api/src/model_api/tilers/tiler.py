@@ -1,0 +1,316 @@
+#
+# Copyright (C) 2020-2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+#
+
+import abc
+import logging as log
+from contextlib import contextmanager
+from itertools import product
+from typing import Generic, TypeVar
+
+from model_api.models.parameters import ParameterRegistry
+from model_api.models.result import Result
+from model_api.pipelines import AsyncPipeline
+
+ResultT = TypeVar("ResultT", bound=Result)
+
+
+class Tiler(abc.ABC, Generic[ResultT]):
+    EXECUTION_MODES = ("async", "sync")
+    """
+    An abstract tiler
+
+    The abstract tiler is free from any executor dependencies.
+    It sets the `Model` instance with the provided model
+    and applies it to tiles of the input image, and then merges
+    results from all tiles.
+
+    The `_postprocess_tile` and `_merge_results` methods must be implemented in a specific inherited tiler.
+    Attributes:
+        logger (Logger): instance of the Logger
+        model (Model): model being executed
+        model_loaded (bool): a flag whether the model is loaded to device
+        async_pipeline (AsyncPipeline): a pipeline for asynchronous execution mode
+        execution_mode: Controls inference mode of the tiler (`async` or `sync`).
+    """
+
+    def __init__(self, model, configuration: dict = {}, execution_mode: str = "async"):
+        """Base constructor for creating a tiling pipeline
+
+        Args:
+            model: underlying model
+            configuration: it contains values for parameters accepted by specific
+              tiler (`tile_size`, `tiles_overlap` etc.) which are set as data attributes.
+            execution_mode: Controls inference mode of the tiler (`async` or `sync`).
+        """
+        self.logger = log.getLogger()
+        self.model = model
+        for name, parameter in self.parameters().items():
+            self.__setattr__(name, parameter.default_value)
+        self._load_config(configuration)
+        self.async_pipeline = AsyncPipeline(self.model)
+        if execution_mode not in Tiler.EXECUTION_MODES:
+            msg = f"Wrong execution mode. The following modes are supported {Tiler.EXECUTION_MODES}"
+            raise ValueError(msg)
+        self.execution_mode = execution_mode
+
+    def get_model(self):
+        """Getter for underlying model"""
+        return self.model
+
+    @classmethod
+    def parameters(cls):
+        """Defines the description and type of configurable data parameters for the tiler.
+
+        The structure is similar to model wrapper parameters.
+
+        Returns:
+            - the dictionary with defined wrapper tiler parameters
+        """
+        return ParameterRegistry.TILER.copy()
+
+    def _load_config(self, config):
+        """Reads the configuration and creates data attributes
+           by setting the wrapper parameters with values from configuration.
+
+        Args:
+            config (dict): the dictionary with keys to be set as data attributes
+              and its values. The example of the config is the following:
+              {
+                  'confidence_threshold': 0.5,
+                  'resize_type': 'fit_to_window',
+              }
+
+        Note:
+            The config keys should be provided in `parameters` method for each wrapper,
+            then the default value of the parameter will be updated. If some key presented
+            in the config is not introduced in `parameters`, it will be omitted.
+
+        Raises:
+            RuntimeError: if the configuration is incorrect
+        """
+        parameters = self.parameters()
+
+        for name, param in parameters.items():
+            try:
+                value = param.from_str(
+                    self.model.inference_adapter.get_rt_info(
+                        ["model_info", name],
+                    ).astype(str),
+                )
+                self.__setattr__(name, value)
+            except RuntimeError as error:
+                missing_rt_info = "Cannot get runtime attribute. Path to runtime attribute is incorrect." in str(error)
+                is_OVMSAdapter = str(error) == "OVMSAdapter does not support RT info getting"
+                if not missing_rt_info and not is_OVMSAdapter:
+                    raise
+
+        for name, value in config.items():
+            if value is None:
+                continue
+            if name in parameters:
+                errors = parameters[name].validate(value)
+                if errors:
+                    self.logger.error(f'Error with "{name}" parameter:')
+                    for _error in errors:
+                        self.logger.error(f"\t{_error}")
+                    msg = "Incorrect user configuration"
+                    raise RuntimeError(msg)
+                value = parameters[name].get_value(value)
+                self.__setattr__(name, value)
+            else:
+                self.logger.warning(
+                    f'The parameter "{name}" not found in tiler, will be omitted',
+                )
+
+    def __call__(self, inputs) -> ResultT:
+        """Applies full pipeline of tiling inference in one call.
+
+        Args:
+            inputs: raw input data, the data type is defined by underlying model wrapper
+
+        Returns:
+            - postprocessed data in the format defined by underlying model wrapper
+        """
+        tile_coords = self._tile(inputs)
+        tile_coords = self._filter_tiles(inputs, tile_coords)
+
+        with self._setup_model():
+            if self.execution_mode == "sync":
+                return self._predict_sync(inputs, tile_coords)
+            return self._predict_async(inputs, tile_coords)
+
+    def predict_tiles(self, tiles, tile_coords, shape) -> ResultT:
+        """Run tiled inference on externally provided (already cropped) tiles and merge.
+
+        This mirrors :meth:`__call__` but skips the internal tiling stage
+        (``_tile`` / ``_filter_tiles`` / ``_crop_tile``): the caller supplies the tile
+        crops together with their absolute coordinates in the full image. This supports
+        pipelines that perform tiling upstream (e.g. inside a data loader) while still
+        reusing the tiler's per-task ``_postprocess_tile`` and ``_merge_results`` logic.
+
+        The underlying model runs once per provided tile, so callers must not pass tiles
+        through a model that itself tiles internally (that would tile each tile a second
+        time).
+
+        Args:
+            tiles: sequence of pre-cropped tile images, each in the layout expected by
+                the underlying model wrapper (typically ``(H, W, C)`` arrays).
+            tile_coords: sequence of ``[x1, y1, x2, y2]`` absolute tile coordinates in the
+                full image, aligned with ``tiles``.
+            shape: full-resolution image shape (``(H, W, C)`` or ``(H, W)``) used to place
+                and merge the per-tile predictions.
+
+        Returns:
+            Merged prediction in the format produced by ``_merge_results``.
+
+        Raises:
+            ValueError: if ``tiles`` and ``tile_coords`` have different lengths.
+        """
+        tiles = list(tiles)
+        tile_coords = list(tile_coords)
+        if len(tiles) != len(tile_coords):
+            msg = "tiles and tile_coords must have the same length"
+            raise ValueError(msg)
+
+        with self._setup_model():
+            if self.execution_mode == "sync":
+                tile_results = [
+                    self._postprocess_tile(self.model(tile), coord) for tile, coord in zip(tiles, tile_coords)
+                ]
+            else:
+                for i, tile in enumerate(tiles):
+                    self.async_pipeline.submit_data(tile, i)
+                self.async_pipeline.await_all()
+                tile_results = [
+                    self._postprocess_tile(self.async_pipeline.get_result(j)[0], tile_coords[j])
+                    for j in range(len(tiles))
+                ]
+            return self._merge_results(tile_results, shape)
+
+    @contextmanager
+    def _setup_model(self):
+        """Temporarily reconfigure the underlying model for tiled inference.
+
+        The base implementation is a no-op. Subclasses override this to toggle
+        model-specific flags for the duration of tiled inference and merging (for
+        example, disabling semantic-mask postprocessing for instance segmentation or
+        enabling soft predictions for semantic segmentation). The reconfiguration is
+        applied consistently by both :meth:`__call__` and :meth:`predict_tiles`.
+        """
+        yield
+
+    def _tile(self, image):
+        """Tiles an input image to overlapping or non-overlapping patches.
+
+        This method implementation also adds the full image as the first tile to process.
+
+        Args:
+            image: Input image to tile.
+
+        Returns:
+            Tiles coordinates
+        """
+        height, width = image.shape[:2]
+
+        coords = []
+        if self.tile_with_full_img:
+            coords += [[0, 0, width, height]]
+        for loc_j, loc_i in product(
+            range(0, width, int(self.tile_size * (1 - self.tiles_overlap))),
+            range(0, height, int(self.tile_size * (1 - self.tiles_overlap))),
+        ):
+            x2 = min(loc_j + self.tile_size, width)
+            y2 = min(loc_i + self.tile_size, height)
+            coords.append([loc_j, loc_i, x2, y2])
+
+        return coords
+
+    def _filter_tiles(self, image, tile_coords):
+        """Filter tiles by some criterion
+
+        Args:
+            image: full size image
+            tile_coords: tile coordinates
+
+        Returns:
+            keep_coords: tile coordinates to keep
+        """
+        return tile_coords
+
+    def _predict_sync(self, image, tile_coords) -> ResultT:
+        """Makes prediction by splitting the input image into tiles in synchronous mode.
+
+        Args:
+            image: full size image
+            tile_coords: list of tile coordinates
+
+        Returns:
+            Inference results aggregated from all tiles
+        """
+        tile_results = []
+        for coord in tile_coords:
+            tile_img = self._crop_tile(image, coord)
+            tile_predictions = self.model(tile_img)
+            tile_result = self._postprocess_tile(tile_predictions, coord)
+            tile_results.append(tile_result)
+
+        return self._merge_results(tile_results, image.shape)
+
+    def _predict_async(self, image, tile_coords) -> ResultT:
+        """Makes prediction by splitting the input image into tiles in asynchronous mode.
+
+        Args:
+            image: full size image
+            tile_coords: tile coordinates
+
+        Returns:
+            Inference results aggregated from all tiles
+        """
+        for i, coord in enumerate(tile_coords):
+            self.async_pipeline.submit_data(self._crop_tile(image, coord), i)
+        self.async_pipeline.await_all()
+
+        num_tiles = len(tile_coords)
+        tile_results = []
+        for j in range(num_tiles):
+            tile_prediction, _ = self.async_pipeline.get_result(j)
+            tile_result = self._postprocess_tile(tile_prediction, tile_coords[j])
+            tile_results.append(tile_result)
+
+        return self._merge_results(tile_results, image.shape)
+
+    @abc.abstractmethod
+    def _postprocess_tile(self, predictions, coord):
+        """Postprocesses predictions made by a model from one tile.
+
+        Args:
+            predictions: model-dependent set of predictions or one prediction
+            coord: a list containing coordinates for the processed tile
+
+        Returns:
+            Postprocessed predictions
+        """
+
+    @abc.abstractmethod
+    def _merge_results(self, results, shape) -> ResultT:
+        """Merge results from all tiles.
+
+        Args:
+            results: list of tile results
+            shape: original full-res image shape
+        """
+
+    def _crop_tile(self, image, coord):
+        """Crop tile from the full image.
+
+        Args:
+            image: full-res image
+            coord: tile coordinates
+
+        Returns:
+            cropped tile
+        """
+        x1, y1, x2, y2 = coord
+        return image[y1:y2, x1:x2]
