@@ -16,7 +16,7 @@ from getitune.backend.openvino.models.base import OVModel
 from getitune.backend.openvino.models.utils import rescale_bboxes_to_original, rescale_masks_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
-from getitune.data.utils.structures.mask.mask_util import encode_rle
+from getitune.data.utils.structures.mask.mask_util import RLEMasks, crop_to_rle, encode_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 from getitune.types.label import LabelInfo
@@ -30,6 +30,11 @@ if TYPE_CHECKING:
     from getitune.data.entity.base import ImageInfo
     from getitune.metrics import MetricCallable
     from getitune.types import PathLike
+
+
+def _as_rle(masks: tv_tensors.Mask | RLEMasks) -> list[dict]:
+    """COCO RLE per instance; already-RLE masks (large tiled images) pass through."""
+    return masks.rles if isinstance(masks, RLEMasks) else [encode_rle(mask) for mask in masks.data]
 
 
 class OVInstanceSegmentationModel(OVModel):
@@ -224,7 +229,7 @@ class OVInstanceSegmentationModel(OVModel):
         pred_info = [
             {
                 "boxes": preds.bboxes[idx].data if preds.bboxes is not None else torch.empty((0, 4)),
-                "masks": [encode_rle(mask) for mask in preds.masks[idx].data]
+                "masks": _as_rle(preds.masks[idx])
                 if preds.masks is not None and len(preds.masks)
                 else torch.empty((0,)),
                 "scores": preds.scores[idx],  # type: ignore[index]
@@ -240,7 +245,7 @@ class OVInstanceSegmentationModel(OVModel):
             # An empty (0, H, W) mask tensor is a valid ground truth for images with no
             # instances (e.g. background-only samples); encode it as an empty RLE list
             # instead of treating it as missing masks.
-            rles = [encode_rle(mask) for mask in inputs.masks[idx].data] if len(inputs.masks[idx]) else []
+            rles = _as_rle(inputs.masks[idx]) if len(inputs.masks[idx]) else []
             target_info.append(
                 {
                     "boxes": inputs.bboxes[idx].data if inputs.bboxes is not None else torch.empty((0, 4)),
@@ -313,6 +318,11 @@ class OVInstanceSegmentationModel(OVModel):
             scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
             # ModelAPI instance labels are 1-based (0 = background); shift to getitune 0-based.
             labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - 1)
+            crops = getattr(merged, "mask_crops", None)
+            if crops is not None:
+                # Crops straight to RLE: a dense (N, H, W) stack is GBs on large images.
+                masks.append(RLEMasks([crop_to_rle(c, x, y, (ori_h, ori_w)) for c, x, y in crops], (ori_h, ori_w)))
+                continue
             merged_masks = np.asarray(merged.masks)
             if merged_masks.ndim == 3 and merged_masks.shape[0] > 0:
                 masks.append(tv_tensors.Mask(torch.as_tensor(merged_masks, dtype=torch.bool)))
@@ -325,7 +335,7 @@ class OVInstanceSegmentationModel(OVModel):
             scores=scores,
             bboxes=bboxes,
             labels=labels,
-            masks=masks if any(mask.numel() > 0 for mask in masks) else None,
+            masks=masks if any(len(mask) > 0 for mask in masks) else None,
         )
 
     def _get_tiler(self) -> InstanceSegmentationTiler:
