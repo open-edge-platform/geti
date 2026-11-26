@@ -44,6 +44,8 @@ export type StagedDataset = components['schemas']['StagedDatasetView'];
 export type SourceMediaUpload = components['schemas']['SourceMediaUploadView'];
 
 export type MediaImage = components['schemas']['ImageView'];
+export type MediaOmeImage = components['schemas']['OmeImageView'];
+export type MediaOmePlane = components['schemas']['OmePlaneView'];
 export type MediaVideo = components['schemas']['VideoView'];
 type MediaVideoFrameDTO = components['schemas']['VideoFrameView'];
 export type MediaVideoFrame = Omit<MediaVideo, 'type'> & {
@@ -52,9 +54,9 @@ export type MediaVideoFrame = Omit<MediaVideo, 'type'> & {
     type: 'video_frame';
 };
 
-export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO;
+export type MediaDTO = MediaImage | MediaVideo | MediaVideoFrameDTO | MediaOmeImage | MediaOmePlane;
 
-export type Media = MediaImage | MediaVideo | MediaVideoFrame;
+export type Media = MediaImage | MediaVideo | MediaVideoFrame | MediaOmeImage | MediaOmePlane;
 
 export type TrainingDevice = components['schemas']['DeviceInfoView'];
 

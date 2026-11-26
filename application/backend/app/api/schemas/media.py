@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 
 from app.core.models import BaseRequiredIDNameModel, Pagination
 from app.models import DatasetItemAnnotation, DatasetItemSubset, MediaFormat, MediaType
+from app.models.ome import OmeChannelView
 
 
 class MediaAnnotationStatusView(BaseModel):
@@ -129,7 +130,38 @@ class VideoView(BaseRequiredIDNameModel):
     }
 
 
-MediaView = Annotated[ImageView | VideoView | VideoFrameView, Field(discriminator="type")]
+class OmeImageView(BaseRequiredIDNameModel):
+    """OME container; annotations belong to its planes rather than the container."""
+
+    type: Literal[MediaType.OME_IMAGE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    source_id: UUID | None = None
+    annotation_status: MediaAnnotationStatusView
+
+
+class OmeChannelViewResponse(OmeChannelView):
+    """API response containing resolved channel settings and their default/saved status."""
+
+
+class OmePlaneView(BaseRequiredIDNameModel):
+    """OME plane with level-zero dimensions and coordinates in its parent."""
+
+    type: Literal[MediaType.OME_PLANE]
+    format: MediaFormat
+    width: int
+    height: int
+    size: int
+    source_id: UUID | None = None
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+    annotation_status: MediaAnnotationStatusView
+
+
+MediaView = Annotated[ImageView | VideoView | VideoFrameView | OmeImageView | OmePlaneView, Field(discriminator="type")]
 
 MediaViewAdapter: TypeAdapter[MediaView] = TypeAdapter(MediaView)
 
@@ -233,3 +265,16 @@ class AnnotatedVideoFrame(BaseModel):
     media_id: UUID
     frame_index: int
     annotation_data: MediaAnnotations
+
+
+class AnnotatedOmePlane(BaseModel):
+    media_id: UUID
+    ome_image_id: UUID
+    z_index: int
+    t_index: int
+    annotation_data: MediaAnnotations
+
+
+class OmePlanesWithPagination(BaseModel):
+    items: list[AnnotatedOmePlane]
+    pagination: Pagination

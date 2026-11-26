@@ -8,6 +8,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
@@ -59,6 +60,8 @@ from app.services import (
     SubsetService,
     TrainingConfigurationService,
 )
+from app.services.base import InvalidImageError
+from app.services.ome.materialization import OME_PROJECTIONS_FILENAME
 from app.supported_models.timm import TimmManifestProvider
 
 MODEL_WEIGHTS_PATH = "model_weights_path"
@@ -308,21 +311,29 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                         )
                     else:
                         logger.info("Creating a new dataset revision with user-verified annotated items")
-                    dm_dataset = self._dataset_service.get_dm_dataset(
-                        project_id=project_id,
-                        task=task,
-                        annotation_status=DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
-                        sample_mode=SampleMode.TRAINING,
-                        dataset_view_id=dataset_view_id,
-                    )
                     try:
-                        dataset_revision_id = self._dataset_revision_service.save_revision(
-                            project_id=project_id,
-                            dataset=dm_dataset,
-                            dataset_view_id=dataset_view_id,
-                            dataset_view_name=dataset_view_name,
-                        )
-                    except ValueError as exc:
+                        with TemporaryDirectory(prefix="geti-ome-training-") as workspace:
+                            plane_dir = Path(workspace)
+                            dm_dataset = self._dataset_service.get_dm_dataset(
+                                project_id=project_id,
+                                task=task,
+                                annotation_status=DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+                                sample_mode=SampleMode.TRAINING,
+                                dataset_view_id=dataset_view_id,
+                                ome_plane_dir=plane_dir,
+                            )
+                            projections_path = plane_dir / OME_PROJECTIONS_FILENAME
+                            dataset_revision_id = self._dataset_revision_service.save_revision(
+                                project_id=project_id,
+                                dataset=dm_dataset,
+                                dataset_view_id=dataset_view_id,
+                                dataset_view_name=dataset_view_name,
+                                ome_projections_path=projections_path if projections_path.exists() else None,
+                            )
+                            dm_dataset = self._dataset_revision_service.load_revision(
+                                project_id=project_id, dataset_revision_id=dataset_revision_id
+                            )
+                    except (ValueError, InvalidImageError) as exc:
                         raise ExecutionErr(str(exc)) from exc
                     logger.info("Dataset revision saved with ID: {}", dataset_revision_id)
 

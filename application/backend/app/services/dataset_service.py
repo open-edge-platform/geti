@@ -4,6 +4,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 from getidata import Dataset
@@ -27,9 +28,10 @@ from app.models import (
 )
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItemSortBy
-from app.models.media import MediaAdapter, SortDirection, VideoFrame
+from app.models.media import MediaAdapter, OmePlane, SortDirection, VideoFrame
 from app.repositories import DatasetItemRepository, DatasetViewRepository
 from app.services.media_service import MediaService
+from app.services.ome.materialization import OmeTrainingMaterializer
 
 from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
 from .label_service import LabelService
@@ -42,6 +44,10 @@ class AnnotationValidationError(Exception):
 
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class UnsupportedDatasetMediaError(ValueError):
+    """Raised when dataset conversion encounters media without a supported binary loader."""
 
 
 class SubsetAlreadyAssignedError(Exception):
@@ -77,6 +83,12 @@ class DatasetService(BaseSessionManagedService):
         self._label_service = label_service
         self._media_service = media_service
         self.register_managed_services(label_service, media_service)
+
+    def register_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane:
+        """Register a plane and its dataset item in the caller's annotation transaction."""
+        plane = self._media_service.create_ome_plane(project_id, media_id, z=z, t=t)
+        DatasetItemRepository(str(project_id), self.db_session).ensure_ome_plane_item(str(plane.id))
+        return plane
 
     def create_dataset_item(
         self,
@@ -372,9 +384,28 @@ class DatasetService(BaseSessionManagedService):
         annotation_status: DatasetItemAnnotationStatus | None,
         sample_mode: SampleMode,
         dataset_view_id: UUID | None = None,
+        ome_plane_dir: Path | None = None,
     ) -> Dataset:
+        """Convert selected items, optionally materializing annotated OME training planes.
+
+        The caller owns ``ome_plane_dir`` and must keep it until the dataset is exported.
+        Paths are staged during conversion; only retained OME samples are materialized afterward.
+        Materialization also writes the revision projection sidecar into that directory.
+
+        Raises:
+            UnsupportedDatasetMediaError: Selected OME planes lack a supported materialization context.
+            ResourceNotFoundError: The requested dataset view does not exist.
+        """
         from app.datumaro_converter import SampleMode, convert_dataset
 
+        materializer = (
+            OmeTrainingMaterializer(self._media_service, ome_plane_dir)
+            if ome_plane_dir is not None
+            and sample_mode == SampleMode.TRAINING
+            and annotation_status == DatasetItemAnnotationStatus.WITH_ANNOTATIONS
+            else None
+        )
+        staged_planes: dict[str, OmePlane] = {}
         if dataset_view_id is not None:
             # The view may have been deleted between the moment the caller resolved it and now.
             view_repo = DatasetViewRepository(project_id=str(project_id), db=self.db_session)
@@ -396,6 +427,15 @@ class DatasetService(BaseSessionManagedService):
             information is preserved in the sample, while for other media types or training samples, the media binary
             path is sufficient.
             """
+            if isinstance(media, OmePlane):
+                if materializer is not None:
+                    staged_planes[str(media.id)] = media
+                    return str(materializer.get_plane_path(media.id))
+                raise UnsupportedDatasetMediaError(
+                    f"OME plane '{media.id}' requires annotated training revision materialization. "
+                    "Direct dataset export of virtual OME planes is not supported. "
+                    "Export a saved training revision or select a dataset view without OME planes."
+                )
             if isinstance(media, VideoFrame) and sample_mode == SampleMode.IMPORT_EXPORT:
                 return str(
                     self._media_service.get_media_binary_path_by_id(project_id=project_id, media_id=media.video_id)
@@ -403,10 +443,16 @@ class DatasetService(BaseSessionManagedService):
             return str(self._media_service.get_media_binary_path_by_id(project_id=project_id, media_id=media.id))
 
         labels = self._label_service.list_all(project_id=project_id)
-        return convert_dataset(
+        dataset = convert_dataset(
             task=task,
             labels=labels,
             get_dataset_items_and_media=get_dataset_items_and_media,
             get_media_path=_get_media_path,
             sample_mode=sample_mode,
         )
+        if materializer is not None:
+            retained_ids = dataset.df["id"].to_list()
+            for item_id in staged_planes.keys() & set(retained_ids):
+                materializer.materialize(project_id, staged_planes[item_id])
+            materializer.write_projections(retained_ids)
+        return dataset

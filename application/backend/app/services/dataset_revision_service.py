@@ -20,7 +20,7 @@ from app.models.dataset_item_revision import DatasetRevisionItem
 from app.models.dataset_revision import DatasetRevision, DatasetRevisionCounts
 from app.models.media import ImageFormat
 from app.repositories import DatasetRevisionRepository
-from app.repositories.base import PrimaryKeyIntegrityError, UniqueConstraintIntegrityError
+from app.services.ome.materialization import OME_PROJECTIONS_FILENAME
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
 
 from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
@@ -41,18 +41,20 @@ class DatasetRevisionService(BaseSessionManagedService):
         dataset: Dataset,
         dataset_view_id: UUID | None = None,
         dataset_view_name: str | None = None,
+        ome_projections_path: Path | None = None,
     ) -> UUID:
         """
         Saves the dataset as a new revision.
 
         Creates a new dataset revision entry in the database and exports the dataset
-        to a zip file in the project's revisions directory.
+        to a self-contained directory in the project's revisions directory.
 
         Args:
             project_id: The UUID of the project to save the revision for.
             dataset: The Datumaro dataset to export.
             dataset_view_id: The UUID of the dataset view the revision was built from, if any.
             dataset_view_name: The name of that dataset view, used to name the revision.
+            ome_projections_path: The immutable OME projection sidecar produced during materialization, if any.
 
         Returns:
             UUID: The UUID of the newly created dataset revision.
@@ -73,14 +75,15 @@ class DatasetRevisionService(BaseSessionManagedService):
 
         revision_path = self.projects_dir / str(project_id) / "dataset_revisions" / dataset_revision_id
         logger.info("Saving dataset revision '{}' to '{}'.", dataset_revision_id, revision_path)
-        export_dataset(
-            dataset=dataset,
-            output_path=revision_path,
-            as_zip=False,  # Export as uncompressed directory, see #5070 for details
-        )
-        size_in_bytes = sum(item.stat().st_size for item in revision_path.rglob("*") if item.is_file())
-
         try:
+            export_dataset(
+                dataset=dataset,
+                output_path=revision_path,
+                as_zip=False,  # Export as uncompressed directory, see #5070 for details
+            )
+            if ome_projections_path is not None:
+                shutil.copyfile(ome_projections_path, revision_path / OME_PROJECTIONS_FILENAME)
+            size_in_bytes = sum(item.stat().st_size for item in revision_path.rglob("*") if item.is_file())
             revision_db = revision_repo.save(
                 DatasetRevisionDB(
                     id=dataset_revision_id,
@@ -95,8 +98,8 @@ class DatasetRevisionService(BaseSessionManagedService):
                     created_at=datetime.now(UTC),  # Set created_at explicitly with microsecond precision.
                 )
             )
-        except (IntegrityError, PrimaryKeyIntegrityError, UniqueConstraintIntegrityError):
-            logger.error("Could not save dataset revision '{}' in the database.", dataset_revision_id)
+        except BaseException:
+            logger.exception("Could not save dataset revision '{}'.", dataset_revision_id)
             if revision_path.exists():
                 shutil.rmtree(revision_path)
                 logger.info("Deleted dataset revision files at '{}'.", revision_path)
@@ -361,7 +364,7 @@ class DatasetRevisionService(BaseSessionManagedService):
 
             return DatasetRevisionItem(
                 id=UUID(df_revision_item["id"]),
-                format=ImageFormat(image_path.suffix.lstrip(".").lower()),
+                format=ImageFormat.from_filename(image_path.name),
                 image_path=image_path,
                 width=df_revision_item["image_info"]["width"],
                 height=df_revision_item["image_info"]["height"],

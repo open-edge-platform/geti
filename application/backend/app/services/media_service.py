@@ -1,9 +1,8 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import errno
 import os
-import os.path
-import shutil
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -17,34 +16,60 @@ from loguru import logger
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
-from app.db.schema import MediaDB
-from app.models import DatasetItem, DatasetItemAnnotationStatus, Media, MediaType, Project, Video, VideoFrame
+from app.db.schema import MediaDB, OmeImageDB
+from app.models import (
+    DatasetItem,
+    DatasetItemAnnotationStatus,
+    Media,
+    MediaStorage,
+    MediaType,
+    Project,
+    Video,
+    VideoFrame,
+)
 from app.models.media import (
+    CONTAINER_MEDIA_TYPES,
     ImageFormat,
     MediaAdapter,
     MediaAnnotationStatus,
     MediaSortBy,
+    OmeImage,
+    OmePlane,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
 )
+from app.models.ome import OmeImageMetadata
 from app.repositories import DatasetViewRepository, MediaRepository
+from app.repositories.ome_image_repo import OmeImageRepository
+from app.services.ome import (
+    ChannelProjectionStrategy,
+    MetadataRgbChannelProjectionStrategy,
+    OmeReaderRegistry,
+    UnsupportedOmeStorageError,
+)
+from app.services.ome.ingest import (
+    OmeMediaTooLargeError,
+    check_storage_space,
+    copy_ome_file,
+    create_ingest_thumbnail,
+    extract_ome_archive,
+    ome_payload_size,
+)
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
+from app.utils.media_storage_ops import (
+    delete_media_storage,
+    discard_media_storage,
+    media_storage_size,
+    move_media_storage,
+)
 
-from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
+from .base import BaseSessionManagedService, InvalidImageError, ResourceNotFoundError, ResourceType
 
 DEFAULT_THUMBNAIL_SIZE = 256
 
 VIDEO_WRITE_CHUNK_SIZE = 100 * 1024 * 1024  # 100 MB
-
-
-class InvalidImageError(Exception):
-    """Exception raised when invalid image is used to create a media."""
-
-    def __init__(self, message: str | None = None):
-        msg = message or "Invalid image has been passed while creating a media."
-        super().__init__(msg)
 
 
 @dataclass(frozen=True)
@@ -90,9 +115,11 @@ def to_media_with_annotation_status(repo: MediaRepository, media_dbs: Sequence[M
     Returns:
         The domain media, in the same order as ``media_dbs``.
     """
-    annotated_media_ids = repo.list_annotated_media_ids([m.id for m in media_dbs if m.type != MediaType.VIDEO])
+    annotated_media_ids = repo.list_annotated_media_ids(
+        [m.id for m in media_dbs if m.type not in CONTAINER_MEDIA_TYPES]
+    )
     annotated_frame_counts = repo.count_annotated_video_frames_by_video_ids(
-        [m.id for m in media_dbs if m.type == MediaType.VIDEO]
+        [m.id for m in media_dbs if m.type in CONTAINER_MEDIA_TYPES]
     )
     media_list: list[Media] = []
     for media_db in media_dbs:
@@ -100,7 +127,9 @@ def to_media_with_annotation_status(repo: MediaRepository, media_dbs: Sequence[M
         annotation_status = (
             VideoAnnotationStatus(annotated_video_frames=annotated_frame_counts.get(media_db.id, 0))
             if isinstance(media, Video)
-            else MediaAnnotationStatus(has_annotations=media_db.id in annotated_media_ids)
+            else MediaAnnotationStatus(
+                has_annotations=media_db.id in annotated_media_ids or annotated_frame_counts.get(media_db.id, 0) > 0
+            )
         )
         media_list.append(media.model_copy(update={"annotation_status": annotation_status}))
     return media_list
@@ -112,10 +141,17 @@ class MediaService(BaseSessionManagedService):
         data_dir: Path,
         video_service: VideoService | None = None,
         db_session: Session | None = None,
+        *,
+        channel_projection_strategy: ChannelProjectionStrategy | None = None,
     ) -> None:
         super().__init__(db_session)
         self.projects_dir = data_dir / "projects"
         self._video_service = video_service
+        self._channel_projection_strategy: ChannelProjectionStrategy = (
+            channel_projection_strategy
+            if channel_projection_strategy is not None
+            else MetadataRgbChannelProjectionStrategy()
+        )
 
     def _get_video_service(self) -> VideoService:
         if self._video_service is None:
@@ -159,14 +195,6 @@ class MediaService(BaseSessionManagedService):
             raise InvalidImageError from error
 
     @staticmethod
-    def _discard_binary(binary_path: Path, source_path: Path | None) -> None:
-        """Remove a binary after a failure, or move it back to where it came from if it was moved."""
-        if source_path is not None:
-            shutil.move(binary_path, source_path)
-        else:
-            binary_path.unlink(missing_ok=True)
-
-    @staticmethod
     def _generate_and_save_thumbnail(image: Image.Image, path: Path) -> None:
         try:
             thumbnail_image = crop_to_thumbnail(
@@ -191,25 +219,26 @@ class MediaService(BaseSessionManagedService):
         """Creates a new media (image)"""
         media_id = uuid4()
         original_binary: BinaryIO | BytesIO | None = None
-        source_path: Path | None = None
+        source_storage: MediaStorage | None = None
         match metadata.data:
             case Image.Image():
                 image = metadata.data
             case np.ndarray():
                 image = self._read_image_from_ndarray(metadata.data)
             case Path():
-                source_path = metadata.data
-                image = self._read_image_from_path(source_path)
+                source_storage = MediaStorage(root=metadata.data)
+                image = self._read_image_from_path(source_storage.root)
             case _:
                 original_binary = metadata.data
                 image = self._read_image_from_binary(metadata.data)
 
         dataset_dir = self.projects_dir / f"{metadata.project_id}/dataset"
         dataset_dir.mkdir(parents=True, exist_ok=True)
-        binary_path = dataset_dir / f"{media_id}.{metadata.image_format}"
+        target_storage = MediaStorage(root=dataset_dir / f"{media_id}.{metadata.image_format}")
+        binary_path = target_storage.root
 
-        if source_path is not None:
-            shutil.move(source_path, binary_path)
+        if source_storage is not None:
+            move_media_storage(source_storage, target_storage)
         elif original_binary is not None:
             self._copy_binary(original_binary, binary_path)
         else:
@@ -233,16 +262,16 @@ class MediaService(BaseSessionManagedService):
                 format=str(metadata.image_format),
                 width=image.width,
                 height=image.height,
-                size=os.path.getsize(binary_path),
+                size=media_storage_size(target_storage),
                 source_id=str(metadata.source_id) if metadata.source_id is not None else None,
-                video_id=str(metadata.video_id) if metadata.video_id is not None else None,
+                parent_id=str(metadata.video_id) if metadata.video_id is not None else None,
                 frame_index=metadata.frame_idx,
             )
 
             repo = MediaRepository(project_id=str(metadata.project_id), db=self.db_session)
             db_media = repo.save(media)
         except Exception as e:
-            self._discard_binary(binary_path, source_path)
+            discard_media_storage(target_storage, source_storage)
             raise e
         return MediaAdapter.validate_python(db_media)
 
@@ -263,12 +292,13 @@ class MediaService(BaseSessionManagedService):
 
         dataset_dir = self.projects_dir / f"{project_id}/dataset"
         dataset_dir.mkdir(parents=True, exist_ok=True)
-        binary_path = dataset_dir / f"{media_id}.{video_format}"
+        target_storage = MediaStorage(root=dataset_dir / f"{media_id}.{video_format}")
+        binary_path = target_storage.root
 
-        source_path: Path | None = None
+        source_storage: MediaStorage | None = None
         if isinstance(data, Path):
-            source_path = data
-            shutil.move(source_path, binary_path)
+            source_storage = MediaStorage(root=data)
+            move_media_storage(source_storage, target_storage)
         else:
             self._copy_binary(data, binary_path, VIDEO_WRITE_CHUNK_SIZE)
 
@@ -284,7 +314,7 @@ class MediaService(BaseSessionManagedService):
                 height=video_metadata.height,
                 frame_count=video_metadata.frame_count,
                 fps=video_metadata.fps,
-                size=os.path.getsize(binary_path),
+                size=media_storage_size(target_storage),
                 source_id=str(source_id) if source_id is not None else None,
             )
 
@@ -298,9 +328,163 @@ class MediaService(BaseSessionManagedService):
         except Exception as e:
             # Release any cached handle on the video, otherwise it cannot be moved/deleted on Windows
             self._get_video_service().release(binary_path)
-            self._discard_binary(binary_path, source_path)
+            discard_media_storage(target_storage, source_storage)
             raise e
         return MediaAdapter.validate_python(db_media)
+
+    def create_ome_image(
+        self,
+        project_id: UUID,
+        name: str,
+        image_format: ImageFormat,
+        data: BinaryIO | Path,
+        *,
+        max_size: int,
+        archive: bool = False,
+    ) -> OmeImage:
+        """Ingest OME pixels and structure atomically, restoring moved uploads on failure."""
+        if image_format not in (ImageFormat.OME_TIF, ImageFormat.OME_TIFF):
+            raise InvalidImageError("Expected an OME-TIFF image format.")
+        media_id = uuid4()
+        dataset_dir = self.projects_dir / str(project_id) / "dataset"
+        dataset_dir.mkdir(parents=True, exist_ok=True)
+        size = ome_payload_size(data)
+        if size > max_size:
+            raise OmeMediaTooLargeError(f"OME image exceeds the maximum size of {max_size} bytes.")
+        check_storage_space(dataset_dir, size, source=data if isinstance(data, Path) else None)
+        target = MediaStorage(
+            root=dataset_dir / (str(media_id) if archive else f"{media_id}.{image_format}"),
+            entrypoint=Path(".") if archive else None,
+        )
+        thumbnail_path = dataset_dir / f"{media_id}-thumb.jpg"
+        source = MediaStorage(root=data) if isinstance(data, Path) and not archive else None
+        registry = OmeReaderRegistry()
+        moved = False
+        try:
+            if archive:
+                target = extract_ome_archive(data, target.root, max_size, registry)
+            elif isinstance(data, Path):
+                move_media_storage(MediaStorage(root=data), target)
+                moved = True
+            else:
+                copy_ome_file(data, target.root, max_size)
+            with registry.get_reader(target).open(target) as handle:
+                info = handle.info
+                projection = self._channel_projection_strategy.compute(info)
+                thumbnail = create_ingest_thumbnail(handle, projection)
+            thumbnail = self._crop_image_to_thumbnail(thumbnail)
+            thumbnail.save(thumbnail_path, format="JPEG")
+            db_media = MediaRepository(str(project_id), self.db_session).save(
+                MediaDB(
+                    id=str(media_id),
+                    project_id=str(project_id),
+                    type=MediaType.OME_IMAGE,
+                    name=name,
+                    format=str(image_format),
+                    width=info.size_x,
+                    height=info.size_y,
+                    size=media_storage_size(target),
+                )
+            )
+            OmeImageRepository(str(project_id), self.db_session).save(
+                OmeImageDB(
+                    media_id=str(media_id),
+                    **info.model_dump(),
+                    channel_projection=projection.model_dump(mode="json"),
+                    entrypoint=target.entrypoint.as_posix() if target.entrypoint is not None else None,
+                    files=(
+                        sorted(
+                            path.relative_to(target.root).as_posix()
+                            for path in target.root.rglob("*")
+                            if path.is_file()
+                        )
+                        if target.is_directory
+                        else []
+                    ),
+                )
+            )
+            return OmeImage.model_validate(db_media, from_attributes=True)
+        except BaseException as error:
+            thumbnail_path.unlink(missing_ok=True)
+            if target.root.exists():
+                discard_media_storage(target, source if moved else None)
+            if isinstance(error, UnsupportedOmeStorageError):
+                raise InvalidImageError("The uploaded file is not an OME-TIFF image.") from error
+            if isinstance(error, OSError) and error.errno == errno.ENOSPC:
+                raise OmeMediaTooLargeError("Insufficient storage space for the OME image.") from error
+            raise
+
+    def get_ome_image_info(self, project_id: UUID, media_id: UUID) -> OmeImageMetadata:
+        """Get immutable OME structure and training projection for a project's container."""
+        media = self.get_media_by_id(project_id, media_id)
+        if media.type != MediaType.OME_IMAGE:
+            raise ValueError("Media is not an OME image.")
+        row = OmeImageRepository(str(project_id), self.db_session).get_by_id(str(media_id))
+        if row is None:
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id), "OME image metadata was not found.")
+        return OmeImageMetadata.model_validate(row, from_attributes=True)
+
+    def discard_ome_image(self, project_id: UUID, media_id: UUID, storage: MediaStorage, upload_path: Path) -> None:
+        """Undo filesystem ingest after the caller rolls back a failed database commit."""
+        self.get_media_thumbnail_path_by_id(project_id, media_id).unlink(missing_ok=True)
+        discard_media_storage(storage, None if storage.is_directory else MediaStorage(root=upload_path))
+
+    def validate_ome_plane_selection(
+        self, project_id: UUID, media_id: UUID, *, z: int | None, t: int | None
+    ) -> OmeImageMetadata:
+        """Validate any supplied coordinates against the immutable container dimensions."""
+        info = self.get_ome_image_info(project_id, media_id)
+        if (z is not None and not 0 <= z < info.size_z) or (t is not None and not 0 <= t < info.size_t):
+            raise ValueError("OME z or t selection is out of range.")
+        return info
+
+    def get_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane | None:
+        """Resolve a registered plane without creating rows or materializing pixels."""
+        self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        repo = MediaRepository(str(project_id), self.db_session)
+        row = repo.get_ome_plane(str(media_id), z, t)
+        return OmePlane.model_validate(row) if row is not None else None
+
+    def create_ome_plane(self, project_id: UUID, media_id: UUID, *, z: int, t: int) -> OmePlane:
+        """Idempotently register plane metadata; its pixels remain in the parent container."""
+        info = self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        image = self.get_media_by_id(project_id, media_id)
+        repo = MediaRepository(str(project_id), self.db_session)
+        row = repo.create_ome_plane(
+            MediaDB(
+                id=str(uuid4()),
+                project_id=str(project_id),
+                type=MediaType.OME_PLANE,
+                name=f"{image.name}_z{z}_t{t}",
+                format=ImageFormat.PNG,
+                width=info.size_x,
+                height=info.size_y,
+                size=0,
+                source_id=image.source_id,
+                parent_id=str(media_id),
+                z_index=z,
+                t_index=t,
+            )
+        )
+        return OmePlane.model_validate(row)
+
+    def list_annotated_ome_planes(
+        self,
+        project_id: UUID,
+        media_id: UUID,
+        *,
+        z: int | None = None,
+        t: int | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> tuple[list[tuple[DatasetItem, OmePlane]], int]:
+        """Return annotated planes in T-major, Z-minor order and their filtered count."""
+        self.validate_ome_plane_selection(project_id, media_id, z=z, t=t)
+        if limit < 1 or offset < 0:
+            raise ValueError("Plane pagination requires a positive limit and non-negative offset.")
+        repo = MediaRepository(str(project_id), self.db_session)
+        rows, total = repo.list_annotated_ome_planes(str(media_id), z=z, t=t, limit=limit, offset=offset)
+        return [(DatasetItem.model_validate(item), OmePlane.model_validate(plane)) for item, plane in rows], total
 
     def count_media(
         self,
@@ -391,8 +575,21 @@ class MediaService(BaseSessionManagedService):
         return result
 
     def get_media_binary_path(self, project_id: UUID, media: MediaDB | Media) -> Path:
+        storage = self.get_media_storage(project_id=project_id, media=media)
+        if storage.is_directory:
+            raise ValueError(f"Media {media.id} is directory-backed and has no single binary path.")
+        return storage.root
+
+    def get_media_storage(self, project_id: UUID, media: MediaDB | Media) -> MediaStorage:
+        """Get where a media payload lives on disk."""
         dataset_dir = self.projects_dir / f"{project_id}/dataset"
-        return dataset_dir / f"{media.id}.{media.format}"
+        if media.type == MediaType.OME_IMAGE:
+            info = OmeImageRepository(str(project_id), self.db_session).get_by_id(str(media.id))
+            if info is None:
+                raise ResourceNotFoundError(ResourceType.MEDIA, str(media.id), "OME image metadata was not found.")
+            if info.entrypoint is not None:
+                return MediaStorage(root=dataset_dir / str(media.id), entrypoint=Path(info.entrypoint))
+        return MediaStorage(root=dataset_dir / f"{media.id}.{media.format}")
 
     def get_media_binary_path_by_id(self, project_id: UUID, media_id: UUID) -> Path:
         """Get a media binary content by its ID"""
@@ -420,11 +617,18 @@ class MediaService(BaseSessionManagedService):
         media = self.get_media_by_id(project_id=project.id, media_id=media_id)
         repo = MediaRepository(project_id=str(project.id), db=self.db_session)
 
-        binary_path = self.get_media_binary_path(project_id=project.id, media=media)
+        if isinstance(media, OmePlane):
+            view_repo = DatasetViewRepository(project_id=str(project.id), db=self.db_session)
+            view_repo.touch_views_containing_media(str(media.id))
+            repo.delete(obj_id=str(media.id))
+            return
+
+        storage = self.get_media_storage(project_id=project.id, media=media)
+        binary_path = storage.effective_path
         if media.type == MediaType.VIDEO:
             self._get_video_service().release(binary_path)
         try:
-            os.remove(binary_path)
+            delete_media_storage(storage)
         except FileNotFoundError:
             logger.warning("Media {} binary was not found during deletion", media_id)
         thumbnail_path = self.get_media_thumbnail_path(project=project, media=media)
@@ -489,7 +693,7 @@ class MediaService(BaseSessionManagedService):
                 format=str(format),
                 width=frame_image.width,
                 height=frame_image.height,
-                video_id=str(video.id),
+                parent_id=str(video.id),
                 frame_index=frame_index,
                 size=os.path.getsize(video_frame_path),
                 source_id=None,

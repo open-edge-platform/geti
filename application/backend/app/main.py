@@ -54,6 +54,7 @@ from app.api.routers import (
     media,
     model_architectures,
     models,
+    ome,
     pipelines,
     projects,
     sinks,
@@ -87,6 +88,7 @@ def _include_api_routers(app: FastAPI) -> None:
     app.include_router(media.router)
     app.include_router(model_architectures.router)
     app.include_router(models.router)
+    app.include_router(ome.router)
     app.include_router(pipelines.router)
     app.include_router(projects.router)
     app.include_router(sinks.router)
@@ -192,8 +194,9 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        # Browser JS can only read the response headers of the resumable upload (TUS) protocol if exposed
+        # Expose render revalidation and resumable-upload headers to browser clients.
         expose_headers=[
+            "ETag",
             "Location",
             "Tus-Resumable",
             "Tus-Version",

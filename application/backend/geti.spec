@@ -76,6 +76,17 @@ datas = [
 binaries = [(dll, 'Library/bin/') for dll in glob.glob('.venv/Library/bin/*')]
 hiddenimports = []
 
+# ---- OME-TIFF pixel access ----
+tmp_ret = collect_all('tifffile')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('imagecodecs')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('zarr')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('numcodecs')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+hiddenimports += ['defusedxml.ElementTree']
+
 # ---- PyTorch core ----
 tmp_ret = collect_all('torch')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
@@ -202,6 +213,8 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 # these modules must be discoverable by the child even though they are only imported
 # dynamically inside the training / export code paths.
 hiddenimports += [
+    # Shared utilities imported by dynamically loaded Alembic revisions
+    'app.alembic.utils',
     # Lightning internals used by Trainer
     'lightning.pytorch.callbacks',
     'lightning.pytorch.loggers',

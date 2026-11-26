@@ -3,6 +3,7 @@
 
 from collections.abc import Generator
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from sqlalchemy.orm import Session
@@ -19,6 +20,14 @@ from app.services import (
 from app.services.dataset_view_service import DatasetViewService
 from app.services.event.event_bus import EventBus
 from app.services.video import VideoService
+
+
+@pytest.fixture
+def ome_ingest(db_session, fxt_db_projects, tmp_path):
+    project = fxt_db_projects[0]
+    db_session.add(project)
+    db_session.flush()
+    return MediaService(tmp_path, db_session=db_session), UUID(project.id)
 
 
 @pytest.fixture
@@ -76,7 +85,11 @@ def fxt_media_service(
     db_session: Session,
 ) -> MediaService:
     """Fixture to create a MediaService instance."""
-    return MediaService(data_dir=fxt_projects_dir.parent, db_session=db_session, video_service=VideoService())
+    return MediaService(
+        data_dir=fxt_projects_dir.parent,
+        db_session=db_session,
+        video_service=VideoService(),
+    )
 
 
 @pytest.fixture

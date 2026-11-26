@@ -4,7 +4,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import CursorResult, Select, delete, func, select, update
+from sqlalchemy import CursorResult, Select, delete, func, null, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
@@ -38,6 +38,20 @@ class DatasetItemRepository:
         self.db.add(dataset_item_db)
         self.db.flush()
         return dataset_item_db
+
+    def ensure_ome_plane_item(self, media_id: str) -> None:
+        """Create an unannotated plane item once without overwriting existing annotations or subsets."""
+        self.db.execute(
+            insert(DatasetItemDB)
+            .values(
+                id=media_id,
+                project_id=self.project_id,
+                subset=DatasetItemSubset.UNASSIGNED,
+                user_reviewed=False,
+                annotation_data=null(),
+            )
+            .on_conflict_do_nothing(index_elements=["id"])
+        )
 
     def count(
         self,
@@ -146,7 +160,7 @@ class DatasetItemRepository:
                 DatasetItemDB.id == obj_id,
             )
             .values(
-                annotation_data=None,
+                annotation_data=null(),
                 updated_at=datetime.now(UTC),
                 user_reviewed=False,
                 prediction_model_id=None,
@@ -213,7 +227,7 @@ class DatasetItemRepository:
         """List label rows of unassigned dataset items, each paired with the parent
         video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB, MediaDB.video_id)
+            select(DatasetItemLabelDB, MediaDB.parent_id)
             .join(DatasetItemDB, DatasetItemLabelDB.dataset_item_id == DatasetItemDB.id)
             .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
@@ -229,14 +243,14 @@ class DatasetItemRepository:
         Used to keep newly annotated frames of a video in the same subset as the
         video's previously assigned frames."""
         stmt = (
-            select(MediaDB.video_id, DatasetItemDB.subset, func.count(DatasetItemDB.id))
+            select(MediaDB.parent_id, DatasetItemDB.subset, func.count(DatasetItemDB.id))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,
                 DatasetItemDB.subset != DatasetItemSubset.UNASSIGNED,
-                MediaDB.video_id.is_not(None),
+                MediaDB.parent_id.is_not(None),
             )
-            .group_by(MediaDB.video_id, DatasetItemDB.subset)
+            .group_by(MediaDB.parent_id, DatasetItemDB.subset)
         )
         return [(row[0], row[1], row[2]) for row in self.db.execute(stmt).all()]
 
@@ -279,7 +293,7 @@ class DatasetItemRepository:
 
         # Annotation Counts (annotated videos)
         annotated_video_stmt = (
-            select(func.count(func.distinct(MediaDB.video_id)).label("count"))
+            select(func.count(func.distinct(MediaDB.parent_id)).label("count"))
             .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,

@@ -20,8 +20,9 @@ from app.api.dependencies import (
     get_inference_media_limit,
     get_media_prediction_service,
     get_media_segment_service,
-    get_media_service,
+    get_ome_rendering_service,
     get_project_service,
+    get_upload_max_size,
 )
 from app.api.schemas.media import (
     ImageView,
@@ -53,6 +54,8 @@ from app.models.media import (
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaSortBy,
+    OmeImage,
+    OmePlane,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
@@ -63,7 +66,6 @@ from app.services import (
     DatasetService,
     DatasetViewService,
     MediaPredictionService,
-    MediaService,
     ProjectService,
     ResourceNotFoundError,
     ResourceType,
@@ -73,6 +75,7 @@ from app.services.inference import InferenceBusyError
 from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
+from app.services.ome.ingest import OmeMediaTooLargeError
 from app.services.sam import MediaSegmentService
 
 
@@ -110,6 +113,445 @@ def fxt_video_media():
 
 
 @pytest.fixture
+def fxt_ome_media():
+    return OmeImage(
+        id=uuid4(),
+        type=MediaType.OME_IMAGE,
+        project_id=uuid4(),
+        name="specimen",
+        format=ImageFormat.OME_TIFF,
+        width=5,
+        height=4,
+        size=1024,
+        source_id=None,
+    )
+
+
+@pytest.fixture
+def fxt_ome_plane(fxt_ome_media):
+    return OmePlane(
+        id=uuid4(),
+        project_id=fxt_ome_media.project_id,
+        name="specimen_z12_t0",
+        source_id=None,
+        type=MediaType.OME_PLANE,
+        format=ImageFormat.PNG,
+        width=fxt_ome_media.width,
+        height=fxt_ome_media.height,
+        size=0,
+        ome_image_id=fxt_ome_media.id,
+        z_index=12,
+        t_index=0,
+    )
+
+
+@pytest.mark.parametrize("query", ["z=0", "t=0", "z=0&t=0&frame_index=0"])
+@pytest.mark.parametrize("method", ["get", "post", "delete"])
+def test_ome_annotation_invalid_selectors(
+    fxt_get_project, fxt_media_service, fxt_dataset_service, fxt_ome_media, fxt_client, query, method
+):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    response = fxt_client.request(
+        method,
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/annotations?{query}",
+        **({"json": {"annotations": []}} if method == "post" else {}),
+    )
+    assert response.status_code == 400
+    fxt_media_service.get_ome_plane.assert_not_called()
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+    fxt_dataset_service.set_dataset_item_annotations.assert_not_called()
+
+
+@pytest.mark.parametrize("query", ["z=-1&t=0", "z=13&t=0", "z=0&t=-1", "z=0&t=2"])
+@pytest.mark.parametrize("method", ["get", "post", "delete"])
+def test_ome_annotation_coordinate_errors(
+    fxt_get_project, fxt_media_service, fxt_dataset_service, fxt_ome_media, fxt_client, query, method
+):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    fxt_media_service.get_ome_plane.side_effect = ValueError("OME z or t selection is out of range.")
+    response = fxt_client.request(
+        method,
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/annotations?{query}",
+        **({"json": {"annotations": []}} if method == "post" else {}),
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "OME z or t selection is out of range."
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+
+
+@pytest.mark.parametrize("method", ["get", "post", "delete"])
+def test_ome_annotations_require_coordinates(
+    fxt_get_project, fxt_media_service, fxt_dataset_service, fxt_ome_media, fxt_client, method
+):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    response = fxt_client.request(
+        method,
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/annotations",
+        **({"json": {"annotations": []}} if method == "post" else {}),
+    )
+    assert response.status_code == 400
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+
+
+@pytest.mark.parametrize("registered", [False, True])
+@pytest.mark.parametrize("by_plane_id", [False, True])
+def test_set_ome_plane_annotations(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_ome_plane,
+    fxt_client,
+    registered,
+    by_plane_id,
+):
+    requested_media = fxt_ome_plane if by_plane_id else fxt_ome_media
+    fxt_media_service.get_media_by_id.return_value = requested_media
+    fxt_media_service.get_ome_plane.return_value = fxt_ome_plane if registered else None
+    fxt_dataset_service.register_ome_plane.return_value = fxt_ome_plane
+    item = MagicMock(
+        spec=DatasetItem,
+        annotation_data=[],
+        user_reviewed=True,
+        prediction_model_id=None,
+        subset=DatasetItemSubset.UNASSIGNED,
+    )
+    fxt_dataset_service.set_dataset_item_annotations.return_value = item
+    fxt_dataset_service.assign_dataset_item_subset.return_value = item
+    response = fxt_client.post(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{requested_media.id}/annotations",
+        params={} if by_plane_id else {"z": 12, "t": 0},
+        json={"annotations": [], "subset": "training"},
+    )
+    assert response.status_code == 201
+    assert response.json()["media_id"] == str(fxt_ome_plane.id)
+    if registered or by_plane_id:
+        fxt_dataset_service.register_ome_plane.assert_not_called()
+    else:
+        assert fxt_dataset_service.method_calls == [
+            call.register_ome_plane(fxt_get_project.id, fxt_ome_media.id, z=12, t=0),
+            call.set_dataset_item_annotations(
+                project=fxt_get_project,
+                dataset_item_id=fxt_ome_plane.id,
+                annotations=[],
+                user_reviewed=True,
+                prediction_model_id=None,
+            ),
+            call.assign_dataset_item_subset(
+                project_id=fxt_get_project.id,
+                dataset_item_id=fxt_ome_plane.id,
+                subset=DatasetItemSubset.TRAINING,
+            ),
+        ]
+    fxt_dataset_service.set_dataset_item_annotations.assert_called_once_with(
+        project=fxt_get_project,
+        dataset_item_id=fxt_ome_plane.id,
+        annotations=[],
+        user_reviewed=True,
+        prediction_model_id=None,
+    )
+
+
+@pytest.mark.parametrize("method", ["get", "delete"])
+def test_unregistered_ome_plane_annotations_not_found(
+    fxt_get_project, fxt_media_service, fxt_dataset_service, fxt_ome_media, fxt_client, method
+):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    fxt_media_service.get_ome_plane.return_value = None
+    response = fxt_client.request(
+        method, f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/annotations?z=12&t=0"
+    )
+    assert response.status_code == 404
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+    fxt_dataset_service.get_dataset_item_by_id.assert_not_called()
+    fxt_dataset_service.delete_dataset_item_annotations.assert_not_called()
+
+
+@pytest.mark.parametrize("by_plane_id", [False, True])
+def test_ome_plane_thumbnail_and_binary_routing(
+    fxt_app,
+    fxt_get_project,
+    fxt_project_service,
+    fxt_media_service,
+    fxt_ome_media,
+    fxt_ome_plane,
+    fxt_client,
+    tmp_path,
+    by_plane_id,
+):
+    rendering = MagicMock()
+    rendering.render_thumbnail.return_value = b"thumbnail"
+    fxt_app.dependency_overrides[get_ome_rendering_service] = lambda: rendering
+    requested_media = fxt_ome_plane if by_plane_id else fxt_ome_media
+    fxt_media_service.get_media_by_id.return_value = requested_media
+    fxt_media_service.get_media_thumbnail_path_by_id.return_value = tmp_path / "not-materialized.jpg"
+    fxt_media_service.get_ome_plane.return_value = None
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media/{requested_media.id}"
+    params = {} if by_plane_id else {"z": 12, "t": 0}
+    response = fxt_client.get(f"{url}/thumbnail", params=params)
+    assert response.status_code == 200
+    assert response.content == b"thumbnail"
+    rendering.render_thumbnail.assert_called_once_with(fxt_get_project.id, fxt_ome_media.id, z=12, t=0)
+    assert fxt_client.get(f"{url}/binary", params=params).status_code == 400
+
+
+@pytest.mark.parametrize("by_plane_id", [False, True])
+@pytest.mark.parametrize("has_annotations", [False, True])
+def test_get_registered_ome_plane_annotations(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_ome_plane,
+    fxt_client,
+    by_plane_id,
+    has_annotations,
+):
+    requested_media = fxt_ome_plane if by_plane_id else fxt_ome_media
+    fxt_media_service.get_media_by_id.return_value = requested_media
+    fxt_media_service.get_ome_plane.return_value = fxt_ome_plane
+    fxt_dataset_service.get_dataset_item_by_id.return_value = MagicMock(
+        spec=DatasetItem,
+        annotation_data=[] if has_annotations else None,
+        user_reviewed=True,
+        prediction_model_id=None,
+        subset=DatasetItemSubset.TRAINING,
+    )
+    response = fxt_client.get(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{requested_media.id}/annotations",
+        params={} if by_plane_id else {"z": 12, "t": 0},
+    )
+    assert response.status_code == (200 if has_annotations else 404)
+    if has_annotations:
+        assert response.json()["annotations"] == []
+        assert response.json()["subset"] == "training"
+    fxt_dataset_service.get_dataset_item_by_id.assert_called_once_with(
+        project_id=fxt_get_project.id,
+        dataset_item_id=fxt_ome_plane.id,
+    )
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+
+
+@pytest.mark.parametrize("by_plane_id", [False, True])
+def test_delete_registered_ome_plane_annotations(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_ome_plane,
+    fxt_client,
+    by_plane_id,
+):
+    requested_media = fxt_ome_plane if by_plane_id else fxt_ome_media
+    fxt_media_service.get_media_by_id.return_value = requested_media
+    fxt_media_service.get_ome_plane.return_value = fxt_ome_plane
+    response = fxt_client.delete(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{requested_media.id}/annotations",
+        params={} if by_plane_id else {"z": 12, "t": 0},
+    )
+    assert response.status_code == 204
+    fxt_dataset_service.delete_dataset_item_annotations.assert_called_once_with(
+        project=fxt_get_project,
+        dataset_item_id=fxt_ome_plane.id,
+    )
+
+
+@pytest.mark.parametrize(
+    ("suffix", "method"),
+    [("annotations", "get"), ("annotations", "post"), ("annotations", "delete"), ("thumbnail", "get")],
+)
+def test_ome_plane_requests_forward_project_scope(
+    fxt_get_project,
+    fxt_project_service,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_client,
+    suffix,
+    method,
+):
+    media_id = uuid4()
+    fxt_media_service.get_media_by_id.side_effect = ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
+    fxt_media_service.get_media_thumbnail_path_by_id.side_effect = ResourceNotFoundError(
+        ResourceType.MEDIA, str(media_id)
+    )
+    response = fxt_client.request(
+        method,
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{media_id}/{suffix}",
+        **({"json": {"annotations": []}} if method == "post" else {}),
+    )
+    assert response.status_code == 404
+    lookup = (
+        fxt_media_service.get_media_thumbnail_path_by_id if suffix == "thumbnail" else fxt_media_service.get_media_by_id
+    )
+    lookup.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
+    fxt_dataset_service.register_ome_plane.assert_not_called()
+
+
+def test_ome_plane_response_contract(fxt_get_project, fxt_media_service, fxt_ome_plane, fxt_client):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_plane
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_plane.id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["type"] == "ome_plane"
+    assert body["ome_image_id"] == str(fxt_ome_plane.ome_image_id)
+    assert (body["z_index"], body["t_index"]) == (12, 0)
+    assert "frame_index" not in body
+
+
+@pytest.mark.parametrize(("query", "expected"), [("z=12", 400), ("z=0&t=0&frame_index=0", 400)])
+def test_ome_plane_thumbnail_selector_validation(
+    fxt_get_project,
+    fxt_project_service,
+    fxt_media_service,
+    fxt_ome_media,
+    fxt_client,
+    query,
+    expected,
+):
+    response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/thumbnail?{query}")
+    assert response.status_code == expected
+
+
+@pytest.mark.parametrize(
+    ("extension", "expected"),
+    [
+        ("a.ome.tiff", ImageFormat.OME_TIFF),
+        ("OME.TIF", ImageFormat.OME_TIF),
+        ("b.tiff", ImageFormat.TIFF),
+        ("tif", ImageFormat.TIF),
+        ("jpeg", ImageFormat.JPEG),
+        ("mp4", VideoFormat.MP4),
+    ],
+)
+def test_parse_compound_media_format(extension, expected):
+    from app.api.routers.media import _parse_media_format
+
+    assert _parse_media_format(extension) == expected
+
+
+@pytest.mark.parametrize("filename", ["specimen.ome.tiff", "specimen.OME.TIF", "specimen.ome.zip"])
+@pytest.mark.parametrize("resumable", [False, True])
+def test_upload_ome(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_create_upload,
+    fxt_upload_service,
+    fxt_client,
+    fxt_upload_max_size,
+    filename,
+    resumable,
+):
+    fxt_media_service.create_ome_image.return_value = fxt_ome_media
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    upload_id = None
+    if resumable:
+        upload_id = fxt_create_upload(filename)
+        response = fxt_client.post(f"{url}:from-upload", json={"upload_id": str(upload_id)})
+    else:
+        response = fxt_client.post(url, files={"file": (filename, b"pixels", "application/octet-stream")})
+    assert response.status_code == 201
+    assert response.json()["type"] == "ome_image"
+    kwargs = fxt_media_service.create_ome_image.call_args.kwargs
+    assert kwargs["name"] == "specimen"
+    assert kwargs["image_format"] == (ImageFormat.OME_TIF if filename.endswith("TIF") else ImageFormat.OME_TIFF)
+    assert kwargs["archive"] == filename.endswith("zip")
+    assert kwargs["max_size"] == fxt_upload_max_size
+    if upload_id is not None:
+        assert kwargs["data"] == fxt_upload_service.path_for(upload_id)
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "consumed"
+    fxt_media_service.create_image.assert_not_called()
+    fxt_dataset_service.create_dataset_item.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("error", "expected"),
+    [(InvalidImageError("bad metadata"), 422), (OmeMediaTooLargeError("too large"), 413)],
+)
+@pytest.mark.parametrize("resumable", [False, True])
+def test_ome_upload_errors(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_create_upload,
+    fxt_client,
+    error,
+    expected,
+    resumable,
+):
+    fxt_media_service.create_ome_image.side_effect = error
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    if resumable:
+        upload_id = fxt_create_upload("bad.ome.tiff")
+        response = fxt_client.post(f"{url}:from-upload", json={"upload_id": str(upload_id)})
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+    else:
+        response = fxt_client.post(url, files={"file": ("bad.ome.tiff", b"invalid")})
+    assert response.status_code == expected
+    fxt_dataset_service.create_dataset_item.assert_not_called()
+
+
+def test_ome_commit_failure_discards_ingest(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_ome_media,
+    fxt_create_upload,
+    fxt_upload_service,
+    fxt_client,
+):
+    upload_id = fxt_create_upload("specimen.ome.tiff")
+    fxt_media_service.create_ome_image.return_value = fxt_ome_media
+    fxt_media_service.db_session.commit.side_effect = RuntimeError("commit failed")
+    storage = fxt_media_service.get_media_storage.return_value
+    with pytest.raises(RuntimeError, match="commit failed"):
+        fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+    fxt_media_service.db_session.rollback.assert_called_once()
+    fxt_media_service.discard_ome_image.assert_called_once_with(
+        fxt_get_project.id, fxt_ome_media.id, storage, fxt_upload_service.path_for(upload_id)
+    )
+    assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+
+
+@pytest.mark.parametrize("filename", [".ome.tiff", ".ome.tif", ".ome.zip"])
+def test_ome_filename_requires_stem(
+    fxt_get_project,
+    fxt_media_service,
+    fxt_dataset_service,
+    fxt_client,
+    filename,
+):
+    from fastapi import HTTPException
+
+    from app.api.upload_utils import split_upload_filename
+
+    url = f"/api/projects/{fxt_get_project.id}/dataset/media"
+    response = fxt_client.post(url, files={"file": (filename, b"pixels")})
+    assert response.status_code == 422
+    fxt_media_service.create_ome_image.assert_not_called()
+    with pytest.raises(HTTPException) as error:
+        split_upload_filename(filename)
+    assert error.value.status_code == 422
+
+
+@pytest.mark.parametrize("is_directory", [False, True])
+@pytest.mark.parametrize("raw", [False, True])
+def test_ome_binary_rejected(fxt_get_project, fxt_media_service, fxt_ome_media, fxt_client, is_directory, raw):
+    fxt_media_service.get_media_by_id.return_value = fxt_ome_media
+    fxt_media_service.get_media_storage.return_value.is_directory = is_directory
+    response = fxt_client.get(
+        f"/api/projects/{fxt_get_project.id}/dataset/media/{fxt_ome_media.id}/binary", params={"raw": raw}
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "OME images do not support binary retrieval. Use the render endpoint instead."
+    fxt_media_service.get_media_storage.assert_not_called()
+    fxt_media_service.get_media_binary_path_by_id.assert_not_called()
+
+
+@pytest.fixture
 def fxt_video_frame_media():
     return VideoFrame(
         id=uuid4(),
@@ -134,11 +576,11 @@ def fxt_project_service(fxt_app) -> MagicMock:
     return project_service
 
 
-@pytest.fixture
-def fxt_media_service(fxt_app) -> MagicMock:
-    media_service = MagicMock(spec=MediaService)
-    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
-    return media_service
+@pytest.fixture(autouse=True)
+def fxt_upload_max_size(fxt_app) -> int:
+    max_size = 10 * 1024 * 1024
+    fxt_app.dependency_overrides[get_upload_max_size] = lambda: max_size
+    return max_size
 
 
 @pytest.fixture
@@ -486,14 +928,14 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=MediaFilters(
                 limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_with_dataset_view_id(
@@ -547,7 +989,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -560,7 +1002,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_naive_dates_are_normalized_to_utc(
@@ -581,7 +1023,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -594,7 +1036,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     @pytest.mark.parametrize("limit", [1000, 0, -20])
@@ -653,7 +1095,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         # No pagination means there is nothing to count.
         fxt_media_service.count_media.assert_not_called()
@@ -681,7 +1123,7 @@ class TestMediaEndpoints:
                 label_ids=[label_id],
                 subsets=[DatasetItemSubset.TRAINING.value],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_ids_with_dataset_view_id(
@@ -743,7 +1185,7 @@ class TestMediaEndpoints:
             annotation_status=annotation_status,
             label_ids=None,
             subsets=None,
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -756,7 +1198,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=None,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     @pytest.mark.parametrize("subset", ["unassigned", "training", "validation", "testing"])
@@ -776,7 +1218,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=[subset],
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -789,7 +1231,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=[subset],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_with_multiple_subsets(
@@ -808,7 +1250,7 @@ class TestMediaEndpoints:
             annotation_status=None,
             label_ids=None,
             subsets=["training", "validation"],
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -821,7 +1263,7 @@ class TestMediaEndpoints:
                 label_ids=None,
                 subsets=["training", "validation"],
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_default_sort_direction(
@@ -846,7 +1288,7 @@ class TestMediaEndpoints:
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=SortDirection.DESC,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     @pytest.mark.parametrize("sort_direction", [SortDirection.ASC, SortDirection.DESC])
@@ -872,7 +1314,7 @@ class TestMediaEndpoints:
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=sort_direction,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     @pytest.mark.parametrize("sort_by", list(MediaSortBy))
@@ -898,7 +1340,7 @@ class TestMediaEndpoints:
                 sort_by=sort_by,
                 sort_direction=SortDirection.DESC,
             ),
-            exclude_types=[MediaType.VIDEO_FRAME],
+            exclude_types=[MediaType.VIDEO_FRAME, MediaType.OME_PLANE],
         )
 
     def test_list_media_wrong_sort_by(self, fxt_get_project, fxt_media_service, fxt_client):

@@ -15,9 +15,33 @@ from sqlalchemy.orm import Session
 from app.datumaro_converter import SampleMode
 from app.db.schema import DatasetItemDB, DatasetRevisionDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project
+from app.models.media import ImageFormat
 from app.services import DatasetRevisionService, DatasetService, DatasetViewService, MediaService
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_revision_service import DATASET_REVISION_ITEM_THUMBNAIL_SIZE
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [
+        ("image.ome.tiff", ImageFormat.OME_TIFF),
+        ("image.OME.TIF", ImageFormat.OME_TIF),
+        ("image.tiff", ImageFormat.TIFF),
+        ("image.png", ImageFormat.PNG),
+    ],
+)
+def test_revision_item_compound_format(fxt_dataset_revision_service, filename, expected):
+    item = fxt_dataset_revision_service._parse_revision_item_from_df_row_dict(
+        project_id=uuid4(),
+        dataset_revision_id=uuid4(),
+        df_revision_item={
+            "id": str(uuid4()),
+            "image": filename,
+            "image_info": {"width": 5, "height": 4},
+            "subset": "training",
+        },
+    )
+    assert item.format == expected
 
 
 @pytest.fixture
@@ -249,7 +273,7 @@ def fxt_project_with_video_frame_items_on_disk(
             size=1024,
             width=1920,
             height=1080,
-            video_id=str(db_video.id),
+            parent_id=str(db_video.id),
             frame_index=frame_index,
             project_id=str(project.id),
             created_at=datetime.fromisoformat("2025-02-01T00:00:00Z"),

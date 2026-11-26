@@ -41,6 +41,8 @@ IMPORT_ORDER = [
     "evaluations",
     "metric_scores",
     "pipelines",
+    "ome_images",
+    "ome_channel_views",
 ]
 
 

@@ -21,6 +21,8 @@ from app.models.media import (
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaType,
+    OmeImage,
+    OmePlane,
     VideoFrame,
     VideoRange,
 )
@@ -70,6 +72,19 @@ class TestMediaPredictionServiceUnit:
             )
 
         return _create_media_prediction_service
+
+    @pytest.mark.parametrize("media_type", [MediaType.OME_IMAGE, MediaType.OME_PLANE])
+    def test_ome_container_prediction_is_not_supported(
+        self, fxt_media_prediction_service, fxt_media_service, media_type
+    ):
+        project = MagicMock(spec=Project, id=uuid4())
+        media = MagicMock(spec=OmeImage if media_type == MediaType.OME_IMAGE else OmePlane, id=uuid4(), type=media_type)
+        fxt_media_service.get_media_by_ids.return_value = [media]
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[MediaPredictionRequest(media_id=media.id, range=None)], device="cpu"
+        )
+        with pytest.raises(ValueError, match="OME plane prediction"):
+            fxt_media_prediction_service()._load_media(project, request)
 
     @pytest.mark.parametrize(
         "index, frame_indexes, inference_keyframe_stride, expected_result",
