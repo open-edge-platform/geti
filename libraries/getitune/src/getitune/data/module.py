@@ -492,7 +492,7 @@ class DataModule(LightningDataModule):
         if source_idx is not None:
             # Tiles of one image are visited together so each large image is decoded once per worker. A custom sampler
             # (e.g. class balancing) keeps its sampling distribution; its draws are only regrouped by image.
-            is_default = config.sampler.class_path == SamplerConfig().class_path
+            is_default = config.sampler == SamplerConfig()  # init_args (e.g. replacement) make it custom
             logger.info("Grouping training tiles by source image (sampling_ratio=%s)", tile_config.sampling_ratio)
             sampler = ImageGroupedSampler(
                 source_idx, tile_config.sampling_ratio, inner=None if is_default else common_args["sampler"]

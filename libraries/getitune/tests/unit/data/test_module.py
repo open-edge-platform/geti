@@ -235,6 +235,25 @@ class TestDataModule:
         images = source_idx[order]
         assert 1 + np.count_nonzero(images[1:] != images[:-1]) == 3  # each image is one contiguous run
 
+    def test_tiled_train_loader_keeps_default_sampler_with_init_args(self, mocker) -> None:
+        """A RandomSampler with init_args is a user choice, not the default: it must be wrapped, not dropped."""
+        dataset = MagicMock()
+        dataset.__len__.return_value = 6
+        dataset.collate_fn = lambda batch: batch
+        dataset.transforms = None
+        mocker.patch("getitune.data.module.tile_source_indices", return_value=np.array([0, 1, 2, 0, 1, 2]))
+        sampler_config = SamplerConfig("torch.utils.data.RandomSampler", {"replacement": True, "num_samples": 12})
+        config = SubsetConfig(batch_size=2, num_workers=0, subset_name="train", sampler=sampler_config)
+        dm = DataModule.__new__(DataModule)
+        dm.tile_config = TileConfig(enable_tiler=True)
+        dm.device = DeviceType.cpu
+        dm.train_subset = config
+        mocker.patch.object(dm, "_get_dataset", return_value=dataset)
+
+        order = list(dm.train_dataloader().sampler)
+
+        assert len(order) == 12  # num_samples honored, with replacement
+
     def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
         """Eval loaders honor the recipe-configured batch size, workers and pinned memory.
 

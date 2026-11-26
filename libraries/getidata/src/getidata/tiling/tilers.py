@@ -495,6 +495,7 @@ class _ImagePolygons:
             np.asarray(p, dtype=np.float64).reshape(-1, 2) if p is not None else np.zeros((0, 2)) for p in polygons
         ]
         self.count = len(self.rings)
+        self.repaired: set[int] = set()  # rings that were invalid (e.g. self-intersecting) and got repaired
         bounds = np.array(
             [[*r.min(axis=0), *r.max(axis=0)] if len(r) else [np.inf, np.inf, -np.inf, -np.inf] for r in self.rings]
         ).reshape(-1, 4)
@@ -510,7 +511,10 @@ class _ImagePolygons:
         if i not in self._polygons:
             try:
                 polygon = ShapelyPolygon(self.rings[i])
-                self._polygons[i] = polygon if polygon.is_valid else make_valid(polygon)
+                if not polygon.is_valid:
+                    self.repaired.add(i)
+                    polygon = make_valid(polygon)
+                self._polygons[i] = polygon
             except ValueError:  # fewer than 3 distinct points
                 self._polygons[i] = None
         return self._polygons[i]
@@ -566,14 +570,16 @@ class PolygonTiler(Tiler):
             inside = overlaps & (image.x0 >= tx0) & (image.x1 <= tx1) & (image.y0 >= ty0) & (image.y1 <= ty1)
             tile_poly = None
             for i in np.flatnonzero(overlaps):
-                if inside[i]:
+                polygon = image.polygon(i)  # cached per image; repairs invalid rings
+                if polygon is None:
+                    continue
+                if inside[i] and i not in image.repaired:
                     ring = image.rings[i]
                     if image.shoelace_area(i) <= 0:
                         continue
                     ring = np.vstack([ring, ring[:1]])  # closed ring, as a clip would return
                 else:
-                    polygon = image.polygon(i)
-                    if polygon is None or polygon.area <= 0:
+                    if polygon.area <= 0:
                         continue
                     tile_poly = tile_poly or box(tx0, ty0, tx1, ty1)
                     ring, clipped_area = self._clip(polygon, tile_poly)

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 import torch
 
@@ -161,3 +162,29 @@ class TestLightningInstanceSegModel:
         batch_size = 2
         batch = model.get_dummy_input(batch_size)
         assert batch.batch_size == batch_size
+
+
+def test_filter_outputs_by_threshold_handles_rle_masks():
+    """Tiled predictions hold RLE masks (no tensor ``device``); filtering keeps masks aligned with boxes."""
+    from types import SimpleNamespace
+
+    from getitune.backend.lightning.models.instance_segmentation.base import LightningInstanceSegModel
+    from getitune.data.entity.sample import PredictionBatch
+    from getitune.data.utils.structures.mask.mask_util import RLEMasks, crop_to_rle
+
+    shape = (32, 40)
+    masks = RLEMasks([crop_to_rle(np.ones((4, 4), dtype=bool), x, 2, shape) for x in (0, 10, 20)], shape)
+    outputs = PredictionBatch(
+        images=[torch.empty(3, *shape)],
+        imgs_info=[None],
+        scores=[torch.tensor([0.9, 0.2, 0.7])],
+        bboxes=[torch.zeros(3, 4)],
+        labels=[torch.tensor([0, 1, 2])],
+        masks=[masks],
+    )
+    fake_self = SimpleNamespace(best_confidence_threshold=0.5)
+
+    filtered = LightningInstanceSegModel._filter_outputs_by_threshold(fake_self, outputs)
+
+    assert filtered.labels[0].tolist() == [0, 2]
+    assert filtered.masks[0].rles == [masks.rles[0], masks.rles[2]]

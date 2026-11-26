@@ -149,6 +149,8 @@ class RLEMasks:
         if isinstance(index, slice):
             return RLEMasks(self.rles[index], self.shape)
         index = torch.as_tensor(index)
+        if index.ndim == 0:  # a single instance, kept as a one-instance RLEMasks
+            index = index.reshape(1)
         if index.dtype == torch.bool:
             index = index.nonzero(as_tuple=True)[0]
         return RLEMasks([self.rles[i] for i in index.tolist()], self.shape)
@@ -207,10 +209,8 @@ def crop_to_rle(mask: np.ndarray, x: int, y: int, shape: tuple[int, int]) -> dic
     change = np.flatnonzero(flat[1:] != flat[:-1]) + 1
     runs = np.diff(np.concatenate(([0], change, [len(flat)])))
     lead = x * height
-    if flat[0]:  # the strip starts with a one-run, so the zero run before it is exactly ``lead``
-        counts = [lead, *runs.tolist()]
-    else:  # merge the strip's first zero run into the leading zeros
-        counts = [lead + int(runs[0]), *runs[1:].tolist()]
+    # A strip starting with a one-run has exactly ``lead`` zeros before it; else its first zero run merges into them.
+    counts = [lead, *runs.tolist()] if flat[0] else [lead + int(runs[0]), *runs[1:].tolist()]
     trail = (width - x - w) * height
     if flat[-1]:  # ends with a one-run: the trailing zero run is new
         counts.append(trail)

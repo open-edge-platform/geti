@@ -907,3 +907,14 @@ def test_polygon_tiling_survives_self_intersecting_polygon():
 
     assert len(left) >= 1  # the valid polygon is still tiled, no exception
     assert right == []
+
+
+def test_polygon_tiling_repairs_self_intersecting_polygon_inside_one_tile():
+    from shapely.geometry import Polygon as ShapelyPolygon
+
+    bowtie = [[10, 10], [40, 40], [40, 10], [10, 40]]  # fully inside the left tile: no clipping needed
+
+    left, _ = _polygon_tiling([bowtie], threshold=0.0)
+
+    assert len(left) == 1
+    assert ShapelyPolygon(np.asarray(left[0]).reshape(-1, 2)).is_valid  # repaired, not emitted as-is

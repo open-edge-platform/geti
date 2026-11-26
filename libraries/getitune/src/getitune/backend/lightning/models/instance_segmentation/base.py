@@ -427,7 +427,9 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             bboxes.append(_bboxes[filtered_idx])
             labels.append(_labels[filtered_idx])
 
-            if _masks is not None:
+            if isinstance(_masks, RLEMasks):
+                masks.append(_masks[filtered_idx[0]])
+            elif _masks is not None:
                 # Ensure filtered_idx is on the same device as masks
                 mask_filtered_idx = tuple(idx.to(_masks.device) for idx in filtered_idx)
                 masks.append(_masks[mask_filtered_idx])

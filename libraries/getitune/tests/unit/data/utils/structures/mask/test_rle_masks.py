@@ -51,3 +51,16 @@ def test_rle_masks_refuses_to_decode_when_dense_would_be_too_large():
 
     with pytest.raises(MemoryError):
         rles.to_dense(max_bytes=1000)
+
+
+def test_rle_masks_scalar_index_selects_one_instance():
+    polygons = np.empty(2, dtype=object)
+    polygons[:] = [
+        np.array([[2, 2], [10, 2], [10, 8], [2, 8]], dtype=np.float32),
+        np.array([[20, 5], [30, 5], [25, 15]], dtype=np.float32),
+    ]
+    rles = RLEMasks.from_polygons(polygons, (32, 40))
+
+    assert len(rles[1]) == 1
+    assert rles[1].rles == [rles.rles[1]]
+    assert len(rles[torch.tensor(0)]) == 1

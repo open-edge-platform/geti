@@ -136,6 +136,28 @@ class TestOVInstanceSegmentationModelTiling:
         dense[10:20, 10:30] = 1
         assert result.masks[0].rles == [encode_rle(dense.bool())]  # pyrefly: ignore[unsupported-operation]
 
+    def test_predict_step_filters_rle_masks_by_confidence(self, inst_seg_model):
+        """Tiled predictions carry RLE masks; the confidence filter must keep them aligned with boxes."""
+        inst_seg_model.hparams = {"best_confidence_threshold": 0.5}
+        merged = MagicMock()
+        merged.bboxes = np.array([[10, 10, 30, 20], [50, 50, 70, 60]], dtype=np.int32)
+        merged.scores = np.array([0.9, 0.2], dtype=np.float32)
+        merged.labels = np.array([2, 2], dtype=np.int32)
+        merged.mask_crops = [(np.ones((10, 20), dtype=np.uint8), 10, 10), (np.ones((10, 20), dtype=np.uint8), 50, 50)]
+        tiler = MagicMock()
+        tiler.predict_tiles.return_value = merged
+        inst_seg_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = inst_seg_model.predict_step(self._make_tile_batch())
+
+        assert result.scores[0].tolist() == pytest.approx([0.9])  # pyrefly: ignore[unsupported-operation]
+        masks = result.masks[0]  # pyrefly: ignore[unsupported-operation]
+        assert isinstance(masks, RLEMasks)
+        assert len(masks) == 1
+        dense = torch.zeros((256, 256), dtype=torch.bool)
+        dense[10:20, 10:30] = True
+        assert masks.rles == [encode_rle(dense)]
+
     def test_forward_tiles_empty_masks_yield_none(self, inst_seg_model):
         """When no instances survive merging, masks must be reported as None."""
         tile_batch = self._make_tile_batch()
