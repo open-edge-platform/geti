@@ -83,7 +83,7 @@ export const useVideoControls = ({
     };
 
     const nextFrame = () => {
-        if (!canSelectNextFrame || videoRef.current === null) {
+        if (!canSelectNextFrame || videoRef.current === null || videoFrame === undefined) {
             return;
         }
 
@@ -91,12 +91,12 @@ export const useVideoControls = ({
             selectFrame(nextVideoFrameNumber);
         } else {
             changeCurrentFrameIndex(nextVideoFrameNumber);
-            videoRef.current.currentTime += 1;
+            videoRef.current.currentTime = nextVideoFrameNumber / videoFrame.fps;
         }
     };
 
     const previousFrame = () => {
-        if (!canSelectPreviousFrame || videoRef.current === null) {
+        if (!canSelectPreviousFrame || videoRef.current === null || videoFrame === undefined) {
             return;
         }
 
@@ -104,7 +104,7 @@ export const useVideoControls = ({
             selectFrame(previousVideoFrameNumber);
         } else {
             changeCurrentFrameIndex(previousVideoFrameNumber);
-            videoRef.current.currentTime -= 1;
+            videoRef.current.currentTime = previousVideoFrameNumber / videoFrame.fps;
         }
     };
 
