@@ -521,9 +521,9 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
     @staticmethod
     @torch.no_grad()
     def _forward_explain_inst_seg(
-        self: TwoStageDetector,
+        self: TwoStageDetector,  # noqa: PLW0211
         entity: SampleBatch,
-        mode: str = "tensor",
+        mode: str = "tensor",  # noqa: ARG004
     ) -> dict[str, Tensor]:
         """Forward func of the BaseDetector instance in ExplainableLightningInstanceSegModel().model."""
         _images = cast("torch.Tensor", entity.images)
