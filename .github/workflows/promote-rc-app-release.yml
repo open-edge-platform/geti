@@ -300,8 +300,21 @@ jobs:
     permissions:
       contents: read
 
-  cleanup-rc-images:
+  tag-latest:
     needs: [validate, promote-docker]
+    if: inputs.dry_run == false
+    name: Tag release images as latest
+    uses: $/.github/workflows/tag-app-latest.yml
+    with:
+      version: ${{ needs.validate.outputs.docker_patch_tag }}
+      force: true # The latest tag moves to each promoted release.
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+  cleanup-rc-images:
+    needs: [validate, tag-latest]
     if: inputs.dry_run == false && inputs.delete_rc_images
     name: Delete promoted version's RC images from GHCR
     uses: $/.github/workflows/remove-rc-app-images.yml

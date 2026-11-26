@@ -17,6 +17,21 @@ on:
         required: false
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      dry_run:
+        type: boolean
+        default: false
+      force:
+        type: boolean
+        default: false
+
+concurrency:
+  group: app-image-latest
+  queue: max
 
 permissions: {} # No permissions by default
 
