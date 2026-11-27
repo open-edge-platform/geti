@@ -173,11 +173,12 @@ def test_stretch_resize_rasterizes_masks_at_target_size(coco_root, resize_target
     resize = Resize(size=(128, 192), resize_targets=resize_targets, keep_aspect_ratio=keep_aspect_ratio)
     dataset = InstanceSegDataset(dm_subset=import_dataset(coco_root), transforms=CPUAugmentationPipeline([resize]))
 
-    expected_at_target = resize_targets and not keep_aspect_ratio
-    assert dataset.rasterize_polygons is expected_at_target
+    assert dataset.rasterize_polygons is resize_targets
     sample = dataset._read_dm_item(0)
     mask_size = tuple(sample.masks.shape[-2:])  # pyrefly: ignore[missing-attribute]
-    assert mask_size == ((128, 192) if expected_at_target else (HEIGHT, WIDTH))
+    # letterbox: masks are rasterized at the content size, the Resize pads them
+    content = (128, 171) if keep_aspect_ratio else (128, 192)
+    assert mask_size == (content if resize_targets else (HEIGHT, WIDTH))
 
     out = dataset[0]
     if resize_targets:  # targets follow the image, so the metric sees masks in the image's space

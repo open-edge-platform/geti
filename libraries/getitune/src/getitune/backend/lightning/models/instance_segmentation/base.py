@@ -127,6 +127,8 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         # InstanceData, which requires all instance-level fields to share length.
         if self.training:
             align_sample_batch_annotations(entity)
+        else:
+            self._keep_eval_predictions_in_input_space(entity)
         if isinstance(entity.images, list):
             entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
         inputs: dict[str, Any] = {}
@@ -135,6 +137,25 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         inputs["mode"] = "loss" if self.training else "predict"
 
         return inputs
+
+    def _keep_eval_predictions_in_input_space(self, entity: SampleBatch) -> None:
+        """Make the heads render predictions in the input canvas when ground truth lives there.
+
+        With ``resize_targets: true`` the GT masks/boxes were resized and padded with the image. Rendering
+        predictions at the original size would cost gigabytes per 4K/8K image and not match the GT anyway, so the
+        batch meta says the "original" image is the input canvas (no rescale). Predict is never touched.
+        """
+        try:
+            if self.trainer.predicting:
+                return
+        except RuntimeError:  # not attached to a Trainer (direct calls)
+            pass
+        for i, img_info in enumerate(entity.imgs_info or []):  # type: ignore[arg-type]
+            gt_masks = entity.masks[i] if entity.masks is not None else None
+            canvas = tuple(img_info.img_shape)  # type: ignore[union-attr]
+            if gt_masks is not None and tuple(gt_masks.shape[-2:]) == canvas != tuple(img_info.ori_shape):  # type: ignore[union-attr]
+                img_info.ori_shape = canvas  # type: ignore[union-attr]
+                img_info.scale_factor = (1.0, 1.0)  # type: ignore[union-attr]
 
     def _customize_outputs(
         self,
