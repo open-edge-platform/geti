@@ -766,7 +766,7 @@ the existing upload-ID request; future remote-source variants must be additive.
 
 ## 8. Implementation plan
 
-Each step is independently mergeable and leaves `main` green.
+Each step is independently mergeable and leaves feature integration branch green.
 
 ### Step 1 - Schema and migration
 
@@ -906,15 +906,7 @@ coordinates and predictions, and verify no new files or database rows. Cover inv
 payloads and exact byte-budget boundaries. Existing image/video prediction tests gate their unchanged result
 keys, keyframe behavior and response JSON. XY regions, tiling and pyramid inference remain out of scope.
 
-### Step 9 - Contract handoff
-
-`just gen-api-spec`, copy to `application/ui/src/api/openapi-spec.json`, `npm run build:api`, add mock handlers for the
-new endpoints, update [`dataset.md`](dataset.md) and [`entities.md`](entities.md).
-
-_Testing._ `just lint`, `just pyrefly`, `just lint-imports` on the backend; `npm run type-check` on the UI to prove the
-regenerated types compile.
-
-### Step 10 (future) - OME-Zarr
+### Step 9 (future) - OME-Zarr
 
 Add `OmeZarrReader`, `container_format = "ome_zarr"`, and the `archive` / `remote` upload source kinds. No schema
 migration, no API break.
