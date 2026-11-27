@@ -2,14 +2,43 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
+from collections.abc import Iterator
 
 import numpy as np
 
-from app.models import OmeImageInfo
+from app.models import OmeImageInfo, Region
 from app.models.ome import ChannelProjection, RgbProjection
 from app.services.base import InvalidImageError
+from app.services.ome.protocols import OmeImageHandle
 
 _RGB_TARGETS: tuple[str, str, str] = ("red", "green", "blue")
+# Warm-cache macOS arm64 benchmarks (six settings, eight uint16 workloads, three runs each):
+# 1M pixels / 256 rows reduced geometric-mean runtime by 16% versus 256K pixels / 64 rows.
+# A 2M-pixel / 512-row budget saved 17%, but peak RSS growth above the import baseline rose
+# from 68 to 139 MiB (112 to 207 MiB in float64 validation). Keep the smaller memory tradeoff.
+PROJECTION_STRIP_PIXELS: int = 1024 * 1024
+PROJECTION_MAX_STRIP_HEIGHT: int = 256
+
+
+def iter_projected_regions(
+    handle: OmeImageHandle, info: OmeImageInfo, projection: ChannelProjection, *, z: int, t: int
+) -> Iterator[tuple[Region, np.ndarray]]:
+    """Yield bounded level-zero HWC uint8 regions with the immutable training projection."""
+    strip_height = max(1, min(PROJECTION_MAX_STRIP_HEIGHT, PROJECTION_STRIP_PIXELS // info.size_x))
+    for y in range(0, info.size_y, strip_height):
+        height = min(strip_height, info.size_y - y)
+        chunk_width = max(1, PROJECTION_STRIP_PIXELS // height)
+        for x in range(0, info.size_x, chunk_width):
+            region = Region(x=x, y=y, width=min(chunk_width, info.size_x - x), height=height)
+            pixels = handle.read_region(level=0, region=region, z=z, t=t, channels=projection.source_channels)
+            if pixels.shape != (len(projection.source_channels), region.height, region.width):
+                raise InvalidImageError("OME reader returned unexpected projected region dimensions.")
+            yield region, render_channel_projection(pixels, info, projection)
+
+
+def projected_plane_bytes(info: OmeImageInfo, projection: ChannelProjection) -> int:
+    """Return full-plane uint8 output size, excluding bounded decode/projection temporaries."""
+    return info.size_x * info.size_y * (3 if isinstance(projection, RgbProjection) else 1)
 
 
 def render_channel_projection(pixels: np.ndarray, info: OmeImageInfo, projection: ChannelProjection) -> np.ndarray:

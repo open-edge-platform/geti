@@ -12,23 +12,18 @@ from uuid import UUID
 
 import numpy as np
 
-from app.models import Region
 from app.models.media import OmePlane
 from app.models.ome import OmeImageMetadata, RgbProjection
 from app.services.base import InvalidImageError
 from app.services.media_service import MediaService
-from app.services.ome.projection import render_channel_projection
+from app.services.ome.projection import PROJECTION_MAX_STRIP_HEIGHT as _MAX_STRIP_HEIGHT
+from app.services.ome.projection import PROJECTION_STRIP_PIXELS as _STRIP_PIXELS
+from app.services.ome.projection import iter_projected_regions
 from app.services.ome.protocols import OmeImageHandle
 from app.services.ome.registry import OmeReaderRegistry
 
 OME_PROJECTIONS_FILENAME: str = "ome_channel_projections.json"
-# Warm-cache macOS arm64 benchmarks (six settings, eight uint16 workloads, three runs each):
-# 1M pixels / 256 rows reduced geometric-mean runtime by 16% versus 256K pixels / 64 rows.
-# A 2M-pixel / 512-row budget saved 17%, but peak RSS growth above the import baseline rose
-# from 68 to 139 MiB (112 to 207 MiB in float64 validation). Keep the smaller memory tradeoff.
 # The separate 8 MiB scanline guard bounds exceptionally wide rows; it is not a total RAM limit.
-_STRIP_PIXELS: int = 1024 * 1024
-_MAX_STRIP_HEIGHT: int = 256
 _MAX_ROW_BYTES: int = 8 * 1024 * 1024
 
 
@@ -51,27 +46,16 @@ def _write_plane(stream: BinaryIO, handle: OmeImageHandle, info: OmeImageMetadat
     )
     compressor = zlib.compressobj()
     strip_height = max(1, min(_MAX_STRIP_HEIGHT, _STRIP_PIXELS // info.size_x))
-    for y in range(0, info.size_y, strip_height):
-        height = min(strip_height, info.size_y - y)
-        # Horizontal chunks also bound source/projection buffers for exceptionally wide images.
-        output = np.empty((height, info.size_x, components), dtype=np.uint8)
-        chunk_width = max(1, _STRIP_PIXELS // height)
-        for x in range(0, info.size_x, chunk_width):
-            width = min(chunk_width, info.size_x - x)
-            pixels = handle.read_region(
-                level=0,
-                region=Region(x=x, y=y, width=width, height=height),
-                z=plane.z_index,
-                t=plane.t_index,
-                channels=projection.source_channels,
-            )
-            if pixels.shape != (len(projection.source_channels), height, width):
-                raise InvalidImageError("OME reader returned unexpected training region dimensions.")
-            output[:, x : x + width] = render_channel_projection(pixels, info, projection)
-        for row in output:
-            compressed = compressor.compress(b"\x00" + row.tobytes())
-            if compressed:
-                _write_chunk(stream, b"IDAT", compressed)
+    output = np.empty((strip_height, info.size_x, components), dtype=np.uint8)
+    for region, pixels in iter_projected_regions(handle, info, projection, z=plane.z_index, t=plane.t_index):
+        if region.height != output.shape[0]:
+            output = np.empty((region.height, info.size_x, components), dtype=np.uint8)
+        output[:, region.x : region.x + region.width] = pixels
+        if region.x + region.width == info.size_x:
+            for row in output:
+                compressed = compressor.compress(b"\x00" + row.tobytes())
+                if compressed:
+                    _write_chunk(stream, b"IDAT", compressed)
     _write_chunk(stream, b"IDAT", compressor.flush())
     _write_chunk(stream, b"IEND", b"")
 

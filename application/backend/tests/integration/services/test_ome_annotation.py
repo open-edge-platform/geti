@@ -35,14 +35,26 @@ from app.models import (
     Rectangle,
     TaskType,
 )
-from app.models.media import LEAF_MEDIA_TYPES, ImageFormat, MediaType
+from app.models.media import (
+    LEAF_MEDIA_TYPES,
+    ImageFormat,
+    IndexRange,
+    MediaListPredictionRequest,
+    MediaPredictionRequest,
+    MediaType,
+    PlaneRange,
+)
 from app.models.ome import OmeChannelSettings
 from app.models.shape import Point
+from app.models.system import DeviceInfo, DeviceType
 from app.services.base import InvalidImageError, ResourceNotFoundError
 from app.services.dataset_revision_service import DatasetRevisionService
 from app.services.dataset_service import DatasetService, UnsupportedDatasetMediaError
+from app.services.media_numpy_loader import MediaNumpyLoader
+from app.services.media_prediction_service import MediaPredictionService
 from app.services.media_service import MediaFilters
-from app.services.ome.materialization import _MAX_ROW_BYTES, OME_PROJECTIONS_FILENAME
+from app.services.ome.materialization import _MAX_ROW_BYTES, OME_PROJECTIONS_FILENAME, OmeTrainingMaterializer
+from app.services.ome.projection import render_channel_projection
 from app.services.ome.registry import UnsupportedOmeStorageError
 from app.services.ome.rendering import OmeRenderingService
 
@@ -114,6 +126,137 @@ def test_annotate_plane_once_and_reload(ome_annotation, db_session, fxt_db_label
     assert service.list_media_ids(project.id, exclude_types=list(LEAF_MEDIA_TYPES)) == (
         (image.id, MediaType.OME_IMAGE),
     )
+
+
+@pytest.mark.parametrize(
+    "projection",
+    [
+        {"mode": "rgb", "channels": [{"channel": 2, "target": "red"}, {"channel": 0, "target": "blue"}]},
+        {"mode": "grayscale", "channel": 1},
+    ],
+)
+def test_prediction_pixels_match_materialized_training_plane(ome_annotation, db_session, tmp_path, projection):
+    service, project, image = ome_annotation
+    row = db_session.get(OmeImageDB, str(image.id))
+    row.channel_projection = projection
+    row.channels = [{"index": index, "window": {"min": 100, "max": 6000}} for index in range(3)]
+    db_session.flush()
+    plane = service.create_ome_plane(project.id, image.id, z=12, t=1)
+    materializer = OmeTrainingMaterializer(service, tmp_path / "training")
+    path = materializer.materialize(project.id, plane)
+    with Image.open(path) as png:
+        expected = np.array(png)
+    if expected.ndim == 2:
+        expected = expected[..., np.newaxis]
+    assert expected.max() > 0
+    rendering = OmeRenderingService(service)
+    rendering.set_channel_view(project.id, image.id, OmeChannelSettings(settings=[]))
+    loader = MediaNumpyLoader(service)
+    with patch.object(service, "get_media_binary_path", side_effect=AssertionError("Virtual plane has no PNG")):
+        result = loader.load_media_binary(project.id, plane)
+    np.testing.assert_array_equal(result, expected)
+    assert result.dtype == np.uint8
+    assert result.shape == (8, 10, 3 if projection["mode"] == "rgb" else 1)
+    assert not service.get_media_storage(project.id, plane).root.exists()
+
+
+def test_predict_plane_range_stride_and_registered_plane(
+    ome_annotation, db_session, fxt_label_service, fxt_db_labels, fxt_dataset_service
+):
+    service, project, image = ome_annotation
+    plane = fxt_dataset_service.register_ome_plane(project.id, image.id, z=12, t=1)
+    fxt_dataset_service.set_dataset_item_annotations(project, plane.id, _annotations(fxt_db_labels[0].id), True, None)
+    files_before = set(service.projects_dir.rglob("*"))
+    media_count = db_session.scalar(select(func.count()).select_from(MediaDB))
+    item_count = db_session.scalar(select(func.count()).select_from(DatasetItemDB))
+    server = Mock()
+    captured = []
+
+    def infer_batch(**kwargs):
+        inputs = kwargs["inputs"]
+        captured.extend(inputs)
+        return {
+            item.key: [
+                DatasetItemAnnotation(
+                    labels=[LabelReference(id=UUID(fxt_db_labels[0].id))],
+                    shape=Rectangle(x=item.z_index, y=item.t_index, width=1, height=1),
+                )
+            ]
+            for item in inputs
+        }
+
+    server.infer_batch.side_effect = infer_batch
+    predictor = MediaPredictionService(
+        fxt_label_service, service, server, 5, MediaNumpyLoader(service), db_session=db_session
+    )
+    request = MediaListPredictionRequest(
+        model_id=uuid4(),
+        media=[
+            MediaPredictionRequest(media_id=plane.id),
+            MediaPredictionRequest(
+                media_id=image.id,
+                plane_range=PlaneRange(
+                    z=IndexRange(start=1, end=12, stride=5),
+                    t=IndexRange(start=0, end=1, stride=1),
+                ),
+            ),
+        ],
+        device="cpu",
+    )
+    result = predictor.predict_media(
+        project, request, DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None)
+    )
+    expected = [(plane.id, 12, 1)] + [(image.id, z, t) for t in [0, 1] for z in [1, 6, 11]]
+    assert [item.key for item in captured] == expected
+    assert [(item.media.id, item.media.z_index, item.media.t_index) for item in result.predictions] == expected
+    for item, (_, z, t) in zip(result.predictions, expected):
+        shape = item.prediction[0].shape
+        assert isinstance(shape, Rectangle)
+        assert shape.x == z
+        assert shape.y == t
+    assert all(item.data.shape == (8, 10, 3) for item in captured)
+    source = np.arange(2 * 13 * 3 * 8 * 10, dtype=np.uint16).reshape(2, 13, 3, 8, 10)
+    info = service.get_ome_image_info(project.id, image.id)
+    for item in captured:
+        selected = source[item.t_index, item.z_index, list(info.channel_projection.source_channels)]
+        np.testing.assert_array_equal(item.data, render_channel_projection(selected, info, info.channel_projection))
+    assert db_session.scalar(select(func.count()).select_from(MediaDB)) == media_count
+    assert db_session.scalar(select(func.count()).select_from(DatasetItemDB)) == item_count
+    assert set(service.projects_dir.rglob("*")) == files_before
+
+
+@pytest.mark.parametrize("plane_indexes", [[(13, 0)], [(0, 2)], [(-1, 0)], [(0, -1)]])
+def test_prediction_invalid_plane_coordinates(ome_annotation, plane_indexes):
+    service, project, image = ome_annotation
+    with patch("app.services.media_service.OmeReaderRegistry") as registry:
+        with pytest.raises(ValueError, match="out of range"):
+            service.get_plane_binaries(project.id, image, plane_indexes)
+        registry.assert_not_called()
+
+
+def test_prediction_output_budget_exact_boundary(ome_annotation):
+    service, project, image = ome_annotation
+    required = 8 * 10 * 3 * 2
+    with patch("app.services.media_service.OmeReaderRegistry") as registry:
+        with pytest.raises(ValueError, match=f"{required}.*{required - 1}"):
+            service.get_plane_binaries(project.id, image, [(0, 0), (1, 0)], max_bytes=required - 1)
+        registry.assert_not_called()
+    result = service.get_plane_binaries(project.id, image, [(0, 0), (1, 0)], max_bytes=required)
+    assert sum(array.nbytes for array in result.values()) == required
+
+
+def test_prediction_missing_ome_payload(ome_annotation):
+    service, project, image = ome_annotation
+    service.get_media_storage(project.id, image).root.unlink()
+    with pytest.raises(ResourceNotFoundError, match="payload was not found"):
+        service.get_plane_binaries(project.id, image, [(0, 0)])
+
+
+def test_prediction_corrupt_ome_payload(ome_annotation):
+    service, project, image = ome_annotation
+    service.get_media_storage(project.id, image).root.write_bytes(b"not a TIFF")
+    with pytest.raises(InvalidImageError, match="no longer readable"):
+        service.get_plane_binaries(project.id, image, [(0, 0)])
 
 
 @pytest.mark.parametrize(("z", "t"), [(-1, 0), (13, 0), (0, -1), (0, 2)])

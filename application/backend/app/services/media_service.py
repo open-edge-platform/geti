@@ -56,7 +56,9 @@ from app.services.ome.ingest import (
     extract_ome_archive,
     ome_payload_size,
 )
+from app.services.ome.projection import iter_projected_regions, projected_plane_bytes
 from app.services.video import VideoService
+from app.settings import DEFAULT_OME_INFERENCE_MAX_BYTES
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
 from app.utils.media_storage_ops import (
     delete_media_storage,
@@ -659,6 +661,58 @@ class MediaService(BaseSessionManagedService):
         """
         video_path = self.get_media_binary_path(project_id=project.id, media=video)
         return self._get_video_service().extract_video_frames(video_path=video_path, frame_indexes=frame_indexes)
+
+    def get_plane_binaries(
+        self,
+        project_id: UUID,
+        image: OmeImage,
+        plane_indexes: list[tuple[int, int]],
+        *,
+        max_bytes: int = DEFAULT_OME_INFERENCE_MAX_BYTES,
+    ) -> dict[tuple[int, int], np.ndarray]:
+        """Load level-zero OME planes with their immutable training projection, without PNGs or database writes.
+
+        Args:
+            project_id: Project containing the OME image.
+            image: Source container.
+            plane_indexes: Requested (z, t) coordinates.
+            max_bytes: Maximum total projected output bytes; excludes decoder and model memory.
+
+        Returns:
+            HWC uint8 RGB or single-channel arrays keyed by (z, t).
+
+        Raises:
+            ValueError: If coordinates or the output budget are invalid.
+            ResourceNotFoundError: If the source payload is missing.
+            InvalidImageError: If the source cannot be decoded or projected.
+        """
+        info = self.get_ome_image_info(project_id, image.id)
+        indexes = list(dict.fromkeys(plane_indexes))
+        if any(not 0 <= z < info.size_z or not 0 <= t < info.size_t for z, t in indexes):
+            raise ValueError("OME z or t selection is out of range.")
+        size = projected_plane_bytes(info, info.channel_projection) * len(indexes)
+        if max_bytes < 1 or size > max_bytes:
+            raise ValueError(
+                f"OME prediction requires {size} projected pixel bytes, exceeding the {max_bytes} byte budget. "
+                "Reduce the plane range or increase INFERENCE_OME_MAX_BYTES."
+            )
+        if not indexes:
+            return {}
+        storage = self.get_media_storage(project_id, image)
+        if not storage.effective_path.is_file():
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(image.id), "OME image payload was not found.")
+        result: dict[tuple[int, int], np.ndarray] = {}
+        try:
+            with OmeReaderRegistry().get_reader(storage).open(storage, series=info.series_index) as handle:
+                for z, t in indexes:
+                    components = 3 if info.channel_projection.mode == "rgb" else 1
+                    output = np.empty((info.size_y, info.size_x, components), dtype=np.uint8)
+                    for region, pixels in iter_projected_regions(handle, info, info.channel_projection, z=z, t=t):
+                        output[region.y : region.y + region.height, region.x : region.x + region.width] = pixels
+                    result[z, t] = output
+        except UnsupportedOmeStorageError as error:
+            raise InvalidImageError("The OME image payload is no longer readable.") from error
+        return result
 
     def get_frame_thumbnail(self, project: Project, video: Video, frame_index: int) -> Image.Image:
         video_frame = self.get_frame_binary(project_id=project.id, video=video, frame_index=frame_index)

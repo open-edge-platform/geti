@@ -14,6 +14,8 @@ from typing import Literal
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DEFAULT_OME_INFERENCE_MAX_BYTES: int = 256 * 1024 * 1024
+
 
 def _read_version() -> str:
     """Read the application version, preferring installed package metadata.
@@ -107,7 +109,16 @@ class Settings(BaseSettings):
     inference_media_limit: int = Field(
         default=64,
         alias="INFERENCE_MEDIA_LIMIT",
-        description="Maximum number for images or video frames passed for inference",
+        description="Maximum number of images, video frames or OME planes requested for inference",
+    )
+    inference_ome_max_bytes: int = Field(
+        default=DEFAULT_OME_INFERENCE_MAX_BYTES,
+        alias="INFERENCE_OME_MAX_BYTES",
+        gt=0,
+        description=(
+            "Maximum total projected uint8 OME pixel bytes per prediction request. "
+            "Excludes TIFF decode buffers, projection temporaries, other media and model memory."
+        ),
     )
     inference_model_ttl: int = Field(
         default=120,

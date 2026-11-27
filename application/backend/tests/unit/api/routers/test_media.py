@@ -50,12 +50,14 @@ from app.models import (
 )
 from app.models.media import (
     ImageFormat,
+    IndexRange,
     MediaAnnotationStatus,
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaSortBy,
     OmeImage,
     OmePlane,
+    PlaneRange,
     SortDirection,
     VideoAnnotationStatus,
     VideoFormat,
@@ -2685,8 +2687,10 @@ class TestMediaEndpoints:
             frame_index_to=9,
         )
 
+    @pytest.mark.parametrize("frame_index", [None, 3])
     def test_media_predict(
         self,
+        frame_index,
         fxt_get_project,
         fxt_media_prediction_service,
         fxt_inference_media_limit,
@@ -2697,7 +2701,14 @@ class TestMediaEndpoints:
         media_id = uuid4()
         request = MediaListPredictionRequest(
             model_id=model_id,
-            media=[MediaPredictionRequest(media_id=media_id, range=None)],
+            media=[
+                MediaPredictionRequest(
+                    media_id=media_id,
+                    range=VideoRange(start_frame=frame_index, end_frame=frame_index, stride=1)
+                    if frame_index is not None
+                    else None,
+                )
+            ],
             device="AUTO",
         )
 
@@ -2706,7 +2717,7 @@ class TestMediaEndpoints:
         fxt_media_prediction_service.predict_media.return_value = BatchInferenceResult(
             predictions=[
                 BatchInferencePrediction(
-                    media=BatchInferenceMedia(id=media_id),
+                    media=BatchInferenceMedia(id=media_id, frame_index=frame_index),
                     prediction=[
                         DatasetItemAnnotation(
                             labels=[LabelReference(id=label_id)],
@@ -2728,7 +2739,7 @@ class TestMediaEndpoints:
                 {
                     "media": {
                         "id": str(media_id),
-                        "frame_index": None,
+                        "frame_index": frame_index,
                     },
                     "prediction": [
                         {
@@ -2813,6 +2824,103 @@ class TestMediaEndpoints:
         }
 
         fxt_media_prediction_service.predict_media.assert_not_called()
+
+    def test_media_predict_plane_range_limit_exceeded(
+        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ):
+        fxt_inference_media_limit(3)
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[
+                MediaPredictionRequest(
+                    media_id=uuid4(),
+                    plane_range=PlaneRange(
+                        z=IndexRange(start=0, end=3, stride=2),
+                        t=IndexRange(start=0, end=1, stride=1),
+                    ),
+                )
+            ],
+            device="AUTO",
+        )
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict", json=request.model_dump(mode="json")
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "requested number is 4" in response.json()["detail"]
+        fxt_media_prediction_service.predict_media.assert_not_called()
+
+    def test_media_predict_huge_plane_range_rejected_without_overflow(
+        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ):
+        fxt_inference_media_limit(64)
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict",
+            json={
+                "model_id": str(uuid4()),
+                "device": "AUTO",
+                "media": [
+                    {
+                        "media_id": str(uuid4()),
+                        "plane_range": {"z": {"start": 0, "end": 10**30, "stride": 1}},
+                    }
+                ],
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        fxt_media_prediction_service.predict_media.assert_not_called()
+
+    def test_media_predict_plane_coordinates_in_response(
+        self, fxt_get_project, fxt_media_prediction_service, fxt_client
+    ):
+        media_id = uuid4()
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[MediaPredictionRequest(media_id=media_id, plane_range=PlaneRange())],
+            device="AUTO",
+        )
+        fxt_media_prediction_service.predict_media.return_value = BatchInferenceResult(
+            predictions=[
+                BatchInferencePrediction(media=BatchInferenceMedia(id=media_id, z_index=0, t_index=0), prediction=[])
+            ]
+        )
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict", json=request.model_dump(mode="json")
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["predictions"][0]["media"] == {
+            "id": str(media_id),
+            "frame_index": None,
+            "z_index": 0,
+            "t_index": 0,
+        }
+
+    @pytest.mark.parametrize(
+        "selection",
+        [
+            {"range": {"start_frame": 0, "end_frame": 1, "stride": 1}, "plane_range": {}},
+            {"plane_range": {"z": {"start": 3, "end": 1, "stride": 1}}},
+            {"plane_range": {"t": {"start": -1, "end": 1, "stride": 1}}},
+            {"plane_range": {"z": {"start": 0, "end": 1, "stride": 0}}},
+        ],
+    )
+    def test_media_predict_invalid_plane_range(self, fxt_get_project, fxt_client, selection):
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict",
+            json={"model_id": str(uuid4()), "device": "AUTO", "media": [{"media_id": str(uuid4()), **selection}]},
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    @pytest.mark.parametrize(
+        "error", [InvalidImageError("OME decode failed"), ValueError("OME output budget exceeded")]
+    )
+    def test_media_predict_ome_errors(self, fxt_get_project, fxt_media_prediction_service, fxt_client, error):
+        fxt_media_prediction_service.predict_media.side_effect = error
+        response = fxt_client.post(
+            f"/api/projects/{uuid4()}/dataset/media:predict",
+            json={"model_id": str(uuid4()), "device": "AUTO", "media": [{"media_id": str(uuid4()), "plane_range": {}}]},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()["detail"] == str(error)
 
     def test_media_predict_inference_busy(
         self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client

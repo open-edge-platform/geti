@@ -7,8 +7,9 @@ from uuid import UUID
 import cv2
 import numpy as np
 
-from app.models.media import Media
+from app.models.media import Media, OmeImage, OmePlane
 from app.services.media_service import MediaService
+from app.settings import DEFAULT_OME_INFERENCE_MAX_BYTES
 
 
 class BinaryNotFoundError(Exception):
@@ -20,8 +21,10 @@ class MediaNumpyLoader:
     def __init__(
         self,
         media_service: MediaService,
+        ome_max_bytes: int = DEFAULT_OME_INFERENCE_MAX_BYTES,
     ) -> None:
         self._media_service = media_service
+        self._ome_max_bytes = ome_max_bytes
 
     def load_media_binary(self, project_id: UUID, media: Media) -> np.ndarray:
         """Decode a media binary into a numpy array, preserving bit depth and channel count.
@@ -32,6 +35,10 @@ class MediaNumpyLoader:
         guaranteed to be in RGB(A) order: OpenCV decodes it as BGR(A), so both 3- and
         4-channel data is converted here. Grayscale has no channel order to speak of
         and is passed through unchanged.
+
+        Virtual OME planes are projected directly from their source container at level zero into
+        uint8 RGB or grayscale, using the same immutable mapping and intensity windows as training.
+        OME containers require a separate explicit plane selection.
 
         Args:
             project_id: ID of the project the media belongs to.
@@ -44,6 +51,15 @@ class MediaNumpyLoader:
         Raises:
             BinaryNotFoundError: If the binary is missing or cannot be decoded.
         """
+        if isinstance(media, OmeImage):
+            raise ValueError("OME containers require an explicit plane selection.")
+        if isinstance(media, OmePlane):
+            parent = self._media_service.get_media_by_id(project_id, media.ome_image_id)
+            if not isinstance(parent, OmeImage):
+                raise ValueError("OME plane parent is not an OME image.")
+            return self._media_service.get_plane_binaries(
+                project_id, parent, [(media.z_index, media.t_index)], max_bytes=self._ome_max_bytes
+            )[media.z_index, media.t_index]
         binary_path = self._media_service.get_media_binary_path(project_id=project_id, media=media)
         # IMREAD_UNCHANGED preserves the original bit depth (e.g. 16-bit PNG/TIFF images).
         binary_data = cv2.imread(str(binary_path), cv2.IMREAD_UNCHANGED)

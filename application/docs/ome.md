@@ -662,8 +662,8 @@ Generalize the range object additively; `range` keeps working for videos.
 
 ```python
 class PlaneRange(BaseModel):
-    z: VideoRange | None  # start/end/stride over Z
-    t: VideoRange | None  # start/end/stride over T
+    z: IndexRange | None = None  # inclusive start/end/stride over Z
+    t: IndexRange | None = None  # inclusive start/end/stride over T
 
 
 class MediaPredictionRequest(BaseModel):
@@ -671,6 +671,51 @@ class MediaPredictionRequest(BaseModel):
     range: VideoRange | None = None       # videos (unchanged)
     plane_range: PlaneRange | None = None  # OME images (new)
 ```
+
+`IndexRange` uses axis-neutral `start`, `end` and `stride` fields. `VideoRange` shares its validation
+and range logic while preserving the existing `start_frame`, `end_frame` and `stride` video JSON fields.
+
+An OME container requires `plane_range`; an omitted axis selects index zero, so `plane_range: {}`
+selects `(z=0, t=0)`. When both axes are supplied, their Cartesian product is predicted in T-major,
+Z-minor order. Bounds are checked against `SizeZ` and `SizeT`, including the declared inclusive
+endpoints, before pixel reads. `range` and `plane_range` are mutually exclusive; `range` is video-only
+and `plane_range` is OME-container-only. A registered `ome_plane` can be predicted directly by its ID
+without a range.
+
+Prediction reads full planes at **level zero** with the immutable ingest-time channel projection and
+source intensity windows used for training (§3.6.1). It reuses `render_channel_projection()`, not the
+mutable `/render` display view. RGB output is `(H, W, 3)` and grayscale is `(H, W, 1)`, both uint8.
+The existing model preprocessing may resize that array to its configured input size; prediction
+coordinates remain in the original level-zero plane coordinate system.
+
+The response identifies each container-addressed prediction with the parent `id`, `z_index` and
+`t_index`. A directly addressed registered plane retains its own `id` and also includes its coordinates.
+Image/video responses omit the new coordinate fields, preserving their existing JSON shape.
+Every selected OME plane is inferred independently: video keyframe skipping and nearest-keyframe
+prediction copying do not apply across Z or T. Prediction neither registers planes/dataset items nor
+creates temporary PNGs.
+
+The existing `INFERENCE_MEDIA_LIMIT` (default 64) counts the requested Z/T Cartesian product alongside
+images and video frames. `INFERENCE_OME_MAX_BYTES` (default 268435456, 256 MiB) additionally limits the
+aggregate projected OME output bytes per request before decoding: `width × height × components`
+per requested plane, with three components for RGB and one for grayscale.
+A 4096×4096 RGB plane occupies 48 MiB, so at the default byte budget at most five such planes fit in
+one request. Oversized requests fail explicitly with HTTP 400; no pyramid level change or downsampling
+is used to make them fit.
+
+Source reads and projection temporaries use the same bounded regions as training (at most 1048576
+pixels and 256 rows per read). Unlike streaming PNG materialization, inference retains complete
+projected arrays for its batch. The output byte limit is **not a total-process RAM limit**: decoder
+buffers (subject to the separate TIFF segment limits), bounded projection temporaries, ordinary
+image/video arrays, model preprocessing, model weights and predictions require additional memory.
+Concurrent requests can multiply these costs. Raising the limit requires sufficient memory headroom.
+Missing source payloads return HTTP 404; unreadable/invalid OME pixels return HTTP 400.
+
+XY-region prediction, pyramid-level inference and overlap-aware tiled full-plane inference are
+deferred. Full-plane level-zero prediction matches the training materialization and avoids introducing
+crop offsets, pyramid coordinate transforms or duplicate merging in this step. However, model resizing
+may erase small objects in large planes; tiling will require a separately specified sampling,
+overlap and merging policy rather than silently changing the input semantics.
 
 ### 5.8 Response models
 
@@ -849,11 +894,17 @@ revision-level tests.
 
 ### Step 8 - Prediction
 
-`PlaneRange`, `MediaService.get_plane_binaries()`, and `MediaNumpyLoader` dispatch on `media.type`.
+`PlaneRange`, `MediaService.get_plane_binaries()`, and `MediaNumpyLoader` support full-plane level-zero
+prediction with the immutable training projection (§5.7). Plane ranges expand over Z/T with explicit
+count and projected-output byte limits. Inference result keys distinguish `(media_id, z_index, t_index)`
+from the existing `(media_id, frame_index)` image/video keys; no video keyframe interpolation is applied
+to OME planes. Direct registered-plane prediction is supported without a materialized PNG.
 
-_Testing._ Unit test that `load_media_binary` for an `ome_plane` returns the same `(H, W, C)` RGB(A) contract as for a
-JPEG. Integration test predicting over a `PlaneRange` with a stride, asserting the predicted plane set. Assert the
-existing video `range` behaviour is byte-identical (regression gate for the additive change).
+_Testing._ Compare inference pixels with decoded training PNGs for RGB/grayscale projections and fixed
+intensity windows after changing the display view. Predict over a `PlaneRange` with strides, assert distinct
+coordinates and predictions, and verify no new files or database rows. Cover invalid ranges, missing/unreadable
+payloads and exact byte-budget boundaries. Existing image/video prediction tests gate their unchanged result
+keys, keyframe behavior and response JSON. XY regions, tiling and pyramid inference remain out of scope.
 
 ### Step 9 - Contract handoff
 
@@ -872,15 +923,17 @@ migration, no API break.
 
 ## 9. Risks
 
-| Risk                                                                       | Mitigation                                                                                                                                                                                                                       |
-| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                                                |
-| `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                                                       |
-| `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1.                            |
-| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If partial rendering is needed, extend `/render` with region parameters.                                                                                                       |
-| Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                                                |
-| RGB projection loses information needed for accuracy                       | Accepted for v1. The projection is a fixed, deterministic mapping (§3.6.1), decoupled from the mutable `OmeChannelView`, and recorded per-image and per-revision so it can be compared fairly against future N-channel training. |
-| Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                                                      |
+| Risk                                                                       | Mitigation                                                                                                                                                                                                                                                            |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New `tifffile` dependency                                                  | Verify licence and that it reaches `geti.spec` `hiddenimports`; PyInstaller smoke test in step 3.                                                                                                                                                                     |
+| `video_id` → `parent_id` rename churn                                      | Mechanical; step 1 is isolated and gated by the existing video suite. If rejected, keep the name and document it as "parent media" - the rest of the design is unaffected.                                                                                            |
+| `video_id` rename breaks public `VideoFrame`/`VideoFrameView` construction | `from_attributes=True` auto-mapping silently fails once the ORM attribute is `parent_id`; fix by mapping explicitly in `media_service.py` (see §4.1) and gate with the contract test added in step 1.                                                                 |
+| Render latency makes Z/T scrubbing unusable                                | Measure at step 5 on a pyramidal BigTIFF fixture. If partial rendering is needed, extend `/render` with region parameters.                                                                                                                                            |
+| Large stores blow past disk limits                                         | Enforce limits in `create_ome_image` through the settings layer, never ad hoc; cover with the 413 test in step 4.                                                                                                                                                     |
+| RGB projection loses information needed for accuracy                       | Accepted for v1. The projection is a fixed, deterministic mapping (§3.6.1), decoupled from the mutable `OmeChannelView`, and recorded per-image and per-revision so it can be compared fairly against future N-channel training.                                      |
+| Full-plane inference exceeds available memory                              | Bound aggregate projected OME output bytes with `INFERENCE_OME_MAX_BYTES` and requested plane count with `INFERENCE_MEDIA_LIMIT`; decode/project bounded regions. These limits exclude model/decoder memory and are per request, so reserve headroom for concurrency. |
+| Small objects disappear when a large plane is resized for inference        | Keep level-zero input consistent with training; do not silently switch pyramid levels. XY crops and overlap-aware tiled inference need a separate coordinate/sampling/merging design.                                                                                 |
+| Downgrade path with OME media present                                      | Downgrade refuses to run if any `ome_image` row exists; documented in [`migration-guidelines.md`](migration-guidelines.md).                                                                                                                                           |
 
 ---
 
@@ -894,3 +947,4 @@ migration, no API break.
 - UI implementation (separate workstream; this document fixes the contract it consumes).
 - Full-fidelity dataset export/import of OME media — export/import carries materialized PNGs and annotations only.
 - SAM embeddings for OME media, including changes to `get_media_embeddings()`.
+- XY-region prediction, pyramid-level inference and overlap-aware tiled full-plane inference.
