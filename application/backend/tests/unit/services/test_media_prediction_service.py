@@ -18,11 +18,13 @@ from app.models import (
 )
 from app.models.media import (
     Image,
+    IndexRange,
     MediaListPredictionRequest,
     MediaPredictionRequest,
     MediaType,
     OmeImage,
     OmePlane,
+    PlaneRange,
     VideoFrame,
     VideoRange,
 )
@@ -31,6 +33,39 @@ from app.services import DatasetService, LabelService, MediaPredictionService, M
 from app.services.inference import InferenceServer
 from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_prediction_service import Frame, LoadedMedia
+
+
+@pytest.mark.parametrize(
+    "range_type, fields", [(IndexRange, {"start": 2, "end": 9}), (VideoRange, {"start_frame": 2, "end_frame": 9})]
+)
+def test_index_ranges_share_logic_and_preserve_wire_names(range_type, fields):
+    selection = range_type(**fields, stride=3)
+    assert list(selection.indexes) == [2, 5, 8]
+    assert selection.count == 3
+    assert selection.model_dump(mode="json") == {**fields, "stride": 3}
+    if isinstance(selection, VideoRange):
+        assert selection.start_frame == 2
+        assert selection.end_frame == 9
+
+
+def test_nested_prediction_ranges_keep_video_and_axis_field_names():
+    video = MediaPredictionRequest(media_id=uuid4(), range=VideoRange(start_frame=2, end_frame=9, stride=3))
+    plane = MediaPredictionRequest(media_id=uuid4(), plane_range=PlaneRange(z=IndexRange(start=2, end=9, stride=3)))
+    assert video.model_dump(mode="json")["range"] == {"start_frame": 2, "end_frame": 9, "stride": 3}
+    assert plane.model_dump(mode="json")["plane_range"]["z"] == {"start": 2, "end": 9, "stride": 3}
+    assert MediaPredictionRequest.model_validate(video.model_dump(mode="json")) == video
+    assert MediaPredictionRequest.model_validate(plane.model_dump(mode="json")) == plane
+    schema = MediaPredictionRequest.model_json_schema()
+    assert set(schema["$defs"]["VideoRange"]["properties"]) == {"start_frame", "end_frame", "stride"}
+    assert set(schema["$defs"]["IndexRange"]["properties"]) == {"start", "end", "stride"}
+
+
+@pytest.mark.parametrize(
+    "range_type, names", [(IndexRange, ("start", "end")), (VideoRange, ("start_frame", "end_frame"))]
+)
+def test_index_ranges_share_endpoint_validation(range_type, names):
+    with pytest.raises(ValueError, match=rf"{names[1]} \(2\) must be >= {names[0]} \(3\)"):
+        range_type(**{names[0]: 3, names[1]: 2}, stride=1)
 
 
 class TestMediaPredictionServiceUnit:
@@ -73,18 +108,113 @@ class TestMediaPredictionServiceUnit:
 
         return _create_media_prediction_service
 
-    @pytest.mark.parametrize("media_type", [MediaType.OME_IMAGE, MediaType.OME_PLANE])
-    def test_ome_container_prediction_is_not_supported(
-        self, fxt_media_prediction_service, fxt_media_service, media_type
-    ):
+    def test_ome_container_prediction_requires_plane_range(self, fxt_media_prediction_service, fxt_media_service):
         project = MagicMock(spec=Project, id=uuid4())
-        media = MagicMock(spec=OmeImage if media_type == MediaType.OME_IMAGE else OmePlane, id=uuid4(), type=media_type)
+        media = MagicMock(spec=OmeImage, id=uuid4(), type=MediaType.OME_IMAGE)
         fxt_media_service.get_media_by_ids.return_value = [media]
         request = MediaListPredictionRequest(
             model_id=uuid4(), media=[MediaPredictionRequest(media_id=media.id, range=None)], device="cpu"
         )
-        with pytest.raises(ValueError, match="OME plane prediction"):
+        with pytest.raises(ValueError, match="require a plane_range"):
             fxt_media_prediction_service()._load_media(project, request)
+
+    @pytest.mark.parametrize("media_type", [MediaType.IMAGE, MediaType.VIDEO, MediaType.OME_PLANE])
+    def test_plane_range_rejects_non_containers(self, fxt_media_prediction_service, fxt_media_service, media_type):
+        model = {MediaType.IMAGE: Image, MediaType.VIDEO: Video, MediaType.OME_PLANE: OmePlane}[media_type]
+        media = MagicMock(spec=model, id=uuid4(), type=media_type)
+        fxt_media_service.get_media_by_ids.return_value = [media]
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[MediaPredictionRequest(media_id=media.id, plane_range=PlaneRange())], device="cpu"
+        )
+        with pytest.raises(ValueError, match="only for OME images"):
+            fxt_media_prediction_service()._load_media(MagicMock(spec=Project, id=uuid4()), request)
+
+    def test_registered_plane_is_single_media(self, fxt_media_prediction_service, fxt_media_service):
+        media = MagicMock(spec=OmePlane, id=uuid4(), type=MediaType.OME_PLANE)
+        fxt_media_service.get_media_by_ids.return_value = [media]
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[MediaPredictionRequest(media_id=media.id)], device="cpu"
+        )
+        assert fxt_media_prediction_service()._load_media(MagicMock(spec=Project, id=uuid4()), request) == LoadedMedia(
+            single_media=[media], video_frames={}
+        )
+
+    def test_load_plane_range_with_stride(self, fxt_media_prediction_service, fxt_media_service):
+        project = MagicMock(spec=Project, id=uuid4())
+        image = MagicMock(spec=OmeImage, id=uuid4(), type=MediaType.OME_IMAGE)
+        fxt_media_service.get_media_by_ids.return_value = [image]
+        selection = PlaneRange(
+            z=IndexRange(start=1, end=5, stride=2),
+            t=IndexRange(start=0, end=2, stride=2),
+        )
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[MediaPredictionRequest(media_id=image.id, plane_range=selection)], device="cpu"
+        )
+        result = fxt_media_prediction_service(5)._load_media(project, request)
+        assert result.ome_planes == {image: [(1, 0), (3, 0), (5, 0), (1, 2), (3, 2), (5, 2)]}
+        fxt_media_service.validate_ome_plane_selection.assert_called_once_with(project.id, image.id, z=5, t=2)
+
+    @pytest.mark.parametrize(
+        ("selection", "expected"),
+        [
+            (PlaneRange(), [(0, 0)]),
+            (PlaneRange(z=IndexRange(start=2, end=4, stride=2)), [(2, 0), (4, 0)]),
+            (PlaneRange(t=IndexRange(start=1, end=3, stride=2)), [(0, 1), (0, 3)]),
+        ],
+    )
+    def test_plane_range_omitted_axes_select_zero(
+        self, fxt_media_prediction_service, fxt_media_service, selection, expected
+    ):
+        image = MagicMock(spec=OmeImage, id=uuid4(), type=MediaType.OME_IMAGE)
+        fxt_media_service.get_media_by_ids.return_value = [image]
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[MediaPredictionRequest(media_id=image.id, plane_range=selection)], device="cpu"
+        )
+        loaded = fxt_media_prediction_service()._load_media(MagicMock(spec=Project, id=uuid4()), request)
+        assert loaded.ome_planes[image] == expected
+        assert request.media[0].count == len(expected)
+
+    def test_plane_range_invalid_endpoint_prevents_loading(
+        self, fxt_media_prediction_service, fxt_media_service, fxt_media_numpy_loader, fxt_inference_server
+    ):
+        image = MagicMock(spec=OmeImage, id=uuid4(), type=MediaType.OME_IMAGE)
+        fxt_media_service.get_media_by_ids.return_value = [image]
+        fxt_media_service.validate_ome_plane_selection.side_effect = ValueError("OME z or t selection is out of range.")
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[
+                MediaPredictionRequest(
+                    media_id=image.id, plane_range=PlaneRange(z=IndexRange(start=0, end=13, stride=5))
+                )
+            ],
+            device="cpu",
+        )
+        with pytest.raises(ValueError, match="out of range"):
+            fxt_media_prediction_service().predict_media(
+                MagicMock(spec=Project, id=uuid4()), request, MagicMock(spec=DeviceInfo)
+            )
+        fxt_media_service.get_plane_binaries.assert_not_called()
+        fxt_media_numpy_loader.load_media_binary.assert_not_called()
+        fxt_inference_server.infer_batch.assert_not_called()
+
+    def test_aggregate_ome_budget_rejects_before_loading(self, fxt_media_prediction_service, fxt_media_service):
+        from app.models.ome import OmeImageMetadata
+
+        project = MagicMock(spec=Project, id=uuid4())
+        image = MagicMock(spec=OmeImage, id=uuid4())
+        info = OmeImageMetadata(
+            size_x=4096,
+            size_y=4096,
+            size_z=8,
+            pixel_type="uint8",
+            dimension_order="XYCZT",
+            channel_projection={"mode": "rgb", "channels": [{"channel": 0, "target": "red"}]},
+        )
+        fxt_media_service.get_ome_image_info.return_value = info
+        loaded = LoadedMedia(single_media=[], video_frames={}, ome_planes={image: [(z, 0) for z in range(6)]})
+        with pytest.raises(ValueError, match="301989888.*268435456"):
+            fxt_media_prediction_service()._convert_to_inference_input(project, loaded)
+        fxt_media_service.get_plane_binaries.assert_not_called()
 
     @pytest.mark.parametrize(
         "index, frame_indexes, inference_keyframe_stride, expected_result",

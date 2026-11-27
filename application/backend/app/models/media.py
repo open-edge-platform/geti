@@ -231,23 +231,92 @@ Media = Annotated[Image | Video | VideoFrame | OmeImage | OmePlane, Field(discri
 MediaAdapter: TypeAdapter[Media] = TypeAdapter(Media)
 
 
-class VideoRange(BaseModel):
-    start_frame: Annotated[int, Field(description="Index of the first frame to predict, inclusive", ge=0)]
-    end_frame: Annotated[int, Field(description="Index of the last frame to predict, inclusive", ge=0)]
+class IndexRange(BaseModel):
+    """An inclusive range of zero-based indexes."""
+
+    start: Annotated[int, Field(description="First index to predict, inclusive", ge=0)]
+    end: Annotated[int, Field(description="Last index to predict, inclusive", ge=0)]
+    stride: Annotated[int, Field(description="Predict every nth index; stride=1 selects every index", ge=1)]
+
+    @model_validator(mode="after")
+    def validate_index_range(self) -> "IndexRange":
+        if self.end < self.start:
+            start_name = type(self).model_fields["start"].alias or "start"
+            end_name = type(self).model_fields["end"].alias or "end"
+            raise ValueError(f"{end_name} ({self.end}) must be >= {start_name} ({self.start})")
+        return self
+
+    @property
+    def indexes(self) -> range:
+        """Return requested indexes without allocating a list."""
+        return range(self.start, self.end + 1, self.stride)
+
+    @property
+    def count(self) -> int:
+        """Count requested indexes without allocating or overflowing a Python range length."""
+        return (self.end - self.start) // self.stride + 1
+
+
+class VideoRange(IndexRange):
+    """An index range preserving the existing video request field names."""
+
+    model_config = ConfigDict(serialize_by_alias=True)
+    start: Annotated[
+        int, Field(alias="start_frame", description="Index of the first frame to predict, inclusive", ge=0)
+    ]
+    end: Annotated[int, Field(alias="end_frame", description="Index of the last frame to predict, inclusive", ge=0)]
     stride: Annotated[
         int, Field(description="Predict every nth frame in the range, e.g. stride=1 means predict every frame", ge=1)
     ]
 
-    @model_validator(mode="after")
-    def validate_frame_range(self) -> "VideoRange":
-        if self.end_frame < self.start_frame:
-            raise ValueError(f"end_frame ({self.end_frame}) must be >= start_frame ({self.start_frame})")
-        return self
+    @property
+    def start_frame(self) -> int:
+        """Return the first requested video frame."""
+        return self.start
+
+    @property
+    def end_frame(self) -> int:
+        """Return the last requested video frame."""
+        return self.end
+
+
+class PlaneRange(BaseModel):
+    """Inclusive Z/T ranges; an omitted axis selects index zero."""
+
+    z: IndexRange | None = None
+    t: IndexRange | None = None
+
+    @property
+    def indexes(self) -> tuple[range, range]:
+        """Return Z and T indexes without allocating plane lists."""
+        return (
+            self.z.indexes if self.z is not None else range(1),
+            self.t.indexes if self.t is not None else range(1),
+        )
+
+    @property
+    def count(self) -> int:
+        """Return the number of planes in the Cartesian product."""
+        return (self.z.count if self.z is not None else 1) * (self.t.count if self.t is not None else 1)
 
 
 class MediaPredictionRequest(BaseModel):
     media_id: UUID
-    range: VideoRange | None
+    range: VideoRange | None = None
+    plane_range: PlaneRange | None = None
+
+    @model_validator(mode="after")
+    def validate_range_selection(self) -> "MediaPredictionRequest":
+        if self.range is not None and self.plane_range is not None:
+            raise ValueError("Specify either range or plane_range, not both.")
+        return self
+
+    @property
+    def count(self) -> int:
+        """Count requested images, frames or planes for the inference limit."""
+        if self.range is not None:
+            return self.range.count
+        return self.plane_range.count if self.plane_range is not None else 1
 
 
 class MediaListPredictionRequest(BaseModel):

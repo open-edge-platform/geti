@@ -767,6 +767,28 @@ class TestInferenceServer:
         )
         assert [e.model_id for e in _cached(server)] == [model_id]
 
+    def test_infer_batch_preserves_distinct_plane_keys(self, tmp_path) -> None:
+        server = InferenceServer(data_dir=tmp_path)
+        model = Mock(spec=Model)
+        entry = _seed_entry(server, model=model)
+        media_id = uuid4()
+        indexes = [(1, 0), (1, 1), (2, 0)]
+        inputs = [
+            BatchInferenceInput(
+                media_id=media_id, z_index=z, t_index=t, data=np.full((8, 10, 3), index, dtype=np.uint8)
+            )
+            for index, (z, t) in enumerate(indexes)
+        ]
+        raw_predictions = [Mock() for _ in inputs]
+        model.infer_batch.return_value = raw_predictions
+        annotations = [[Mock(spec=DatasetItemAnnotation)] for _ in inputs]
+        with patch("app.services.inference.inference_server.convert_prediction", side_effect=annotations) as converter:
+            result = self._infer(server, entry, inputs=inputs)
+        assert result == {(media_id, z, t): annotation for (z, t), annotation in zip(indexes, annotations)}
+        for index, converted in enumerate(converter.call_args_list):
+            assert converted.kwargs["frame_data"] is inputs[index].data
+            assert converted.kwargs["prediction"] is raw_predictions[index]
+
     def test_infer_batch_busy_raises(self, tmp_path, monkeypatch) -> None:
         """A model already busy with another inference makes the request time out."""
         monkeypatch.setattr("app.services.inference.inference_server.LOCK_ACQUIRE_TIMEOUT", 0.1)

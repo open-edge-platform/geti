@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import bisect
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from uuid import UUID
 
 from loguru import logger
@@ -17,8 +17,11 @@ from app.models import (
     Project,
     VideoFrame,
 )
+from app.models.inference import InferenceResultKey
 from app.models.media import Media, MediaListPredictionRequest, MediaType, OmeImage, OmePlane, Video, VideoRange
 from app.models.system import DeviceInfo
+from app.services.ome.projection import projected_plane_bytes
+from app.settings import DEFAULT_OME_INFERENCE_MAX_BYTES
 
 from .base import BaseSessionManagedService, ResourceError, ResourceNotFoundError, ResourceType
 from .inference import InferenceServer
@@ -41,8 +44,9 @@ class VideoRangeError(ResourceError):
 
 @dataclass(frozen=True)
 class LoadedMedia:
-    single_media: list[Image | VideoFrame]
+    single_media: list[Image | VideoFrame | OmePlane]
     video_frames: dict[Video, list[Frame]]
+    ome_planes: dict[OmeImage, list[tuple[int, int]]] = field(default_factory=dict)
 
 
 class MediaPredictionService(BaseSessionManagedService):
@@ -54,6 +58,7 @@ class MediaPredictionService(BaseSessionManagedService):
         inference_keyframe_stride: int,
         media_numpy_loader: MediaNumpyLoader,
         db_session: Session | None = None,
+        ome_max_bytes: int = DEFAULT_OME_INFERENCE_MAX_BYTES,
     ) -> None:
         super().__init__(db_session)
         self._label_service = label_service
@@ -61,6 +66,7 @@ class MediaPredictionService(BaseSessionManagedService):
         self._inference_server = inference_server
         self._inference_keyframe_stride = inference_keyframe_stride
         self._media_numpy_loader = media_numpy_loader
+        self._ome_max_bytes = ome_max_bytes
 
     @staticmethod
     def _is_frame_index_to_infer(index: int, frame_indexes: list[int], inference_keyframe_stride: int) -> bool:
@@ -98,8 +104,9 @@ class MediaPredictionService(BaseSessionManagedService):
         return video_frames
 
     def _load_media(self, project: Project, request: MediaListPredictionRequest) -> LoadedMedia:
-        single_media: list[Image | VideoFrame] = []
+        single_media: list[Image | VideoFrame | OmePlane] = []
         video_frames: dict[Video, list[Frame]] = {}
+        ome_planes: dict[OmeImage, list[tuple[int, int]]] = {}
 
         media_ids: list[UUID] = [media_request.media_id for media_request in request.media]
         media_list = self._media_service.get_media_by_ids(project_id=project.id, media_ids=media_ids)
@@ -109,8 +116,21 @@ class MediaPredictionService(BaseSessionManagedService):
             media = media_dict.get(media_request.media_id, None)
             if media is None:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_request.media_id))
-            if isinstance(media, OmeImage | OmePlane):
-                raise ValueError("OME plane prediction is not available yet.")
+            if media_request.plane_range is not None:
+                if not isinstance(media, OmeImage):
+                    raise ValueError("Plane range can be specified only for OME images.")
+                selection = media_request.plane_range
+                self._media_service.validate_ome_plane_selection(
+                    project.id,
+                    media.id,
+                    z=selection.z.end if selection.z is not None else 0,
+                    t=selection.t.end if selection.t is not None else 0,
+                )
+                z_indexes, t_indexes = selection.indexes
+                ome_planes.setdefault(media, []).extend((z, t) for t in t_indexes for z in z_indexes)
+                continue
+            if isinstance(media, OmeImage):
+                raise ValueError("OME images require a plane_range for predictions.")
             if media_request.range is None:
                 if media.type == MediaType.VIDEO:
                     raise VideoRangeError(
@@ -123,15 +143,45 @@ class MediaPredictionService(BaseSessionManagedService):
                 video_frames[media] = self._load_frame_range(
                     project=project, video=media, video_range=media_request.range
                 )
-        return LoadedMedia(single_media=single_media, video_frames=video_frames)
+        return LoadedMedia(single_media=single_media, video_frames=video_frames, ome_planes=ome_planes)
+
+    def _validate_ome_budget(self, project: Project, loaded_media: LoadedMedia) -> None:
+        """Reject aggregate OME output allocations before decoding any requested media."""
+        parent_counts = {image.id: len(indexes) for image, indexes in loaded_media.ome_planes.items()}
+        for media in loaded_media.single_media:
+            if isinstance(media, OmePlane):
+                parent_counts[media.ome_image_id] = parent_counts.get(media.ome_image_id, 0) + 1
+        size = 0
+        for parent_id, count in parent_counts.items():
+            info = self._media_service.get_ome_image_info(project.id, parent_id)
+            size += count * projected_plane_bytes(info, info.channel_projection)
+        if size > self._ome_max_bytes:
+            raise ValueError(
+                f"OME prediction requires {size} projected pixel bytes, exceeding the "
+                f"{self._ome_max_bytes} byte budget. Reduce the plane range or increase INFERENCE_OME_MAX_BYTES."
+            )
 
     def _convert_to_inference_input(self, project: Project, loaded_media: LoadedMedia) -> list[BatchInferenceInput]:
         inputs: list[BatchInferenceInput] = []
+        self._validate_ome_budget(project, loaded_media)
 
         # Process single media (images and already-saved video frames)
         for single_media in loaded_media.single_media:
             data = self._media_numpy_loader.load_media_binary(project_id=project.id, media=single_media)
-            inputs.append(BatchInferenceInput(media_id=single_media.id, data=data))
+            inputs.append(
+                BatchInferenceInput(
+                    media_id=single_media.id,
+                    data=data,
+                    z_index=single_media.z_index if isinstance(single_media, OmePlane) else None,
+                    t_index=single_media.t_index if isinstance(single_media, OmePlane) else None,
+                )
+            )
+
+        for image, indexes in loaded_media.ome_planes.items():
+            planes = self._media_service.get_plane_binaries(project.id, image, indexes, max_bytes=self._ome_max_bytes)
+            inputs.extend(
+                BatchInferenceInput(media_id=image.id, data=planes[z, t], z_index=z, t_index=t) for z, t in indexes
+            )
 
         for video in loaded_media.video_frames:
             frames = loaded_media.video_frames[video]
@@ -172,14 +222,26 @@ class MediaPredictionService(BaseSessionManagedService):
         return before if (frame_index - before) <= (after - frame_index) else after
 
     def _convert_result(
-        self, loaded_media: LoadedMedia, inference_result: dict[tuple[UUID, int | None], list[DatasetItemAnnotation]]
+        self, loaded_media: LoadedMedia, inference_result: dict[InferenceResultKey, list[DatasetItemAnnotation]]
     ) -> BatchInferenceResult:
         predictions: list[BatchInferencePrediction] = []
         for single_media in loaded_media.single_media:
+            z = single_media.z_index if isinstance(single_media, OmePlane) else None
+            t = single_media.t_index if isinstance(single_media, OmePlane) else None
+            key = (single_media.id, z, t) if z is not None and t is not None else (single_media.id, None)
             predictions.append(
                 BatchInferencePrediction(
-                    media=BatchInferenceMedia(id=single_media.id), prediction=inference_result[(single_media.id, None)]
+                    media=BatchInferenceMedia(id=single_media.id, z_index=z, t_index=t),
+                    prediction=inference_result[key],
                 )
+            )
+        for image, indexes in loaded_media.ome_planes.items():
+            predictions.extend(
+                BatchInferencePrediction(
+                    media=BatchInferenceMedia(id=image.id, z_index=z, t_index=t),
+                    prediction=inference_result[image.id, z, t],
+                )
+                for z, t in indexes
             )
         for video in loaded_media.video_frames:
             frames = loaded_media.video_frames[video]
@@ -212,9 +274,10 @@ class MediaPredictionService(BaseSessionManagedService):
         device: DeviceInfo,
     ) -> BatchInferenceResult:
         """
-        Perform batch inference for a number of media. Media can be an image, annotated frame or video frame range.
+        Perform batch inference for images, registered frames/planes, video ranges or OME Z/T ranges.
         Method loads media metadata and binaries with extracting frames from video if needed and passes
-        binaries to the inference service.
+        binaries to the inference service. OME planes use level-zero training projections; every
+        requested plane is inferred independently, without video keyframe interpolation.
 
         Args:
             project: Project object containing project information.

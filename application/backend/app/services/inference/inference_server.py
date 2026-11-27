@@ -12,7 +12,7 @@ from loguru import logger
 
 from app.db import get_db_session
 from app.models import BatchInferenceInput, DatasetItemAnnotation, Label
-from app.models.inference import InferenceModel, InferenceState, InferenceStatus
+from app.models.inference import InferenceModel, InferenceResultKey, InferenceState, InferenceStatus
 from app.models.model_revision import ModelFormat, ModelPrecision
 from app.models.system import DeviceInfo
 from app.services.base import ResourceNotFoundError, ResourceType
@@ -508,7 +508,7 @@ class InferenceServer:
         inputs: list[BatchInferenceInput],
         model_variant_id: UUID | None = None,
         confidence_threshold: float | None = None,
-    ) -> dict[tuple[UUID, int | None], list[DatasetItemAnnotation]]:
+    ) -> dict[InferenceResultKey, list[DatasetItemAnnotation]]:
         """
         Perform batch inference on the provided inputs, loading the requested model if it is not cached yet.
 
@@ -526,7 +526,7 @@ class InferenceServer:
                 When None, the model keeps the threshold it is currently using.
 
         Returns:
-            Dictionary mapping (media_id, frame_index) tuples to lists of DatasetItemAnnotation predictions.
+            Predictions keyed by (media_id, frame_index) or (media_id, z_index, t_index).
 
         Raises:
             InferenceBusyError: if the model could not be leased, or is busy with another inference.
@@ -552,9 +552,7 @@ class InferenceServer:
             self._release(entry)
 
         return {
-            (input.media_id, input.frame_index): convert_prediction(
-                labels=labels, frame_data=input_data[idx], prediction=inference_result[idx]
-            )
+            input.key: convert_prediction(labels=labels, frame_data=input_data[idx], prediction=inference_result[idx])
             for idx, input in enumerate(inputs)
         }
 

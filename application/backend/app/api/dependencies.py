@@ -290,10 +290,13 @@ def get_media_service(
 
 
 def get_media_numpy_loader(
+    request: Request,
     media_service: Annotated[MediaService, Depends(get_media_service)],
 ) -> MediaNumpyLoader:
     """Provides a MediaNumpyLoader instance."""
-    return MediaNumpyLoader(media_service=media_service)
+    return MediaNumpyLoader(
+        media_service=media_service, ome_max_bytes=request.app.state.settings.inference_ome_max_bytes
+    )
 
 
 def get_ome_rendering_service(
@@ -313,6 +316,7 @@ def get_dataset_service(
 
 
 def get_media_prediction_service(
+    request: Request,
     label_service: Annotated[LabelService, Depends(get_label_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
     inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
@@ -328,6 +332,7 @@ def get_media_prediction_service(
         inference_keyframe_stride=inference_keyframe_stride,
         media_numpy_loader=media_numpy_loader,
         db_session=db,
+        ome_max_bytes=request.app.state.settings.inference_ome_max_bytes,
     )
 
 

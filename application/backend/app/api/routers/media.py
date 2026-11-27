@@ -884,7 +884,7 @@ def delete_media_annotation(
 MEDIA_PREDICT_RESPONSES: dict[int | str, dict[str, Any]] = {
     status.HTTP_200_OK: {"description": "Media predictions are calculated"},
     status.HTTP_400_BAD_REQUEST: {
-        "description": "Missing frame range, range is specified for non-video media, or media inference limit exceeded"
+        "description": "Invalid frame/plane selection, unreadable OME pixels, or inference count/pixel budget exceeded"
     },
     status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
     status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -906,16 +906,7 @@ def media_predict(
     system_service: Annotated[SystemService, Depends(get_system_service)],
 ) -> BatchInferenceResult:
     """Get predictions for media."""
-    items_count = sum(
-        [
-            1
-            if media_request.range is None
-            else len(
-                range(media_request.range.start_frame, media_request.range.end_frame + 1, media_request.range.stride)
-            )
-            for media_request in request.media
-        ]
-    )
+    items_count = sum(media_request.count for media_request in request.media)
     if items_count > inference_media_limit:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -932,6 +923,8 @@ def media_predict(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except BinaryNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except InvalidImageError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except InferenceBusyError as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
     except ValueError as e:

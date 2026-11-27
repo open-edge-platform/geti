@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import Annotated
 from uuid import UUID
 
 import numpy as np
@@ -11,18 +12,31 @@ from pydantic import BaseModel, Field
 from app.models import DatasetItemAnnotation
 from app.models.system import DeviceInfo
 
+type InferenceResultKey = tuple[UUID, int | None] | tuple[UUID, int, int]
+
 
 @dataclass(frozen=True)
 class BatchInferenceInput:
     media_id: UUID
     data: np.ndarray
     frame_index: int | None = None
+    z_index: int | None = None
+    t_index: int | None = None
+
+    @property
+    def key(self) -> InferenceResultKey:
+        """Identify a plane without changing existing image/video result keys."""
+        if self.z_index is not None and self.t_index is not None:
+            return self.media_id, self.z_index, self.t_index
+        return self.media_id, self.frame_index
 
 
 @dataclass(frozen=True)
 class BatchInferenceMedia:
     id: UUID
     frame_index: int | None = None
+    z_index: Annotated[int | None, Field(exclude_if=lambda value: value is None)] = None
+    t_index: Annotated[int | None, Field(exclude_if=lambda value: value is None)] = None
 
 
 @dataclass(frozen=True)

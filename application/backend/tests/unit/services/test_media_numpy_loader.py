@@ -1,14 +1,17 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import cv2
 import numpy as np
 import pytest
 
-from app.models.media import Media
+from app.models import MediaStorage
+from app.models.media import Media, OmeImage
+from app.models.ome import OmeImageMetadata
+from app.services.base import InvalidImageError
 from app.services.media_numpy_loader import BinaryNotFoundError, MediaNumpyLoader
 from app.services.media_service import MediaService
 
@@ -82,3 +85,54 @@ class TestMediaNumpyLoader:
 
         with pytest.raises(BinaryNotFoundError):
             fxt_loader.load_media_binary(project_id=uuid4(), media=fxt_media)
+
+    def test_ome_container_requires_selection(self, fxt_loader, fxt_media_service):
+        with pytest.raises(ValueError, match="explicit plane selection"):
+            fxt_loader.load_media_binary(uuid4(), MagicMock(spec=OmeImage))
+        fxt_media_service.get_media_binary_path.assert_not_called()
+
+    @pytest.mark.parametrize("failure", [False, True])
+    def test_full_plane_uses_bounded_reads_and_closes_reader(self, tmp_path, failure):
+        service = MediaService(tmp_path)
+        info = OmeImageMetadata(
+            size_x=4096,
+            size_y=4096,
+            pixel_type="uint16",
+            dimension_order="XYCZT",
+            channel_projection={"mode": "rgb", "channels": [{"channel": 0, "target": "blue"}]},
+        )
+        image = MagicMock(spec=OmeImage, id=uuid4())
+        source = tmp_path / "source.ome.tiff"
+        source.touch()
+        handle = MagicMock()
+        handle.__enter__.return_value = handle
+        regions = []
+
+        def read_region(*, level, region, z, t, channels):
+            assert level == 0 and (z, t) == (0, 0)
+            assert channels == (0,)
+            assert region.height <= 256 and region.width * region.height <= 1048576
+            regions.append(region)
+            if failure:
+                return np.zeros((1, 1, 1), dtype=np.uint16)
+            return np.full((1, region.height, region.width), 65535, dtype=np.uint16)
+
+        handle.read_region.side_effect = read_region
+        with (
+            patch.object(service, "get_ome_image_info", return_value=info),
+            patch.object(service, "get_media_storage", return_value=MediaStorage(root=source)),
+            patch("app.services.media_service.OmeReaderRegistry") as registry,
+        ):
+            registry.return_value.get_reader.return_value.open.return_value = handle
+            if failure:
+                with pytest.raises(InvalidImageError, match="dimensions"):
+                    service.get_plane_binaries(uuid4(), image, [(0, 0)])
+            else:
+                result = service.get_plane_binaries(uuid4(), image, [(0, 0)])[0, 0]
+                assert result.shape == (4096, 4096, 3)
+                assert result.dtype == np.uint8
+                assert np.all(result[..., :2] == 0)
+                assert np.all(result[..., 2] == 255)
+                assert len(regions) == 16
+            handle.__exit__.assert_called_once()
+            registry.return_value.get_reader.return_value.open.assert_called_once()
