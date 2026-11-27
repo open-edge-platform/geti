@@ -2669,7 +2669,7 @@ wheels = [
 
 [[package]]
 name = "openvino-model-api"
-version = "0.4.7"
+version = "0.5.0"
 source = { editable = "../../libraries/model_api" }
 dependencies = [
     { name = "numpy", marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
@@ -2697,6 +2697,16 @@ requires-dist = [
 provides-extras = ["onnx", "ovms", "huggingface", "examples"]
 
 [package.metadata.requires-dev]
+dev = [
+    { name = "defusedxml" },
+    { name = "httpx" },
+    { name = "onnx" },
+    { name = "onnxruntime" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-mock" },
+    { name = "sympy" },
+]
 docs = [
     { name = "breathe" },
     { name = "graphviz" },
@@ -2708,15 +2718,9 @@ docs = [
     { name = "sphinx-copybutton" },
     { name = "sphinx-design" },
 ]
-tests = [
-    { name = "defusedxml" },
-    { name = "httpx" },
-    { name = "onnx" },
-    { name = "onnxruntime" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-mock" },
-    { name = "sympy" },
+lint = [
+    { name = "pyrefly", specifier = "~=0.51.0" },
+    { name = "ruff", specifier = "==0.11.13" },
 ]
 yolo-tests = [
     { name = "torch" },
