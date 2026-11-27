@@ -467,3 +467,20 @@ class TestCachedTransformsLabelDtypes:
             result = transform(_make_det_sample(h=32, w=32, n_boxes=2, label_dtype=label_dtype))
         assert result.label.dtype == torch.long
         assert result.label.shape[0] == result.bboxes.shape[0]
+
+
+def test_cache_clone_does_not_upscale_masks_rasterized_below_cache_size() -> None:
+    from types import SimpleNamespace
+
+    from getitune.data.augmentation.cache import _clone_for_cache
+    from getitune.data.augmentation.transforms import CachedMosaic
+
+    sample = SimpleNamespace(
+        image=torch.zeros(3, 4000, 5000),
+        bboxes=torch.zeros((1, 4)),
+        label=torch.zeros(1, dtype=torch.long),
+        masks=torch.zeros((1, 512, 640), dtype=torch.uint8),  # already at the mosaic's letterbox content size
+    )
+    cached = _clone_for_cache(sample, 1024)  # pyrefly: ignore[bad-argument-type]
+    assert tuple(cached.masks.shape[-2:]) == (512, 640)
+    assert CachedMosaic(img_scale=(640, 640)).mask_content_size(4000, 5000) == (512, 640)

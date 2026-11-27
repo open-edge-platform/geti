@@ -67,6 +67,10 @@ class Resize(tvt_v2.Transform):
         self.interpolation = interpolation
         self.antialias = antialias
 
+    def mask_content_size(self, orig_h: int, orig_w: int) -> tuple[int, int]:
+        """Size this transform gives the image content (before padding): where masks can be rasterized directly."""
+        return self._compute_resize_params(orig_h, orig_w)[:2]
+
     def _compute_resize_params(
         self,
         orig_h: int,
@@ -323,6 +327,11 @@ class CachedMosaic(CacheableMixin, tvt_v2.Transform):
         self.translate = translate
         self.area_thr = area_thr
         self._init_cache()
+
+    def mask_content_size(self, orig_h: int, orig_w: int) -> tuple[int, int]:
+        """Size this transform gives the image content (before padding): where masks can be rasterized directly."""
+        scale = min(self.img_scale[0] / orig_h, self.img_scale[1] / orig_w)
+        return round(orig_h * scale), round(orig_w * scale)
 
     def _resize_keep_ratio(self, img: torch.Tensor, target_h: int, target_w: int) -> tuple[torch.Tensor, float]:
         """Resize CHW image keeping aspect ratio (FIT mode). Returns (resized, scale)."""

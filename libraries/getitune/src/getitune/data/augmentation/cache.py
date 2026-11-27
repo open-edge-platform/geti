@@ -58,11 +58,13 @@ def _clone_for_cache(sample: DetectionSample | InstanceSegmentationSample, max_s
         bboxes[:, 0::2] *= new_width / width
         bboxes[:, 1::2] *= new_height / height
         if masks is not None:
-            masks = (
-                F.resize(masks, [new_height, new_width], interpolation=F.InterpolationMode.NEAREST, antialias=False)
-                if masks.numel()
-                else torch.zeros((0, new_height, new_width), dtype=masks.dtype, device=masks.device)
-            )
+            if not masks.numel():
+                masks = torch.zeros((0, new_height, new_width), dtype=masks.dtype, device=masks.device)
+            elif masks.shape[-2] * masks.shape[-1] > new_height * new_width:
+                masks = F.resize(
+                    masks, [new_height, new_width], interpolation=F.InterpolationMode.NEAREST, antialias=False
+                )
+            # else: rasterized below the cache size already; upscaling would only multiply a dense cache's RAM
     else:
         image = sample.image.clone()
         bboxes = sample.bboxes.clone()
