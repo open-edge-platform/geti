@@ -55,8 +55,10 @@ jobs:
               - application/**
               - libraries/getitune/src/**
               - libraries/getidata/src/**
+              - libraries/model_api/src/**
               - libraries/getidata/pyproject.toml
               - libraries/getitune/pyproject.toml
+              - libraries/model_api/pyproject.toml
               - libraries/getitune/uv.lock
               - libraries/getitune/MANIFEST.in
               - .github/workflows/build.yaml

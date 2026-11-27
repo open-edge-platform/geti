@@ -28,6 +28,9 @@
 !libraries/getidata/pyproject.toml
 !libraries/getidata/README.md
 !libraries/getidata/src/getidata
+!libraries/model_api/pyproject.toml
+!libraries/model_api/README.md
+!libraries/model_api/src/model_api
 
 # Exclude non-essential files that sneak in via the above whitelists
 **/__pycache__

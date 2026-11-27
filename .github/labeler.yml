@@ -15,6 +15,11 @@ Geti UI:
   - changed-files:
       - any-glob-to-any-file:
           - "application/ui/**/*"
+        
+Model API:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libraries/model_api/**/*"
 
 TEST:
   - changed-files:

@@ -55,9 +55,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
     --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
+    --mount=type=bind,source=libraries/model_api/pyproject.toml,target=/libraries/model_api/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package getidata --no-install-package av --extra mqtt --extra cpu
+    --no-install-package getidata --no-install-package openvino-model-api --no-install-package av --extra mqtt --extra cpu
 
 # Step 2: Build and install the local getitune package + the project itself.
 # This layer is invalidated by library source changes, but is fast since all
@@ -68,6 +69,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
     --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
+    --mount=type=bind,source=libraries/model_api,target=/libraries/model_api,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cpu
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
@@ -89,9 +91,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
     --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
+    --mount=type=bind,source=libraries/model_api/pyproject.toml,target=/libraries/model_api/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package getidata --no-install-package av --extra mqtt --extra cuda
+    --no-install-package getidata --no-install-package openvino-model-api --no-install-package av --extra mqtt --extra cuda
 
 # Step 2: Build and install the local getitune package + the project itself.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -100,6 +103,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
     --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
+    --mount=type=bind,source=libraries/model_api,target=/libraries/model_api,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cuda
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
@@ -121,9 +125,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune/pyproject.toml,target=/libraries/getitune/pyproject.toml \
     --mount=type=bind,source=libraries/getidata/pyproject.toml,target=/libraries/getidata/pyproject.toml \
+    --mount=type=bind,source=libraries/model_api/pyproject.toml,target=/libraries/model_api/pyproject.toml \
     --mount=type=bind,source=libraries/getitune/src/getitune/__init__.py,target=/libraries/getitune/src/getitune/__init__.py \
     uv sync --frozen --no-dev --no-editable --no-install-project --no-install-workspace \
-    --no-install-package getidata --no-install-package av --extra mqtt --extra xpu
+    --no-install-package getidata --no-install-package openvino-model-api --no-install-package av --extra mqtt --extra xpu
 
 # Step 2: Build and install the local getitune package + the project itself.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -132,6 +137,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
     --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
+    --mount=type=bind,source=libraries/model_api,target=/libraries/model_api,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra xpu
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.

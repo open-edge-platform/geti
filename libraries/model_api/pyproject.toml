@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024-2025 Intel Corporation
+# Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -9,7 +9,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openvino_model_api"
-version = "0.4.7"
+version = "0.5.0"
 requires-python = ">=3.11"
 authors = [
   {name = "Intel(R) Corporation"},
@@ -53,7 +53,7 @@ examples = [
 ]
 
 [dependency-groups]
-tests = [
+dev = [
     "httpx",
     "pytest",
     "pytest-cov",
@@ -62,6 +62,10 @@ tests = [
     "onnx",
     "onnxruntime",
     "sympy",
+]
+lint = [
+    "ruff==0.11.13",
+    "pyrefly~=0.51.0",
 ]
 yolo-tests = [
   "torch",
@@ -83,6 +87,10 @@ docs = [
 Homepage = "https://github.com/open-edge-platform/model_api"
 Documentation = "https://github.com/open-edge-platform/model_api/blob/master/README.md"
 Repository = "https://github.com/open-edge-platform/model_api.git"
+
+[tool.uv]
+default-groups = ["dev", "lint"]
+required-version = "~=0.10.4"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/model_api"]

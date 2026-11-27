@@ -1,0 +1,75 @@
+default_language_version:
+  node: 22.10.0
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      # list of supported hooks: https://pre-commit.com/hooks.html
+      - id: trailing-whitespace
+        files: ^libraries/model_api/
+      - id: end-of-file-fixer
+        files: ^libraries/model_api/
+      - id: check-yaml
+        files: ^libraries/model_api/
+      - id: check-added-large-files
+        files: ^libraries/model_api/
+      - id: debug-statements
+        files: ^libraries/model_api/
+      - id: detect-private-key
+        files: ^libraries/model_api/
+
+  # Ruff version.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.6.2"
+    hooks:
+      # Run the linter.
+      - id: ruff
+        name: ruff
+        args: ["--fix", "--config=libraries/model_api/pyproject.toml"]
+        files: ^libraries/model_api/
+      # Run the formatter
+      - id: ruff-format
+        name: ruff-format
+        args: ["--config=libraries/model_api/pyproject.toml"]
+        files: ^libraries/model_api/
+
+  # python static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.11.2"
+    hooks:
+      - id: mypy
+        name: mypy
+        args: ["--config-file=libraries/model_api/pyproject.toml"]
+        files: ^libraries/model_api/(src|tests|examples)/.*\.py$
+        additional_dependencies: [types-PyYAML, types-setuptools]
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.6.2
+    hooks:
+      - id: prettier
+        files: ^libraries/model_api/
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint
+        files: ^libraries/model_api/
+
+  # add bandit for security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.3
+    hooks:
+      - id: bandit
+        name: bandit
+        args:
+          [
+            "-c",
+            "libraries/model_api/pyproject.toml",
+            "--severity-level",
+            "all",
+            "--confidence-level",
+            "all",
+          ]
+        files: ^libraries/model_api/.*\.py$
+        additional_dependencies: ["bandit[toml]"]

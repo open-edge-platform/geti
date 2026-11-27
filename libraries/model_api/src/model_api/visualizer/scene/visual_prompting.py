@@ -1,6 +1,6 @@
 """Visual Prompting Scene."""
 
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 from model_api.models.result import VisualPromptingResult
