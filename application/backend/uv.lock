@@ -1288,7 +1288,7 @@ requires-dist = [
     { name = "onnxscript", specifier = "==0.6.2" },
     { name = "onnxslim", specifier = "~=0.1.71" },
     { name = "openvino", specifier = "~=2026.4.0" },
-    { name = "openvino-model-api", git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&rev=841a9bf684ce55861430e20245e642cdd9f38bd7" },
+    { name = "openvino-model-api", git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=master" },
     { name = "psutil", marker = "extra == 'benchmark'", specifier = ">=6.0" },
     { name = "pycocotools", specifier = "~=2.0" },
     { name = "pydata-sphinx-theme", marker = "extra == 'docs'", specifier = "==0.12.0" },
@@ -2679,7 +2679,7 @@ wheels = [
 [[package]]
 name = "openvino-model-api"
 version = "0.4.7"
-source = { git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&rev=841a9bf684ce55861430e20245e642cdd9f38bd7#841a9bf684ce55861430e20245e642cdd9f38bd7" }
+source = { git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=master#647b3d5b092604608919d51ce2eba8bf3b792fff" }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
