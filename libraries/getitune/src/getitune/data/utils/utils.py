@@ -288,10 +288,11 @@ def _collect_object_edges(df: Any, box_format: str, normalize: bool) -> np.ndarr
         for polygons in df["polygons"].to_list():
             if polygons is None or len(polygons) == 0:
                 continue
-            points = np.concatenate([np.asarray(p, dtype=np.float64).reshape(-1, 2) for p in polygons])
-            widths = points[:, 0].max() - points[:, 0].min()
-            heights = points[:, 1].max() - points[:, 1].min()
-            edge_values.append(np.array(max(widths, heights, 0.0)))
+            # One edge per polygon (its bounding-box larger side), like the box branch above.
+            rings = [np.asarray(p, dtype=np.float64).reshape(-1, 2) for p in polygons]
+            rings = [ring for ring in rings if len(ring)]
+            if rings:
+                edge_values.append(np.array([max(np.ptp(ring[:, 0]), np.ptp(ring[:, 1])) for ring in rings]))
     if not edge_values:
         return None
     return np.concatenate(edge_values)

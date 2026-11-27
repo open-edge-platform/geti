@@ -49,6 +49,20 @@ def make_dm_subset(
     return SimpleNamespace(df=pl.DataFrame(data), schema=_schema_with_bboxes(box_format, normalize))
 
 
+def make_polygon_subset(polygons: list[list[list[float]]], sizes: list[tuple[int, int]]) -> Any:  # noqa: ANN401
+    """Polygon-only subset (instance segmentation in the app has no ``bboxes`` column); one flat ring per instance."""
+    frame = pl.DataFrame(
+        {
+            "polygons": pl.Series(polygons, dtype=pl.List(pl.List(pl.Float32))),
+            "dm_image_info": pl.Series(
+                [{"width": w, "height": h} for w, h in sizes],
+                dtype=pl.Struct({"width": pl.Int32, "height": pl.Int32}),
+            ),
+        }
+    )
+    return SimpleNamespace(df=frame, schema=SimpleNamespace(attributes={}))
+
+
 class TestAdaptTileConfig:
     """Tests for ``adapt_tile_config``."""
 
@@ -218,3 +232,26 @@ class TestAdaptTileConfig:
         # 100/0.25 = 400, but 400 is not a multiple of 32, so ceil -> 416.
         assert tile_config.tile_size == (416, 416)
         assert tile_config.overlap == 0.25
+
+    def test_polygon_only_subset_uses_one_edge_per_polygon(self) -> None:
+        # Per image: 9 small 30 px squares plus one 200 px square, spread over a 4000x4000 image. The edges are
+        # per object (p50 30, p95 200 -> ceil32(200/0.25)=800); an image-level extent would give ~3500 px.
+        small = [[x, 10.0, x + 30, 10.0, x + 30, 40.0, x, 40.0] for x in range(0, 3600, 400)]
+        big = [[3000.0, 3000.0, 3200.0, 3000.0, 3200.0, 3200.0, 3000.0, 3200.0]]
+        subset = make_polygon_subset([[*small[:9], *big]] * 10, sizes=[(4000, 4000)] * 10)
+        tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400))
+
+        adapt_tile_config(tile_config, subset, input_size=(640, 640))
+
+        assert tile_config.enable_tiler is True
+        assert tile_config.tile_size == (800, 800)
+        assert tile_config.overlap == 0.25
+
+    def test_polygon_subset_without_polygons_keeps_config(self) -> None:
+        subset = make_polygon_subset([[]] * 5, sizes=[(4000, 4000)] * 5)
+        tile_config = TileConfig(enable_tiler=True, tile_size=(400, 400), overlap=0.2)
+
+        adapt_tile_config(tile_config, subset, input_size=(640, 640))
+
+        assert tile_config.tile_size == (400, 400)
+        assert tile_config.overlap == 0.2
