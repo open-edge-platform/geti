@@ -151,6 +151,8 @@ jobs:
           - "3.13"
           - "3.14"
     runs-on: ${{ matrix.os }}
+    needs:
+      - check-paths
     steps:
       - *harden-runner
 
