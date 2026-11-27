@@ -94,7 +94,7 @@ overrides:
           init_args:
             size: $(input_size)
             keep_aspect_ratio: false
-            resize_targets: false
+            resize_targets: true
 
     test_subset:
       batch_size: 4
@@ -103,4 +103,4 @@ overrides:
           init_args:
             size: $(input_size)
             keep_aspect_ratio: false
-            resize_targets: false
+            resize_targets: true

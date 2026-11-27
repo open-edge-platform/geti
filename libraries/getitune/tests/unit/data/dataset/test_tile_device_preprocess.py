@@ -140,3 +140,12 @@ class TestFloatGuard:
 
     def test_float_tiles_pass(self):
         require_float_tiles([[tv_tensors.Image(torch.zeros(3, 8, 8))]])
+
+
+def test_evaluation_tiles_defer_resize_even_when_recipe_rescales_targets():
+    resize = {**RESIZE, "init_args": {**RESIZE["init_args"], "resize_targets": True}}
+    pipeline = CPUAugmentationPipeline.from_config(
+        SubsetConfig(augmentations_cpu=[resize], intensity=IntensityConfig(storage_dtype="uint8"))
+    )
+    assert not pipeline.is_intensity_resize_only()
+    assert pipeline.is_intensity_resize_only(ignore_target_resize=True)

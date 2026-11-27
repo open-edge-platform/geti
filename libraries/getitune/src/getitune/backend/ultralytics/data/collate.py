@@ -122,7 +122,8 @@ def instance_seg_collate_fn(batch: list[dict[str, Any]]) -> dict[str, Any]:
 
         # Build overlap index map: paint instances 1..N (smaller overwrite larger).
         h, w = masks.shape[1], masks.shape[2]
-        index_map = torch.zeros((h, w), dtype=torch.uint8)
+        # uint8 holds 255 instances; dense images (hundreds of objects) need the wider type. The loss only compares.
+        index_map = torch.zeros((h, w), dtype=torch.uint8 if n_inst < 256 else torch.int16)
         for k in range(n_inst):
             index_map[masks[k] > 0] = k + 1
         overlap_maps.append(index_map)

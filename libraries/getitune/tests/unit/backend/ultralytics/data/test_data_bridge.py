@@ -346,3 +346,25 @@ def test_dataset_adapter_handles_uint16_labels_above_255() -> None:
     result = UltralyticsDatasetAdapter(dataset)[0]
     assert result["cls"].dtype == np.float32
     np.testing.assert_array_equal(result["cls"], np.array([[255.0], [299.0]], dtype=np.float32))
+
+
+def test_instance_seg_collate_fn_handles_more_than_255_instances() -> None:
+    n = 300
+    masks = torch.zeros((n, 20, 20), dtype=torch.uint8)
+    for k in range(n):  # one pixel per instance, so none overlaps
+        masks[k, k // 20, k % 20] = 1
+    batch = [
+        {
+            "img": torch.rand(3, 20, 20),
+            "cls": np.zeros((n, 1), dtype=np.float32),
+            "bboxes": np.full((n, 4), 0.1, dtype=np.float32),
+            "masks": masks,
+            "ori_shape": (20, 20),
+            "resized_shape": (20, 20),
+            "ratio_pad": ((1.0, 1.0), (0, 0)),
+            "im_file": "a.jpg",
+        },
+    ]
+    collated = instance_seg_collate_fn(batch)
+    assert int(collated["masks"].max()) == n  # no uint8 overflow
+    assert int((collated["masks"] > 0).sum()) == n

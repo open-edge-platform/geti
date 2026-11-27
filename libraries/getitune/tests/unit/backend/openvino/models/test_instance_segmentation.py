@@ -15,6 +15,7 @@ from getitune.config.data import TileConfig
 from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import PredictionBatch
 from getitune.data.entity.tile import TileBatchData
+from getitune.data.utils.structures.mask.mask_util import RLEMasks, encode_rle
 
 
 class _FakeInstanceSegResult:
@@ -113,6 +114,68 @@ class TestOVInstanceSegmentationModelTiling:
         torch.testing.assert_close(result.labels[0], torch.tensor([1]))  # pyrefly: ignore[unsupported-operation]
         assert result.masks is not None
         assert result.masks[0].shape == (1, 256, 256)  # pyrefly: ignore[unsupported-operation]
+
+    def test_forward_tiles_crops_become_rle_without_dense_masks(self, inst_seg_model, monkeypatch):
+        """Large merged results go straight to RLE, equal to the dense result, and `.masks` is never read."""
+        monkeypatch.setattr("getitune.backend.openvino.models.instance_segmentation.MAX_DENSE_MASK_BYTES", 1)
+        tile_batch = self._make_tile_batch()
+        crop = np.ones((10, 20), dtype=np.uint8)
+        merged = MagicMock()
+        merged.bboxes = np.array([[10, 10, 30, 20]], dtype=np.int32)
+        merged.scores = np.array([0.9], dtype=np.float32)
+        merged.labels = np.array([2], dtype=np.int32)
+        merged.mask_crops = [(crop, 10, 10)]
+        type(merged).masks = property(lambda _: pytest.fail("dense masks were built"))
+        tiler = MagicMock()
+        tiler.predict_tiles.return_value = merged
+        inst_seg_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = inst_seg_model.forward_tiles(tile_batch)
+
+        assert isinstance(result.masks[0], RLEMasks)  # pyrefly: ignore[unsupported-operation]
+        dense = torch.zeros((256, 256), dtype=torch.uint8)
+        dense[10:20, 10:30] = 1
+        assert result.masks[0].rles == [encode_rle(dense.bool())]  # pyrefly: ignore[unsupported-operation]
+
+    def test_small_merged_results_stay_dense(self, inst_seg_model):
+        """Below the dense-size limit, tiled predictions keep tensor masks, as before."""
+        merged = MagicMock()
+        merged.bboxes = np.array([[10, 10, 30, 20]], dtype=np.int32)
+        merged.scores = np.array([0.9], dtype=np.float32)
+        merged.labels = np.array([2], dtype=np.int32)
+        merged.mask_crops = [(np.ones((10, 20), dtype=np.uint8), 10, 10)]
+        merged.masks = np.zeros((1, 256, 256), dtype=np.uint8)
+        tiler = MagicMock()
+        tiler.predict_tiles.return_value = merged
+        inst_seg_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = inst_seg_model.forward_tiles(self._make_tile_batch())
+
+        assert isinstance(result.masks[0], torch.Tensor)  # pyrefly: ignore[unsupported-operation]
+        assert result.masks[0].shape == (1, 256, 256)  # pyrefly: ignore[unsupported-operation]
+
+    def test_predict_step_filters_rle_masks_by_confidence(self, inst_seg_model, monkeypatch):
+        """Tiled predictions carry RLE masks; the confidence filter must keep them aligned with boxes."""
+        monkeypatch.setattr("getitune.backend.openvino.models.instance_segmentation.MAX_DENSE_MASK_BYTES", 1)
+        inst_seg_model.hparams = {"best_confidence_threshold": 0.5}
+        merged = MagicMock()
+        merged.bboxes = np.array([[10, 10, 30, 20], [50, 50, 70, 60]], dtype=np.int32)
+        merged.scores = np.array([0.9, 0.2], dtype=np.float32)
+        merged.labels = np.array([2, 2], dtype=np.int32)
+        merged.mask_crops = [(np.ones((10, 20), dtype=np.uint8), 10, 10), (np.ones((10, 20), dtype=np.uint8), 50, 50)]
+        tiler = MagicMock()
+        tiler.predict_tiles.return_value = merged
+        inst_seg_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = inst_seg_model.predict_step(self._make_tile_batch())
+
+        assert result.scores[0].tolist() == pytest.approx([0.9])  # pyrefly: ignore[unsupported-operation]
+        masks = result.masks[0]  # pyrefly: ignore[unsupported-operation]
+        assert isinstance(masks, RLEMasks)
+        assert len(masks) == 1
+        dense = torch.zeros((256, 256), dtype=torch.bool)
+        dense[10:20, 10:30] = True
+        assert masks.rles == [encode_rle(dense)]
 
     def test_forward_tiles_empty_masks_yield_none(self, inst_seg_model):
         """When no instances survive merging, masks must be reported as None."""

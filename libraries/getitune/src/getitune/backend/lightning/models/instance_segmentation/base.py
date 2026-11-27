@@ -38,7 +38,7 @@ from getitune.data.entity.base import BatchLoss, ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.data.entity.utils import stack_batch
-from getitune.data.utils.structures.mask.mask_util import encode_rle
+from getitune.data.utils.structures.mask.mask_util import RLEMasks, encode_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import FMeasure, MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -46,11 +46,17 @@ from getitune.types.label import LabelInfoTypes
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
-    from getidata.fields import TileInfo
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
     from getitune.types import PathLike
+
+
+def _as_rle(masks: tv_tensors.Mask | RLEMasks) -> list[dict]:
+    """COCO RLE of every instance mask. Masks that are already RLE (large tiled images) pass through."""
+    if isinstance(masks, RLEMasks):
+        return masks.rles
+    return [encode_rle(mask) for mask in masks.data]
 
 
 class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
@@ -121,6 +127,8 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         # InstanceData, which requires all instance-level fields to share length.
         if self.training:
             align_sample_batch_annotations(entity)
+        else:
+            self._keep_eval_predictions_in_input_space(entity)
         if isinstance(entity.images, list):
             entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
         inputs: dict[str, Any] = {}
@@ -129,6 +137,25 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         inputs["mode"] = "loss" if self.training else "predict"
 
         return inputs
+
+    def _keep_eval_predictions_in_input_space(self, entity: SampleBatch) -> None:
+        """Make the heads render predictions in the input canvas when ground truth lives there.
+
+        With ``resize_targets: true`` the GT masks/boxes were resized and padded with the image. Rendering
+        predictions at the original size would cost gigabytes per 4K/8K image and not match the GT anyway, so the
+        batch meta says the "original" image is the input canvas (no rescale). Predict is never touched.
+        """
+        try:
+            if self.trainer.predicting:
+                return
+        except RuntimeError:  # not attached to a Trainer (direct calls)
+            pass
+        for i, img_info in enumerate(entity.imgs_info or []):  # type: ignore[arg-type]
+            gt_masks = entity.masks[i] if entity.masks is not None else None
+            canvas = tuple(img_info.img_shape)  # type: ignore[union-attr]
+            if gt_masks is not None and tuple(gt_masks.shape[-2:]) == canvas != tuple(img_info.ori_shape):  # type: ignore[union-attr]
+                img_info.ori_shape = canvas  # type: ignore[union-attr]
+                img_info.scale_factor = (1.0, 1.0)  # type: ignore[union-attr]
 
     def _customize_outputs(
         self,
@@ -215,8 +242,6 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         Returns:
             TorchPredBatch: Merged instance segmentation prediction.
         """
-        tile_preds: list[PredictionBatch] = []
-        tile_infos: list[list[TileInfo]] = []
         merger = InstanceSegTileMerge(
             inputs.imgs_info,
             self.num_classes,
@@ -228,9 +253,8 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             if isinstance(output, BatchLoss):
                 msg = "Loss output is not supported for tile merging"
                 raise TypeError(msg)
-            tile_preds.append(output)
-            tile_infos.append(batch_tile_infos)
-        pred_entities = merger.merge(tile_preds, tile_infos)
+            merger.add(output, batch_tile_infos)  # reduces the dense tile masks right away
+        pred_entities = merger.finalize()
 
         pred_entity = PredictionBatch(
             images=[pred_entity.image for pred_entity in pred_entities],
@@ -424,10 +448,12 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             bboxes.append(_bboxes[filtered_idx])
             labels.append(_labels[filtered_idx])
 
-            if _masks is not None:
+            if isinstance(_masks, RLEMasks):
+                masks.append(_masks[filtered_idx[0]])
+            elif _masks is not None:
                 # Ensure filtered_idx is on the same device as masks
                 mask_filtered_idx = tuple(idx.to(_masks.device) for idx in filtered_idx)
-                masks.append(_masks[mask_filtered_idx])
+                masks.append(_masks[mask_filtered_idx])  # pyrefly: ignore[bad-argument-type]
 
         outputs.scores = scores
         outputs.bboxes = bboxes
@@ -462,7 +488,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             pred_info.append(
                 {
                     "boxes": bboxes.data,
-                    "masks": [encode_rle(mask) for mask in masks.data],
+                    "masks": _as_rle(masks),  # pyrefly: ignore[bad-argument-type]
                     "scores": scores,
                     "labels": labels,
                 },
@@ -476,7 +502,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             if masks is None:
                 msg = "Masks are required for metric computation"
                 raise ValueError(msg)
-            rles = [encode_rle(mask) for mask in masks.data]
+            rles = _as_rle(masks)
             target_info.append(
                 {
                     "boxes": bboxes.data,

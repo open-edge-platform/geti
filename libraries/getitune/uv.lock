@@ -3884,7 +3884,7 @@ wheels = [
 [[package]]
 name = "openvino-model-api"
 version = "0.4.7"
-source = { git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=master#379da1fa1ff4b9d5cc29016e531edcfcde883eb3" }
+source = { git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=master#647b3d5b092604608919d51ce2eba8bf3b792fff" }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python-headless" },

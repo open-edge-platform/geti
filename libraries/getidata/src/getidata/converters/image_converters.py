@@ -1,5 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import os
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Any
 
@@ -18,6 +20,13 @@ from getidata.type_registry import polars_to_numpy_dtype
 
 # Mapping from numpy dtype to Polars dtype for image data.
 # Used by converters that load/decode images to detect and preserve bit depth.
+# Tiled datasets read the same large source image once per tile. Keeping the last few decoded images of a process,
+# as the polars Series the converter returns (immutable, so shared without a copy), makes repeat reads free.
+# Bounded by entry count and per-image size so memory stays predictable.
+_DECODED_CACHE_ENTRIES = 2
+_DECODED_CACHE_MAX_BYTES = 256 * 1024 * 1024
+_decoded_cache: OrderedDict[tuple, tuple[pl.Series, pl.Series, pl.DataType]] = OrderedDict()
+
 _NUMPY_TO_POLARS_DTYPE: dict[np.dtype, pl.DataType] = {
     np.dtype(np.uint8): pl.UInt8(),
     np.dtype(np.uint16): pl.UInt16(),
@@ -348,6 +357,14 @@ class ImagePathToImageConverter(MediaBridgeConverter):
 
         return img_array
 
+    @staticmethod
+    def _cache_key(path: str, output_format: str) -> tuple | None:
+        try:
+            stat = os.stat(path)
+        except OSError:
+            return None
+        return (path, stat.st_mtime_ns, stat.st_size, output_format)
+
     def convert(self, df: pl.DataFrame) -> pl.DataFrame:
         """
         Convert image paths to loaded image tensors and image info.
@@ -361,6 +378,14 @@ class ImagePathToImageConverter(MediaBridgeConverter):
         input_col = self.input_path.name
         output_col = self.output_image.name
         output_format = self.output_image.field.format
+
+        key = self._cache_key(str(df[input_col][0]), output_format) if len(df) == 1 else None
+        hit = _decoded_cache.get(key) if key is not None else None
+        if key is not None and hit is not None:
+            _decoded_cache.move_to_end(key)
+            image_series, shape_series, actual_polars_dtype = hit
+            self._set_output_dtype(actual_polars_dtype)
+            return df.clone().with_columns([image_series.alias(output_col), shape_series.alias(output_col + "_shape")])
 
         # Load images from paths
         image_data: list[Any] = []
@@ -389,31 +414,35 @@ class ImagePathToImageConverter(MediaBridgeConverter):
 
         # Detect actual dtype from loaded images and update the output field
         # to match. This handles 16-bit (uint16), 32-bit (float32), etc.
+        actual_polars_dtype = None
         if image_data:
-            actual_numpy_dtype = image_data[0].dtype
-            actual_polars_dtype = _NUMPY_TO_POLARS_DTYPE.get(actual_numpy_dtype)
-            if actual_polars_dtype is not None and actual_polars_dtype != self.output_image.field.dtype:
-                self.output_image = AttributeSpec(
-                    name=self.output_image.name,
-                    field=ImageField(
-                        semantic=self.output_image.field.semantic,
-                        dtype=actual_polars_dtype,
-                        format=self.output_image.field.format,
-                        channels_first=self.output_image.field.channels_first,
-                    ),
-                )
+            actual_polars_dtype = _NUMPY_TO_POLARS_DTYPE.get(image_data[0].dtype)
+            if actual_polars_dtype is not None:
+                self._set_output_dtype(actual_polars_dtype)
 
         # Create output DataFrame
         image_schema = self.output_image.field.to_polars_schema("image")
+        image_series = pl.Series(output_col, image_data, dtype=image_schema["image"])
+        shape_series = pl.Series(output_col + "_shape", image_shapes, dtype=image_schema["image_shape"])
 
-        result_df = df.clone()
+        if key and actual_polars_dtype is not None and image_data[0].nbytes <= _DECODED_CACHE_MAX_BYTES:
+            _decoded_cache[key] = (image_series, shape_series, actual_polars_dtype)
+            while len(_decoded_cache) > _DECODED_CACHE_ENTRIES:
+                _decoded_cache.popitem(last=False)
 
-        return result_df.with_columns(
-            [
-                pl.Series(output_col, image_data, dtype=image_schema["image"]),
-                pl.Series(output_col + "_shape", image_shapes, dtype=image_schema["image_shape"]),
-            ]
-        )
+        return df.clone().with_columns([image_series, shape_series])
+
+    def _set_output_dtype(self, polars_dtype: pl.DataType) -> None:
+        if polars_dtype != self.output_image.field.dtype:
+            self.output_image = AttributeSpec(
+                name=self.output_image.name,
+                field=ImageField(
+                    semantic=self.output_image.field.semantic,
+                    dtype=polars_dtype,
+                    format=self.output_image.field.format,
+                    channels_first=self.output_image.field.channels_first,
+                ),
+            )
 
 
 @converter

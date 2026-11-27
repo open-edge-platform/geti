@@ -402,3 +402,58 @@ class TestRFDETRInst:
             ]
         )
         torch.testing.assert_close(target["boxes"][0].cpu(), exp_cxcywh, rtol=1e-4, atol=1e-4)
+
+
+class TestEvalTargetShapes:
+    """Predictions follow the space ground-truth masks live in, so the metric never compares mismatched sizes."""
+
+    @staticmethod
+    def _batch(gt_hw: tuple[int, int] | None) -> object:
+        from types import SimpleNamespace
+
+        info = SimpleNamespace(ori_shape=(4000, 6000), img_shape=(640, 640))
+        masks = None if gt_hw is None else [torch.zeros((2, *gt_hw), dtype=torch.bool)]
+        return SimpleNamespace(imgs_info=[info], masks=masks)
+
+    @pytest.mark.parametrize(
+        ("gt_hw", "predicting", "expected"),
+        [
+            ((640, 640), False, (640, 640)),  # GT resized with the image: stay in input space
+            ((4000, 6000), False, (4000, 6000)),  # GT at original size: legacy behaviour
+            (None, False, (4000, 6000)),  # no GT
+            ((640, 640), True, (4000, 6000)),  # predict always returns original coordinates
+        ],
+    )
+    def test_shapes(self, gt_hw, predicting, expected) -> None:
+        from types import SimpleNamespace
+
+        model = SimpleNamespace(trainer=SimpleNamespace(predicting=predicting))
+        assert RFDETRMixin._eval_target_shapes(model, self._batch(gt_hw)) == [expected]  # type: ignore[arg-type]
+
+
+class TestMaskRCNNEvalMeta:
+    """Mask R-CNN style heads render predictions where the GT masks live (no rescale to the original size)."""
+
+    @pytest.mark.parametrize(
+        ("gt_hw", "expected_ori", "expected_scale"),
+        [
+            ((640, 640), (640, 640), (1.0, 1.0)),  # GT resized and padded with the image
+            ((4000, 6000), (4000, 6000), (0.1, 0.1)),  # GT at original size: untouched
+        ],
+    )
+    def test_meta(self, gt_hw, expected_ori, expected_scale) -> None:
+        from types import SimpleNamespace
+
+        from getitune.backend.lightning.models.instance_segmentation.base import LightningInstanceSegModel
+
+        info = SimpleNamespace(ori_shape=(4000, 6000), img_shape=(640, 640), scale_factor=(0.1, 0.1))
+        entity = SimpleNamespace(imgs_info=[info], masks=[torch.zeros((1, *gt_hw), dtype=torch.bool)])
+
+        class _Detached:  # a LightningModule outside of a Trainer raises on ``.trainer``
+            @property
+            def trainer(self) -> None:
+                msg = "not attached to a Trainer"
+                raise RuntimeError(msg)
+
+        LightningInstanceSegModel._keep_eval_predictions_in_input_space(_Detached(), entity)  # type: ignore[arg-type]
+        assert (info.ori_shape, info.scale_factor) == (expected_ori, expected_scale)

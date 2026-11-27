@@ -73,7 +73,8 @@ def test_full_image_mask_recipe_consistency(recipe_name: str) -> None:
                 f"{recipe_name}: {subset_name} Resize must not preserve aspect ratio"
             )
             if subset_name != "train_subset":
-                assert resize["init_args"].get("resize_targets") is False
+                # GT is resized with the image: dense full-size GT masks of 4K/8K images blow up host RAM
+                assert resize["init_args"].get("resize_targets") is True
 
         # the GPU-side augs of the shared base (flip + normalize) must survive
         gpu_paths = [aug.get("class_path", "") for aug in subset.get("augmentations_gpu", [])]

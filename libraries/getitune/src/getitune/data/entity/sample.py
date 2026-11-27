@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
+import numpy as np
 import polars as pl
 import torch
 from getidata import register_sample
@@ -22,6 +23,7 @@ from getidata.fields import (
     keypoints_field,
     label_field,
     mask_field,
+    polygon_field,
     subset_field,
 )
 from torchvision import tv_tensors
@@ -40,6 +42,7 @@ from getitune.data.entity.validation import (
     validate_masks,
     validate_scores,
 )
+from getitune.data.utils.structures.mask.mask_util import polygon_to_bitmap
 
 if TYPE_CHECKING:
     from torchvision.tv_tensors import BoundingBoxes, Mask
@@ -203,6 +206,77 @@ class InstanceSegmentationSample(BaseSample):
             img_shape=shape,
             ori_shape=shape,
         )
+
+
+class InstanceSegmentationPolygonSample(BaseSample):
+    """Instance segmentation sample that keeps polygons instead of dense masks.
+
+    Tiling this form clips the polygons per tile, so masks are rasterized at tile size afterwards. Tiling dense masks
+    would first rasterize every instance at the size of the whole image: gigabytes for a 20 MP image.
+    """
+
+    subset: Subset = subset_field()
+    image: tv_tensors.Image | torch.Tensor = image_field(dtype=pl.UInt8(), channels_first=True)
+    bboxes: tv_tensors.BoundingBoxes | torch.Tensor = bbox_field(dtype=pl.Float32())
+    polygons: np.ndarray | None = polygon_field(dtype=pl.Float32())
+    label: torch.Tensor | None = label_field(dtype=pl.UInt16(), is_list=True)
+    dm_image_info: DmImageInfo = image_info_field()
+
+    def __post_init__(self) -> None:
+        shape = (self.dm_image_info.height, self.dm_image_info.width)
+        if self.label is None:
+            self.label = torch.zeros(0, dtype=torch.uint16)
+        if not isinstance(self.bboxes, tv_tensors.BoundingBoxes):
+            bboxes = self.bboxes if self.bboxes is not None else torch.zeros((0, 4), dtype=torch.float32)
+            self.bboxes = tv_tensors.BoundingBoxes(
+                bboxes.reshape(-1, 4),
+                format=tv_tensors.BoundingBoxFormat.XYXY,
+                canvas_size=shape,
+                dtype=torch.float32,
+            )
+        self.img_info = ImageInfo(img_idx=0, img_shape=shape, ori_shape=shape)
+
+    def to_instance_segmentation_sample(
+        self,
+        with_annotations: bool = True,
+        mask_size: tuple[int, int] | None = None,
+    ) -> InstanceSegmentationSample:
+        """Build the regular sample, rasterizing the polygons at this sample's own size.
+
+        Args:
+            with_annotations: Keep boxes, labels and masks. Tiles that are only run through a model carry no
+                annotations, which also skips the rasterization.
+            mask_size: ``(height, width)`` to rasterize at instead of the image size. Only for pipelines whose first
+                spatial transform resizes the masks to a fixed size anyway: a 20 MP image with a few hundred
+                instances would otherwise be rasterized at full size first (gigabytes) just to be shrunk.
+        """
+        height, width = self.dm_image_info.height, self.dm_image_info.width
+        bboxes, label = self.bboxes, self.label
+        if with_annotations and self.polygons is not None and len(self.polygons) > 0:
+            polygons, mask_h, mask_w = self.polygons, height, width
+            if mask_size is not None and mask_size != (height, width):
+                mask_h, mask_w = mask_size
+                factor = np.array([mask_w / width, mask_h / height], dtype=np.float32)
+                polygons = np.empty(len(self.polygons), dtype=object)
+                for i, polygon in enumerate(self.polygons):
+                    polygons[i] = np.asarray(polygon, dtype=np.float32) * factor
+            masks = torch.from_numpy(polygon_to_bitmap(polygons, mask_h, mask_w).astype("uint8"))
+        else:
+            masks = torch.zeros((0, *(mask_size or (height, width))), dtype=torch.uint8)
+        if not with_annotations:
+            bboxes = torch.zeros((0, 4), dtype=torch.float32)
+            label = torch.zeros(0, dtype=torch.uint16)
+        sample = InstanceSegmentationSample(
+            subset=self.subset,
+            image=self.image,
+            bboxes=bboxes,
+            masks=tv_tensors.Mask(masks),
+            label=label,
+            dm_image_info=self.dm_image_info,
+        )
+        if (tile := getattr(self, "tile", None)) is not None:
+            object.__setattr__(sample, "tile", tile)
+        return sample
 
 
 @register_pytree_node

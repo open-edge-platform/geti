@@ -6,6 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import numpy as np
 import pytest
 from importlib_resources import files
 from lightning.pytorch.loggers import CSVLogger
@@ -14,6 +15,7 @@ from torchvision.transforms.v2 import Normalize
 
 from getitune.config.data import (
     IntensityConfig,
+    SamplerConfig,
     SubsetConfig,
     TileConfig,
 )
@@ -23,6 +25,7 @@ from getitune.data.module import (
     DeviceType,
     TaskType,
 )
+from getitune.data.samplers.image_grouped_sampler import ImageGroupedSampler
 
 
 class TestDataModule:
@@ -127,6 +130,7 @@ class TestDataModule:
     ) -> None:
         """``adapt_tile_config`` runs on the training subset when tiler + adaptive are both on."""
         adapt = mocker.patch("getitune.data.module.adapt_tile_config")
+        mocker.patch("getitune.data.module.TileDatasetFactory")  # tiling itself is not under test here
         train_subset = MagicMock()
         train_subset.__len__ = lambda _: 10
         val_subset, test_subset = MagicMock(), MagicMock()
@@ -155,6 +159,7 @@ class TestDataModule:
     ) -> None:
         """``adapt_tile_config`` is not called when ``enable_adaptive_tiling`` is off."""
         adapt = mocker.patch("getitune.data.module.adapt_tile_config")
+        mocker.patch("getitune.data.module.TileDatasetFactory")  # tiling itself is not under test here
         train_subset = MagicMock()
         train_subset.__len__ = lambda _: 10
         val_subset, test_subset = MagicMock(), MagicMock()
@@ -204,6 +209,50 @@ class TestDataModule:
         assert dm.test_dataloader().persistent_workers is False
         assert dm.predict_dataloader().persistent_workers is False
         assert dm.val_dataloader().persistent_workers is True
+
+    @pytest.mark.parametrize("sampler_path", ["torch.utils.data.RandomSampler", "torch.utils.data.SequentialSampler"])
+    def test_tiled_train_loader_groups_tiles_by_image(self, mocker, sampler_path) -> None:
+        """Tiles are visited image by image; a custom sampler keeps its draws and is only regrouped."""
+        source_idx = np.array([0, 1, 2, 0, 1, 2])
+        dataset = MagicMock()
+        dataset.__len__.return_value = 6
+        dataset.collate_fn = lambda batch: batch
+        dataset.transforms = None
+        mocker.patch("getitune.data.module.tile_source_indices", return_value=source_idx)
+        config = SubsetConfig(batch_size=2, num_workers=0, subset_name="train", sampler=SamplerConfig(sampler_path))
+
+        dm = DataModule.__new__(DataModule)
+        dm.tile_config = TileConfig(enable_tiler=True)
+        dm.device = DeviceType.cpu
+        dm.train_subset = config
+        mocker.patch.object(dm, "_get_dataset", return_value=dataset)
+
+        sampler = dm.train_dataloader().sampler
+
+        assert isinstance(sampler, ImageGroupedSampler)
+        order = list(sampler)
+        assert sorted(order) == list(range(6))
+        images = source_idx[order]
+        assert 1 + np.count_nonzero(images[1:] != images[:-1]) == 3  # each image is one contiguous run
+
+    def test_tiled_train_loader_keeps_default_sampler_with_init_args(self, mocker) -> None:
+        """A RandomSampler with init_args is a user choice, not the default: it must be wrapped, not dropped."""
+        dataset = MagicMock()
+        dataset.__len__.return_value = 6
+        dataset.collate_fn = lambda batch: batch
+        dataset.transforms = None
+        mocker.patch("getitune.data.module.tile_source_indices", return_value=np.array([0, 1, 2, 0, 1, 2]))
+        sampler_config = SamplerConfig("torch.utils.data.RandomSampler", {"replacement": True, "num_samples": 12})
+        config = SubsetConfig(batch_size=2, num_workers=0, subset_name="train", sampler=sampler_config)
+        dm = DataModule.__new__(DataModule)
+        dm.tile_config = TileConfig(enable_tiler=True)
+        dm.device = DeviceType.cpu
+        dm.train_subset = config
+        mocker.patch.object(dm, "_get_dataset", return_value=dataset)
+
+        order = list(dm.train_dataloader().sampler)
+
+        assert len(order) == 12  # num_samples honored, with replacement
 
     def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
         """Eval loaders honor the recipe-configured batch size, workers and pinned memory.

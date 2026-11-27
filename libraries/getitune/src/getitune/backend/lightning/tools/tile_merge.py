@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections import defaultdict
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import cv2
 import numpy as np
+import pycocotools.mask as mask_utils
 import torch
-from packaging import version
 from torchvision import tv_tensors
 from torchvision.ops import batched_nms
 
@@ -20,41 +20,10 @@ from getitune.backend.lightning.tools.explain.explain_algo import InstSegExplain
 from getitune.config.data import TileConfig
 from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import Prediction, PredictionBatch
+from getitune.data.utils.structures.mask.mask_util import MAX_DENSE_MASK_BYTES, RLEMasks, crop_to_rle
 
 if TYPE_CHECKING:
     from getidata.fields import TileInfo
-
-# Maximum number of elements 2**31 -1
-MAX_ELEMENTS: int = np.iinfo(np.int32).max
-
-
-# NOTE: RuntimeError: nonzero is not supported for tensors with more than INT_MAX elements,
-# See https://github.com/pytorch/pytorch/issues/51871
-int_max_check_condition: Callable[[torch.Tensor], bool] = (
-    lambda tile_masks: version.parse(torch.__version__) < version.parse("2.6")
-    and torch.numel(tile_masks) > MAX_ELEMENTS
-)
-
-
-def keep_chunkify(tensor: torch.Tensor, max_element: int = MAX_ELEMENTS) -> torch.Tensor:
-    """Splits tensor into chunks and processes each chunk separately.
-
-    Args:
-        tensor (torch.Tensor): Input tensor of shape (B, H, W).
-
-    Returns:
-        torch.Tensor: Boolean mask of shape (B,) indicating nonzero sum.
-    """
-    _, h, w = tensor.shape
-    max_batch_size = int(max_element) // (h * w)
-    chunk_size = max(1, min(max_batch_size, tensor.shape[0]))
-
-    keep_indices = []
-    for i in range(0, tensor.shape[0], chunk_size):
-        chunk = tensor[i : i + chunk_size]
-        keep_indices.append(chunk.sum(dim=(1, 2)) > 0)  # Process chunk
-
-    return torch.cat(keep_indices, dim=0)
 
 
 class TileMerge:
@@ -114,6 +83,11 @@ class TileMerge:
         """
         raise NotImplementedError
 
+    def _nms_keep(self, bboxes: torch.Tensor, scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+        """Indices that survive the cross-tile NMS, capped at ``max_num_instances``."""
+        keep = batched_nms(bboxes, scores, labels, self.iou_threshold)
+        return keep[: self.max_num_instances]
+
     def nms_postprocess(
         self,
         bboxes: torch.Tensor,
@@ -122,9 +96,7 @@ class TileMerge:
         masks: list[torch.Tensor] | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor | None]:
         """Non-maximum suppression and post-process."""
-        keep = batched_nms(bboxes, scores, labels, self.iou_threshold)
-        if len(keep) > self.max_num_instances:
-            keep = keep[: self.max_num_instances]
+        keep = self._nms_keep(bboxes, scores, labels)
         bboxes = bboxes[keep]
         labels = labels[keep]
         scores = scores[keep]
@@ -332,8 +304,51 @@ def _non_linear_normalization(saliency_map: np.ndarray) -> np.ndarray:
     return np.floor(saliency_map)
 
 
+def _placeholder_image(shape: tuple[int, int]) -> torch.Tensor:
+    """An image-shaped tensor that owns no memory: predictions carry the field, but nobody reads its pixels."""
+    return torch.empty(1).expand(3, *shape)
+
+
+def _instance_crops(masks: torch.Tensor, offset_x: int, offset_y: int) -> list[tuple[dict, int, int]]:
+    """Tight crop of every ``(n, h, w)`` tile mask as RLE, with its top-left position in the full image.
+
+    RLE keeps a crop at a few hundred bytes. Tens of thousands of predictions are held while the tiles of one
+    image are collected, and only the instances that survive NMS are ever unpacked again.
+    """
+    crops = []
+    for mask in masks.bool().cpu().numpy():
+        rows, cols = np.flatnonzero(mask.any(axis=1)), np.flatnonzero(mask.any(axis=0))
+        crop = np.asfortranarray(mask[rows[0] : rows[-1] + 1, cols[0] : cols[-1] + 1], dtype=np.uint8)
+        crops.append((mask_utils.encode(crop), offset_x + int(cols[0]), offset_y + int(rows[0])))
+    return crops  # pyrefly: ignore[bad-return]
+
+
+def _paste_instances(
+    crops: list[tuple[dict, int, int]], img_size: tuple[int, int], dense: bool = False
+) -> torch.Tensor | RLEMasks:
+    """Place instance crops into full-image masks: dense ``(N, H, W)``, or RLE when that would be too large."""
+    height, width = img_size
+    if not dense and len(crops) * height * width > MAX_DENSE_MASK_BYTES:
+        return RLEMasks(
+            [crop_to_rle(mask_utils.decode(rle).astype(bool), x, y, img_size) for rle, x, y in crops], img_size
+        )
+    masks = torch.zeros((len(crops), height, width), dtype=torch.bool)
+    for i, (rle, x, y) in enumerate(crops):
+        crop = mask_utils.decode(rle).astype(bool)  # pyrefly: ignore[bad-argument-type]
+        masks[i, y : y + crop.shape[0], x : x + crop.shape[1]] = torch.from_numpy(crop)
+    return masks
+
+
 class InstanceSegTileMerge(TileMerge):
     """Instance segmentation tile merge."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._reset()
+
+    def _reset(self) -> None:
+        self._entities_to_merge: dict[int, list[Prediction]] = defaultdict(list)
+        self._img_ids: list[int] = []
 
     def merge(
         self, batch_tile_preds: list[PredictionBatch], batch_tile_infos: list[list[TileInfo]]
@@ -344,59 +359,74 @@ class InstanceSegTileMerge(TileMerge):
             batch_tile_preds (list): instance-seg tile predictions.
 
         """
-        entities_to_merge = defaultdict(list)
-        img_ids = []
+        self._reset()
+        for tile_preds, tile_infos in zip(batch_tile_preds, batch_tile_infos, strict=True):
+            self.add(tile_preds, tile_infos)
+        return self.finalize()
+
+    def add(self, tile_preds: PredictionBatch, tile_infos: list[TileInfo]) -> None:
+        """Take one batch of tile predictions, keeping only compact per-instance data.
+
+        Calling this as the tiles are predicted lets the dense tile masks go right away, instead of holding the
+        masks of every tile of the image until the last one is done.
+        """
+        entities_to_merge = self._entities_to_merge
+        img_ids = self._img_ids
         explain_mode = self.explain_mode
 
-        for tile_preds, tile_infos in zip(batch_tile_preds, batch_tile_infos, strict=True):
-            feature_vectors = tile_preds.feature_vector if explain_mode else [[] for _ in range(len(tile_infos))]
-            for i in range(len(tile_infos)):
-                tile_info = tile_infos[i]
-                tile_img_info = tile_preds.imgs_info[i] if tile_preds.imgs_info is not None else None
-                tile_bboxes = tile_preds.bboxes[i] if tile_preds.bboxes is not None else None
-                tile_labels = tile_preds.labels[i] if tile_preds.labels is not None else None
-                tile_scores = tile_preds.scores[i] if tile_preds.scores is not None else None
-                tile_masks = tile_preds.masks[i] if tile_preds.masks is not None else None
-                tile_f_vect = feature_vectors[i] if feature_vectors is not None else None
+        feature_vectors = tile_preds.feature_vector if explain_mode else [[] for _ in range(len(tile_infos))]
+        for i in range(len(tile_infos)):
+            tile_info = tile_infos[i]
+            tile_img_info = tile_preds.imgs_info[i] if tile_preds.imgs_info is not None else None
+            tile_bboxes = tile_preds.bboxes[i] if tile_preds.bboxes is not None else None
+            tile_labels = tile_preds.labels[i] if tile_preds.labels is not None else None
+            tile_scores = tile_preds.scores[i] if tile_preds.scores is not None else None
+            tile_masks = tile_preds.masks[i] if tile_preds.masks is not None else None
+            tile_f_vect = feature_vectors[i] if feature_vectors is not None else None
 
-                if int_max_check_condition(tile_masks):
-                    keep_indices = keep_chunkify(tile_masks)
-                else:
-                    keep_indices = tile_masks.to_sparse().sum((1, 2)).to_dense() > 0
-                keep_indices = keep_indices.nonzero(as_tuple=True)[0]
-                _bboxes = tile_bboxes[keep_indices]
-                _labels = tile_labels[keep_indices]
-                _scores = tile_scores[keep_indices]
-                _masks = tile_masks[keep_indices]
+            # Instances whose mask is empty carry no information.
+            keep_indices = (
+                tile_masks.flatten(1).any(dim=1).nonzero(as_tuple=True)[0]
+            )  # pyrefly: ignore[missing-attribute]
+            _bboxes = tile_bboxes[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _labels = tile_labels[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _scores = tile_scores[keep_indices]  # pyrefly: ignore[unsupported-operation]
+            _masks = tile_masks[keep_indices]  # pyrefly: ignore[unsupported-operation]
 
-                offset_x = tile_info.x
-                offset_y = tile_info.y
-                _bboxes[:, 0::2] += offset_x
-                _bboxes[:, 1::2] += offset_y
+            offset_x = tile_info.x
+            offset_y = tile_info.y
+            _bboxes[:, 0::2] += offset_x
+            _bboxes[:, 1::2] += offset_y
 
-                tile_id = tile_info.source_sample_idx
-                if tile_id not in img_ids:
-                    img_ids.append(tile_id)
-                tile_img_info.padding = [tile_info.x, tile_info.y, tile_info.width, tile_info.height]  # type: ignore[union-attr]
+            tile_id = tile_info.source_sample_idx
+            if tile_id not in img_ids:
+                img_ids.append(tile_id)
+            tile_img_info.padding = [tile_info.x, tile_info.y, tile_info.width, tile_info.height]  # type: ignore[union-attr]
 
-                inst_seg_pred_entity = Prediction(
-                    image=torch.empty(3, *tile_img_info.ori_shape),  # type: ignore[union-attr]
-                    img_info=tile_img_info,
-                    bboxes=tv_tensors.BoundingBoxes(_bboxes, canvas_size=tile_img_info.ori_shape, format="XYXY"),  # type: ignore[union-attr]
-                    label=_labels,
-                    scores=_scores,
-                    masks=tv_tensors.Mask(_masks),
-                )
+            inst_seg_pred_entity = Prediction(
+                image=_placeholder_image(tile_img_info.ori_shape),  # type: ignore[union-attr]
+                img_info=tile_img_info,
+                bboxes=tv_tensors.BoundingBoxes(_bboxes, canvas_size=tile_img_info.ori_shape, format="XYXY"),  # type: ignore[union-attr]
+                label=_labels,
+                scores=_scores,
+                # Tight per-instance crops with their position in the full image, not tile-sized masks: tens of
+                # thousands of tile-sized masks pile up while the tiles of one image are collected.
+                masks=_instance_crops(_masks, offset_x, offset_y),  # type: ignore[arg-type]
+            )
 
-                if explain_mode:
-                    inst_seg_pred_entity.feature_vector = tile_f_vect
-                    inst_seg_pred_entity.saliency_map = []
-                entities_to_merge[tile_id].append(inst_seg_pred_entity)
+            if explain_mode:
+                inst_seg_pred_entity.feature_vector = tile_f_vect  # pyrefly: ignore[bad-assignment]
+                inst_seg_pred_entity.saliency_map = []  # pyrefly: ignore[bad-assignment]
+            entities_to_merge[tile_id].append(inst_seg_pred_entity)
 
-        return [
-            self._merge_entities(image_info, entities_to_merge[img_id], explain_mode)
-            for img_id, image_info in zip(img_ids, self.img_infos, strict=True)
+    def finalize(self) -> list[Prediction]:
+        """Merge everything collected by :meth:`add` into one prediction per source image."""
+        merged = [
+            self._merge_entities(image_info, self._entities_to_merge[img_id], self.explain_mode)
+            for img_id, image_info in zip(self._img_ids, self.img_infos, strict=True)
         ]
+        self._reset()
+        return merged
 
     def _merge_entities(
         self,
@@ -416,7 +446,7 @@ class InstanceSegTileMerge(TileMerge):
         bboxes: list | torch.Tensor = []
         labels: list | torch.Tensor = []
         scores: list | torch.Tensor = []
-        masks: list | torch.Tensor = []
+        crops: list[tuple[np.ndarray, int, int]] = []
         feature_vectors = []
         img_size = img_info.ori_shape
         for tile_entity in entities:
@@ -426,32 +456,28 @@ class InstanceSegTileMerge(TileMerge):
                 labels.extend(tile_entity.label if tile_entity.label is not None else [])
                 scores.extend(tile_entity.scores if tile_entity.scores is not None else [])
 
-                offset_x, offset_y, _, _ = tile_entity.img_info.padding  # type: ignore[union-attr]
-                mask_indices = tile_entity.masks.to_sparse().indices() if tile_entity.masks is not None else None
-                mask_values = tile_entity.masks.to_sparse().values() if tile_entity.masks is not None else None
-                if mask_indices is not None and mask_values is not None:
-                    mask_indices[1] += offset_y
-                    mask_indices[2] += offset_x
-                    masks.extend(
-                        torch.sparse_coo_tensor(mask_indices, mask_values, (num_preds, *img_size)),
-                    )
+                crops.extend(tile_entity.masks)  # type: ignore[arg-type]
             if explain_mode:
                 feature_vectors.append(tile_entity.feature_vector)
 
         bboxes = torch.stack(bboxes) if len(bboxes) > 0 else torch.empty((0, 4), device=img_info.device)
         labels = torch.stack(labels) if len(labels) > 0 else torch.empty((0,), dtype=torch.long, device=img_info.device)
         scores = torch.stack(scores) if len(scores) > 0 else torch.empty((0,), device=img_info.device)
-        masks = masks if len(masks) > 0 else torch.empty((0, *img_size))
 
-        bboxes, labels, scores, masks = self.nms_postprocess(bboxes, scores, labels, masks)
+        keep = self._nms_keep(bboxes, scores, labels) if len(crops) > 0 else torch.zeros(0, dtype=torch.long)
+        bboxes, labels, scores = bboxes[keep], labels[keep], scores[keep]
+        # XAI needs the dense masks; otherwise large images keep RLE.
+        masks = _paste_instances([crops[i] for i in keep.tolist()], img_size, dense=explain_mode)
 
         inst_seg_pred_entity = Prediction(
-            image=torch.empty(3, *img_size),
+            image=_placeholder_image(img_size),
             img_info=img_info,
             scores=scores,
             bboxes=tv_tensors.BoundingBoxes(bboxes, canvas_size=img_size, format="XYXY"),
             label=labels,
-            masks=tv_tensors.Mask(masks, dtype=bool),
+            masks=masks  # pyrefly: ignore[bad-argument-type]
+            if isinstance(masks, RLEMasks)
+            else tv_tensors.Mask(masks, dtype=bool),  # pyrefly: ignore[bad-argument-type]
         )
 
         if explain_mode:
@@ -459,7 +485,7 @@ class InstanceSegTileMerge(TileMerge):
             inst_seg_pred_entity.saliency_map = self.get_saliency_maps_from_masks(
                 labels,
                 scores,
-                masks,
+                masks,  # pyrefly: ignore[bad-argument-type]
                 self.num_classes,
             )
 

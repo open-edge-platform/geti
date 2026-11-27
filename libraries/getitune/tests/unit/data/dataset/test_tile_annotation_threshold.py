@@ -125,3 +125,23 @@ def test_instance_segmentation_threshold_keeps_masks_aligned(threshold, expected
     assert first.label.tolist() == expected_labels
     assert len(first.bboxes) == len(first.label) == len(first.masks)
     torch.testing.assert_close(first.masks, masks[: len(expected_labels), :100, :100])
+
+
+def test_first_subset_reads_dataframe_without_building_a_sample():
+    """Indexing the dataset builds a sample (full-size instance masks for instance segmentation)."""
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
+    import polars as pl
+    from getidata.fields import Subset, SubsetField
+
+    from getitune.data.dataset.tile import _first_subset
+
+    dm_subset = MagicMock()
+    dm_subset.schema = SimpleNamespace(
+        attributes={"image": SimpleNamespace(field=object()), "subset": SimpleNamespace(field=SubsetField())}
+    )
+    dm_subset.df = pl.DataFrame({"subset": ["VALIDATION", "TRAINING"]})
+
+    assert _first_subset(dm_subset) is Subset.VALIDATION
+    dm_subset.__getitem__.assert_not_called()

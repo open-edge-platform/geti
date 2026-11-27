@@ -7,12 +7,15 @@ Implementations of tilers for specific field types.
 
 import operator
 from collections.abc import Callable
+from functools import partial
 from typing import Any, Generic, TypeVar
 
 import numpy as np
 import polars as pl
-from shapely import GeometryCollection, MultiPolygon, box, transform
+import pyarrow as pa
+from shapely import GeometryCollection, MultiPolygon, box, make_valid
 from shapely import Polygon as ShapelyPolygon
+from shapely.errors import GEOSException
 from shapely.geometry.base import BaseGeometry
 
 from getidata.fields import (
@@ -26,6 +29,7 @@ from getidata.fields import (
     SubsetField,
 )
 from getidata.schema import AttributeSpec
+from getidata.type_registry import polars_to_numpy_dtype
 
 from .tiler_registry import Tiler, TilerRegistry
 
@@ -294,88 +298,65 @@ class BboxTiler(Tiler):
         if self.field_spec.field.format != "x1y1x2y2":
             raise RuntimeError(f"The format {self.field_spec.field.format} is not supported.")
 
-        results = []
+        out_dtype = self.field_spec.field.dtype
+        np_dtype = polars_to_numpy_dtype(out_dtype) if out_dtype is not None else np.float32
+        bboxes_out: list[np.ndarray] = []
+        keeps_out: list[np.ndarray] = []
 
-        # Cache the per-image exploded/split boxes (the part that only depends on
-        # the source image, not the tile) so it is computed once per image rather
-        # than once per tile. Tiles are processed contiguously per image, so a
-        # single-slot cache is sufficient and keeps memory bounded to one image.
-        # NOTE: bbox payloads are small, so this is a modest speedup rather than
-        # an OOM safeguard (unlike the mask tilers), but it keeps the caching
-        # strategy consistent across tilers.
-        boxes_cache: _LastImageCache[pl.DataFrame] = _LastImageCache()
+        # The per-image boxes only depend on the source image, not the tile. Tiles are processed contiguously per
+        # image, so a single-slot cache is enough. Plain numpy per tile: a polars query per tile dominates the cost
+        # for images with hundreds of tiles.
+        boxes_cache: _LastImageCache[np.ndarray] = _LastImageCache()
 
-        def _load_boxes(image_id: int) -> pl.DataFrame:
-            boxes = df[image_id].select(column_name).explode(column_name)
-            return boxes.with_columns(
-                x1=pl.col(column_name).arr.get(0),
-                y1=pl.col(column_name).arr.get(1),
-                x2=pl.col(column_name).arr.get(2),
-                y2=pl.col(column_name).arr.get(3),
-            )
+        def _load_boxes(image_id: int) -> np.ndarray:
+            raw = df[image_id, column_name]
+            if raw is None or len(raw) == 0:
+                return np.zeros((0, 4), dtype=np_dtype)
+            return np.asarray(raw, dtype=np_dtype).reshape(-1, 4)
 
         for tile_row in tiles_df["tile"]:
             image_id = tile_row["source_sample_idx"] - slice_offset
-            # with_columns below returns new frames, so the cached frame is never mutated.
-            boxes = boxes_cache.get(image_id, lambda: _load_boxes(image_id))
-            if len(boxes) == 1 and boxes[column_name][0] is None:
-                # Image without any annotation list: the explode above yields a single null row.
-                results.append(
-                    pl.DataFrame(
-                        {column_name: [[]], "keep": [[]]},
-                        schema={column_name: df.schema[column_name], "keep": pl.List(pl.Boolean())},
-                    )
-                )
-                continue
+            boxes = boxes_cache.get(image_id, partial(_load_boxes, image_id))
 
-            # Get tile coordinates
             tile_x = tile_row["x"]
             tile_y = tile_row["y"]
-            tile_width = tile_row["width"]
-            tile_height = tile_row["height"]
-            tile_x2 = tile_x + tile_width
-            tile_y2 = tile_y + tile_height
+            tile_x2 = tile_x + tile_row["width"]
+            tile_y2 = tile_y + tile_row["height"]
+            x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
 
             # Area of the original box (before clipping), for the threshold rule below.
-            boxes = boxes.with_columns(
-                full_area=(pl.col("x2") - pl.col("x1")) * (pl.col("y2") - pl.col("y1")),
-            )
+            full_area = (x2 - x1) * (y2 - y1)
+            keep = (x2 > tile_x) & (x1 < tile_x2) & (y2 > tile_y) & (y1 < tile_y2)
 
-            # Check if box intersects with tile
-            boxes = boxes.with_columns(
-                keep=(pl.col("x2") > tile_x)
-                & (pl.col("x1") < tile_x2)
-                & (pl.col("y2") > tile_y)
-                & (pl.col("y1") < tile_y2)
-            )
-
-            # Calculate visible (clipped) part of the box in the tile
-            boxes = boxes.with_columns(
-                pl.col("x1").clip(lower_bound=tile_x) - tile_x,
-                pl.col("y1").clip(lower_bound=tile_y) - tile_y,
-                pl.col("x2").clip(upper_bound=tile_x2) - tile_x,
-                pl.col("y2").clip(upper_bound=tile_y2) - tile_y,
-            )
+            # Visible (clipped) part of the box, relative to the tile origin.
+            cx1 = np.maximum(x1, tile_x) - tile_x
+            cy1 = np.maximum(y1, tile_y) - tile_y
+            cx2 = np.minimum(x2, tile_x2) - tile_x
+            cy2 = np.minimum(y2, tile_y2) - tile_y
 
             # Drop annotations whose visible part is below the configured ratio of their full area
             # (visible_area >= 0 * full_area is always true, so threshold 0 keeps any intersection).
-            boxes = (
-                boxes.with_columns(
-                    visible_area=(pl.col("x2") - pl.col("x1")) * (pl.col("y2") - pl.col("y1")),
-                )
-                .with_columns(
-                    keep=pl.col("keep") & (pl.col("visible_area") >= self.threshold_drop_ann * pl.col("full_area")),
-                )
-                .drop("full_area", "visible_area")
-            )
+            visible_area = (cx2 - cx1) * (cy2 - cy1)
+            keep &= visible_area >= self.threshold_drop_ann * full_area
 
-            boxes = boxes.with_columns(bboxes=pl.concat_arr("x1", "y1", "x2", "y2"))
+            bboxes_out.append(np.stack([cx1, cy1, cx2, cy2], axis=1).astype(np_dtype, copy=False))
+            keeps_out.append(keep)
 
-            boxes = boxes.group_by(pl.lit(1)).agg(pl.col("bboxes", "keep")).drop("literal")
-
-            results.append(boxes)
-
-        return pl.concat(results)
+        # Build both list columns from flat buffers plus offsets (one Arrow call each) instead of per-tile python
+        # lists, which polars converts element by element: tens of millions of boxes for a large tiled dataset.
+        offsets = pa.array(np.concatenate([[0], np.cumsum([len(k) for k in keeps_out])]).astype(np.int32))
+        flat_boxes = np.concatenate(bboxes_out) if bboxes_out else np.zeros((0, 4), dtype=np_dtype)
+        flat_keep = np.concatenate(keeps_out) if keeps_out else np.zeros(0, dtype=bool)
+        boxes_arrow = pa.ListArray.from_arrays(
+            offsets, pa.FixedSizeListArray.from_arrays(pa.array(flat_boxes.reshape(-1)), 4)
+        )
+        keep_arrow = pa.ListArray.from_arrays(offsets, pa.array(flat_keep))
+        return pl.DataFrame(
+            {
+                column_name: pl.from_arrow(boxes_arrow).cast(df.schema[column_name]),
+                "keep": pl.from_arrow(keep_arrow).cast(pl.List(pl.Boolean())),
+            }
+        )
 
 
 @TilerRegistry.register(LabelField)
@@ -506,9 +487,42 @@ class ImageTiler(Tiler):
         return pl.DataFrame(results)
 
 
-def _apply_offset(geom: BaseGeometry, offset_x: float, offset_y: float) -> BaseGeometry:
-    """Apply offset to geometry."""
-    return transform(geometry=geom, transformation=lambda x, y: (x - offset_x, y - offset_y), interleaved=False)
+def _polygons_of_image(df: pl.DataFrame, row: int, column_name: str) -> "_ImagePolygons":
+    return _ImagePolygons(df[row, column_name])
+
+
+class _ImagePolygons:
+    """Polygon rings of one source image with their bounding boxes, for cheap per-tile pre-selection."""
+
+    def __init__(self, raw: pl.Series | None) -> None:
+        polygons = [] if raw is None else raw.to_list()
+        self.rings = [
+            np.asarray(p, dtype=np.float64).reshape(-1, 2) if p is not None else np.zeros((0, 2)) for p in polygons
+        ]
+        self.count = len(self.rings)
+        self.repaired: set[int] = set()  # rings that were invalid (e.g. self-intersecting) and got repaired
+        bounds = np.array(
+            [[*r.min(axis=0), *r.max(axis=0)] if len(r) else [np.inf, np.inf, -np.inf, -np.inf] for r in self.rings]
+        ).reshape(-1, 4)
+        self.x0, self.y0, self.x1, self.y1 = bounds.T
+        self._polygons: dict[int, ShapelyPolygon | BaseGeometry | None] = {}
+
+    def shoelace_area(self, i: int) -> float:
+        x, y = self.rings[i].T
+        return abs(float(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1)))) / 2
+
+    def polygon(self, i: int) -> BaseGeometry | None:
+        """Shapely geometry of polygon ``i``; invalid (e.g. self-intersecting) input is repaired, else None."""
+        if i not in self._polygons:
+            try:
+                polygon = ShapelyPolygon(self.rings[i])
+                if not polygon.is_valid:
+                    self.repaired.add(i)
+                    polygon = make_valid(polygon)
+                self._polygons[i] = polygon
+            except ValueError:  # fewer than 3 distinct points
+                self._polygons[i] = None
+        return self._polygons[i]
 
 
 @TilerRegistry.register(PolygonField)
@@ -536,67 +550,86 @@ class PolygonTiler(Tiler):
             - column_name: tiled polygon annotations
             - keep: List[bool] series indicating which polygons to keep
         """
-        results = []
-        keeps = []
-
         column_name = self.field_spec.name
+        out_dtype = self.field_spec.field.dtype
+        np_dtype = polars_to_numpy_dtype(out_dtype) if out_dtype is not None else np.float32
+
+        # Per-image data, computed once per image (tiles of one image are contiguous, see ``_LastImageCache``).
+        image_cache: _LastImageCache[_ImagePolygons] = _LastImageCache()
+
+        vertices: list[np.ndarray] = []  # kept rings, in tile then polygon order
+        ring_lengths: list[np.ndarray] = []  # per tile: vertices of every polygon (0 for dropped ones)
+        keeps: list[np.ndarray] = []
 
         for tile_row in tiles_df["tile"]:
             source_idx = tile_row["source_sample_idx"] - slice_offset
-            source_polygons = df[source_idx, column_name]
+            image = image_cache.get(source_idx, partial(_polygons_of_image, df, source_idx, column_name))
+            tx0, ty0 = tile_row["x"], tile_row["y"]
+            tx1, ty1 = tx0 + tile_row["width"], ty0 + tile_row["height"]
 
-            # Create tile polygon
-            tile_poly = box(
-                tile_row["x"],
-                tile_row["y"],
-                tile_row["x"] + tile_row["width"],
-                tile_row["y"] + tile_row["height"],
-            )
-
-            # Process each polygon
-            tiled_polygons = []
-            polygon_keeps = []  # Track which polygons to keep
-
-            for poly_coords in source_polygons:
-                polygon = ShapelyPolygon(poly_coords)
-
-                # Get intersection and apply offset
-                intersection = polygon.intersection(tile_poly)
-
-                # NOTE: intersection may return a GeometryCollection or MultiPolygon
-                if isinstance(intersection, GeometryCollection | MultiPolygon):
-                    shapes = [(geom, geom.area) for geom in list(intersection.geoms) if geom.is_valid]
-                    if not shapes:
-                        tiled_polygons.append(None)  # Placeholder for dropped polygon
-                        polygon_keeps.append(False)
+            lengths = np.zeros(image.count, dtype=np.int64)
+            keep = np.zeros(image.count, dtype=bool)
+            # Polygons whose bounding box misses the tile cannot intersect it. Those fully inside are kept as they are;
+            # only the ones crossing the tile edge need a (comparatively slow) geometric clip.
+            overlaps = (image.x1 > tx0) & (image.x0 < tx1) & (image.y1 > ty0) & (image.y0 < ty1)
+            inside = overlaps & (image.x0 >= tx0) & (image.x1 <= tx1) & (image.y0 >= ty0) & (image.y1 <= ty1)
+            tile_poly = None
+            for i in np.flatnonzero(overlaps):
+                polygon = image.polygon(i)  # cached per image; repairs invalid rings
+                if polygon is None:
+                    continue
+                if inside[i] and i not in image.repaired:
+                    ring = image.rings[i]
+                    if image.shoelace_area(i) <= 0:
                         continue
+                    ring = np.vstack([ring, ring[:1]])  # closed ring, as a clip would return
+                else:
+                    if polygon.area <= 0:
+                        continue
+                    tile_poly = tile_poly or box(tx0, ty0, tx1, ty1)
+                    ring, clipped_area = self._clip(polygon, tile_poly)
+                    if ring is None or clipped_area is None or clipped_area < self.threshold_drop_ann * polygon.area:
+                        continue
+                vertices.append(ring - (tx0, ty0))
+                lengths[i] = len(ring)
+                keep[i] = True
+            ring_lengths.append(lengths)
+            keeps.append(keep)
 
-                    intersection, _ = max(shapes, key=operator.itemgetter(1))
+        # Build the nested list column from flat buffers plus offsets (one Arrow call per level) instead of
+        # per-polygon polars Series. Dropped polygons are empty rings; the keep flags remove them afterwards.
+        flat = np.concatenate(vertices).astype(np_dtype, copy=False) if vertices else np.zeros((0, 2), dtype=np_dtype)
+        polygon_offsets = pa.array(np.concatenate([[0], np.cumsum(np.concatenate(ring_lengths))]).astype(np.int32))
+        tile_offsets = pa.array(np.concatenate([[0], np.cumsum([len(k) for k in keeps])]).astype(np.int32))
+        rings_arrow = pa.ListArray.from_arrays(
+            polygon_offsets, pa.FixedSizeListArray.from_arrays(pa.array(flat.reshape(-1)), 2)
+        )
+        polygons_arrow = pa.ListArray.from_arrays(tile_offsets, rings_arrow)
+        flat_keep = np.concatenate(keeps) if keeps else np.zeros(0, dtype=bool)
+        keep_arrow = pa.ListArray.from_arrays(tile_offsets, pa.array(flat_keep))
+        return pl.DataFrame(
+            {
+                column_name: pl.from_arrow(polygons_arrow).cast(df.schema[column_name]),
+                "keep": pl.from_arrow(keep_arrow).cast(pl.List(pl.Boolean())),
+            }
+        )
 
-                if not isinstance(intersection, ShapelyPolygon) or intersection.is_empty or not intersection.is_valid:
-                    tiled_polygons.append(None)  # Placeholder for dropped polygon
-                    polygon_keeps.append(False)
-                    continue
+    @staticmethod
+    def _clip(polygon: BaseGeometry, tile_poly: BaseGeometry) -> tuple[np.ndarray | None, float | None]:
+        """Return (exterior ring, area) of the largest polygonal part of ``polygon`` inside ``tile_poly``.
 
-                prop_area = intersection.area / polygon.area
-
-                if prop_area < self.threshold_drop_ann:
-                    tiled_polygons.append(None)  # Placeholder for dropped polygon
-                    polygon_keeps.append(False)
-                    continue
-
-                offset_poly = _apply_offset(intersection, tile_row["x"], tile_row["y"])
-
-                tiled_polygons.append(np.array(offset_poly.exterior.coords))
-                polygon_keeps.append(True)
-
-            # Always create output row
-            results.append(
-                pl.Series(
-                    [pl.Series(polygon, dtype=pl.Array(self.field_spec.field.dtype, 2)) for polygon in tiled_polygons]
-                )
-            )
-            keeps.append(polygon_keeps)
-
-        # Create DataFrame with results and keep column as List[Boolean]
-        return pl.DataFrame({column_name: results, "keep": pl.Series(keeps, dtype=pl.List(pl.Boolean()))})
+        ``(None, None)`` when nothing usable remains, including when GEOS rejects an invalid input geometry.
+        """
+        try:
+            intersection = polygon.intersection(tile_poly)
+        except GEOSException:
+            return None, None
+        # NOTE: intersection may return a GeometryCollection or MultiPolygon
+        if isinstance(intersection, GeometryCollection | MultiPolygon):
+            shapes = [g for g in intersection.geoms if isinstance(g, ShapelyPolygon) and g.is_valid]
+            if not shapes:
+                return None, None
+            intersection = max(shapes, key=operator.attrgetter("area"))
+        if not isinstance(intersection, ShapelyPolygon) or intersection.is_empty or not intersection.is_valid:
+            return None, None
+        return np.asarray(intersection.exterior.coords), intersection.area

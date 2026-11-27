@@ -271,6 +271,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         from getitune.config.data import TileConfig
         from getitune.data.dataset.tile import TileDatasetFactory
         from getitune.data.entity.utils import detect_storage_dtype
+        from getitune.data.utils import adapt_tile_config
 
         with self._db_session_factory() as db:
             self._dataset_service.set_db_session(db)
@@ -369,6 +370,11 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             tile_cfg_data = getitune_training_config["data"].get("tile_config", {})
             tile_config = TileConfig(**tile_cfg_data)
             logger.info("Tiling is set to {}", tile_config.enable_tiler)
+            if tile_config.enable_tiler and tile_config.enable_adaptive_tiling:
+                # The datasets are tiled here, before the DataModule is built, so adapt the parameters now
+                # (may also switch tiling off). Done once: clear the flag so nothing downstream re-adapts.
+                adapt_tile_config(tile_config, dm_training_dataset, train_subset_config.input_size)
+                tile_config.enable_adaptive_tiling = False
             # Whether a task/model actually supports tiling is decided upstream by the
             # application (tiling capabilities); here we simply honor the resolved flag.
             if tile_config.enable_tiler:

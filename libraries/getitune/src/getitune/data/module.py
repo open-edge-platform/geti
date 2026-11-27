@@ -17,11 +17,12 @@ from lightning import LightningDataModule
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader, RandomSampler
 
-from getitune.config.data import SubsetConfig, TileConfig
+from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
 from getitune.data.augmentation import CPUAugmentationPipeline
 from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
+from getitune.data.samplers.image_grouped_sampler import ImageGroupedSampler, tile_source_indices
 from getitune.data.utils import adapt_tile_config, get_adaptive_num_workers, instantiate_sampler
 from getitune.types.device import DeviceType
 from getitune.types.label import LabelInfo
@@ -487,7 +488,17 @@ class DataModule(LightningDataModule):
         }
 
         tile_config = self.tile_config
-        if tile_config.enable_tiler and tile_config.sampling_ratio < 1:
+        source_idx = tile_source_indices(dataset) if tile_config.enable_tiler else None
+        if source_idx is not None:
+            # Tiles of one image are visited together so each large image is decoded once per worker. A custom sampler
+            # (e.g. class balancing) keeps its sampling distribution; its draws are only regrouped by image.
+            is_default = config.sampler == SamplerConfig()  # init_args (e.g. replacement) make it custom
+            logger.info("Grouping training tiles by source image (sampling_ratio=%s)", tile_config.sampling_ratio)
+            sampler = ImageGroupedSampler(
+                source_idx, tile_config.sampling_ratio, inner=None if is_default else common_args["sampler"]
+            )
+            common_args.update({"shuffle": False, "sampler": sampler})
+        elif tile_config.enable_tiler and tile_config.sampling_ratio < 1:
             num_samples = max(1, int(len(dataset) * tile_config.sampling_ratio))
             logger.info("Using tiled sampling with %s samples", num_samples)
             common_args.update(

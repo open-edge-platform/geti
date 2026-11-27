@@ -5,15 +5,20 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pycocotools.mask as mask_utils
 import torch
 from torchvision.ops import roi_align
 
 if TYPE_CHECKING:
-    import numpy as np
     from torchvision import tv_tensors
+
+#: Dense ``(N, H, W)`` instance masks above this many bytes are kept as :class:`RLEMasks` instead. A 20 MP image
+#: with a few hundred instances is several GB dense, but a few hundred KB as RLE.
+MAX_DENSE_MASK_BYTES = 256 * 1024 * 1024
 
 
 def polygon_to_bitmap(
@@ -120,3 +125,102 @@ def crop_and_resize_masks(
     else:
         resized_masks = torch.empty((0, *out_shape), device=device)
     return resized_masks.float()
+
+
+@dataclass
+class RLEMasks:
+    """Instance masks of one image as COCO RLE, for images where a dense ``(N, H, W)`` tensor would not fit.
+
+    The IS metric consumes RLE directly, so tiled evaluation of very large images never needs the dense masks.
+    ``rles`` hold ``{"counts", "size": [H, W]}`` dicts, one per instance.
+    """
+
+    rles: list[dict]
+    shape: tuple[int, int]
+
+    def __len__(self) -> int:
+        return len(self.rles)
+
+    def __iter__(self):
+        return iter(self.rles)
+
+    def __getitem__(self, index) -> RLEMasks:  # noqa: ANN001
+        """Select instances by slice, integer/boolean sequence or tensor."""
+        if isinstance(index, slice):
+            return RLEMasks(self.rles[index], self.shape)
+        index = torch.as_tensor(index)
+        if index.ndim == 0:  # a single instance, kept as a one-instance RLEMasks
+            index = index.reshape(1)
+        if index.dtype == torch.bool:
+            index = index.nonzero(as_tuple=True)[0]
+        return RLEMasks([self.rles[i] for i in index.tolist()], self.shape)
+
+    @classmethod
+    def from_polygons(cls, polygons: np.ndarray | None, shape: tuple[int, int]) -> RLEMasks:
+        """Rasterize polygons straight to RLE (no dense mask). ``shape`` is ``(H, W)``."""
+        if polygons is None or len(polygons) == 0:
+            return cls([], shape)
+        return cls(list(polygon_to_rle(polygons, *shape)), shape)
+
+    def to_dense(self, max_bytes: int = MAX_DENSE_MASK_BYTES) -> torch.Tensor:
+        """Decode to a dense boolean ``(N, H, W)`` tensor. Refuses when that would exceed ``max_bytes``."""
+        height, width = self.shape
+        if len(self) * height * width > max_bytes:
+            msg = f"{len(self)} masks of {height}x{width} do not fit in {max_bytes} bytes as a dense tensor"
+            raise MemoryError(msg)
+        if not self.rles:
+            return torch.zeros((0, height, width), dtype=torch.bool)
+        rles = [
+            {
+                **rle,
+                "counts": mask_utils.frPyObjects(rle, height, width)["counts"],  # pyrefly: ignore[no-matching-overload]
+            }  # pyrefly: ignore[no-matching-overload]
+            if isinstance(rle["counts"], list)
+            else rle
+            for rle in self.rles
+        ]
+        return torch.from_numpy(
+            mask_utils.decode(rles).astype(bool).transpose((2, 0, 1))  # pyrefly: ignore[bad-argument-type]
+        )  # pyrefly: ignore[bad-argument-type]
+
+
+def crop_to_rle(mask: np.ndarray, x: int, y: int, shape: tuple[int, int]) -> dict:
+    """RLE of a full ``(H, W)`` canvas that holds ``mask`` with its top-left corner at ``(x, y)``.
+
+    The canvas is never built: only the columns the mask touches are expanded (column-major, as RLE requires),
+    so the cost depends on the object, not on the image size.
+
+    Args:
+        mask: Boolean ``(h, w)`` array.
+        x: Left offset of the mask in the canvas.
+        y: Top offset of the mask in the canvas.
+        shape: Canvas ``(H, W)``.
+
+    Returns:
+        dict: ``{"counts": list[int], "size": [H, W]}``, equal to ``encode_rle`` of the pasted canvas.
+    """
+    height, width = shape
+    mask = np.asarray(mask, dtype=bool)
+    rows, cols = np.flatnonzero(mask.any(axis=1)), np.flatnonzero(mask.any(axis=0))
+    if len(rows) == 0:
+        return {"counts": [height * width], "size": [height, width]}
+    mask = mask[rows[0] : rows[-1] + 1, cols[0] : cols[-1] + 1]
+    x, y = x + int(cols[0]), y + int(rows[0])
+    h, w = mask.shape
+    # Full-height strip of the touched columns, flattened column-major.
+    strip = np.zeros((height, w), dtype=bool)
+    strip[y : y + h] = mask
+    flat = strip.T.ravel()
+    change = np.flatnonzero(flat[1:] != flat[:-1]) + 1
+    runs = np.diff(np.concatenate(([0], change, [len(flat)])))
+    lead = x * height
+    # A strip starting with a one-run has exactly ``lead`` zeros before it; else its first zero run merges into them.
+    counts = [lead, *runs.tolist()] if flat[0] else [lead + int(runs[0]), *runs[1:].tolist()]
+    trail = (width - x - w) * height
+    if flat[-1]:  # ends with a one-run: the trailing zero run is new
+        counts.append(trail)
+    else:
+        counts[-1] += trail
+    if counts[-1] == 0 and len(counts) > 1:
+        counts.pop()
+    return {"counts": counts, "size": [height, width]}

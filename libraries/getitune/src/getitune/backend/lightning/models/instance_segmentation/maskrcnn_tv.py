@@ -195,6 +195,8 @@ class MaskRCNNTV(LightningInstanceSegModel):
         return model
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
+        if not self.training:
+            self._keep_eval_predictions_in_input_space(entity)
         if isinstance(entity.images, list):
             entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[arg-type,assignment]
         return {"entity": entity}
