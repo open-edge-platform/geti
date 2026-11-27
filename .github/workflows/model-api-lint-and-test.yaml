@@ -188,7 +188,7 @@ jobs:
         working-directory: libraries/model_api
         run: |
           uv run python -c "from model_api.models import Model; Model.create_model('./data/otx_models/ssd-card-detection.xml').save('ovms_models/ssd-card-detection/1/ssd-card-detection.xml')"
-          docker run -d --rm -v $GITHUB_WORKSPACE/model_api/ovms_models/:/models -p 8000:8000 openvino/model_server:latest --model_path /models/ssd-card-detection/ --model_name ssd-card-detection --rest_port 8000 --log_level DEBUG --target_device CPU
+          docker run -d --rm -v $PWD/ovms_models/:/models -p 8000:8000 openvino/model_server:latest --model_path /models/ssd-card-detection/ --model_name ssd-card-detection --rest_port 8000 --log_level DEBUG --target_device CPU
           echo "Waiting for OVMS to be ready..."
           timeout 120 bash -c 'until curl -sf http://localhost:8000/v2/health/ready; do sleep 3; done'
           uv run python examples/serving_api/run.py data/coco128/images/train2017/000000000009.jpg  # detects 4 objects
