@@ -1,0 +1,7 @@
+[
+  { "name": "otx_models/ssd-card-detection.xml" },
+  { "name": "otx_models/Lite-hrnet-18.xml" },
+  { "name": "otx_models/cls_efficient_b0_cars.xml" },
+  { "name": "otx_models/sam_vit_b_zsl_encoder.xml" },
+  { "name": "otx_models/sam_vit_b_zsl_decoder.xml" }
+]

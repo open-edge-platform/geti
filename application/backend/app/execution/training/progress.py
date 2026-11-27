@@ -42,3 +42,39 @@ class TrainingProgressCallback(Callback):
         self._update_total_steps(trainer)
         self._current_step += 1
         self._emit_progress()
+
+
+class TestingProgressCallback(Callback):
+    def __init__(self, on_progress_update: Callable[[float], None], min_p: float = 0, max_p: float = 100.0):
+        self._on_progress_update = on_progress_update
+        self._min_p = min_p
+        self._max_p = max_p
+        self._total_steps: int | None = None
+        self._current_step: int = 0
+
+    def _update_total_steps(self, trainer: LightningTrainer) -> None:
+        if self._total_steps is not None:
+            return
+        num_test_batches = trainer.num_test_batches
+        total_batches = int(sum(num_test_batches)) if isinstance(num_test_batches, list) else int(num_test_batches)
+        self._total_steps = max(1, total_batches)
+
+    def _emit_progress(self) -> None:
+        if self._total_steps is None:
+            return
+        ratio = self._current_step / self._total_steps
+        progress = self._min_p + ratio * (self._max_p - self._min_p)
+        self._on_progress_update(progress)
+
+    def on_test_batch_end(
+        self,
+        trainer: LightningTrainer,
+        pl_module: LightningModule,
+        outputs: STEP_OUTPUT,
+        batch: Any,
+        batch_idx: int,
+        dataloader_idx: int = 0,
+    ) -> None:
+        self._update_total_steps(trainer)
+        self._current_step += 1
+        self._emit_progress()
