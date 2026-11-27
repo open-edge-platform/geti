@@ -58,7 +58,7 @@ jobs:
     environment: pypi
     runs-on: ubuntu-latest
     permissions:
-      contents: write # required by svenstaro/upload-release-action
+      contents: write # required to publish release assets
       id-token: write # required by trusted publisher
     steps:
       - *harden-runner
@@ -84,13 +84,13 @@ jobs:
 
       - name: Upload package distributions to github
         if: ${{ steps.check-tag.outputs.match != '' }}
-        uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/*
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
+          fi
+          gh release upload "$GITHUB_REF_NAME" dist/* --clobber
 
       - name: Publish package distributions to PyPI
         if: ${{ steps.check-tag.outputs.match != '' }}
