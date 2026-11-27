@@ -32,7 +32,7 @@ venv-lock: _ensure_uv
 # Linting and formatting
 # -------------------------------------------------------------------------------------------------
 
-# Run linters (ruff + pyrefly)
+# Run linters via pre-commit
 lint:
     uvx pre-commit run --all-files --config .pre-commit-config.yaml
 
@@ -69,3 +69,15 @@ test-functional-download-models *ARGS: _ensure_uv
 # Run functional tests with pytest
 test-functional *ARGS: _ensure_uv
     uv run pytest ./tests/functional -v {{ ARGS }}
+
+# -------------------------------------------------------------------------------------------------
+# Building
+# -------------------------------------------------------------------------------------------------
+
+# Build sdist
+build-sdist: _ensure_uv
+    uv build --sdist
+
+# Build wheel
+build-wheel: _ensure_uv
+    uv build --wheel

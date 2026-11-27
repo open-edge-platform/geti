@@ -72,7 +72,8 @@ jobs:
           uv-version-file: libraries/model_api/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: "3.11" # Use the lowest supported Python version for linting/type-checking
 
-      - name: Prepare venv and install Python dependencies
+      - &venv
+        name: Prepare venv and install Python dependencies
         working-directory: libraries/model_api
         run: just venv
 
@@ -106,16 +107,9 @@ jobs:
             python-version: "3.14" # started to fail with "Windows fatal exception: access violation"
     name: tests-${{ matrix.os }}-Python${{ matrix.python-version }}
     steps:
-      # YAML anchors not used cause currently zizmor don't support them in matrix strategies
-      - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
-        with:
-          egress-policy: audit
+      - *harden-runner
 
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
+      - *checkout
 
       - name: Install Python, uv and Just
         uses: $/.github/actions/install-common-deps
@@ -123,15 +117,14 @@ jobs:
           uv-version-file: libraries/model_api/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: ${{ matrix.python-version }}
 
-      - name: Installing dependencies
-        working-directory: libraries/model_api
-        run: just venv
+      - *venv
 
       - name: Unit testing
         working-directory: libraries/model_api
         run: just test-unit --cov --cov-report=xml --cov-append
 
-      - name: Prepare test data
+      - &test-data
+        name: Prepare test data
         working-directory: libraries/model_api
         run: just test-functional-download-models -d data
 
@@ -159,16 +152,9 @@ jobs:
           - "3.14"
     runs-on: ${{ matrix.os }}
     steps:
-      # YAML anchors not used cause currently zizmor don't support them in matrix strategies
-      - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
-        with:
-          egress-policy: audit
+      - *harden-runner
 
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
+      - *checkout
 
       - name: Install Python, uv and Just
         uses: $/.github/actions/install-common-deps
@@ -176,13 +162,9 @@ jobs:
           uv-version-file: libraries/model_api/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: ${{ matrix.python-version }}
 
-      - name: Installing dependencies
-        working-directory: libraries/model_api
-        run: just venv
+      - *venv
 
-      - name: Prepare test data
-        working-directory: libraries/model_api
-        run: just test-functional-download-models -d data
+      - *test-data
 
       - name: serving_api
         working-directory: libraries/model_api

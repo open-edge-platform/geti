@@ -1,0 +1,104 @@
+name: Build and upload Model API to PyPI
+
+on:
+  workflow_dispatch: # run on request (no need for PR)
+  release:
+    types: [published]
+
+permissions: {} # No permissions by default on workflow level
+
+jobs:
+  build:
+    name: Build model_api
+    runs-on: ubuntu-latest
+    steps:
+      # YAML anchors not used cause currently zizmor don't support them in matrix strategies
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install Python, uv and Just
+        uses: $/.github/actions/install-common-deps
+        with:
+          uv-version-file: libraries/model_api/pyproject.toml # Install the uv version specified in pyproject.toml
+          python-version: "3.14"
+
+      - name: Installing dependencies
+        working-directory: libraries/model_api
+        run: just venv
+
+      - name: Build sdist
+        working-directory: libraries/model_api
+        run: just build-sdist
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: artifact-model_api-sdist
+          path: libraries/model_api/dist/*.tar.gz
+
+      - name: Build wheel
+        working-directory: libraries/model_api
+        run: just build-wheel
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: artifact-model_api-wheel
+          path: libraries/model_api/dist/*.whl
+
+  publish_package:
+    name: Publish package
+    needs: [build]
+    environment: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # required by svenstaro/upload-release-action
+      id-token: write # required by trusted publisher
+    steps:
+      - *harden-runner
+
+      - name: Download artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          pattern: artifact-*
+          merge-multiple: true
+
+      # to determine where to publish the package distribution to PyPI or TestPyPI
+      - name: Check tag
+        id: check-tag
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          if [[ "${GITHUB_REF}" =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+(rc[0-9]+)?$ ]]; then
+            echo "match=${GITHUB_REF}" >> $GITHUB_OUTPUT
+          else
+            echo "match=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload package distributions to github
+        if: ${{ steps.check-tag.outputs.match != '' }}
+        uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+
+      - name: Publish package distributions to PyPI
+        if: ${{ steps.check-tag.outputs.match != '' }}
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+
+      - name: Publish package distributions to TestPyPI
+        if: ${{ steps.check-tag.outputs.match == '' }}
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
