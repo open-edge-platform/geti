@@ -175,7 +175,8 @@ class TileDataset(VisionDataset):
         # travel unchanged. The device pipeline is built from the same transforms as the worker one.
         self.device_preprocess: CPUAugmentationPipeline | None = (
             self.transforms
-            if isinstance(self.transforms, CPUAugmentationPipeline) and self.transforms.is_intensity_resize_only()
+            if isinstance(self.transforms, CPUAugmentationPipeline)
+            and self.transforms.is_intensity_resize_only(ignore_target_resize=True)
             else None
         )
 

@@ -163,3 +163,25 @@ def test_merged_masks_are_rle_for_large_images_and_equal_the_dense_result(monkey
         m[300:350, 450:520].all()
         for m in dense.masks  # pyrefly: ignore[not-iterable]
     )  # second tile's instance sits at its (400, 200) offset  # pyrefly: ignore[not-iterable]
+
+
+@pytest.mark.parametrize(("resize_targets", "keep_aspect_ratio"), [(True, False), (False, False), (True, True)])
+def test_stretch_resize_rasterizes_masks_at_target_size(coco_root, resize_targets, keep_aspect_ratio):
+    from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
+    from getitune.data.augmentation.transforms import Resize
+
+    resize = Resize(size=(128, 192), resize_targets=resize_targets, keep_aspect_ratio=keep_aspect_ratio)
+    dataset = InstanceSegDataset(dm_subset=import_dataset(coco_root), transforms=CPUAugmentationPipeline([resize]))
+
+    expected_at_target = resize_targets and not keep_aspect_ratio
+    assert dataset.rasterize_polygons is expected_at_target
+    sample = dataset._read_dm_item(0)
+    mask_size = tuple(sample.masks.shape[-2:])  # pyrefly: ignore[missing-attribute]
+    assert mask_size == ((128, 192) if expected_at_target else (HEIGHT, WIDTH))
+
+    out = dataset[0]
+    if resize_targets:  # targets follow the image, so the metric sees masks in the image's space
+        assert tuple(out.masks.shape[-2:]) == tuple(out.image.shape[-2:])  # pyrefly: ignore[missing-attribute]
+    else:  # ground truth stays at the original size (consumers reproject it)
+        assert tuple(out.masks.shape[-2:]) == (HEIGHT, WIDTH)  # pyrefly: ignore[missing-attribute]
+    assert len(out.masks) == 2  # pyrefly: ignore[missing-attribute]

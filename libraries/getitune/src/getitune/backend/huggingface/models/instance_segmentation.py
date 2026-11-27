@@ -247,17 +247,15 @@ class HFInstSegModel(HFModel):
             if img_info is None:
                 msg = "Instance segmentation batches need per-sample img_info to compute metrics."
                 raise ValueError(msg)
+            if tuple(masks.shape[-2:]) == input_size and tuple(img_info.ori_shape) != input_size:
+                # Targets were already resized with the image (``resize_targets: true``), which keeps full-resolution
+                # ground-truth masks of very large images out of the loader and off the GPU.
+                target_boxes, target_masks = boxes.as_subclass(torch.Tensor), masks.as_subclass(torch.Tensor).bool()
+            else:
+                target_boxes = reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info)
+                target_masks = reproject_masks_to_input_space(masks.as_subclass(torch.Tensor), img_info, input_size)
             target.append(
-                {
-                    "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
-                    "masks": [
-                        encode_rle(mask)
-                        for mask in reproject_masks_to_input_space(
-                            masks.as_subclass(torch.Tensor), img_info, input_size
-                        )
-                    ],
-                    "labels": labels,
-                }
+                {"boxes": target_boxes, "masks": [encode_rle(mask) for mask in target_masks], "labels": labels}
             )
         return {"preds": preds, "target": target}
 

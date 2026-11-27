@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING
 from getidata.fields import PolygonField
 
 from getitune import LabelInfo
+from getitune.data.augmentation.pipeline import CPUAugmentationPipeline, _IntensityAdapter
+from getitune.data.augmentation.transforms import Resize
 from getitune.data.dataset.base import Transforms, VisionDataset
 from getitune.data.entity.sample import InstanceSegmentationPolygonSample, InstanceSegmentationSample
 from getitune.data.entity.utils import with_image_dtype
@@ -49,6 +51,7 @@ class InstanceSegDataset(VisionDataset):
         self._source_dm_subset: Dataset | None = dm_subset
         self._storage_dtype = storage_dtype
         self.rasterize_polygons = False
+        self._mask_size: tuple[int, int] | None = None
         dm_subset = dm_subset.convert_to_schema(sample_type)
         super().__init__(
             dm_subset=dm_subset,
@@ -63,16 +66,36 @@ class InstanceSegDataset(VisionDataset):
             label_ids=[str(i) for i in range(len(labels))],
         )
         self._task_type = task_type
+        # Plain-resize pipelines shrink the masks right away: rasterize them at that size, not at full image size.
+        if (mask_size := self._resize_target_size()) is not None:
+            self.use_polygons(mask_size=mask_size)
 
-    def use_polygons(self) -> bool:
+    def _resize_target_size(self) -> tuple[int, int] | None:
+        """Size the first spatial transform resizes masks to, when that transform is a plain stretch ``Resize``."""
+        if not isinstance(self.transforms, CPUAugmentationPipeline):
+            return None
+        for aug in self.transforms.augmentations:
+            if isinstance(aug, _IntensityAdapter):
+                continue
+            if isinstance(aug, Resize) and not aug.keep_aspect_ratio and aug.resize_targets:
+                return (int(aug.size[0]), int(aug.size[1]))
+            return None
+        return None
+
+    def use_polygons(self, mask_size: tuple[int, int] | None = None) -> bool:
         """Read samples from polygons and rasterize masks per sample, instead of from stored full-size masks.
 
         Tiling needs this: a tile's masks must come from the tile's own clipped polygons. Rasterizing each
         instance at full image size first costs gigabytes for a 20 MP image with a few hundred instances.
 
+        Args:
+            mask_size: Rasterize masks at this size instead of the image size (see ``_resize_target_size``). Tiling
+                leaves it unset: tiles are already small.
+
         Returns:
             bool: True when the dataset now reads polygons; False (nothing changed) when the source has none.
         """
+        self._mask_size = mask_size
         source = self._source_dm_subset
         if source is None:
             return self.rasterize_polygons
@@ -92,7 +115,9 @@ class InstanceSegDataset(VisionDataset):
     def _read_dm_item(self, index: int) -> InstanceSegmentationSample:
         item = super()._read_dm_item(index)
         return (
-            item.to_instance_segmentation_sample()  # pyrefly: ignore[bad-return, missing-attribute]
+            item.to_instance_segmentation_sample(
+                mask_size=self._mask_size
+            )  # pyrefly: ignore[bad-return, missing-attribute]
             if self.rasterize_polygons
             else item  # pyrefly: ignore[bad-return, missing-attribute]
         )  # pyrefly: ignore[bad-return, missing-attribute]

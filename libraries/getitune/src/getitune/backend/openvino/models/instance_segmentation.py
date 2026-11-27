@@ -138,6 +138,11 @@ class OVInstanceSegmentationModel(OVModel):
             img_info = imgs_info[i]
             img_h, img_w = img_info.img_shape
             ori_h, ori_w = img_info.ori_shape
+            # Ground truth already resized to the model input (``resize_targets: true``): predictions stay in that space
+            # too, so very large images never get dense full-resolution prediction masks.
+            gt_masks = inputs.masks[i] if inputs.masks is not None else None
+            if gt_masks is not None and tuple(gt_masks.shape[-2:]) == (img_h, img_w) != (ori_h, ori_w):
+                ori_h, ori_w = img_h, img_w
 
             bboxes_data = torch.as_tensor(output.bboxes, dtype=torch.float32).clone()
 

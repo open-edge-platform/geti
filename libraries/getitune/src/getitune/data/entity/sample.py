@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
-import numpy as np  # noqa: TC002 - resolved at runtime when the polygon sample's schema is inferred
+import numpy as np
 import polars as pl
 import torch
 from getidata import register_sample
@@ -236,19 +236,33 @@ class InstanceSegmentationPolygonSample(BaseSample):
             )
         self.img_info = ImageInfo(img_idx=0, img_shape=shape, ori_shape=shape)
 
-    def to_instance_segmentation_sample(self, with_annotations: bool = True) -> InstanceSegmentationSample:
+    def to_instance_segmentation_sample(
+        self,
+        with_annotations: bool = True,
+        mask_size: tuple[int, int] | None = None,
+    ) -> InstanceSegmentationSample:
         """Build the regular sample, rasterizing the polygons at this sample's own size.
 
         Args:
             with_annotations: Keep boxes, labels and masks. Tiles that are only run through a model carry no
                 annotations, which also skips the rasterization.
+            mask_size: ``(height, width)`` to rasterize at instead of the image size. Only for pipelines whose first
+                spatial transform resizes the masks to a fixed size anyway: a 20 MP image with a few hundred
+                instances would otherwise be rasterized at full size first (gigabytes) just to be shrunk.
         """
         height, width = self.dm_image_info.height, self.dm_image_info.width
         bboxes, label = self.bboxes, self.label
         if with_annotations and self.polygons is not None and len(self.polygons) > 0:
-            masks = torch.from_numpy(polygon_to_bitmap(self.polygons, height, width).astype("uint8"))
+            polygons, mask_h, mask_w = self.polygons, height, width
+            if mask_size is not None and mask_size != (height, width):
+                mask_h, mask_w = mask_size
+                factor = np.array([mask_w / width, mask_h / height], dtype=np.float32)
+                polygons = np.empty(len(self.polygons), dtype=object)
+                for i, polygon in enumerate(self.polygons):
+                    polygons[i] = np.asarray(polygon, dtype=np.float32) * factor
+            masks = torch.from_numpy(polygon_to_bitmap(polygons, mask_h, mask_w).astype("uint8"))
         else:
-            masks = torch.zeros((0, height, width), dtype=torch.uint8)
+            masks = torch.zeros((0, *(mask_size or (height, width))), dtype=torch.uint8)
         if not with_annotations:
             bboxes = torch.zeros((0, 4), dtype=torch.float32)
             label = torch.zeros(0, dtype=torch.uint16)

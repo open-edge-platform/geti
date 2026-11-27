@@ -227,6 +227,27 @@ class RFDETRMixin:
             "targets": targets,
         }
 
+    def _eval_target_shapes(self, inputs: SampleBatch) -> list[tuple[int, int]]:
+        """Pick the canvas each prediction is rendered at.
+
+        Normally the original image size. When validating or testing with ground-truth masks that were already
+        resized with the image (``resize_targets: true``), predictions stay in model input space too: dense
+        original-size masks of 4K/8K images cost gigabytes per image on both sides of the metric.
+        """
+        try:
+            predicting = bool(self.trainer.predicting)  # type: ignore[attr-defined]
+        except RuntimeError:  # not attached to a Trainer (direct calls)
+            predicting = False
+        if predicting:
+            return [img_info.ori_shape for img_info in inputs.imgs_info]  # type: ignore[union-attr]
+        shapes = []
+        for i, img_info in enumerate(inputs.imgs_info):  # type: ignore[arg-type]
+            gt_masks = inputs.masks[i] if inputs.masks is not None else None
+            ori, img = tuple(img_info.ori_shape), tuple(img_info.img_shape)
+            in_input_space = gt_masks is not None and tuple(gt_masks.shape[-2:]) == img != ori
+            shapes.append(img if in_input_space else ori)
+        return shapes
+
     def _customize_outputs(  # pyrefly: ignore[bad-override]
         self,
         outputs: tuple[torch.Tensor, ...] | dict[str, Any],
@@ -264,7 +285,7 @@ class RFDETRMixin:
                     raise TypeError(msg)
             return losses
 
-        image_shapes = [img_info.ori_shape for img_info in inputs.imgs_info]  # type: ignore[union-attr]
+        image_shapes = self._eval_target_shapes(inputs)
         scores_list, boxes_list, labels_list, masks_list = self.model.postprocess(  # type: ignore[attr-defined]  # pyrefly: ignore[not-callable]
             outputs,
             image_shapes,
