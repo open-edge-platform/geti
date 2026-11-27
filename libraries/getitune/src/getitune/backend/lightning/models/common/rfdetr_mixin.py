@@ -243,7 +243,7 @@ class RFDETRMixin:
         shapes = []
         for i, img_info in enumerate(inputs.imgs_info):  # type: ignore[arg-type]
             gt_masks = inputs.masks[i] if inputs.masks is not None else None
-            ori, img = tuple(img_info.ori_shape), tuple(img_info.img_shape)
+            ori, img = tuple(img_info.ori_shape), tuple(img_info.img_shape)  # pyrefly: ignore[missing-attribute]
             in_input_space = gt_masks is not None and tuple(gt_masks.shape[-2:]) == img != ori
             shapes.append(img if in_input_space else ori)
         return shapes
