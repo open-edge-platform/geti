@@ -29,6 +29,10 @@ on:
 
 permissions: {} # No permissions by default
 
+concurrency:
+  group: ${{ inputs.dry_run && github.run_id || 'app-rc-promotion' }}
+  cancel-in-progress: false
+
 jobs:
   validate:
     name: Validate inputs and RC tag
@@ -300,8 +304,101 @@ jobs:
     permissions:
       contents: read
 
-  cleanup-rc-images:
+  tag-latest:
     needs: [validate, promote-docker]
+    if: inputs.dry_run == false
+    name: Tag release images as latest
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      packages: write # Permission to push packages to GHCR
+      id-token: write # Permission to request OIDC token for signing images
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [cpu, xpu, cuda]
+    steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Log in to GHCR
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag application image as latest for ${{ matrix.device }}
+        id: retag
+        env:
+          VERSION: ${{ needs.validate.outputs.docker_patch_tag }}
+          DEVICE: ${{ matrix.device }}
+        run: |
+          set -euo pipefail
+          SOURCE_IMAGE="ghcr.io/open-edge-platform/geti-${DEVICE}:${VERSION}"
+          TARGET_IMAGE="ghcr.io/open-edge-platform/geti-${DEVICE}:latest"
+
+          echo "Pulling ${SOURCE_IMAGE}"
+          docker pull "${SOURCE_IMAGE}"
+
+          # Skip the push if latest already points to this release.
+          if MANIFEST=$(docker manifest inspect "${TARGET_IMAGE}" 2>&1); then
+            echo "Target image ${TARGET_IMAGE} already exists in GHCR."
+            docker pull "${TARGET_IMAGE}"
+            SOURCE_ID=$(docker inspect --format='{{.Id}}' "${SOURCE_IMAGE}")
+            TARGET_ID=$(docker inspect --format='{{.Id}}' "${TARGET_IMAGE}")
+            if [[ "${SOURCE_ID}" == "${TARGET_ID}" ]]; then
+              echo "::notice::${TARGET_IMAGE} already points to the same image as ${SOURCE_IMAGE}. Skipping push (idempotent re-run)."
+              exit 0
+            fi
+            # Promoted images retain the version label from the RC build.
+            LATEST_LABEL=$(docker inspect --format='{{index .Config.Labels "org.opencontainers.image.version"}}' "${TARGET_IMAGE}")
+            if [[ ! "${LATEST_LABEL}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(rc[0-9]+)?$ ]]; then
+              echo "::error::Cannot determine the release version of ${TARGET_IMAGE} from its image label."
+              exit 1
+            fi
+            LATEST_VERSION="${BASH_REMATCH[1]}"
+            if ! printf '%s\n' "${LATEST_VERSION}" "${VERSION}" | LC_ALL=C sort -V -C; then
+              echo "::notice::${TARGET_IMAGE} already points to newer release ${LATEST_VERSION}. Skipping ${VERSION}."
+              echo 'skip_signing=true' >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+            echo "Moving ${TARGET_IMAGE} to ${SOURCE_IMAGE}"
+          elif [[ "${MANIFEST}" != "no such manifest: ${TARGET_IMAGE}" && "${MANIFEST}" != *"manifest unknown"* ]]; then
+            echo "::error::Failed to inspect ${TARGET_IMAGE}: ${MANIFEST}"
+            exit 1
+          fi
+
+          echo "Tagging ${TARGET_IMAGE}"
+          docker tag "${SOURCE_IMAGE}" "${TARGET_IMAGE}"
+
+          echo "Pushing ${TARGET_IMAGE}"
+          docker push "${TARGET_IMAGE}"
+
+      - name: Sign Docker image
+        if: steps.retag.outputs.skip_signing != 'true'
+        uses: open-edge-platform/geti-ci/actions/sign-image@d11f15c3a23b05dc4abecbef70ff05a6b74b0cab # sign-image/v0.1.3
+        with:
+          image-uri: ghcr.io/open-edge-platform/geti-${{ matrix.device }}:latest
+
+      - name: Print summary
+        if: steps.retag.outputs.skip_signing != 'true'
+        env:
+          DEVICE: ${{ matrix.device }}
+        run: |
+          {
+            echo "## Tagging Complete"
+            echo ""
+            echo "### Docker Images"
+            echo "- ghcr.io/open-edge-platform/geti-${DEVICE}:latest"
+            echo ""
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+  cleanup-rc-images:
+    needs: [validate, tag-latest]
     if: inputs.dry_run == false && inputs.delete_rc_images
     name: Delete promoted version's RC images from GHCR
     uses: $/.github/workflows/remove-rc-app-images.yml
