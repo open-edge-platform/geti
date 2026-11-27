@@ -69,7 +69,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=libraries/getitune,target=/libraries/getitune,rw \
     --mount=type=bind,source=libraries/getidata,target=/libraries/getidata,rw \
-    --mount=type=bind,source=model_api/getidata,target=/libraries/model_api,rw \
+    --mount=type=bind,source=libraries/model_api,target=/libraries/model_api,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cpu
 
 # Optionally uninstall ultralytics and its AGPL-licensed dependencies.
