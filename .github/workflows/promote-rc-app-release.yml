@@ -30,7 +30,7 @@ on:
 permissions: {} # No permissions by default
 
 concurrency:
-  group: app-rc-promotion
+  group: ${{ inputs.dry_run && github.run_id || 'app-rc-promotion' }}
   cancel-in-progress: false
 
 jobs:
@@ -332,6 +332,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tag application image as latest for ${{ matrix.device }}
+        id: retag
         env:
           VERSION: ${{ needs.validate.outputs.docker_patch_tag }}
           DEVICE: ${{ matrix.device }}
@@ -344,7 +345,7 @@ jobs:
           docker pull "${SOURCE_IMAGE}"
 
           # Skip the push if latest already points to this release.
-          if docker manifest inspect "${TARGET_IMAGE}" >/dev/null 2>&1; then
+          if MANIFEST=$(docker manifest inspect "${TARGET_IMAGE}" 2>&1); then
             echo "Target image ${TARGET_IMAGE} already exists in GHCR."
             docker pull "${TARGET_IMAGE}"
             SOURCE_ID=$(docker inspect --format='{{.Id}}' "${SOURCE_IMAGE}")
@@ -353,7 +354,22 @@ jobs:
               echo "::notice::${TARGET_IMAGE} already points to the same image as ${SOURCE_IMAGE}. Skipping push (idempotent re-run)."
               exit 0
             fi
+            # Promoted images retain the version label from the RC build.
+            LATEST_LABEL=$(docker inspect --format='{{index .Config.Labels "org.opencontainers.image.version"}}' "${TARGET_IMAGE}")
+            if [[ ! "${LATEST_LABEL}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(rc[0-9]+)?$ ]]; then
+              echo "::error::Cannot determine the release version of ${TARGET_IMAGE} from its image label."
+              exit 1
+            fi
+            LATEST_VERSION="${BASH_REMATCH[1]}"
+            if ! printf '%s\n' "${LATEST_VERSION}" "${VERSION}" | LC_ALL=C sort -V -C; then
+              echo "::notice::${TARGET_IMAGE} already points to newer release ${LATEST_VERSION}. Skipping ${VERSION}."
+              echo 'skip_signing=true' >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
             echo "Moving ${TARGET_IMAGE} to ${SOURCE_IMAGE}"
+          elif [[ "${MANIFEST}" != "no such manifest: ${TARGET_IMAGE}" && "${MANIFEST}" != *"manifest unknown"* ]]; then
+            echo "::error::Failed to inspect ${TARGET_IMAGE}: ${MANIFEST}"
+            exit 1
           fi
 
           echo "Tagging ${TARGET_IMAGE}"
@@ -363,11 +379,13 @@ jobs:
           docker push "${TARGET_IMAGE}"
 
       - name: Sign Docker image
+        if: steps.retag.outputs.skip_signing != 'true'
         uses: open-edge-platform/geti-ci/actions/sign-image@d11f15c3a23b05dc4abecbef70ff05a6b74b0cab # sign-image/v0.1.3
         with:
           image-uri: ghcr.io/open-edge-platform/geti-${{ matrix.device }}:latest
 
       - name: Print summary
+        if: steps.retag.outputs.skip_signing != 'true'
         env:
           DEVICE: ${{ matrix.device }}
         run: |
