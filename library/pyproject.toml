@@ -40,7 +40,7 @@ dependencies = [
     "pytorchcv==0.0.74",
     "timm==1.0.29",
     "openvino~=2026.4.0",
-    "openvino-model-api==0.4.7",
+    "openvino-model-api==0.4.8",
     "onnx==1.22.0",
     "onnxruntime==1.26.0",
     "onnxslim~=0.1.71",
@@ -187,7 +187,6 @@ torchvision = [
     { index = "torch-cuda", extra = "cuda"},
 ]
 ultralytics = { git = "https://github.com/ultralytics/ultralytics.git", rev = "3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" }
-openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "master", subdirectory = "model_api" }
 
 [[tool.uv.index]]
 name = "torch-cpu"
